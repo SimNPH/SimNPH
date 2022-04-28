@@ -1,14 +1,21 @@
 Package: SimNPH
 Type: Package
-Title: What the Package Does (Title Case)
-Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
+Title: Helper Functions to Simulate non Proprotional Hazards
+Version: 0.0.1
+Author: Tobias Fellinger
+Maintainer: Tobias Fellinger <tobias.fellinger@ages.at>
+Description: This package provides helper functions to simulate and analyse time  to event datasets with non-proportional hazards. It includes functions to generate datasets in common scenarios with non proportional hazards and functions that implement common tests and models for analysis. All functions can readily be used in the framework of the SimDesign package.
+License: proprietary
 Encoding: UTF-8
 LazyData: true
+Depends:
+    SimDesign, 
+    R (>= 4.1.0)
 Suggests: 
+    knitr,
+    rmarkdown,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
+VignetteBuilder: knitr
+RoxygenNote: 7.1.2
+Roxygen: list(markdown = TRUE)

@@ -1,0 +1,109 @@
+---
+title: "simple_example"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{simple_example}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(SimDesign)
+library(SimNPH)
+```
+
+This is a simple example on how to run a simulation of analyses of datasets with
+a delayed treatment effect using the max-combo and the log-rank test. The 
+
+## Setting up the Scenarios
+
+Setting up the simulations to be run. `createDesign` creates a `tibble` with
+every combination of the parameters. Each line corresponds to one simulation to
+be run.
+
+The function `generate_delayed_effect` needs the columns: `n_trt`: number of
+patients in the treatment arm, `n_ctrl`: number of patients in the control arm,
+`delay`: delay until onset of treatment effect, `hazard_ctrl`: hazard under
+control and before onset of treatment effect, `hazart_trt`: hazard under
+treatement, `t_max`: maximum time of observation.
+
+An example design `tibble` with all parameters filled out can be created with
+`desing_skeleton_delayed_effect`. Use the function to output a skeleton you can
+fill in or to create a design `tibble` with some default parameters.
+
+We will run simulations for 50 patients in each arm, a constant hazard of 0.2
+under control and a hazard of 0.02 under treatment and a maximum time of 1000.
+The cutoff time will vary from 0 to 10 in steps of 2.
+
+```{r}
+Design <- desing_skeleton_delayed_effect()
+
+knitr::kable(Design)
+```
+
+## Defining the summarise function
+
+We will use a very simple summarise function that just outputs the power
+function for the logrank and the maxcombo test. The functions `analyse_logrank`
+and `analyse_maxcombo` (used in the call to `runSimulation` later on) output a
+`data.frame` containing the column `p` with the `p` value of the test. For each
+szenario we just average the number of times the test discards the null to get
+the power.
+
+The columns `results$maxcombo.p` and `results$logrank.p` are named after the
+name of the function in the named list given to the `analyse` argument of
+`runSimulation` and the name of the column returned by `analyse_logrank` and
+`analyse_maxcombo`.
+
+```{r}
+alpha <- 0.05
+
+Summarise <- function(condition, results, fixed_objects = NULL) {
+    ret <- c(
+      power.maxcombo = mean(results$maxcombo.p < alpha),
+      power.logrank  = mean(results$logrank.p  < alpha)
+    )
+    ret
+}
+```
+
+## Putting it all together
+
+Now we put it all together: in Design we give the scenarios defined before. We
+want to run 100 replications for each scenario. We want to generate data using
+the `generate_delayed_effect` function using the parameters from `Design` and
+analyse each replication of each scenario with the two functions
+`analyse_logrank` and `analyse_maxcombo`. The output should be summarised with
+the `Summarise` function defined before and the simulations should be run in
+parallel.
+
+Finally we select the interesting columns from the output. Since all other
+parameters are the same for each scenario we just select delay and the powers of
+the two tests.
+
+```{r}
+res <- runSimulation(
+  Design,
+  replications = 100,
+  generate = generate_delayed_effect,
+  analyse = list(
+    logrank  = analyse_logrank,
+    maxcombo = analyse_maxcombo
+  ),
+  summarise = Summarise,
+  parallel = TRUE
+)
+
+res %>% 
+  select(delay, power.maxcombo, power.logrank) %>% 
+  knitr::kable()
+```
+
+
