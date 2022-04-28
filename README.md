@@ -20,6 +20,14 @@ manually. Unit tests using
 [testthat](https://cran.r-project.org/package=testthat) are in `tests/testthat`
 with filenames corresponding to the filenames of the functions being tested. 
 
+### Project Setup
+
+1. clone this repository
+2. get all the dependencies for building the package, vignettes, etc. 
+   using `renv::restore()` (this can take some time)
+4. do everything else (run tests, build documentation, build the package,
+   build vignettes, ...) using `devtools` or RStudio
+
 ### Coding Style
 
 Please roughly keep to the [tidyverse styleguide](https://style.tidyverse.org/)
