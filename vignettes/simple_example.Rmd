@@ -1,5 +1,6 @@
 ---
-title: "simple_example"
+title: "Logrank Test vs. MaxCombo Test to Analyse Datasets with delayed treatment effects"
+subtitle: "A simple example"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{simple_example}
@@ -101,8 +102,8 @@ res <- runSimulation(
   parallel = TRUE
 )
 
-res %>% 
-  select(delay, power.maxcombo, power.logrank) %>% 
+res |> 
+  subset(select=c("delay", "power.maxcombo", "power.logrank")) |>
   knitr::kable()
 ```
 
