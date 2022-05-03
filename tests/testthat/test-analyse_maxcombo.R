@@ -1,4 +1,4 @@
-test_that("analyse_maxcombo outputs plausible data.frame", {
+test_that("analyse_maxcombo outputs plausible data.frame for delayed effect", {
   capture_output(
     condition <- desing_skeleton_delayed_effect() |>
       head(1)
