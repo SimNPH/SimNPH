@@ -23,7 +23,7 @@ with filenames corresponding to the filenames of the functions being tested.
 ### Project Setup
 
 1. clone this repository
-2. install needed packages (I will add a list and more detailed description)
+2. install needed packages by running `install_dependencies.R`
 3. do everything else (run tests, build documentation, build the package,
    build vignettes, ...) using `devtools` or RStudio
 
