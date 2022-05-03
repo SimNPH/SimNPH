@@ -23,9 +23,8 @@ with filenames corresponding to the filenames of the functions being tested.
 ### Project Setup
 
 1. clone this repository
-2. get all the dependencies for building the package, vignettes, etc. 
-   using `renv::restore()` (this can take some time)
-4. do everything else (run tests, build documentation, build the package,
+2. install needed packages (I will add a list and more detailed description)
+3. do everything else (run tests, build documentation, build the package,
    build vignettes, ...) using `devtools` or RStudio
 
 ### Coding Style
