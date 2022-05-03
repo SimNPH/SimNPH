@@ -15,7 +15,8 @@ Suggests:
     knitr,
     rmarkdown,
     testthat (>= 3.0.0),
-    nph
+    nph,
+    covr
 Config/testthat/edition: 3
 VignetteBuilder: knitr
 RoxygenNote: 7.1.2
