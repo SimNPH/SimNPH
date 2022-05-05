@@ -2,5 +2,8 @@
 
 export(analyse_logrank)
 export(analyse_maxcombo)
+export(analyse_rmst)
+export(desing_skeleton_cure_mixture)
 export(desing_skeleton_delayed_effect)
+export(generate_cure_mixture)
 export(generate_delayed_effect)
