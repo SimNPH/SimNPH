@@ -4,7 +4,7 @@
 \alias{random_censoring_exp}
 \title{Apply Random Exponentially Distributed Censoring}
 \usage{
-random_censoring_exp(rate)
+random_censoring_exp(dat, rate)
 }
 \arguments{
 \item{rate}{time of end of enrollment}

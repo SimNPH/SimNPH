@@ -8,9 +8,9 @@
 \usage{
 recruitment_uniform(dat, recruitment_until, recruitment_from = 0)
 
-admin_censoring_time(dat, followup)
+admin_censoring_time(dat, followup, keep_non_recruited = FALSE)
 
-admin_censoring_events(dat, events)
+admin_censoring_events(dat, events, keep_non_recruited = FALSE)
 }
 \arguments{
 \item{dat}{a simulated dataset}
@@ -21,7 +21,7 @@ admin_censoring_events(dat, events)
 
 \item{followup}{followup time}
 
-\item{events}{}
+\item{events}{number of events after which the dataset is analyzed}
 }
 \value{
 Returns the dataset with added recruitment times.
@@ -63,3 +63,33 @@ Times and event indicaotrs for patients recruited after followup are set to
 \item \code{admin_censoring_events}: apply administrative censoring after fixed number of events
 }}
 
+\examples{
+dat <- data.frame(t=c(0, 1, 2), trt=c(FALSE, FALSE, TRUE))
+recruitment_uniform(dat, 7, 0)
+dat <- data.frame(
+  t = 1:10,
+  rec_time = rep(1:5, each=2),
+  trt = rep(c(TRUE, FALSE), times=5),
+  evt = rep(TRUE, times=10)
+)
+dat
+
+admin_censoring_time(dat, 4)
+admin_censoring_time(dat, 4, keep_non_recruited = TRUE)
+
+dat_censored <- admin_censoring_time(dat, 5)
+attr(dat_censored, "followup")
+dat <- data.frame(
+  t = 1:10,
+  rec_time = rep(2*(1:5), each=2),
+  trt = rep(c(TRUE, FALSE), times=5),
+  evt = rep(TRUE, times=10)
+)
+dat
+
+admin_censoring_events(dat, 4)
+admin_censoring_events(dat, 4, keep_non_recruited = TRUE)
+
+dat_censored <- admin_censoring_events(dat, 4)
+attr(dat_censored, "followup")
+}

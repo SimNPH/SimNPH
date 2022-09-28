@@ -29,12 +29,10 @@
 #'   ylab = "censored times"
 #' )
 #' abline(0,1)
-random_censoring_exp <- function(rate){
-  function(dat){
-    censoring_time <- rexp(nrow(dat), rate = rate)
-    dat$evt[dat$t > censoring_time] <- FALSE
-    dat$t <- pmin(dat$t, censoring_time)
-    dat
-  }
+random_censoring_exp <- function(dat, rate){
+  censoring_time <- rexp(nrow(dat), rate = rate)
+  dat$evt[dat$t > censoring_time] <- FALSE
+  dat$t <- pmin(dat$t, censoring_time)
+  dat
 }
 

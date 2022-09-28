@@ -18,7 +18,17 @@ knitr::opts_chunk$set(
 ```{r setup}
 library(SimDesign)
 library(SimNPH)
+library(parallel)
+
+cl <- makeCluster(8)
+clusterEvalQ(cl, {
+  library(SimDesign)
+  library(SimNPH)
+  library(parallel)
+})
 ```
+
+# A simple scenario with fixed followup
 
 This is a simple example on how to run a simulation of analyses of datasets with
 a delayed treatment effect using the max-combo and the log-rank test. The 
@@ -33,30 +43,48 @@ The function `generate_delayed_effect` needs the columns: `n_trt`: number of
 patients in the treatment arm, `n_ctrl`: number of patients in the control arm,
 `delay`: delay until onset of treatment effect, `hazard_ctrl`: hazard under
 control and before onset of treatment effect, `hazart_trt`: hazard under
-treatement, `t_max`: maximum time of observation.
+treatment, `t_max`: maximum time of observation.
 
 An example design `tibble` with all parameters filled out can be created with
-`desing_skeleton_delayed_effect`. Use the function to output a skeleton you can
-fill in or to create a design `tibble` with some default parameters.
+`desing_skeleton_delayed_effect`. Use the function to output an example function call that you can copy and modify as needed, or assign the result to a variable to obtain a design `tibble` with some default parameters.
 
-We will run simulations for 50 patients in each arm, a constant hazard of 0.2
-under control and a hazard of 0.02 under treatment and a maximum time of 1000.
-The cutoff time will vary from 0 to 10 in steps of 2.
+By default this will create a simulation design skeleton for simulations of 50 patients in each arm, a constant hazard of 0.2
+under control and a hazard of 0.02 under treatment after the effect onset varying from 0 to 10. 
+
+<!-- TODO remove t_max from vignette and skeleton call and use some a parameter with a default value; details can be given in the function reference (like optimizer controls) -->
+<!-- TODO set parameters to be somehow relevant (e.g. not 5mts delay and 200mts follow-up) -->
 
 ```{r}
+N_sim <- 10
+
 Design <- desing_skeleton_delayed_effect()
+
+Design$followup <- 200
+Design$random_withdrawal <- 0.01
+Design$recruitment <- 50
 
 knitr::kable(Design)
 ```
 
-## Defining the summarise function
+## Defining the 'generate' funcion
 
-We will use a very simple summarise function that just outputs the power
-function for the logrank and the maxcombo test. The functions `analyse_logrank`
-and `analyse_maxcombo` (used in the call to `runSimulation` later on) output a
-`data.frame` containing the column `p` with the `p` value of the test. For each
-szenario we just average the number of times the test discards the null to get
-the power.
+Define the data generating 'generate' function, that beside simulating the time to event also applies the different censoring processes.
+
+```{r}
+## Ev auch fuer generator - default generator function
+my_generator <- function(condition, fixed_objects=NULL){
+  generate_delayed_effect(condition, fixed_objects) |>
+    recruitment_uniform(condition$recruitment) |>
+    random_censoring_exp(condition$random_withdrawal) |>
+    admin_censoring_time(condition$followup)
+} 
+
+```
+
+## Defining the 'summarise' function
+
+
+Next, we need to specify a summary function that computes the desired operating characteristics for each simulation scenario, and each analysis method. In the example below, we specify a summary function that computes the power (as we consider scenarios under the alternative in the example) of the log-rank test and the max-combo test across simulated scenarios. For each scenario we just average the number of times the computed p-value is below the significance level obtain the power.
 
 The columns `results$maxcombo.p` and `results$logrank.p` are named after the
 name of the function in the named list given to the `analyse` argument of
@@ -66,13 +94,14 @@ name of the function in the named list given to the `analyse` argument of
 ```{r}
 alpha <- 0.05
 
-Summarise <- function(condition, results, fixed_objects = NULL) {
-    ret <- c(
-      power.maxcombo = mean(results$maxcombo.p < alpha),
-      power.logrank  = mean(results$logrank.p  < alpha)
-    )
-    ret
-}
+Summarise <- create_summarise_function(list(
+  maxcombo = function(condition, results, fixed_objects=NULL){
+    data.frame("rejection.maxcombo"=mean(results$p < alpha))
+  },
+  logrank  = function(condition, results, fixed_objects=NULL){
+    data.frame("rejection.logrank"=mean(results$p < alpha))
+  }
+))
 ```
 
 ## Putting it all together
@@ -92,19 +121,115 @@ the two tests.
 ```{r}
 res <- runSimulation(
   Design,
-  replications = 100,
-  generate = generate_delayed_effect,
+  replications = N_sim,
+  generate = my_generator,
   analyse = list(
     logrank  = analyse_logrank,
     maxcombo = analyse_maxcombo
   ),
   summarise = Summarise,
-  parallel = TRUE
+  cl = cl,
+  save=FALSE
 )
 
 res |> 
-  subset(select=c("delay", "power.maxcombo", "power.logrank")) |>
+  subset(select=c("delay", "rejection.maxcombo", "rejection.logrank")) |>
   knitr::kable()
 ```
 
+# A scenario with an interim analysis
 
+In this scenario we extend the scenario from above to include a fixed followup as well as an interim analysis after a fixed number of events. For this we will define additional analyse functions.
+
+First we extend the Design to include a column with the number of events after which an interim analysis should be done.
+
+```{r}
+Design$interim_events <- 25
+
+knitr::kable(Design)
+```
+
+## More complicated 'analyse' functions
+
+The functions `analyse_logrank`
+and `analyse_maxcombo` (used in the call to `runSimulation` later on) output a
+`data.frame` containing the column `p` with the `p` value of the test.
+
+<!-- TODO -->
+
+Sometimes it is useful to pass full follow-up data to the 'analyse' functions - e.g. if administrative censoring can happen at two timepoints during the trial in case of an interim analysis. In that case we can define custom 'analyse' functions that take parameters used by the corresponding SimDesign functions.
+
+Could also be useful for intercurrent events where analyses according to composite or treatment policy estimands are considered, where for the former we set the event time to the time of the intercurrent event (if earlier than the event of interest), in the other we would ignore the intercurrent event and use the time of the event of interest regardless.
+
+```{r}
+## O'Brien-Fleming Bounds for GSD with interim analysis at information time 1/2
+bounds <- ldbounds::ldBounds(c(0.5,1))$nom.alpha
+analyse_logrank_sequential <- analyse_group_sequential(
+    followup = c(condition$interim_events, condition$followup),
+    followup_type = c("event", "time"),
+    alpha = c(0.025, 0.05),
+    analyse_functions = analyse_logrank
+  )
+
+analyse_maxcombo_sequential <- analyse_group_sequential(
+    followup = c(condition$interim_events, condition$followup),
+    followup_type = c("event", "time"),
+    alpha = c(0.025, 0.05),
+    analyse_functions = analyse_maxcombo
+  )
+```
+
+```{r}
+## Schoen waer eine standard funktion der ich nur die (Namen der) Analyse function uebergeb, und dann fuer alle die gleiche Summary bekomme (ev. default)
+
+## zB. create_summarise_function(Analyse,summarize_test)
+## c(create_summarize(Analyse_tests,summarize_test),create_summarize(Analyse_est,summarize_est))
+## summarize_test=function(...) data.frame(...)
+## create_summarize(Analyse_exotic,function(...) customsummarycode)
+Summarise <- create_summarise_function(list(
+  maxcombo_seq = function(condition, results, fixed_objects=NULL){
+    data.frame(
+      "rejection.maxcombo_seq" = mean(is.finite(results$rejected_at_stage)),
+          "n_pat.maxcombo_seq" = mean(results$N_pat),
+          "n_evt.maxcombo_seq" = mean(results$N_evt),
+       "followup.maxcombo_seq" = mean(results$followup)
+      )
+  },
+  logrank_seq = function(condition, results, fixed_objects=NULL){
+    data.frame(
+      "rejection.logrank_seq" = mean(is.finite(results$rejected_at_stage)),
+          "n_pat.logrank_seq" = mean(results$N_pat),
+          "n_evt.logrank_seq" = mean(results$N_evt),
+       "followup.logrank_seq" = mean(results$followup)
+      )
+  }
+))
+
+Analyse <-  list(
+    logrank_seq  = analyse_logrank_sequential,
+    maxcombo_seq = analyse_maxcombo_sequential
+  )
+```
+
+
+```{r}
+res <- runSimulation(
+  Design,
+  replications = N_sim,
+  generate = my_generator,
+  analyse = Analyse,
+  summarise = Summarise,
+  cl = cl,
+  save=FALSE
+)
+
+res |>
+  subset(select=c(
+    "delay", 
+    "rejection.maxcombo_seq", "rejection.logrank_seq",
+    "n_pat.maxcombo_seq", "n_pat.logrank_seq",
+    "n_evt.maxcombo_seq", "n_evt.logrank_seq",
+    "followup.maxcombo_seq", "followup.logrank_seq"
+    )) |>
+  knitr::kable()
+```

@@ -13,7 +13,9 @@
 #' dat <- generate_delayed_effect(condition)
 #' analyse_logrank(condition, dat)
 analyse_logrank <- function(condition, dat, fixed_objects = NULL){
-  data.frame(
-    p=nph::logrank.test(dat$t, dat$evt, dat$trt)$test$p
+  list(
+    p=nph::logrank.test(dat$t, dat$evt, dat$trt)$test$p,
+    N_pat=nrow(dat),
+    N_evt=sum(dat$evt)
   )
 }

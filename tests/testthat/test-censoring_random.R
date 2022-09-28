@@ -12,7 +12,7 @@ test_that("random censoring works", {
   test_data$additional_column <- NA
 
   rate <- 0.01
-  test_res <- random_censoring_exp(rate)(test_data)
+  test_res <- random_censoring_exp(test_data, rate)
 
   expect(all(test_res$t <= test_data$t), "not all censored times less equal uncensored times")
   expect_named(test_res, c("t", "evt", "additional_column"))

@@ -19,13 +19,13 @@ test_that("desing_skeleton_delayed_effect outputs correct tibble", {
   expect_true(
     all(hasName(
       test_design,
-      c("n_trt", "n_ctrl", "delay", "hazard_ctrl", "hazard_trt", "t_max")
+      c("n_trt", "n_ctrl", "delay", "hazard_ctrl", "hazard_trt")
     )),
     label = "output of desing_skeleton_delayed_effect has the right columns"
   )
 
   expect_true(
-    test_design[, c("n_trt", "n_ctrl", "delay", "hazard_ctrl", "hazard_trt", "t_max")] |>
+    test_design[, c("n_trt", "n_ctrl", "delay", "hazard_ctrl", "hazard_trt")] |>
       sapply(is.numeric) |>
       all(),
     label = "columns of output of desing_skeleton_delayed_effect have the right datatype"
@@ -51,12 +51,6 @@ test_that("test that generate_delayed_effect outputs correct tibble", {
       c("t", "trt", "evt")
     )),
     label = "simulated dataset has the right columns"
-  )
-
-  expect_lte(
-    max(one_simulation$t, na.rm = TRUE),
-    scenario$t_max,
-    label = "no times after t_max"
   )
 
   expect_equal(
@@ -100,12 +94,6 @@ test_that("test that generate_delayed_effect outputs correct tibble with delay=0
       c("t", "trt", "evt")
     )),
     label = "simulated dataset has the right columns"
-  )
-
-  expect_lte(
-    max(one_simulation$t, na.rm = TRUE),
-    scenario$t_max,
-    label = "no times after t_max"
   )
 
   expect_equal(

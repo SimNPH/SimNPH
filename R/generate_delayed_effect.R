@@ -12,7 +12,11 @@
 #'   * hazard_ctrl hazard in the control arm = hazard before onset of treatment
 #'     effect
 #'   * hazard_trt hazard in the treatment arm afert onset of treatment effect
-#'   * t_max the maximal (cutoff) time
+#'
+#' If fixed_objects is given and contains an element `t_max`, then this is used
+#' as the cutoff for the simulation used internally. If t_max is not given in
+#' this way the 1-(1/10000) quantile of the survival distribution in the control
+#' or treatment arm is used (which ever is larger).
 #'
 #' @return
 #' For generate_delayed_effect: A dataset with the columns t (time) and trt
@@ -29,6 +33,17 @@
 #' head(one_simulation)
 #' tail(one_simulation)
 generate_delayed_effect <- function(condition, fixed_objects=NULL){
+
+  # if t_max is not given in fixed_objects
+  if(is.null(fixed_objects) || (!hasName(fixed_objects, t_max))){
+    # set t_max to 1-1/10000 quantile of control or treatment survival function
+    # whichever is later
+    t_max <- max(
+      log(10000) / condition$hazard_ctrl,
+      log(10000) / condition$hazard_trt
+    )
+  }
+
   # simulate treatment group
   if (condition$delay < 0){
   # if delay is smaller than 0 stop with error
@@ -40,7 +55,7 @@ generate_delayed_effect <- function(condition, fixed_objects=NULL){
       t = nph::rSurv_fun(
         condition$n_trt,
         nph::pchaz(
-          c(0, condition$t_max),
+          c(0, t_max),
           c(condition$hazard_trt)
         )
       ),
@@ -54,7 +69,7 @@ generate_delayed_effect <- function(condition, fixed_objects=NULL){
       t = nph::rSurv_fun(
         condition$n_trt,
         nph::pchaz(
-          c(0, condition$delay, condition$t_max),
+          c(0, condition$delay, t_max),
           c(condition$hazard_ctrl, condition$hazard_trt)
         )
       ),
@@ -68,7 +83,7 @@ generate_delayed_effect <- function(condition, fixed_objects=NULL){
     t = nph::rSurv_fun(
       condition$n_ctrl,
       nph::pchaz(
-        c(0, condition$t_max),
+        c(0, t_max),
         c(condition$hazard_ctrl)
       )
     ),
@@ -100,8 +115,7 @@ desing_skeleton_delayed_effect <- function(){
   n_ctrl=50,              # 100 patients in the control arm
   delay=seq(0, 10, by=2), # delay of 0, 1, ..., 10 days
   hazard_ctrl=0.2,        # hazard under control and before treatment effect
-  hazard_trt=0.02,        # hazard after onset of treatment effect
-  t_max=1000              # cutoff time
+  hazard_trt=0.02         # hazard after onset of treatment effect
 )
 "
 
@@ -111,4 +125,24 @@ desing_skeleton_delayed_effect <- function(){
       str2expression() |>
       eval()
   )
+}
+
+#' Calculate hr after onset of treatment effect from gAHR
+#'
+#' @param condition condition data.frame
+#' @param target_gAHR target geometric average hazard ratio
+#'
+#' @return For prepare_design_delayed_effect_gAHR: the condition
+#'   data.frame passed as argument with the additional column hazard_trt.
+#' @export
+#'
+#' @describeIn generate_delayed_effect  Calculate hr after onset of treatment effect from gAHR
+#'
+#' @examples
+#' my_condition <- desing_skeleton_delayed_effect()
+#' my_condition$hr_trt <- NA
+#' my_condition <- prepare_design_delayed_effect_gAHR(my_condition, 0.8)
+#' my_condition
+prepare_design_delayed_effect_gAHR <- function(condition, target_gAHR){
+
 }
