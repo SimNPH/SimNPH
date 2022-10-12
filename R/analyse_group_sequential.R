@@ -83,3 +83,30 @@ analyse_group_sequential <- function(followup, followup_type, alpha, analyse_fun
   }
 }
 
+
+#' Summarise Output from Analyse Functions for Group Sequential Design
+#'
+#' @param condition
+#' @param results
+#' @param fixed_objects
+#'
+#' @describeIn analyse_group_sequential Summarise Output from Analyse Functions for Group Sequential Design
+#'
+#' @return
+#' Returns a `data.frame` with the columns
+#'  * `rejection` the empirical rejection rate
+#'  * `n_pat` the mean number of patients recruited
+#'  * `n_evt` the mean number of observed events
+#'  * `followup` the mean followup time
+#'
+#' @export
+#'
+#' @examples
+summarise_group_sequential <- function(condition, results, fixed_objects=NULL){
+  data.frame(
+    "rejection" = mean(is.finite(results$rejected_at_stage)),
+    "n_pat" = mean(results$N_pat),
+    "n_evt" = mean(results$N_evt),
+    "followup" = mean(results$followup)
+  )
+}

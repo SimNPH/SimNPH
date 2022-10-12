@@ -18,7 +18,8 @@ Suggests:
     nph,
     covr,
     survRM2,
-    withr
+    withr,
+    ldbounds
 Imports:
     purrr,
     rlang,

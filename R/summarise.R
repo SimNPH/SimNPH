@@ -18,18 +18,21 @@
 #'   the SimNPH package all return lists.)
 #'
 #'   The individual summarise functions have to return data.frames, which are
-#'   concatendated column-wise to give one row per condition.
+#'   concatendated column-wise to give one row per condition. The names of the
+#'   analyse methods are prepended to the respective coumn names.
 #'
 #' @examples
-#' Summarise <- create_summarise_function(list(
+#' Summarise <- create_summarise_function(
 #'   maxcombo = function(condition, results, fixed_objects=NULL){
-#'     data.frame("rejection.maxcombo"=mean(results$p < alpha))
+#'     data.frame("rejection"=mean(results$p < alpha))
 #'   },
 #'   logrank  = function(condition, results, fixed_objects=NULL){
-#'     data.frame("rejection.logrank"=mean(results$p < alpha))
+#'     data.frame("rejection"=mean(results$p < alpha))
 #'   }
-#' ))
-create_summarise_function <- function(summarise_functions){
+#' )
+create_summarise_function <- function(...){
+
+  summarise_functions <- list(...)
 
   function(condition, results, fixed_objects = NULL){
     # transpose lists, so each analyse function can be summarised in a map
@@ -45,11 +48,14 @@ create_summarise_function <- function(summarise_functions){
     aggregate_results <- purrr::map(
       common_names,
       function(i){
-        summarise_functions[[i]](condition, results_t[[i]], fixed_objects)
+        res <- summarise_functions[[i]](condition, results_t[[i]], fixed_objects)
+        names(res) <- paste0(i, ".", names(res))
+        res
       }
     )
 
-    aggregate_results <- do.call(cbind, aggregate_results)
+    aggregate_results <- do.call(cbind, aggregate_results) |>
+      as.data.frame()
 
     aggregate_results
   }

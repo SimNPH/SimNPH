@@ -46,6 +46,11 @@ effect
 \item hazard_trt hazard in the treatment arm afert onset of treatment effect
 }
 
+If fixed_objects is given and contains an element \code{t_max}, then this is used
+as the cutoff for the simulation used internally. If t_max is not given in
+this way the 1-(1/10000) quantile of the survival distribution in the control
+or treatment arm is used (which ever is larger).
+
 desing_skeleton_delayed_effect prints the code to generate a default
 design tibble for use with generate_delayed_effect and returns the
 evaluated code invisibly. This function is intended to be used to copy

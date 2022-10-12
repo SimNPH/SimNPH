@@ -4,7 +4,7 @@
 \alias{create_summarise_function}
 \title{Create a summarise function from a named list of functions}
 \usage{
-create_summarise_function(summarise_functions)
+create_summarise_function(...)
 }
 \arguments{
 \item{summarise_functions}{named list of functions}
@@ -29,15 +29,16 @@ otherwise the results are simplified to data.frames. Analyse functions from
 the SimNPH package all return lists.)
 
 The individual summarise functions have to return data.frames, which are
-concatendated column-wise to give one row per condition.
+concatendated column-wise to give one row per condition. The names of the
+analyse methods are prepended to the respective coumn names.
 }
 \examples{
-Summarise <- create_summarise_function(list(
+Summarise <- create_summarise_function(
   maxcombo = function(condition, results, fixed_objects=NULL){
-    data.frame("rejection.maxcombo"=mean(results$p < alpha))
+    data.frame("rejection"=mean(results$p < alpha))
   },
   logrank  = function(condition, results, fixed_objects=NULL){
-    data.frame("rejection.logrank"=mean(results$p < alpha))
+    data.frame("rejection"=mean(results$p < alpha))
   }
-))
+)
 }
