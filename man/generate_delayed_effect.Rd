@@ -3,27 +3,37 @@
 \name{generate_delayed_effect}
 \alias{generate_delayed_effect}
 \alias{desing_skeleton_delayed_effect}
+\alias{prepare_design_delayed_effect_gAHR}
 \title{Generate Dataset with delayed effect}
 \usage{
 generate_delayed_effect(condition, fixed_objects = NULL)
 
 desing_skeleton_delayed_effect()
+
+prepare_design_delayed_effect_gAHR(condition, target_gAHR)
 }
 \arguments{
-\item{condition}{condition row of Design dataset}
+\item{condition}{condition data.frame}
 
 \item{fixed_objects}{fixed objects of Design dataset}
+
+\item{target_gAHR}{target geometric average hazard ratio}
 }
 \value{
 For generate_delayed_effect: A dataset with the columns t (time) and trt
 (1=treatment, 0=control), evt (event, currently TRUE for all observations)
 
 For desing_skeleton_delayed_effect: a design tibble with default values invisibly
+
+For prepare_design_delayed_effect_gAHR: the condition
+data.frame passed as argument with the additional column hazard_trt.
 }
 \description{
 Generate Dataset with delayed effect
 
 Create design skeleton for use with generate_delayed_effect
+
+Calculate hr after onset of treatment effect from gAHR
 }
 \details{
 Condidtion has to contain the following columns:
@@ -34,8 +44,12 @@ Condidtion has to contain the following columns:
 \item hazard_ctrl hazard in the control arm = hazard before onset of treatment
 effect
 \item hazard_trt hazard in the treatment arm afert onset of treatment effect
-\item t_max the maximal (cutoff) time
 }
+
+If fixed_objects is given and contains an element \code{t_max}, then this is used
+as the cutoff for the simulation used internally. If t_max is not given in
+this way the 1-(1/10000) quantile of the survival distribution in the control
+or treatment arm is used (which ever is larger).
 
 desing_skeleton_delayed_effect prints the code to generate a default
 design tibble for use with generate_delayed_effect and returns the
@@ -48,6 +62,8 @@ paste the code and edit the parameters.
 treatment effect
 
 \item \code{desing_skeleton_delayed_effect}: generate default design tibble
+
+\item \code{prepare_design_delayed_effect_gAHR}: Calculate hr after onset of treatment effect from gAHR
 }}
 
 \examples{
@@ -58,4 +74,8 @@ head(one_simulation)
 tail(one_simulation)
 Design <- desing_skeleton_delayed_effect()
 Design
+my_condition <- desing_skeleton_delayed_effect()
+my_condition$hr_trt <- NA
+my_condition <- prepare_design_delayed_effect_gAHR(my_condition, 0.8)
+my_condition
 }

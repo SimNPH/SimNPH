@@ -14,7 +14,9 @@
 #' dat <- generate_delayed_effect(condition)
 #' analyse_maxcombo(condition, dat)
 analyse_maxcombo <- function(condition, dat, fixed_objects = NULL){
-  data.frame(
-    p=nph::logrank.maxtest(dat$t, dat$evt, dat$trt)$pmult
+  list(
+    p=nph::logrank.maxtest(dat$t, dat$evt, dat$trt)$pmult,
+    N_pat=nrow(dat),
+    N_evt=sum(dat$evt)
   )
 }

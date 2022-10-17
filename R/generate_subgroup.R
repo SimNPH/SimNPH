@@ -1,3 +1,7 @@
+# old code mixture of cured and non cured patients
+# refactor/reparametrize to subgroup, prevalence and hr in subgroup and total pop
+
+
 #' Generate Dataset with mixture of cured patients
 #'
 #' @param condition condition row of Design dataset

@@ -15,10 +15,20 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup}
+```{r setup, results='hide'}
 library(SimDesign)
 library(SimNPH)
+library(parallel)
+
+cl <- makeCluster(8)
+clusterEvalQ(cl, {
+  library(SimDesign)
+  library(SimNPH)
+  library(parallel)
+})
 ```
+
+# A simple scenario with fixed followup
 
 This is a simple example on how to run a simulation of analyses of datasets with
 a delayed treatment effect using the max-combo and the log-rank test. The 
@@ -33,46 +43,75 @@ The function `generate_delayed_effect` needs the columns: `n_trt`: number of
 patients in the treatment arm, `n_ctrl`: number of patients in the control arm,
 `delay`: delay until onset of treatment effect, `hazard_ctrl`: hazard under
 control and before onset of treatment effect, `hazart_trt`: hazard under
-treatement, `t_max`: maximum time of observation.
+treatment, `t_max`: maximum time of observation.
 
 An example design `tibble` with all parameters filled out can be created with
-`desing_skeleton_delayed_effect`. Use the function to output a skeleton you can
-fill in or to create a design `tibble` with some default parameters.
+`desing_skeleton_delayed_effect`. Use the function to output an example function
+call that you can copy and modify as needed, or assign the result to a variable
+to obtain a design `tibble` with some default parameters.
 
-We will run simulations for 50 patients in each arm, a constant hazard of 0.2
-under control and a hazard of 0.02 under treatment and a maximum time of 1000.
-The cutoff time will vary from 0 to 10 in steps of 2.
+By default this will create a simulation design skeleton for simulations of 50
+patients in each arm, a constant hazard of 0.2 under control and a hazard of
+0.02 under treatment after the effect onset varying from 0 to 10.
+
+<!-- TODO set parameters to be somehow relevant (e.g. not 5mts delay and 200mts follow-up) -->
 
 ```{r}
+N_sim <- 100
+
 Design <- desing_skeleton_delayed_effect()
+
+Design$followup <- 200
+Design$random_withdrawal <- 0.01
+Design$recruitment <- 50
 
 knitr::kable(Design)
 ```
 
-## Defining the summarise function
+## Defining the 'Generate' funcion
 
-We will use a very simple summarise function that just outputs the power
-function for the logrank and the maxcombo test. The functions `analyse_logrank`
-and `analyse_maxcombo` (used in the call to `runSimulation` later on) output a
-`data.frame` containing the column `p` with the `p` value of the test. For each
-szenario we just average the number of times the test discards the null to get
-the power.
+Define the data generating 'generate' function, that beside simulating the time
+to event also applies the different censoring processes.
 
-The columns `results$maxcombo.p` and `results$logrank.p` are named after the
-name of the function in the named list given to the `analyse` argument of
-`runSimulation` and the name of the column returned by `analyse_logrank` and
-`analyse_maxcombo`.
+```{r}
+## Ev auch fuer generator - default generator function
+my_generator <- function(condition, fixed_objects=NULL){
+  generate_delayed_effect(condition, fixed_objects) |>
+    recruitment_uniform(condition$recruitment) |>
+    random_censoring_exp(condition$random_withdrawal) |>
+    admin_censoring_time(condition$followup)
+} 
+
+```
+
+## Defining the 'Summarise' function
+
+Next, we need to specify a summary function that computes the desired operating
+characteristics for each simulation scenario, and each analysis method. In the
+example below, we specify a summary function that computes the power (as we
+consider scenarios under the alternative in the example) of the log-rank test
+and the max-combo test across simulated scenarios. For each scenario we just
+average the number of times the computed p-value is below the significance level
+obtain the power.
+
+The results object contains the results of all replications of the corresponding
+method for each row of the `Design` object. In this example `results$p` contains
+all `N_sim` p-values returned by the `analyse_maxcombo` or `analyse_logrank`
+functions respectively. The Summary will contain two columns
+`rejection.maxcombo` and `rejection.logrank` with the empirical rejection rates
+of both tests for each scenario.
 
 ```{r}
 alpha <- 0.05
 
-Summarise <- function(condition, results, fixed_objects = NULL) {
-    ret <- c(
-      power.maxcombo = mean(results$maxcombo.p < alpha),
-      power.logrank  = mean(results$logrank.p  < alpha)
-    )
-    ret
-}
+Summarise <- create_summarise_function(
+  maxcombo = function(condition, results, fixed_objects=NULL){
+    data.frame("rejection"=mean(results$p < alpha))
+  },
+  logrank  = function(condition, results, fixed_objects=NULL){
+    data.frame("rejection"=mean(results$p < alpha))
+  }
+)
 ```
 
 ## Putting it all together
@@ -89,22 +128,126 @@ Finally we select the interesting columns from the output. Since all other
 parameters are the same for each scenario we just select delay and the powers of
 the two tests.
 
-```{r}
+```{r, results='hide'}
 res <- runSimulation(
   Design,
-  replications = 100,
-  generate = generate_delayed_effect,
+  replications = N_sim,
+  generate = my_generator,
   analyse = list(
     logrank  = analyse_logrank,
     maxcombo = analyse_maxcombo
   ),
   summarise = Summarise,
-  parallel = TRUE
+  cl = cl,
+  save=FALSE
 )
 
+```
+
+```{r}
 res |> 
-  subset(select=c("delay", "power.maxcombo", "power.logrank")) |>
+  subset(select=c("delay", "maxcombo.rejection", "logrank.rejection")) |>
   knitr::kable()
 ```
 
+# A scenario with an interim analysis
 
+In this scenario we extend the scenario from above to include a fixed followup
+as well as an interim analysis after a fixed number of events. For this we will
+define additional analyse functions.
+
+First we extend the Design to include a column with the number of events after
+which an interim analysis should be done.
+
+```{r}
+Design$interim_events <- 25
+Design$final_events <- 50
+
+knitr::kable(Design)
+```
+
+## 'Analyse' functions with an interim analysis
+
+The `analyse_group_sequential` function allows to combine two or more analyse
+functions to create an analysis function corresponding to a group sequential
+design. The arguments are the times or events after which the analyses are done,
+the nominal alpha at each stage and the analyse functions to be used at each
+stage.
+
+```{r}
+## O'Brien-Fleming Bounds for GSD with interim analysis at information time 1/2
+nominal_alpha <- ldbounds::ldBounds(c(0.5,1))$nom.alpha
+
+clusterExport(cl, "nominal_alpha")
+
+Analyse <-  list(
+  logrank_seq  = analyse_group_sequential(
+    followup = c(condition$interim_events, condition$final_events),
+    followup_type = c("event", "event"),
+    alpha = nominal_alpha,
+    analyse_functions = analyse_logrank
+  ),
+  maxcombo_seq = analyse_group_sequential(
+    followup = c(condition$interim_events, condition$final_events),
+    followup_type = c("event", "event"),
+    alpha = nominal_alpha,
+    analyse_functions = analyse_maxcombo
+  )
+)
+```
+
+## A `Summarise` function for the more complex scenario
+
+The output of the function created with `analyse_group_sequential` contains
+additional columsn. `rejected_at_stage` includes the stage at which the null was
+first rejected or `Inf` if the null was not rejected, `N_pat` and `N_evt`
+contain the number of patients recruited and the number of events observed
+before the null was rejected and `followup` contains the time after study start
+at which the last analysis was done.
+
+The results object also includes the results returned by each stage in
+`results_stages`, but here we only use the overall test-decision.
+
+```{r}
+## Schoen waer eine standard funktion der ich nur die (Namen der) Analyse function uebergeb, und dann fuer alle die gleiche Summary bekomme (ev. default)
+
+## zB. create_summarise_function(Analyse,summarize_test)
+## c(create_summarize(Analyse_tests,summarize_test),create_summarize(Analyse_est,summarize_est))
+## summarize_test=function(...) data.frame(...)
+## create_summarize(Analyse_exotic,function(...) customsummarycode)
+Summarise <- create_summarise_function(
+  maxcombo_seq = summarise_group_sequential,
+  logrank_seq = summarise_group_sequential
+)
+
+```
+
+## Putting it all together
+
+The call to `runSimulation` looks almost the same as above but now the
+additional columns we defined in our `Summarise` functions are included in the
+result.
+
+```{r, results='hide'}
+res <- runSimulation(
+  Design,
+  replications = N_sim,
+  generate = my_generator,
+  analyse = Analyse,
+  summarise = Summarise,
+  cl = cl,
+  save=FALSE
+)
+```
+
+```{r}
+res |>
+  subset(select=c(
+    "delay", 
+    "maxcombo_seq.rejection", "logrank_seq.rejection",
+    "maxcombo_seq.n_pat", "logrank_seq.n_pat",
+    "maxcombo_seq.n_evt", "logrank_seq.n_evt",
+    "maxcombo_seq.followup", "logrank_seq.followup"
+    )) |>
+  knitr::kable()
+```
