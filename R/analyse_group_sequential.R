@@ -86,9 +86,9 @@ analyse_group_sequential <- function(followup, followup_type, alpha, analyse_fun
 
 #' Summarise Output from Analyse Functions for Group Sequential Design
 #'
-#' @param condition
-#' @param results
-#' @param fixed_objects
+#' @param condition condition row passed from runSimulation
+#' @param results list of results from analyse functions
+#' @param fixed_objects fixed_objects passed from runSimulation
 #'
 #' @describeIn analyse_group_sequential Summarise Output from Analyse Functions for Group Sequential Design
 #'
@@ -102,6 +102,10 @@ analyse_group_sequential <- function(followup, followup_type, alpha, analyse_fun
 #' @export
 #'
 #' @examples
+#' Summarise <- create_summarise_function(
+#'   maxcombo_seq = summarise_group_sequential,
+#'   logrank_seq = summarise_group_sequential
+#' )
 summarise_group_sequential <- function(condition, results, fixed_objects=NULL){
   data.frame(
     "rejection" = mean(is.finite(results$rejected_at_stage)),

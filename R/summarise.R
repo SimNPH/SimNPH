@@ -31,7 +31,6 @@
 #'   }
 #' )
 create_summarise_function <- function(...){
-
   summarise_functions <- list(...)
 
   function(condition, results, fixed_objects = NULL){
@@ -43,20 +42,102 @@ create_summarise_function <- function(...){
           dplyr::bind_rows()
         })
 
-    common_names <- intersect(names(results_t), names(summarise_functions))
 
-    aggregate_results <- purrr::map(
-      common_names,
-      function(i){
-        res <- summarise_functions[[i]](condition, results_t[[i]], fixed_objects)
-        names(res) <- paste0(i, ".", names(res))
-        res
+    aggregate_results <- purrr::imap(summarise_functions, function(f,i){
+      if(i %in% names(results_t)){
+        res <- f(condition, results_t[[i]], fixed_objects)
+      } else {
+        res <- NA_real_
       }
-    )
+    })
+
+    names(aggregate_results) <- make.unique(names(aggregate_results))
 
     aggregate_results <- do.call(cbind, aggregate_results) |>
       as.data.frame()
 
     aggregate_results
+  }
+}
+
+
+#' Generic Summarise function for esitmators
+#'
+#' @param est estimator, expression evaluated in results
+#' @param real real summary statistic, expression evaluated in condition
+#' @param lower lower CI, expression evaluated in results
+#' @param upper upper CI, expression evaluated in results
+#'
+#' @return
+#'
+#' A data frame with the columns
+#'
+#' * bias the bias with respect to the true value
+#' * var the variance
+#' * mse the mean squared error with respect to the true value
+#' * mae the mean absolute error with respect to the true value
+#' * coverage the coverage of the confidence interval
+#' * width the mean width of the confidence interval
+#'
+#' @export
+#'
+#' @examples
+#' # generate the design matrix and append the true summary statistics
+#' condition <- desing_skeleton_delayed_effect() |>
+#'   tail(4) |>
+#'   head(1) |>
+#'   true_summary_statistics_delayed_effect(cutoff_stats = 15)
+#'
+#' # create some summarise functions
+#' summarise_all <- create_summarise_function(
+#'   coxph=summarise_estimator(hr, gAHR, hr_lower, hr_upper),
+#'   coxph=summarise_estimator(hr, hazard_trt/hazard_ctrl, hr_lower, hr_upper),
+#'   coxph=summarise_estimator(exp(coef), gAHR),
+#'   coxph=summarise_estimator(hr, NA_real_)
+#' )
+#'
+#' # runs simulations
+#' sim_results <- runSimulation(
+#'   design=condition,
+#'   replications=10,
+#'   generate=generate_delayed_effect,
+#'   analyse=list(
+#'     coxph=analyse_coxph
+#'   ),
+#'   summarise = summarise_all
+#' )
+#'
+#' # mse is missing for the summarise function in which the real value was NA
+#' sim_results[, names(sim_results) |> grepl(pattern="mse")]
+#' # but the variance can be estimated in all cases
+#' sim_results[, names(sim_results) |> grepl(pattern="var")]
+summarise_estimator <- function(est, real, lower=NULL, upper=NULL){
+
+  est <- substitute(est)
+  real <- substitute(real)
+  lower <- substitute(lower)
+  upper <- substitute(upper)
+
+  function(condition, results, fixed_objects){
+    est    <- eval(est,   envir = results)
+    real   <- eval(real,  envir = condition)
+    lower  <- eval(lower, envir = results)
+    upper  <- eval(upper, envir = results)
+
+    results_tmp <- data.frame(
+      bias     = mean(est - real),
+      var      = var(est),
+      mse      = mean((est-real)^2),
+      mae      = mean(abs(est-real)),
+      coverage = NA_real_,
+      width    = NA_real_
+    )
+
+    if(!is.null(lower) && !is.null(upper)){
+      results_tmp$coverage <- mean( (lower <= real) && (upper >= real) )
+      results_tmp$width    <- mean( abs(upper - lower) )
+    }
+
+    results_tmp
   }
 }

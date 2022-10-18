@@ -1,0 +1,37 @@
+test_that("internal function for real summary statistics outputs correct values", {
+
+  capture_output({
+    condition <- desing_skeleton_delayed_effect() |>
+      tail(1)
+  })
+
+  t_max <- max(
+    log(10000) / condition$hazard_ctrl,
+    log(10000) / condition$hazard_trt
+  )
+
+  treatment <- nph::pchaz(
+    c(0, condition$delay, t_max),
+    c(condition$hazard_ctrl, condition$hazard_trt)
+  )
+
+  control <- nph::pchaz(
+    c(0, t_max),
+    c(condition$hazard_ctrl)
+  )
+
+  result_1 <- internal_real_statistics_pchaz(treatment, control)
+  result_2 <- internal_real_statistics_pchaz(treatment, treatment)
+  result_3 <- internal_real_statistics_pchaz(control, control)
+
+  # correct class, names, etc.
+  expect_s3_class(result_1, "data.frame")
+  expect_named(result_1, c("rmst_trt", "median_survival_trt", "rmst_ctrl", "median_survival_ctrl", "gAHR", "AHR"))
+
+  # AHR has to be one, if treatment and control have the same distribution
+  expect_equal(result_2$gAHR, 1)
+  expect_equal(result_2$AHR, 1)
+  expect_equal(result_3$gAHR, 1)
+  expect_equal(result_3$AHR, 1)
+
+})

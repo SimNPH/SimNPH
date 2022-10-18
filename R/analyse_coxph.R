@@ -21,12 +21,14 @@
 #' analyse_coxph(condition, dat)
 analyse_coxph <- function(condition, dat, fixed_objects = NULL){
   model <- survival::coxph(survival::Surv(t, evt) ~ trt, dat, robust=FALSE)
+  model_summary <- summary(model)
 
   list(
     p = 1-pchisq(model$score, 1),
     coef = coefficients(model)["trt"],
     hr   = exp(coefficients(model)["trt"]),
-    confint = summary(model)$conf.int[, c("lower .95", "upper .95")],
+    hr_lower = model_summary$conf.int[, "lower .95"],
+    hr_upper = model_summary$conf.int[, "upper .95"],
     N_pat=nrow(dat),
     N_evt=sum(dat$evt)
   )

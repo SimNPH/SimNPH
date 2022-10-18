@@ -149,7 +149,11 @@ hr_after_onset_from_gAHR <- function(design, target_gAHR){
 
 #' Calculate true summary statistics for scenarios with delayed treatment effect
 #'
-#' @return For true_summary_statistics_delayed_effect the design data.frame
+#' @param Design Design data.frame for delayed effect
+#' @param cutoff_stats Cutoff time for rmst and average hazard ratios
+#' @param fixed_objects=NULL fixed objects not used for now
+#'
+#' @return For true_summary_statistics_delayed_effect: the design data.frame
 #'   passed as argument with the additional columns:
 #' * `rmst_trt` rmst in the treatment group
 #' * `median_surv_trt` median survival in the treatment group
@@ -160,14 +164,16 @@ hr_after_onset_from_gAHR <- function(design, target_gAHR){
 #'
 #' @export
 #'
+#' @describeIn generate_delayed_effect  calculate true summary statistics for delayed effect
+#'
 #' @examples
 #' my_design <- desing_skeleton_delayed_effect()
-#' my_design <- true_summary_statistics_delayed_effect(my_design)
+#' my_design$follwup <- 15
+#' my_design <- true_summary_statistics_delayed_effect(my_design, cutoff_stats=my_design$followup)
 #' my_design
-true_summary_statistics_delayed_effect <- function(Design, fixed_objects=NULL){
-  # TODO: add cutoff for gAHR, AHR, rmst
+true_summary_statistics_delayed_effect <- function(Design, cutoff_stats=10, fixed_objects=NULL){
 
-  true_summary_statistics_delayed_effect_rowwise <- function(condition){
+  true_summary_statistics_delayed_effect_rowwise <- function(condition, cutoff_stats){
 
     # if t_max is not given in fixed_objects
     if(is.null(fixed_objects) || (!hasName(fixed_objects, t_max))){
@@ -179,7 +185,7 @@ true_summary_statistics_delayed_effect <- function(Design, fixed_objects=NULL){
       )
     }
 
-    # simulate treatment group
+    # create functions for treatment group
     if (condition$delay < 0){
       # if delay is smaller than 0 stop with error
       stop(gettext("Delay has to be >= 0"))
@@ -192,8 +198,8 @@ true_summary_statistics_delayed_effect <- function(Design, fixed_objects=NULL){
       )
 
     } else {
-      # if delay is positive simulate in the time intervals bevore and after
-      # treatment effect
+      # if delay is positive create piecewise constant hazards and respective
+      # functions in the time intervals bevore and after treatment effect
       data_generating_model_trt <- nph::pchaz(
         c(0, condition$delay, t_max),
         c(condition$hazard_ctrl, condition$hazard_trt)
@@ -201,7 +207,7 @@ true_summary_statistics_delayed_effect <- function(Design, fixed_objects=NULL){
 
     }
 
-    # simulate control group with constant hazard from 0 to t_max
+    # create functions for control group with constant hazard from 0 to t_max
     data_generating_model_ctrl <- nph::pchaz(
       c(0, t_max),
       c(condition$hazard_ctrl)
@@ -213,7 +219,8 @@ true_summary_statistics_delayed_effect <- function(Design, fixed_objects=NULL){
         data_generating_model_trt,
         data_generating_model_ctrl,
         N_trt=condition$n_trt,
-        N_ctrl=condition$n_ctrl
+        N_ctrl=condition$n_ctrl,
+        cutoff = cutoff_stats
       )
     )
 
@@ -223,7 +230,7 @@ true_summary_statistics_delayed_effect <- function(Design, fixed_objects=NULL){
 
   Design <- Design |>
     split(1:nrow(Design)) |>
-    lapply(true_summary_statistics_delayed_effect_rowwise)
+    mapply(FUN=true_summary_statistics_delayed_effect_rowwise, cutoff_stats = cutoff_stats, SIMPLIFY = FALSE)
 
   Design <- do.call(rbind, Design)
 

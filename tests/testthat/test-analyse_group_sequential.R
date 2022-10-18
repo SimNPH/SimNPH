@@ -1,5 +1,4 @@
 test_that("group sequential tests work", {
-  N_sim <- 10
 
   capture.output({
     condition <- desing_skeleton_delayed_effect() |>
@@ -44,4 +43,41 @@ test_that("group sequential tests work", {
   expect_length(result$results_stages[[1]][[1]], 2)
   expect_named(result$results_stages[[1]][[1]][[1]], c("p", "N_pat", "N_evt"))
   expect_named(result$results_stages[[1]][[1]][[2]], c("p", "N_pat", "N_evt"))
+})
+
+test_that("summarising results from group sequential function works", {
+  capture.output({
+    condition <- desing_skeleton_delayed_effect() |>
+      head(1)
+  })
+
+  condition$followup <- 200
+  condition$recruitment <- 50
+  condition$interim_events <- 25
+
+  my_generator <- function(condition, fixed_objects=NULL){
+    generate_delayed_effect(condition, fixed_objects) |>
+      recruitment_uniform(condition$recruitment)
+  }
+
+  analyse_logrank_sequential <- analyse_group_sequential(
+    followup = c(condition$interim_events, condition$followup),
+    followup_type = c("event", "time"),
+    alpha = c(0.025, 0.05),
+    analyse_functions = analyse_logrank
+  )
+
+  dat <- withr::with_seed(0, replicate(2, my_generator(condition), simplify=FALSE))
+
+  results <- lapply(dat, \(dat){analyse_logrank_sequential(condition, dat)})
+
+  results <- results |>
+    purrr::map(tibble::as_tibble) |>
+    dplyr::bind_rows()
+
+  aggregate_results <- summarise_group_sequential(condition, results)
+
+  expect_s3_class(aggregate_results, "data.frame")
+  expect_named(aggregate_results, c("rejection", "n_pat", "n_evt", "followup"), ignore.order = TRUE)
+  expect_equal(nrow(aggregate_results), 1)
 })

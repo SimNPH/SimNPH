@@ -3,21 +3,36 @@
 \name{generate_delayed_effect}
 \alias{generate_delayed_effect}
 \alias{desing_skeleton_delayed_effect}
-\alias{prepare_design_delayed_effect_gAHR}
+\alias{hr_after_onset_from_gAHR}
+\alias{true_summary_statistics_delayed_effect}
 \title{Generate Dataset with delayed effect}
 \usage{
 generate_delayed_effect(condition, fixed_objects = NULL)
 
 desing_skeleton_delayed_effect()
 
-prepare_design_delayed_effect_gAHR(condition, target_gAHR)
+hr_after_onset_from_gAHR(design, target_gAHR)
+
+true_summary_statistics_delayed_effect(
+  Design,
+  cutoff_stats = 10,
+  fixed_objects = NULL
+)
 }
 \arguments{
-\item{condition}{condition data.frame}
+\item{condition}{condition row of Design dataset}
 
 \item{fixed_objects}{fixed objects of Design dataset}
 
+\item{design}{design data.frame}
+
 \item{target_gAHR}{target geometric average hazard ratio}
+
+\item{Design}{Design data.frame for delayed effect}
+
+\item{cutoff_stats}{Cutoff time for rmst and average hazard ratios}
+
+\item{fixed_objects=NULL}{fixed objects not used for now}
 }
 \value{
 For generate_delayed_effect: A dataset with the columns t (time) and trt
@@ -25,8 +40,19 @@ For generate_delayed_effect: A dataset with the columns t (time) and trt
 
 For desing_skeleton_delayed_effect: a design tibble with default values invisibly
 
-For prepare_design_delayed_effect_gAHR: the condition
-data.frame passed as argument with the additional column hazard_trt.
+For hr_after_onset_from_gAHR: the design data.frame passed as
+argument with the additional column hazard_trt.
+
+For true_summary_statistics_delayed_effect: the design data.frame
+passed as argument with the additional columns:
+\itemize{
+\item \code{rmst_trt} rmst in the treatment group
+\item \code{median_surv_trt} median survival in the treatment group
+\item \code{rmst_ctrl} rmst in the control group
+\item \code{median_surv_ctrl} median survial in the control group
+\item \code{gAHR} geometric average hazard ratio
+\item \code{AHR} average hazard ratio
+}
 }
 \description{
 Generate Dataset with delayed effect
@@ -34,6 +60,8 @@ Generate Dataset with delayed effect
 Create design skeleton for use with generate_delayed_effect
 
 Calculate hr after onset of treatment effect from gAHR
+
+Calculate true summary statistics for scenarios with delayed treatment effect
 }
 \details{
 Condidtion has to contain the following columns:
@@ -63,7 +91,9 @@ treatment effect
 
 \item \code{desing_skeleton_delayed_effect}: generate default design tibble
 
-\item \code{prepare_design_delayed_effect_gAHR}: Calculate hr after onset of treatment effect from gAHR
+\item \code{hr_after_onset_from_gAHR}: Calculate hr after onset of treatment effect from gAHR
+
+\item \code{true_summary_statistics_delayed_effect}: calculate true summary statistics for delayed effect
 }}
 
 \examples{
@@ -74,8 +104,12 @@ head(one_simulation)
 tail(one_simulation)
 Design <- desing_skeleton_delayed_effect()
 Design
-my_condition <- desing_skeleton_delayed_effect()
-my_condition$hr_trt <- NA
-my_condition <- prepare_design_delayed_effect_gAHR(my_condition, 0.8)
-my_condition
+my_design <- desing_skeleton_delayed_effect()
+my_design$hr_trt <- NA
+my_design <- hr_after_onset_from_gAHR(my_design, 0.8)
+my_design
+my_design <- desing_skeleton_delayed_effect()
+my_design$follwup <- 15
+my_design <- true_summary_statistics_delayed_effect(my_design, cutoff_stats=my_design$followup)
+my_design
 }
