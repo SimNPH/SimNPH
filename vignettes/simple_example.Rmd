@@ -146,7 +146,7 @@ res <- runSimulation(
 
 ```{r}
 res |> 
-  subset(select=c("delay", "maxcombo.rejection", "logrank.rejection")) |>
+  subset(select=c("delay", "rejection...10", "rejection...11")) |>
   knitr::kable()
 ```
 
@@ -251,3 +251,76 @@ res |>
     )) |>
   knitr::kable()
 ```
+
+# Estimation
+
+## Calculating the true values of the summary statistics
+
+To evaluate the performance of an estimator, we first compute the values of some
+true summary statistics to which the estimates will be compared. The most
+relevant true summary statistics can be computed by a convenience function for
+each scenario. Just pipe the Design data.frame to the function and the values of
+the statistics are added as columns.
+
+```{r}
+Design <- Design |> 
+  true_summary_statistics_delayed_effect()
+
+knitr::kable(Design)
+```
+
+## Defining the `Summarise` function
+
+In the Summarise function the true value against which the estimator should be
+compared has to be specified. If coverage and average width of the confidence
+intervalls should be estimated, the CI bounds should also be specified.
+
+The arguments to the functions are left unevaluated and are later evaluated in
+the `results` and `condition` datasets respectively. So any expressions using
+variables from results can be used for the estimated value and the CI bounds and
+expressions using variables from condition can be used in the argument for the
+real value.
+
+In this case we want to compare the hazard ratio estimated by the cox model to
+the geometric average hazard ratio (the summary statistic the Cox model acutally
+computes under non proportional hazards) as well as to the hazard ratio after
+onset of treatment, calculated from the two respective columns of the Design
+data.frame.
+
+Note that one name can be used twice to summarise the output of one analysis
+method two times, like in this case, comparing it to two different summary
+statistics.
+
+```{r}
+Summarise <- create_summarise_function(
+    coxph=summarise_estimator(hr, gAHR, hr_lower, hr_upper),
+    coxph=summarise_estimator(hr, hazard_trt/hazard_ctrl, hr_lower, hr_upper)
+  )
+```
+
+## Putting it all together
+
+```{r}
+Analyse <- list(
+  coxph = analyse_coxph
+)
+
+res <- runSimulation(
+  Design,
+  replications = N_sim,
+  generate = my_generator,
+  analyse = Analyse,
+  summarise = Summarise,
+  cl = cl,
+  save=FALSE
+)
+```
+
+```{r}
+res |>
+  subset(select=c(
+    "delay", "coxph.bias", "coxph.1.bias", "coxph.mse", "coxph.1.mse", "coxph.coverage", "coxph.1.coverage"
+  )) |> 
+  knitr::kable()
+```
+

@@ -134,7 +134,7 @@ summarise_estimator <- function(est, real, lower=NULL, upper=NULL){
     )
 
     if(!is.null(lower) && !is.null(upper)){
-      results_tmp$coverage <- mean( (lower <= real) && (upper >= real) )
+      results_tmp$coverage <- mean( (lower <= real) & (upper >= real) )
       results_tmp$width    <- mean( abs(upper - lower) )
     }
 
