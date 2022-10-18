@@ -1,13 +1,13 @@
 test_that("creating summarise function works", {
 
-  Summarise <- create_summarise_function(list(
+  Summarise <- create_summarise_function(
     method1 = function(condition, results, fixed_objects){
       mean(results$value1)
     },
     method2 = function(condition, results, fixed_objects){
       mean(results$value2)
     }
-  ))
+  )
 
 
   condition <- numeric(0)
@@ -20,5 +20,7 @@ test_that("creating summarise function works", {
   summary <- Summarise(condition, results)
 
   expect_type(Summarise, "closure")
-  expect_equal(summary[1, ], c(2,2))
+  expect_equal(as.numeric(summary[1, ]), c(2,2))
+  expect_type(summary, "list")
+  expect_s3_class(summary, "data.frame")
 })

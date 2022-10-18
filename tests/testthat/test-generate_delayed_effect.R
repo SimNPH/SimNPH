@@ -103,3 +103,41 @@ test_that("test that generate_delayed_effect outputs correct tibble with delay=0
   )
 
 })
+
+test_that("test that true_summary_statistics_delayed_effect works", {
+  test_design <- createDesign(
+    n_trt=50,
+    n_ctrl=50,
+    delay=c(0,7),
+    hazard_ctrl=0.2,
+    hazard_trt=c(0.2, 0.02),
+    cutoff_stats=c(7, 15)
+  )
+
+  test_design <- test_design |>
+    true_summary_statistics_delayed_effect(cutoff_stats = test_design$cutoff_stats)
+
+
+  expect_named(test_design, c("n_trt", "n_ctrl", "delay", "hazard_ctrl", "hazard_trt", "cutoff_stats", "rmst_trt", "median_survival_trt", "rmst_ctrl", "median_survival_ctrl", "gAHR", "AHR"))
+
+  expect(all(test_design$AHR[test_design$hazard_ctrl == test_design$hazard_trt] == 1), "all average hazard ratios should be 1 for equal hazards")
+  expect(all(test_design$AHR[test_design$delay >= test_design$cutoff_stats] == 1), "all average hazard ratios should be 1 if effect starts after cutoff")
+  expect(all(test_design$AHR[(test_design$delay < test_design$cutoff_stats) & (test_design$hazard_ctrl > test_design$hazard_trt)] < 1), "all average hazard ratios should be less than 1 if there's an effect before cutoff")
+
+  expect(all(test_design$gAHR[test_design$hazard_ctrl == test_design$hazard_trt] == 1), "all geometric average hazard ratios should be 1 for equal hazards")
+  expect(all(test_design$gAHR[test_design$delay >= test_design$cutoff_stats] == 1), "all geometric average hazard ratios should be 1 if effect starts after cutoff")
+  expect(all(test_design$gAHR[(test_design$delay < test_design$cutoff_stats) & (test_design$hazard_ctrl > test_design$hazard_trt)] < 1), "all geometric average hazard ratios should be less than 1 if there's an effect before cutoff")
+})
+
+test_that("test that true_summary_statistics_delayed_effect fails on delay < 0", {
+  capture_output(
+    scenario <- desing_skeleton_delayed_effect() |>
+      head(1)
+  )
+
+  scenario$delay <- -1
+
+  expect_error(
+    true_summary_statistics_delayed_effect(scenario)
+  )
+})

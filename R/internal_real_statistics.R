@@ -21,8 +21,8 @@ internal_real_statistics_pchaz <- function(data_gen_model_trt, data_gen_model_ct
   w  <- \(t){1} # Cox
   # w  <- \(t){(1/(N_trt+N_ctrl))*(N_trt*group_1$funs$surv_f(t) + N_ctrl*group_2$funs$surv_f(t))} # WCox
 
-  gAHR <- exp(integrate(\(t){log(h2(t) / h1(t)) * f(t) * w(t)}, 0, cutoff)$value)
-  AHR  <- integrate(\(t){(h2(t)/h(t)) * f(t) * w(t)}, 0, cutoff)$value / integrate(\(t){(h1(t)/h(t)) * f(t) * w(t)}, 0, cutoff)$value
+  gAHR <- exp(integrate(\(t){log(h1(t) / h2(t)) * f(t) * w(t)}, 0, cutoff)$value)
+  AHR  <- integrate(\(t){(h1(t)/h(t)) * f(t) * w(t)}, 0, cutoff)$value / integrate(\(t){(h2(t)/h(t)) * f(t) * w(t)}, 0, cutoff)$value
 
 
   names(real_stats_trt) <- paste0(names(real_stats_trt), "_trt")

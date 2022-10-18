@@ -168,7 +168,8 @@ hr_after_onset_from_gAHR <- function(design, target_gAHR){
 #'
 #' @examples
 #' my_design <- desing_skeleton_delayed_effect()
-#' my_design <- true_summary_statistics_delayed_effect(my_design)
+#' my_design$follwup <- 15
+#' my_design <- true_summary_statistics_delayed_effect(my_design, cutoff_stats=my_design$followup)
 #' my_design
 true_summary_statistics_delayed_effect <- function(Design, cutoff_stats=10, fixed_objects=NULL){
 
@@ -229,7 +230,7 @@ true_summary_statistics_delayed_effect <- function(Design, cutoff_stats=10, fixe
 
   Design <- Design |>
     split(1:nrow(Design)) |>
-    lapply(true_summary_statistics_delayed_effect_rowwise, cutoff_stats = cutoff_stats)
+    mapply(FUN=true_summary_statistics_delayed_effect_rowwise, cutoff_stats = cutoff_stats, SIMPLIFY = FALSE)
 
   Design <- do.call(rbind, Design)
 
