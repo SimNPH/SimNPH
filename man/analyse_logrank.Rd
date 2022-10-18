@@ -14,7 +14,12 @@ analyse_logrank(condition, dat, fixed_objects = NULL)
 \item{fixed_objects}{other constants}
 }
 \value{
-a dataframe with the p-value of the logrank test in the column p
+a data frame with the columns
+\itemize{
+\item \code{p} p-value of the logrank test
+\item \code{N_pat} number of patients
+\item \code{N_evt} number of events
+}
 }
 \description{
 Analyse Dataset with the Logrank Test

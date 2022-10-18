@@ -18,7 +18,11 @@ summarise_group_sequential(condition, results, fixed_objects = NULL)
 
 \item{analyse_functions}{analyse function or list of analyse functions}
 
-\item{fixed_objects}{}
+\item{condition}{condition row passed from runSimulation}
+
+\item{results}{list of results from analyse functions}
+
+\item{fixed_objects}{fixed_objects passed from runSimulation}
 }
 \value{
 an analyse function that can be used in runSimulation
@@ -60,5 +64,9 @@ analyse_maxcombo_sequential <- analyse_group_sequential(
   followup_type = c("event", "time"),
   alpha = c(0.025, 0.05),
   analyse_functions = analyse_maxcombo
+)
+Summarise <- create_summarise_function(
+  maxcombo_seq = summarise_group_sequential,
+  logrank_seq = summarise_group_sequential
 )
 }
