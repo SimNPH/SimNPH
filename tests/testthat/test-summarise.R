@@ -1,9 +1,9 @@
 test_that("creating summarise function from many functions works", {
 
   Summarise <- create_summarise_function(
-    method1 = function(condition, results, fixed_objects){
+    method1 = `attr<-`(function(condition, results, fixed_objects){
       mean(results$value1)
-    },
+    }, "name", "mean_val_1"),
     method2 = function(condition, results, fixed_objects){
       mean(results$value2)
     },
@@ -29,7 +29,7 @@ test_that("creating summarise function from many functions works", {
   expect_equal(as.numeric(summary[1, ]), c(4,4,1,NA_real_))
   expect_type(summary, "list")
   expect_s3_class(summary, "data.frame")
-  expect_named(summary, c("method1", "method2", "method1.1", "method3"))
+  expect_named(summary, c("method1.mean_val_1", "method2", "method1", "method3"))
 })
 
 test_that("creating a summarise function for an estimator works", {

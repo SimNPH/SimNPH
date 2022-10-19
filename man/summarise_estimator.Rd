@@ -4,7 +4,7 @@
 \alias{summarise_estimator}
 \title{Generic Summarise function for esitmators}
 \usage{
-summarise_estimator(est, real, lower = NULL, upper = NULL)
+summarise_estimator(est, real, lower = NULL, upper = NULL, name = NULL)
 }
 \arguments{
 \item{est}{estimator, expression evaluated in results}
@@ -14,6 +14,8 @@ summarise_estimator(est, real, lower = NULL, upper = NULL)
 \item{lower}{lower CI, expression evaluated in results}
 
 \item{upper}{upper CI, expression evaluated in results}
+
+\item{name}{= NULL name for the summarise function, appended to the name of the analysis method in the final results}
 }
 \value{
 A data frame with the columns
@@ -38,8 +40,8 @@ condition <- desing_skeleton_delayed_effect() |>
 
 # create some summarise functions
 summarise_all <- create_summarise_function(
-  coxph=summarise_estimator(hr, gAHR, hr_lower, hr_upper),
-  coxph=summarise_estimator(hr, hazard_trt/hazard_ctrl, hr_lower, hr_upper),
+  coxph=summarise_estimator(hr, gAHR, hr_lower, hr_upper, name="aAHR"),
+  coxph=summarise_estimator(hr, hazard_trt/hazard_ctrl, hr_lower, hr_upper, name="HR"),
   coxph=summarise_estimator(exp(coef), gAHR),
   coxph=summarise_estimator(hr, NA_real_)
 )

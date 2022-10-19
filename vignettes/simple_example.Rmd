@@ -108,7 +108,7 @@ Summarise <- create_summarise_function(
   maxcombo = function(condition, results, fixed_objects=NULL){
     data.frame("rejection"=mean(results$p < alpha))
   },
-  logrank  = function(condition, results, fixed_objects=NULL){
+  logrank = function(condition, results, fixed_objects=NULL){
     data.frame("rejection"=mean(results$p < alpha))
   }
 )
@@ -216,8 +216,8 @@ The results object also includes the results returned by each stage in
 ## summarize_test=function(...) data.frame(...)
 ## create_summarize(Analyse_exotic,function(...) customsummarycode)
 Summarise <- create_summarise_function(
-  maxcombo_seq = summarise_group_sequential,
-  logrank_seq = summarise_group_sequential
+  maxcombo_seq = summarise_group_sequential(),
+  logrank_seq = summarise_group_sequential()
 )
 
 ```
@@ -293,8 +293,8 @@ statistics.
 
 ```{r}
 Summarise <- create_summarise_function(
-    coxph=summarise_estimator(hr, gAHR, hr_lower, hr_upper),
-    coxph=summarise_estimator(hr, hazard_trt/hazard_ctrl, hr_lower, hr_upper)
+    coxph=summarise_estimator(hr, gAHR, hr_lower, hr_upper, name="gAHR"),
+    coxph=summarise_estimator(hr, hazard_trt/hazard_ctrl, hr_lower, hr_upper, name="HR")
   )
 ```
 
@@ -319,7 +319,7 @@ res <- runSimulation(
 ```{r}
 res |>
   subset(select=c(
-    "delay", "coxph.bias", "coxph.1.bias", "coxph.mse", "coxph.1.mse", "coxph.coverage", "coxph.1.coverage"
+    "delay", "coxph.HR.bias", "coxph.gAHR.bias", "coxph.HR.mse", "coxph.gAHR.mse", "coxph.HR.coverage", "coxph.gAHR.coverage"
   )) |> 
   knitr::kable()
 ```

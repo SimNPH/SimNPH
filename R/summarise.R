@@ -19,7 +19,10 @@
 #'
 #'   The individual summarise functions have to return data.frames, which are
 #'   concatendated column-wise to give one row per condition. The names of the
-#'   analyse methods are prepended to the respective coumn names.
+#'   analyse methods are prepended to the respective coumn names, if the
+#'   functions have a "name" attribute this is appended to the column names of
+#'   the output. Column names not unique after that are appended numbers by
+#'   `make.unique`.
 #'
 #' @examples
 #' Summarise <- create_summarise_function(
@@ -42,15 +45,24 @@ create_summarise_function <- function(...){
           dplyr::bind_rows()
         })
 
-
-    aggregate_results <- purrr::imap(summarise_functions, function(f,i){
-      if(i %in% names(results_t)){
-        res <- f(condition, results_t[[i]], fixed_objects)
+    names_funs <- purrr::map_chr(summarise_functions, \(x){
+      name <- attr(x, "name")
+      if(is.null(name)){
+        ""
       } else {
-        res <- NA_real_
+        paste0(".", name)
       }
     })
 
+    aggregate_results <- purrr::imap(summarise_functions, function(f,i){
+      if(i %in% names(results_t)){
+        f(condition, results_t[[i]], fixed_objects)
+      } else {
+        NA_real_
+      }
+    })
+
+    names(aggregate_results) <- paste0(names(aggregate_results), names_funs)
     names(aggregate_results) <- make.unique(names(aggregate_results))
 
     aggregate_results <- do.call(cbind, aggregate_results) |>
@@ -67,6 +79,7 @@ create_summarise_function <- function(...){
 #' @param real real summary statistic, expression evaluated in condition
 #' @param lower lower CI, expression evaluated in results
 #' @param upper upper CI, expression evaluated in results
+#' @param name = NULL name for the summarise function, appended to the name of the analysis method in the final results
 #'
 #' @return
 #'
@@ -90,8 +103,8 @@ create_summarise_function <- function(...){
 #'
 #' # create some summarise functions
 #' summarise_all <- create_summarise_function(
-#'   coxph=summarise_estimator(hr, gAHR, hr_lower, hr_upper),
-#'   coxph=summarise_estimator(hr, hazard_trt/hazard_ctrl, hr_lower, hr_upper),
+#'   coxph=summarise_estimator(hr, gAHR, hr_lower, hr_upper, name="aAHR"),
+#'   coxph=summarise_estimator(hr, hazard_trt/hazard_ctrl, hr_lower, hr_upper, name="HR"),
 #'   coxph=summarise_estimator(exp(coef), gAHR),
 #'   coxph=summarise_estimator(hr, NA_real_)
 #' )
@@ -111,14 +124,14 @@ create_summarise_function <- function(...){
 #' sim_results[, names(sim_results) |> grepl(pattern="mse")]
 #' # but the variance can be estimated in all cases
 #' sim_results[, names(sim_results) |> grepl(pattern="var")]
-summarise_estimator <- function(est, real, lower=NULL, upper=NULL){
+summarise_estimator <- function(est, real, lower=NULL, upper=NULL, name=NULL){
 
   est <- substitute(est)
   real <- substitute(real)
   lower <- substitute(lower)
   upper <- substitute(upper)
 
-  function(condition, results, fixed_objects){
+  res <- function(condition, results, fixed_objects){
     est    <- eval(est,   envir = results)
     real   <- eval(real,  envir = condition)
     lower  <- eval(lower, envir = results)
@@ -140,4 +153,8 @@ summarise_estimator <- function(est, real, lower=NULL, upper=NULL){
 
     results_tmp
   }
+
+  attr(res, "name") <- name
+
+  res
 }

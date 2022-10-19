@@ -1,6 +1,8 @@
 test_that("analyse coxph works", {
-  condition <- desing_skeleton_delayed_effect() |>
-    head(1)
+  capture.output({
+    condition <- desing_skeleton_delayed_effect() |>
+      head(1)
+  })
   dat <- generate_delayed_effect(condition)
   results <- analyse_coxph(condition, dat)
 

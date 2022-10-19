@@ -75,7 +75,7 @@ test_that("summarising results from group sequential function works", {
     purrr::map(tibble::as_tibble) |>
     dplyr::bind_rows()
 
-  aggregate_results <- summarise_group_sequential(condition, results)
+  aggregate_results <- summarise_group_sequential()(condition, results)
 
   expect_s3_class(aggregate_results, "data.frame")
   expect_named(aggregate_results, c("rejection", "n_pat", "n_evt", "followup"), ignore.order = TRUE)

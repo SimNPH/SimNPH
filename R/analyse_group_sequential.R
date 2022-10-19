@@ -86,14 +86,18 @@ analyse_group_sequential <- function(followup, followup_type, alpha, analyse_fun
 
 #' Summarise Output from Analyse Functions for Group Sequential Design
 #'
-#' @param condition condition row passed from runSimulation
-#' @param results list of results from analyse functions
-#' @param fixed_objects fixed_objects passed from runSimulation
+#' @param name name attribute of the returned closure
 #'
 #' @describeIn analyse_group_sequential Summarise Output from Analyse Functions for Group Sequential Design
 #'
 #' @return
-#' Returns a `data.frame` with the columns
+#' Returns a function with the arguments:
+#'  * condition
+#'  * results
+#'  * fixed objects
+#'
+#' that can be passed to create_summarise_function or to
+#' SimDesign::runSimulation and that returns a `data.frame` with the columns
 #'  * `rejection` the empirical rejection rate
 #'  * `n_pat` the mean number of patients recruited
 #'  * `n_evt` the mean number of observed events
@@ -103,14 +107,20 @@ analyse_group_sequential <- function(followup, followup_type, alpha, analyse_fun
 #'
 #' @examples
 #' Summarise <- create_summarise_function(
-#'   maxcombo_seq = summarise_group_sequential,
-#'   logrank_seq = summarise_group_sequential
+#'   maxcombo_seq = summarise_group_sequential(),
+#'   logrank_seq = summarise_group_sequential(name="logrank")
 #' )
-summarise_group_sequential <- function(condition, results, fixed_objects=NULL){
-  data.frame(
-    "rejection" = mean(is.finite(results$rejected_at_stage)),
-    "n_pat" = mean(results$N_pat),
-    "n_evt" = mean(results$N_evt),
-    "followup" = mean(results$followup)
-  )
+summarise_group_sequential <- function(name=NULL){
+  res <- function(condition, results, fixed_objects=NULL){
+    data.frame(
+      "rejection" = mean(is.finite(results$rejected_at_stage)),
+      "n_pat" = mean(results$N_pat),
+      "n_evt" = mean(results$N_evt),
+      "followup" = mean(results$followup)
+    )
+  }
+
+  attr(res, "name") <- name
+
+  res
 }
