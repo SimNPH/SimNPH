@@ -21,7 +21,7 @@ bugs, changes and missing functionality!**
 The current unstable version can be installed with:
 
 ```
-remotes::install_github("SimNPH/SimNPH")
+remotes::install_git("https://github.com/SimNPH/SimNPH.git")
 ```
 
 ### Getting Started
