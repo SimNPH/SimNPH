@@ -9,3 +9,4 @@ inst/doc
 !/doc/*.pdf
 /Meta/
 notes_drafts_etc
+/doc/
