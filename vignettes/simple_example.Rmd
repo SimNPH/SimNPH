@@ -1,6 +1,6 @@
 ---
-title: "Logrank Test vs. MaxCombo Test to Analyse Datasets with delayed treatment effects"
-subtitle: "A simple example"
+title: "Some Simple Examples for the Usage of the SimNPH Package"
+subtitle: "Generate Data, Test and Estimate, Summarise"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{simple_example}
@@ -312,7 +312,8 @@ res <- runSimulation(
 ```{r}
 res |>
   subset(select=c(
-    "delay", "coxph.HR.bias", "coxph.gAHR.bias", "coxph.HR.mse", "coxph.gAHR.mse", "coxph.HR.coverage", "coxph.gAHR.coverage"
+    "delay", "coxph.HR.bias", "coxph.gAHR.bias", "coxph.HR.mse", 
+    "coxph.gAHR.mse", "coxph.HR.coverage", "coxph.gAHR.coverage"
   )) |> 
   knitr::kable()
 ```
