@@ -15,7 +15,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup, results='hide'}
+```{r setup, results='hide', message=FALSE, warning=FALSE}
 library(SimDesign)
 library(SimNPH)
 library(parallel)
@@ -74,7 +74,6 @@ Define the data generating 'generate' function, that beside simulating the time
 to event also applies the different censoring processes.
 
 ```{r}
-## Ev auch fuer generator - default generator function
 my_generator <- function(condition, fixed_objects=NULL){
   generate_delayed_effect(condition, fixed_objects) |>
     recruitment_uniform(condition$recruitment) |>
@@ -108,7 +107,7 @@ Summarise <- create_summarise_function(
   maxcombo = function(condition, results, fixed_objects=NULL){
     data.frame("rejection"=mean(results$p < alpha))
   },
-  logrank  = function(condition, results, fixed_objects=NULL){
+  logrank = function(condition, results, fixed_objects=NULL){
     data.frame("rejection"=mean(results$p < alpha))
   }
 )
@@ -146,7 +145,7 @@ res <- runSimulation(
 
 ```{r}
 res |> 
-  subset(select=c("delay", "rejection...10", "rejection...11")) |>
+  subset(select=c("delay", "maxcombo.rejection", "logrank.rejection")) |>
   knitr::kable()
 ```
 
@@ -196,7 +195,7 @@ Analyse <-  list(
 )
 ```
 
-## A `Summarise` function for the more complex scenario
+## A 'Summarise' function for the more complex scenario
 
 The output of the function created with `analyse_group_sequential` contains
 additional columsn. `rejected_at_stage` includes the stage at which the null was
@@ -209,15 +208,9 @@ The results object also includes the results returned by each stage in
 `results_stages`, but here we only use the overall test-decision.
 
 ```{r}
-## Schoen waer eine standard funktion der ich nur die (Namen der) Analyse function uebergeb, und dann fuer alle die gleiche Summary bekomme (ev. default)
-
-## zB. create_summarise_function(Analyse,summarize_test)
-## c(create_summarize(Analyse_tests,summarize_test),create_summarize(Analyse_est,summarize_est))
-## summarize_test=function(...) data.frame(...)
-## create_summarize(Analyse_exotic,function(...) customsummarycode)
 Summarise <- create_summarise_function(
-  maxcombo_seq = summarise_group_sequential,
-  logrank_seq = summarise_group_sequential
+  maxcombo_seq = summarise_group_sequential(),
+  logrank_seq = summarise_group_sequential()
 )
 
 ```
@@ -293,14 +286,14 @@ statistics.
 
 ```{r}
 Summarise <- create_summarise_function(
-    coxph=summarise_estimator(hr, gAHR, hr_lower, hr_upper),
-    coxph=summarise_estimator(hr, hazard_trt/hazard_ctrl, hr_lower, hr_upper)
+    coxph=summarise_estimator(hr, gAHR, hr_lower, hr_upper, name="gAHR"),
+    coxph=summarise_estimator(hr, hazard_trt/hazard_ctrl, hr_lower, hr_upper, name="HR")
   )
 ```
 
 ## Putting it all together
 
-```{r}
+```{r, results='hide'}
 Analyse <- list(
   coxph = analyse_coxph
 )
@@ -319,7 +312,7 @@ res <- runSimulation(
 ```{r}
 res |>
   subset(select=c(
-    "delay", "coxph.bias", "coxph.1.bias", "coxph.mse", "coxph.1.mse", "coxph.coverage", "coxph.1.coverage"
+    "delay", "coxph.HR.bias", "coxph.gAHR.bias", "coxph.HR.mse", "coxph.gAHR.mse", "coxph.HR.coverage", "coxph.gAHR.coverage"
   )) |> 
   knitr::kable()
 ```

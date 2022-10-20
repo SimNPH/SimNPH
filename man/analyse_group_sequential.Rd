@@ -7,7 +7,7 @@
 \usage{
 analyse_group_sequential(followup, followup_type, alpha, analyse_functions)
 
-summarise_group_sequential(condition, results, fixed_objects = NULL)
+summarise_group_sequential(name = NULL)
 }
 \arguments{
 \item{followup}{followup events or time}
@@ -18,16 +18,20 @@ summarise_group_sequential(condition, results, fixed_objects = NULL)
 
 \item{analyse_functions}{analyse function or list of analyse functions}
 
-\item{condition}{condition row passed from runSimulation}
-
-\item{results}{list of results from analyse functions}
-
-\item{fixed_objects}{fixed_objects passed from runSimulation}
+\item{name}{name attribute of the returned closure}
 }
 \value{
 an analyse function that can be used in runSimulation
 
-Returns a \code{data.frame} with the columns
+Returns a function with the arguments:
+\itemize{
+\item condition
+\item results
+\item fixed objects
+}
+
+that can be passed to create_summarise_function or to
+SimDesign::runSimulation and that returns a \code{data.frame} with the columns
 \itemize{
 \item \code{rejection} the empirical rejection rate
 \item \code{n_pat} the mean number of patients recruited
@@ -66,7 +70,7 @@ analyse_maxcombo_sequential <- analyse_group_sequential(
   analyse_functions = analyse_maxcombo
 )
 Summarise <- create_summarise_function(
-  maxcombo_seq = summarise_group_sequential,
-  logrank_seq = summarise_group_sequential
+  maxcombo_seq = summarise_group_sequential(),
+  logrank_seq = summarise_group_sequential(name="logrank")
 )
 }

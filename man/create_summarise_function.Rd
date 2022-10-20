@@ -30,7 +30,10 @@ the SimNPH package all return lists.)
 
 The individual summarise functions have to return data.frames, which are
 concatendated column-wise to give one row per condition. The names of the
-analyse methods are prepended to the respective coumn names.
+analyse methods are prepended to the respective coumn names, if the
+functions have a "name" attribute this is appended to the column names of
+the output. Column names not unique after that are appended numbers by
+\code{make.unique}.
 }
 \examples{
 Summarise <- create_summarise_function(

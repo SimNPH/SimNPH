@@ -1,14 +1,14 @@
 test_that("creating summarise function from many functions works", {
 
   Summarise <- create_summarise_function(
-    method1 = function(condition, results, fixed_objects){
-      mean(results$value1)
-    },
+    method1 = `attr<-`(function(condition, results, fixed_objects){
+      data.frame(val=mean(results$value1))
+    }, "name", "mean_val_1"),
     method2 = function(condition, results, fixed_objects){
-      mean(results$value2)
+      data.frame(val=mean(results$value2))
     },
     method1 = function(condition, results, fixed_objects){
-      median(results$value1)
+      data.frame(val=median(results$value1))
     },
     method3 = function(condition, results, fixed_objects){
       data.frame(x=2, y=2)
@@ -26,10 +26,10 @@ test_that("creating summarise function from many functions works", {
   summary <- Summarise(condition, results)
 
   expect_type(Summarise, "closure")
-  expect_equal(as.numeric(summary[1, ]), c(4,4,1,NA_real_))
+  expect_equal(as.numeric(summary[1, ]), c(4,4,1))
   expect_type(summary, "list")
   expect_s3_class(summary, "data.frame")
-  expect_named(summary, c("method1", "method2", "method1.1", "method3"))
+  expect_named(summary, c("method1.mean_val_1.val", "method2.val", "method1.val"))
 })
 
 test_that("creating a summarise function for an estimator works", {
@@ -44,8 +44,8 @@ test_that("creating a summarise function for an estimator works", {
 
   # create some summarise functions
   summarise_all <- create_summarise_function(
-    coxph=summarise_estimator(hr, gAHR, hr_lower, hr_upper),
-    coxph=summarise_estimator(hr, hazard_trt/hazard_ctrl, hr_lower, hr_upper),
+    coxph=summarise_estimator(hr, gAHR, hr_lower, hr_upper, name="gAHR"),
+    coxph=summarise_estimator(hr, hazard_trt/hazard_ctrl, hr_lower, hr_upper, name="hr"),
     coxph=summarise_estimator(exp(coef), gAHR),
     coxph=summarise_estimator(hr, NA_real_)
   )
@@ -70,7 +70,7 @@ test_that("creating a summarise function for an estimator works", {
     )
   )
 
-  expected_names <- expand.grid("coxph.", c("bias", "var", "mse", "mae", "coverage", "width"), c("", paste0(1:3, "."))) |>
+  expected_names <- expand.grid("coxph.", c("bias", "var", "mse", "mae", "coverage", "width"), c("gAHR.", "hr.", "", "1.")) |>
     subset(select=c(1,3,2)) |>
     apply(1, paste, collapse="") |>
     unname()
@@ -79,7 +79,7 @@ test_that("creating a summarise function for an estimator works", {
 
   expect_named(sim_results, expected_names)
 
-  expect(all(is.na(sim_results[, c("coxph.3.mse", "coxph.3.mae", "coxph.3.bias", "coxph.3.coverage")])), "summary results depending on the true value should be missing when the true value is not given")
-  expect(all(is.na(sim_results[, c("coxph.2.coverage", "coxph.2.width")])), "summary results depending on the CI should be missing if no CI boundaries are given")
+  expect(all(is.na(sim_results[, c("coxph.1.mse", "coxph.1.mae", "coxph.1.bias", "coxph.1.coverage")])), "summary results depending on the true value should be missing when the true value is not given")
+  expect(all(is.na(sim_results[, c("coxph.coverage", "coxph.width")])), "summary results depending on the CI should be missing if no CI boundaries are given")
 
 })

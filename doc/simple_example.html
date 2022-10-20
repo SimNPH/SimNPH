@@ -12,7 +12,7 @@
 
 
 
-<title>simple_example</title>
+<title>Logrank Test vs. MaxCombo Test to Analyse Datasets with delayed treatment effects</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -330,12 +330,24 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 
 
-<h1 class="title toc-ignore">simple_example</h1>
+<h1 class="title toc-ignore">Logrank Test vs. MaxCombo Test to Analyse
+Datasets with delayed treatment effects</h1>
+<h3 class="subtitle">A simple example</h3>
 
 
 
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(SimDesign)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(SimNPH)</span></code></pre></div>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(SimNPH)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(parallel)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>cl <span class="ot">&lt;-</span> <span class="fu">makeCluster</span>(<span class="dv">8</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">clusterEvalQ</span>(cl, {</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">library</span>(SimDesign)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">library</span>(SimNPH)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">library</span>(parallel)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>})</span></code></pre></div>
+<div id="a-simple-scenario-with-fixed-followup" class="section level1">
+<h1>A simple scenario with fixed followup</h1>
 <p>This is a simple example on how to run a simulation of analyses of
 datasets with a delayed treatment effect using the max-combo and the
 log-rank test. The</p>
@@ -349,28 +361,45 @@ Each line corresponds to one simulation to be run.</p>
 <code>n_ctrl</code>: number of patients in the control arm,
 <code>delay</code>: delay until onset of treatment effect,
 <code>hazard_ctrl</code>: hazard under control and before onset of
-treatment effect, <code>hazart_trt</code>: hazard under treatement,
+treatment effect, <code>hazart_trt</code>: hazard under treatment,
 <code>t_max</code>: maximum time of observation.</p>
 <p>An example design <code>tibble</code> with all parameters filled out
 can be created with <code>desing_skeleton_delayed_effect</code>. Use the
-function to output a skeleton you can fill in or to create a design
+function to output an example function call that you can copy and modify
+as needed, or assign the result to a variable to obtain a design
 <code>tibble</code> with some default parameters.</p>
-<p>We will run simulations for 50 patients in each arm, a constant
-hazard of 0.2 under control and a hazard of 0.02 under treatment and a
-maximum time of 1000. The cutoff time will vary from 0 to 10 in steps of
-2.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>Design <span class="ot">&lt;-</span> <span class="fu">desing_skeleton_delayed_effect</span>()</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; createDesign(</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   n_trt=50,               # 100 patients in the treatment arm</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   n_ctrl=50,              # 100 patients in the control arm</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   delay=seq(0, 10, by=2), # delay of 0, 1, ..., 10 days</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   hazard_ctrl=0.2,        # hazard under control and before treatment effect</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   hazard_trt=0.02,        # hazard after onset of treatment effect</span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   t_max=1000              # cutoff time</span></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; )</span></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(Design)</span></code></pre></div>
-<table>
+<p>By default this will create a simulation design skeleton for
+simulations of 50 patients in each arm, a constant hazard of 0.2 under
+control and a hazard of 0.02 under treatment after the effect onset
+varying from 0 to 10.</p>
+<!-- TODO set parameters to be somehow relevant (e.g. not 5mts delay and 200mts follow-up) -->
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>N_sim <span class="ot">&lt;-</span> <span class="dv">100</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>Design <span class="ot">&lt;-</span> <span class="fu">desing_skeleton_delayed_effect</span>()</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; createDesign(</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   n_trt=50,               # 100 patients in the treatment arm</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   n_ctrl=50,              # 100 patients in the control arm</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   delay=seq(0, 10, by=2), # delay of 0, 1, ..., 10 days</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   hazard_ctrl=0.2,        # hazard under control and before treatment effect</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   hazard_trt=0.02         # hazard after onset of treatment effect</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; )</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>Design<span class="sc">$</span>followup <span class="ot">&lt;-</span> <span class="dv">200</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>Design<span class="sc">$</span>random_withdrawal <span class="ot">&lt;-</span> <span class="fl">0.01</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>Design<span class="sc">$</span>recruitment <span class="ot">&lt;-</span> <span class="dv">50</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(Design)</span></code></pre></div>
+<table style="width:100%;">
+<colgroup>
+<col width="7%" />
+<col width="8%" />
+<col width="7%" />
+<col width="14%" />
+<col width="13%" />
+<col width="11%" />
+<col width="22%" />
+<col width="14%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th align="right">n_trt</th>
@@ -378,7 +407,9 @@ maximum time of 1000. The cutoff time will vary from 0 to 10 in steps of
 <th align="right">delay</th>
 <th align="right">hazard_ctrl</th>
 <th align="right">hazard_trt</th>
-<th align="right">t_max</th>
+<th align="right">followup</th>
+<th align="right">random_withdrawal</th>
+<th align="right">recruitment</th>
 </tr>
 </thead>
 <tbody>
@@ -388,7 +419,9 @@ maximum time of 1000. The cutoff time will vary from 0 to 10 in steps of
 <td align="right">0</td>
 <td align="right">0.2</td>
 <td align="right">0.02</td>
-<td align="right">1000</td>
+<td align="right">200</td>
+<td align="right">0.01</td>
+<td align="right">50</td>
 </tr>
 <tr class="even">
 <td align="right">50</td>
@@ -396,7 +429,9 @@ maximum time of 1000. The cutoff time will vary from 0 to 10 in steps of
 <td align="right">2</td>
 <td align="right">0.2</td>
 <td align="right">0.02</td>
-<td align="right">1000</td>
+<td align="right">200</td>
+<td align="right">0.01</td>
+<td align="right">50</td>
 </tr>
 <tr class="odd">
 <td align="right">50</td>
@@ -404,7 +439,9 @@ maximum time of 1000. The cutoff time will vary from 0 to 10 in steps of
 <td align="right">4</td>
 <td align="right">0.2</td>
 <td align="right">0.02</td>
-<td align="right">1000</td>
+<td align="right">200</td>
+<td align="right">0.01</td>
+<td align="right">50</td>
 </tr>
 <tr class="even">
 <td align="right">50</td>
@@ -412,7 +449,9 @@ maximum time of 1000. The cutoff time will vary from 0 to 10 in steps of
 <td align="right">6</td>
 <td align="right">0.2</td>
 <td align="right">0.02</td>
-<td align="right">1000</td>
+<td align="right">200</td>
+<td align="right">0.01</td>
+<td align="right">50</td>
 </tr>
 <tr class="odd">
 <td align="right">50</td>
@@ -420,7 +459,9 @@ maximum time of 1000. The cutoff time will vary from 0 to 10 in steps of
 <td align="right">8</td>
 <td align="right">0.2</td>
 <td align="right">0.02</td>
-<td align="right">1000</td>
+<td align="right">200</td>
+<td align="right">0.01</td>
+<td align="right">50</td>
 </tr>
 <tr class="even">
 <td align="right">50</td>
@@ -428,34 +469,53 @@ maximum time of 1000. The cutoff time will vary from 0 to 10 in steps of
 <td align="right">10</td>
 <td align="right">0.2</td>
 <td align="right">0.02</td>
-<td align="right">1000</td>
+<td align="right">200</td>
+<td align="right">0.01</td>
+<td align="right">50</td>
 </tr>
 </tbody>
 </table>
 </div>
+<div id="defining-the-generate-funcion" class="section level2">
+<h2>Defining the ‘Generate’ funcion</h2>
+<p>Define the data generating ‘generate’ function, that beside
+simulating the time to event also applies the different censoring
+processes.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>my_generator <span class="ot">&lt;-</span> <span class="cf">function</span>(condition, <span class="at">fixed_objects=</span><span class="cn">NULL</span>){</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate_delayed_effect</span>(condition, fixed_objects) <span class="sc">|&gt;</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">recruitment_uniform</span>(condition<span class="sc">$</span>recruitment) <span class="sc">|&gt;</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">random_censoring_exp</span>(condition<span class="sc">$</span>random_withdrawal) <span class="sc">|&gt;</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">admin_censoring_time</span>(condition<span class="sc">$</span>followup)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>} </span></code></pre></div>
+</div>
 <div id="defining-the-summarise-function" class="section level2">
-<h2>Defining the summarise function</h2>
-<p>We will use a very simple summarise function that just outputs the
-power function for the logrank and the maxcombo test. The functions
-<code>analyse_logrank</code> and <code>analyse_maxcombo</code> (used in
-the call to <code>runSimulation</code> later on) output a
-<code>data.frame</code> containing the column <code>p</code> with the
-<code>p</code> value of the test. For each szenario we just average the
-number of times the test discards the null to get the power.</p>
-<p>The columns <code>results$maxcombo.p</code> and
-<code>results$logrank.p</code> are named after the name of the function
-in the named list given to the <code>analyse</code> argument of
-<code>runSimulation</code> and the name of the column returned by
-<code>analyse_logrank</code> and <code>analyse_maxcombo</code>.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>alpha <span class="ot">&lt;-</span> <span class="fl">0.05</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>Summarise <span class="ot">&lt;-</span> <span class="cf">function</span>(condition, results, <span class="at">fixed_objects =</span> <span class="cn">NULL</span>) {</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    ret <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>      <span class="at">power.maxcombo =</span> <span class="fu">mean</span>(results<span class="sc">$</span>maxcombo.p <span class="sc">&lt;</span> alpha),</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>      <span class="at">power.logrank  =</span> <span class="fu">mean</span>(results<span class="sc">$</span>logrank.p  <span class="sc">&lt;</span> alpha)</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    ret</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<h2>Defining the ‘Summarise’ function</h2>
+<p>Next, we need to specify a summary function that computes the desired
+operating characteristics for each simulation scenario, and each
+analysis method. In the example below, we specify a summary function
+that computes the power (as we consider scenarios under the alternative
+in the example) of the log-rank test and the max-combo test across
+simulated scenarios. For each scenario we just average the number of
+times the computed p-value is below the significance level obtain the
+power.</p>
+<p>The results object contains the results of all replications of the
+corresponding method for each row of the <code>Design</code> object. In
+this example <code>results$p</code> contains all <code>N_sim</code>
+p-values returned by the <code>analyse_maxcombo</code> or
+<code>analyse_logrank</code> functions respectively. The Summary will
+contain two columns <code>rejection.maxcombo</code> and
+<code>rejection.logrank</code> with the empirical rejection rates of
+both tests for each scenario.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>alpha <span class="ot">&lt;-</span> <span class="fl">0.05</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>Summarise <span class="ot">&lt;-</span> <span class="fu">create_summarise_function</span>(</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">maxcombo =</span> <span class="cf">function</span>(condition, results, <span class="at">fixed_objects=</span><span class="cn">NULL</span>){</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">data.frame</span>(<span class="st">&quot;rejection&quot;</span><span class="ot">=</span><span class="fu">mean</span>(results<span class="sc">$</span>p <span class="sc">&lt;</span> alpha))</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  },</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">logrank =</span> <span class="cf">function</span>(condition, results, <span class="at">fixed_objects=</span><span class="cn">NULL</span>){</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">data.frame</span>(<span class="st">&quot;rejection&quot;</span><span class="ot">=</span><span class="fu">mean</span>(results<span class="sc">$</span>p <span class="sc">&lt;</span> alpha))</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div id="putting-it-all-together" class="section level2">
 <h2>Putting it all together</h2>
@@ -470,49 +530,31 @@ defined before and the simulations should be run in parallel.</p>
 <p>Finally we select the interesting columns from the output. Since all
 other parameters are the same for each scenario we just select delay and
 the powers of the two tests.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">runSimulation</span>(</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  Design,</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">replications =</span> <span class="dv">100</span>,</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">generate =</span> generate_delayed_effect,</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">analyse =</span> <span class="fu">list</span>(</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">logrank  =</span> analyse_logrank,</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">maxcombo =</span> analyse_maxcombo</span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  ),</span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">summarise =</span> Summarise,</span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">parallel =</span> <span class="cn">TRUE</span></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Number of parallel clusters in use: 8</span></span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>Design row<span class="sc">:</span> <span class="dv">1</span><span class="sc">/</span><span class="dv">6</span>;   Started<span class="sc">:</span> Thu Apr <span class="dv">28</span> <span class="dv">11</span><span class="sc">:</span><span class="dv">53</span><span class="sc">:</span><span class="dv">06</span> <span class="dv">2022</span>;   Total elapsed time<span class="sc">:</span> <span class="fl">0.00</span>s </span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>Design row<span class="sc">:</span> <span class="dv">2</span><span class="sc">/</span><span class="dv">6</span>;   Started<span class="sc">:</span> Thu Apr <span class="dv">28</span> <span class="dv">11</span><span class="sc">:</span><span class="dv">53</span><span class="sc">:</span><span class="dv">11</span> <span class="dv">2022</span>;   Total elapsed time<span class="sc">:</span> <span class="fl">4.42</span>s </span>
-<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>Design row<span class="sc">:</span> <span class="dv">3</span><span class="sc">/</span><span class="dv">6</span>;   Started<span class="sc">:</span> Thu Apr <span class="dv">28</span> <span class="dv">11</span><span class="sc">:</span><span class="dv">53</span><span class="sc">:</span><span class="dv">16</span> <span class="dv">2022</span>;   Total elapsed time<span class="sc">:</span> <span class="fl">9.28</span>s </span>
-<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>Design row<span class="sc">:</span> <span class="dv">4</span><span class="sc">/</span><span class="dv">6</span>;   Started<span class="sc">:</span> Thu Apr <span class="dv">28</span> <span class="dv">11</span><span class="sc">:</span><span class="dv">53</span><span class="sc">:</span><span class="dv">21</span> <span class="dv">2022</span>;   Total elapsed time<span class="sc">:</span> <span class="fl">14.16</span>s </span>
-<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>Design row<span class="sc">:</span> <span class="dv">5</span><span class="sc">/</span><span class="dv">6</span>;   Started<span class="sc">:</span> Thu Apr <span class="dv">28</span> <span class="dv">11</span><span class="sc">:</span><span class="dv">53</span><span class="sc">:</span><span class="dv">25</span> <span class="dv">2022</span>;   Total elapsed time<span class="sc">:</span> <span class="fl">18.74</span>s </span>
-<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>Design row<span class="sc">:</span> <span class="dv">6</span><span class="sc">/</span><span class="dv">6</span>;   Started<span class="sc">:</span> Thu Apr <span class="dv">28</span> <span class="dv">11</span><span class="sc">:</span><span class="dv">53</span><span class="sc">:</span><span class="dv">30</span> <span class="dv">2022</span>;   Total elapsed time<span class="sc">:</span> <span class="fl">23.72</span>s</span>
-<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Simulation complete. Total execution time: 28.33s</span></span>
-<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a>res <span class="sc">|&gt;</span> </span>
-<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">subset</span>(<span class="at">select=</span><span class="fu">c</span>(<span class="st">&quot;delay&quot;</span>, <span class="st">&quot;power.maxcombo&quot;</span>, <span class="st">&quot;power.logrank&quot;</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">runSimulation</span>(</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  Design,</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">replications =</span> N_sim,</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">generate =</span> my_generator,</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">analyse =</span> <span class="fu">list</span>(</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">logrank  =</span> analyse_logrank,</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">maxcombo =</span> analyse_maxcombo</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">summarise =</span> Summarise,</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">cl =</span> cl,</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">save=</span><span class="cn">FALSE</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Number of parallel clusters in use: 8</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Simulation complete. Total execution time: 22.11s</span></span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>res <span class="sc">|&gt;</span> </span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">subset</span>(<span class="at">select=</span><span class="fu">c</span>(<span class="st">&quot;delay&quot;</span>, <span class="st">&quot;maxcombo.rejection&quot;</span>, <span class="st">&quot;logrank.rejection&quot;</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div>
 <table>
 <thead>
 <tr class="header">
 <th align="right">delay</th>
-<th align="right">power.maxcombo</th>
-<th align="right">power.logrank</th>
+<th align="right">maxcombo.rejection</th>
+<th align="right">logrank.rejection</th>
 </tr>
 </thead>
 <tbody>
@@ -528,26 +570,602 @@ the powers of the two tests.</p>
 </tr>
 <tr class="odd">
 <td align="right">4</td>
-<td align="right">1.00</td>
 <td align="right">0.98</td>
+<td align="right">0.75</td>
 </tr>
 <tr class="even">
 <td align="right">6</td>
-<td align="right">0.76</td>
-<td align="right">0.57</td>
+<td align="right">0.80</td>
+<td align="right">0.45</td>
 </tr>
 <tr class="odd">
 <td align="right">8</td>
-<td align="right">0.42</td>
-<td align="right">0.26</td>
+<td align="right">0.40</td>
+<td align="right">0.19</td>
 </tr>
 <tr class="even">
 <td align="right">10</td>
-<td align="right">0.16</td>
-<td align="right">0.10</td>
+<td align="right">0.15</td>
+<td align="right">0.12</td>
 </tr>
 </tbody>
 </table>
+</div>
+</div>
+<div id="a-scenario-with-an-interim-analysis" class="section level1">
+<h1>A scenario with an interim analysis</h1>
+<p>In this scenario we extend the scenario from above to include a fixed
+followup as well as an interim analysis after a fixed number of events.
+For this we will define additional analyse functions.</p>
+<p>First we extend the Design to include a column with the number of
+events after which an interim analysis should be done.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>Design<span class="sc">$</span>interim_events <span class="ot">&lt;-</span> <span class="dv">25</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>Design<span class="sc">$</span>final_events <span class="ot">&lt;-</span> <span class="dv">50</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(Design)</span></code></pre></div>
+<table>
+<colgroup>
+<col width="5%" />
+<col width="6%" />
+<col width="5%" />
+<col width="11%" />
+<col width="10%" />
+<col width="8%" />
+<col width="16%" />
+<col width="11%" />
+<col width="13%" />
+<col width="11%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="right">n_trt</th>
+<th align="right">n_ctrl</th>
+<th align="right">delay</th>
+<th align="right">hazard_ctrl</th>
+<th align="right">hazard_trt</th>
+<th align="right">followup</th>
+<th align="right">random_withdrawal</th>
+<th align="right">recruitment</th>
+<th align="right">interim_events</th>
+<th align="right">final_events</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">50</td>
+<td align="right">50</td>
+<td align="right">0</td>
+<td align="right">0.2</td>
+<td align="right">0.02</td>
+<td align="right">200</td>
+<td align="right">0.01</td>
+<td align="right">50</td>
+<td align="right">25</td>
+<td align="right">50</td>
+</tr>
+<tr class="even">
+<td align="right">50</td>
+<td align="right">50</td>
+<td align="right">2</td>
+<td align="right">0.2</td>
+<td align="right">0.02</td>
+<td align="right">200</td>
+<td align="right">0.01</td>
+<td align="right">50</td>
+<td align="right">25</td>
+<td align="right">50</td>
+</tr>
+<tr class="odd">
+<td align="right">50</td>
+<td align="right">50</td>
+<td align="right">4</td>
+<td align="right">0.2</td>
+<td align="right">0.02</td>
+<td align="right">200</td>
+<td align="right">0.01</td>
+<td align="right">50</td>
+<td align="right">25</td>
+<td align="right">50</td>
+</tr>
+<tr class="even">
+<td align="right">50</td>
+<td align="right">50</td>
+<td align="right">6</td>
+<td align="right">0.2</td>
+<td align="right">0.02</td>
+<td align="right">200</td>
+<td align="right">0.01</td>
+<td align="right">50</td>
+<td align="right">25</td>
+<td align="right">50</td>
+</tr>
+<tr class="odd">
+<td align="right">50</td>
+<td align="right">50</td>
+<td align="right">8</td>
+<td align="right">0.2</td>
+<td align="right">0.02</td>
+<td align="right">200</td>
+<td align="right">0.01</td>
+<td align="right">50</td>
+<td align="right">25</td>
+<td align="right">50</td>
+</tr>
+<tr class="even">
+<td align="right">50</td>
+<td align="right">50</td>
+<td align="right">10</td>
+<td align="right">0.2</td>
+<td align="right">0.02</td>
+<td align="right">200</td>
+<td align="right">0.01</td>
+<td align="right">50</td>
+<td align="right">25</td>
+<td align="right">50</td>
+</tr>
+</tbody>
+</table>
+<div id="analyse-functions-with-an-interim-analysis" class="section level2">
+<h2>‘Analyse’ functions with an interim analysis</h2>
+<p>The <code>analyse_group_sequential</code> function allows to combine
+two or more analyse functions to create an analysis function
+corresponding to a group sequential design. The arguments are the times
+or events after which the analyses are done, the nominal alpha at each
+stage and the analyse functions to be used at each stage.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="do">## O&#39;Brien-Fleming Bounds for GSD with interim analysis at information time 1/2</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>nominal_alpha <span class="ot">&lt;-</span> ldbounds<span class="sc">::</span><span class="fu">ldBounds</span>(<span class="fu">c</span>(<span class="fl">0.5</span>,<span class="dv">1</span>))<span class="sc">$</span>nom.alpha</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="fu">clusterExport</span>(cl, <span class="st">&quot;nominal_alpha&quot;</span>)</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>Analyse <span class="ot">&lt;-</span>  <span class="fu">list</span>(</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">logrank_seq  =</span> <span class="fu">analyse_group_sequential</span>(</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">followup =</span> <span class="fu">c</span>(condition<span class="sc">$</span>interim_events, condition<span class="sc">$</span>final_events),</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">followup_type =</span> <span class="fu">c</span>(<span class="st">&quot;event&quot;</span>, <span class="st">&quot;event&quot;</span>),</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> nominal_alpha,</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">analyse_functions =</span> analyse_logrank</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">maxcombo_seq =</span> <span class="fu">analyse_group_sequential</span>(</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">followup =</span> <span class="fu">c</span>(condition<span class="sc">$</span>interim_events, condition<span class="sc">$</span>final_events),</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">followup_type =</span> <span class="fu">c</span>(<span class="st">&quot;event&quot;</span>, <span class="st">&quot;event&quot;</span>),</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> nominal_alpha,</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">analyse_functions =</span> analyse_maxcombo</span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+</div>
+<div id="a-summarise-function-for-the-more-complex-scenario" class="section level2">
+<h2>A ‘Summarise’ function for the more complex scenario</h2>
+<p>The output of the function created with
+<code>analyse_group_sequential</code> contains additional columsn.
+<code>rejected_at_stage</code> includes the stage at which the null was
+first rejected or <code>Inf</code> if the null was not rejected,
+<code>N_pat</code> and <code>N_evt</code> contain the number of patients
+recruited and the number of events observed before the null was rejected
+and <code>followup</code> contains the time after study start at which
+the last analysis was done.</p>
+<p>The results object also includes the results returned by each stage
+in <code>results_stages</code>, but here we only use the overall
+test-decision.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>Summarise <span class="ot">&lt;-</span> <span class="fu">create_summarise_function</span>(</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">maxcombo_seq =</span> <span class="fu">summarise_group_sequential</span>(),</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">logrank_seq =</span> <span class="fu">summarise_group_sequential</span>()</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+</div>
+<div id="putting-it-all-together-1" class="section level2">
+<h2>Putting it all together</h2>
+<p>The call to <code>runSimulation</code> looks almost the same as above
+but now the additional columns we defined in our <code>Summarise</code>
+functions are included in the result.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">runSimulation</span>(</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  Design,</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">replications =</span> N_sim,</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">generate =</span> my_generator,</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">analyse =</span> Analyse,</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">summarise =</span> Summarise,</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">cl =</span> cl,</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">save=</span><span class="cn">FALSE</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Number of parallel clusters in use: 8</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Simulation complete. Total execution time: 25.42s</span></span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>res <span class="sc">|&gt;</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">subset</span>(<span class="at">select=</span><span class="fu">c</span>(</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;delay&quot;</span>, </span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;maxcombo_seq.rejection&quot;</span>, <span class="st">&quot;logrank_seq.rejection&quot;</span>,</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;maxcombo_seq.n_pat&quot;</span>, <span class="st">&quot;logrank_seq.n_pat&quot;</span>,</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;maxcombo_seq.n_evt&quot;</span>, <span class="st">&quot;logrank_seq.n_evt&quot;</span>,</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;maxcombo_seq.followup&quot;</span>, <span class="st">&quot;logrank_seq.followup&quot;</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>    )) <span class="sc">|&gt;</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div>
+<table>
+<colgroup>
+<col width="3%" />
+<col width="13%" />
+<col width="13%" />
+<col width="11%" />
+<col width="10%" />
+<col width="11%" />
+<col width="10%" />
+<col width="13%" />
+<col width="12%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="right">delay</th>
+<th align="right">maxcombo_seq.rejection</th>
+<th align="right">logrank_seq.rejection</th>
+<th align="right">maxcombo_seq.n_pat</th>
+<th align="right">logrank_seq.n_pat</th>
+<th align="right">maxcombo_seq.n_evt</th>
+<th align="right">logrank_seq.n_evt</th>
+<th align="right">maxcombo_seq.followup</th>
+<th align="right">logrank_seq.followup</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">0</td>
+<td align="right">1.00</td>
+<td align="right">1.00</td>
+<td align="right">54.26</td>
+<td align="right">54.26</td>
+<td align="right">26.25</td>
+<td align="right">26.25</td>
+<td align="right">27.09765</td>
+<td align="right">27.09765</td>
+</tr>
+<tr class="even">
+<td align="right">2</td>
+<td align="right">1.00</td>
+<td align="right">0.97</td>
+<td align="right">58.42</td>
+<td align="right">69.76</td>
+<td align="right">35.25</td>
+<td align="right">44.00</td>
+<td align="right">29.10240</td>
+<td align="right">34.64550</td>
+</tr>
+<tr class="odd">
+<td align="right">4</td>
+<td align="right">0.80</td>
+<td align="right">0.54</td>
+<td align="right">69.62</td>
+<td align="right">71.29</td>
+<td align="right">47.75</td>
+<td align="right">49.25</td>
+<td align="right">34.35649</td>
+<td align="right">35.21559</td>
+</tr>
+<tr class="even">
+<td align="right">6</td>
+<td align="right">0.36</td>
+<td align="right">0.17</td>
+<td align="right">66.37</td>
+<td align="right">67.63</td>
+<td align="right">48.50</td>
+<td align="right">49.50</td>
+<td align="right">33.15296</td>
+<td align="right">33.75750</td>
+</tr>
+<tr class="odd">
+<td align="right">8</td>
+<td align="right">0.10</td>
+<td align="right">0.07</td>
+<td align="right">66.09</td>
+<td align="right">66.09</td>
+<td align="right">50.00</td>
+<td align="right">50.00</td>
+<td align="right">33.21763</td>
+<td align="right">33.21763</td>
+</tr>
+<tr class="even">
+<td align="right">10</td>
+<td align="right">0.06</td>
+<td align="right">0.03</td>
+<td align="right">64.58</td>
+<td align="right">64.27</td>
+<td align="right">50.00</td>
+<td align="right">49.75</td>
+<td align="right">32.48209</td>
+<td align="right">32.31849</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="estimation" class="section level1">
+<h1>Estimation</h1>
+<div id="calculating-the-true-values-of-the-summary-statistics" class="section level2">
+<h2>Calculating the true values of the summary statistics</h2>
+<p>To evaluate the performance of an estimator, we first compute the
+values of some true summary statistics to which the estimates will be
+compared. The most relevant true summary statistics can be computed by a
+convenience function for each scenario. Just pipe the Design data.frame
+to the function and the values of the statistics are added as
+columns.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>Design <span class="ot">&lt;-</span> Design <span class="sc">|&gt;</span> </span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">true_summary_statistics_delayed_effect</span>()</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(Design)</span></code></pre></div>
+<table>
+<colgroup>
+<col width="3%" />
+<col width="3%" />
+<col width="3%" />
+<col width="6%" />
+<col width="5%" />
+<col width="4%" />
+<col width="9%" />
+<col width="6%" />
+<col width="7%" />
+<col width="6%" />
+<col width="4%" />
+<col width="10%" />
+<col width="5%" />
+<col width="11%" />
+<col width="5%" />
+<col width="5%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="right">n_trt</th>
+<th align="right">n_ctrl</th>
+<th align="right">delay</th>
+<th align="right">hazard_ctrl</th>
+<th align="right">hazard_trt</th>
+<th align="right">followup</th>
+<th align="right">random_withdrawal</th>
+<th align="right">recruitment</th>
+<th align="right">interim_events</th>
+<th align="right">final_events</th>
+<th align="right">rmst_trt</th>
+<th align="right">median_survival_trt</th>
+<th align="right">rmst_ctrl</th>
+<th align="right">median_survival_ctrl</th>
+<th align="right">gAHR</th>
+<th align="right">AHR</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">50</td>
+<td align="right">50</td>
+<td align="right">0</td>
+<td align="right">0.2</td>
+<td align="right">0.02</td>
+<td align="right">200</td>
+<td align="right">0.01</td>
+<td align="right">50</td>
+<td align="right">25</td>
+<td align="right">50</td>
+<td align="right">9.063462</td>
+<td align="right">34.657361</td>
+<td align="right">4.323324</td>
+<td align="right">3.465736</td>
+<td align="right">0.2999391</td>
+<td align="right">0.1000000</td>
+</tr>
+<tr class="even">
+<td align="right">50</td>
+<td align="right">50</td>
+<td align="right">2</td>
+<td align="right">0.2</td>
+<td align="right">0.02</td>
+<td align="right">200</td>
+<td align="right">0.01</td>
+<td align="right">50</td>
+<td align="right">25</td>
+<td align="right">50</td>
+<td align="right">6.603949</td>
+<td align="right">16.657359</td>
+<td align="right">4.323324</td>
+<td align="right">3.465736</td>
+<td align="right">0.4818947</td>
+<td align="right">0.4274490</td>
+</tr>
+<tr class="odd">
+<td align="right">50</td>
+<td align="right">50</td>
+<td align="right">4</td>
+<td align="right">0.2</td>
+<td align="right">0.02</td>
+<td align="right">200</td>
+<td align="right">0.01</td>
+<td align="right">50</td>
+<td align="right">25</td>
+<td align="right">50</td>
+<td align="right">5.293852</td>
+<td align="right">3.465736</td>
+<td align="right">4.323324</td>
+<td align="right">3.465736</td>
+<td align="right">0.6570514</td>
+<td align="right">0.6617127</td>
+</tr>
+<tr class="even">
+<td align="right">50</td>
+<td align="right">50</td>
+<td align="right">6</td>
+<td align="right">0.2</td>
+<td align="right">0.02</td>
+<td align="right">200</td>
+<td align="right">0.01</td>
+<td align="right">50</td>
+<td align="right">25</td>
+<td align="right">50</td>
+<td align="right">4.651875</td>
+<td align="right">3.465737</td>
+<td align="right">4.323324</td>
+<td align="right">3.465736</td>
+<td align="right">0.8044382</td>
+<td align="right">0.8223728</td>
+</tr>
+<tr class="odd">
+<td align="right">50</td>
+<td align="right">50</td>
+<td align="right">8</td>
+<td align="right">0.2</td>
+<td align="right">0.02</td>
+<td align="right">200</td>
+<td align="right">0.01</td>
+<td align="right">50</td>
+<td align="right">25</td>
+<td align="right">50</td>
+<td align="right">4.386342</td>
+<td align="right">3.465739</td>
+<td align="right">4.323324</td>
+<td align="right">3.465736</td>
+<td align="right">0.9178277</td>
+<td align="right">0.9296242</td>
+</tr>
+<tr class="even">
+<td align="right">50</td>
+<td align="right">50</td>
+<td align="right">10</td>
+<td align="right">0.2</td>
+<td align="right">0.02</td>
+<td align="right">200</td>
+<td align="right">0.01</td>
+<td align="right">50</td>
+<td align="right">25</td>
+<td align="right">50</td>
+<td align="right">4.323324</td>
+<td align="right">3.465747</td>
+<td align="right">4.323324</td>
+<td align="right">3.465736</td>
+<td align="right">1.0000000</td>
+<td align="right">1.0000000</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="defining-the-summarise-function-1" class="section level2">
+<h2>Defining the <code>Summarise</code> function</h2>
+<p>In the Summarise function the true value against which the estimator
+should be compared has to be specified. If coverage and average width of
+the confidence intervalls should be estimated, the CI bounds should also
+be specified.</p>
+<p>The arguments to the functions are left unevaluated and are later
+evaluated in the <code>results</code> and <code>condition</code>
+datasets respectively. So any expressions using variables from results
+can be used for the estimated value and the CI bounds and expressions
+using variables from condition can be used in the argument for the real
+value.</p>
+<p>In this case we want to compare the hazard ratio estimated by the cox
+model to the geometric average hazard ratio (the summary statistic the
+Cox model acutally computes under non proportional hazards) as well as
+to the hazard ratio after onset of treatment, calculated from the two
+respective columns of the Design data.frame.</p>
+<p>Note that one name can be used twice to summarise the output of one
+analysis method two times, like in this case, comparing it to two
+different summary statistics.</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>Summarise <span class="ot">&lt;-</span> <span class="fu">create_summarise_function</span>(</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">coxph=</span><span class="fu">summarise_estimator</span>(hr, gAHR, hr_lower, hr_upper, <span class="at">name=</span><span class="st">&quot;gAHR&quot;</span>),</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">coxph=</span><span class="fu">summarise_estimator</span>(hr, hazard_trt<span class="sc">/</span>hazard_ctrl, hr_lower, hr_upper, <span class="at">name=</span><span class="st">&quot;HR&quot;</span>)</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
+</div>
+<div id="putting-it-all-together-2" class="section level2">
+<h2>Putting it all together</h2>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>Analyse <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">coxph =</span> analyse_coxph</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">runSimulation</span>(</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>  Design,</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">replications =</span> N_sim,</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">generate =</span> my_generator,</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">analyse =</span> Analyse,</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">summarise =</span> Summarise,</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">cl =</span> cl,</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">save=</span><span class="cn">FALSE</span></span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Number of parallel clusters in use: 8</span></span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Simulation complete. Total execution time: 13.44s</span></span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>res <span class="sc">|&gt;</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">subset</span>(<span class="at">select=</span><span class="fu">c</span>(</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;delay&quot;</span>, <span class="st">&quot;coxph.HR.bias&quot;</span>, <span class="st">&quot;coxph.gAHR.bias&quot;</span>, <span class="st">&quot;coxph.HR.mse&quot;</span>, <span class="st">&quot;coxph.gAHR.mse&quot;</span>, <span class="st">&quot;coxph.HR.coverage&quot;</span>, <span class="st">&quot;coxph.gAHR.coverage&quot;</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">|&gt;</span> </span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div>
+<table>
+<colgroup>
+<col width="5%" />
+<col width="13%" />
+<col width="15%" />
+<col width="12%" />
+<col width="14%" />
+<col width="17%" />
+<col width="19%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="right">delay</th>
+<th align="right">coxph.HR.bias</th>
+<th align="right">coxph.gAHR.bias</th>
+<th align="right">coxph.HR.mse</th>
+<th align="right">coxph.gAHR.mse</th>
+<th align="right">coxph.HR.coverage</th>
+<th align="right">coxph.gAHR.coverage</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">0</td>
+<td align="right">0.0041741</td>
+<td align="right">-0.1957650</td>
+<td align="right">0.0012482</td>
+<td align="right">0.0395547</td>
+<td align="right">0.92</td>
+<td align="right">0.05</td>
+</tr>
+<tr class="even">
+<td align="right">2</td>
+<td align="right">0.2155839</td>
+<td align="right">-0.1663108</td>
+<td align="right">0.0529527</td>
+<td align="right">0.0341356</td>
+<td align="right">0.02</td>
+<td align="right">0.61</td>
+</tr>
+<tr class="odd">
+<td align="right">4</td>
+<td align="right">0.4459718</td>
+<td align="right">-0.1110796</td>
+<td align="right">0.2120640</td>
+<td align="right">0.0255118</td>
+<td align="right">0.00</td>
+<td align="right">0.91</td>
+</tr>
+<tr class="even">
+<td align="right">6</td>
+<td align="right">0.5871123</td>
+<td align="right">-0.1173259</td>
+<td align="right">0.3694869</td>
+<td align="right">0.0385513</td>
+<td align="right">0.00</td>
+<td align="right">0.87</td>
+</tr>
+<tr class="odd">
+<td align="right">8</td>
+<td align="right">0.7049491</td>
+<td align="right">-0.1128786</td>
+<td align="right">0.5215787</td>
+<td align="right">0.0373671</td>
+<td align="right">0.00</td>
+<td align="right">0.94</td>
+</tr>
+<tr class="even">
+<td align="right">10</td>
+<td align="right">0.8018708</td>
+<td align="right">-0.0981292</td>
+<td align="right">0.6781156</td>
+<td align="right">0.0447481</td>
+<td align="right">0.00</td>
+<td align="right">0.89</td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 
 
