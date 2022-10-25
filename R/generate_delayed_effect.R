@@ -27,7 +27,11 @@
 #'   treatment effect
 #'
 #' @examples
-#' one_simulation <- desing_skeleton_delayed_effect() |>
+#' one_simulation <- merge(
+#'     assumptions_delayed_effect(),
+#'     design_fixed_followup(),
+#'     by=NULL
+#'   ) |>
 #'   head(1) |>
 #'   generate_delayed_effect()
 #' head(one_simulation)
@@ -35,13 +39,15 @@
 generate_delayed_effect <- function(condition, fixed_objects=NULL){
 
   # if t_max is not given in fixed_objects
-  if(is.null(fixed_objects) || (!hasName(fixed_objects, t_max))){
+  if(is.null(fixed_objects) || (!hasName(fixed_objects, "t_max"))){
     # set t_max to 1-1/10000 quantile of control or treatment survival function
     # whichever is later
     t_max <- max(
       log(10000) / condition$hazard_ctrl,
       log(10000) / condition$hazard_trt
     )
+  } else {
+    t_max <- fixed_objects$t_max
   }
 
   # simulate treatment group
@@ -94,11 +100,11 @@ generate_delayed_effect <- function(condition, fixed_objects=NULL){
   rbind(data_trt, data_ctrl)
 }
 
-#' Create design skeleton for use with generate_delayed_effect
+#' Create an empty assumtions data.frame for generate_delayed_effect
 #'
-#' @return For desing_skeleton_delayed_effect: a design tibble with default values invisibly
+#' @return For assumptions_delayed_effect: a design tibble with default values invisibly
 #'
-#' @details desing_skeleton_delayed_effect prints the code to generate a default
+#' @details assumptions_delayed_effect prints the code to generate a default
 #'   design tibble for use with generate_delayed_effect and returns the
 #'   evaluated code invisibly. This function is intended to be used to copy
 #'   paste the code and edit the parameters.
@@ -107,15 +113,14 @@ generate_delayed_effect <- function(condition, fixed_objects=NULL){
 #' @describeIn generate_delayed_effect generate default design tibble
 #'
 #' @examples
-#' Design <- desing_skeleton_delayed_effect()
+#' Design <- assumptions_delayed_effect()
 #' Design
-desing_skeleton_delayed_effect <- function(){
-  skel <- "createDesign(
-  n_trt=50,               # 100 patients in the treatment arm
-  n_ctrl=50,              # 100 patients in the control arm
+assumptions_delayed_effect <- function(){
+  skel <- "expand.grid(
   delay=seq(0, 10, by=2), # delay of 0, 1, ..., 10 days
   hazard_ctrl=0.2,        # hazard under control and before treatment effect
-  hazard_trt=0.02         # hazard after onset of treatment effect
+  hazard_trt=0.02,        # hazard after onset of treatment effect
+  random_withdrawal=0.01  # rate of random withdrawal
 )
 "
 
@@ -139,7 +144,11 @@ invisible(
 #' @describeIn generate_delayed_effect  Calculate hr after onset of treatment effect from gAHR
 #'
 #' @examples
-#' my_design <- desing_skeleton_delayed_effect()
+#' my_design <- merge(
+#'     assumptions_delayed_effect(),
+#'     design_fixed_followup(),
+#'     by=NULL
+#'   )
 #' my_design$hr_trt <- NA
 #' my_design <- hr_after_onset_from_gAHR(my_design, 0.8)
 #' my_design
@@ -167,7 +176,11 @@ hr_after_onset_from_gAHR <- function(design, target_gAHR){
 #' @describeIn generate_delayed_effect  calculate true summary statistics for delayed effect
 #'
 #' @examples
-#' my_design <- desing_skeleton_delayed_effect()
+#' my_design <- merge(
+#'     assumptions_delayed_effect(),
+#'     design_fixed_followup(),
+#'     by=NULL
+#'   )
 #' my_design$follwup <- 15
 #' my_design <- true_summary_statistics_delayed_effect(my_design, cutoff_stats=my_design$followup)
 #' my_design
@@ -176,13 +189,15 @@ true_summary_statistics_delayed_effect <- function(Design, cutoff_stats=10, fixe
   true_summary_statistics_delayed_effect_rowwise <- function(condition, cutoff_stats){
 
     # if t_max is not given in fixed_objects
-    if(is.null(fixed_objects) || (!hasName(fixed_objects, t_max))){
+    if(is.null(fixed_objects) || (!hasName(fixed_objects, "t_max"))){
       # set t_max to 1-1/10000 quantile of control or treatment survival function
       # whichever is later
       t_max <- max(
         log(10000) / condition$hazard_ctrl,
         log(10000) / condition$hazard_trt
       )
+    } else {
+      t_max <- fixed_objects$t_max
     }
 
     # create functions for treatment group

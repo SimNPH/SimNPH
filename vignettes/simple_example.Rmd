@@ -59,11 +59,11 @@ patients in each arm, a constant hazard of 0.2 under control and a hazard of
 ```{r}
 N_sim <- 100
 
-Design <- desing_skeleton_delayed_effect()
+Assumptions <- assumptions_delayed_effect()
 
-Design$followup <- 200
-Design$random_withdrawal <- 0.01
-Design$recruitment <- 50
+Options <- design_fixed_followup()
+
+Design <- merge(Assumptions, Options, by=NULL)
 
 knitr::kable(Design)
 ```
@@ -159,8 +159,9 @@ First we extend the Design to include a column with the number of events after
 which an interim analysis should be done.
 
 ```{r}
-Design$interim_events <- 25
-Design$final_events <- 50
+Options <- design_group_sequential()
+
+Design <- merge(Assumptions, Options, by=NULL)
 
 knitr::kable(Design)
 ```
@@ -256,6 +257,10 @@ each scenario. Just pipe the Design data.frame to the function and the values of
 the statistics are added as columns.
 
 ```{r}
+Options <- design_fixed_followup()
+
+Design <- merge(Assumptions, Options, by=NULL)
+
 Design <- Design |> 
   true_summary_statistics_delayed_effect()
 

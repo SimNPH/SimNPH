@@ -1,7 +1,11 @@
 test_that("internal function for real summary statistics outputs correct values", {
 
   capture_output({
-    condition <- desing_skeleton_delayed_effect() |>
+    condition <- merge(
+      assumptions_delayed_effect(),
+      design_fixed_followup(),
+      by=NULL
+    ) |>
       tail(1)
   })
 

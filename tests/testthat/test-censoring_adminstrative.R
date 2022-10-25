@@ -1,7 +1,11 @@
 test_that("adding recruitment times works", {
 
   capture.output({
-    data <- desing_skeleton_delayed_effect() |>
+    data <- merge(
+      assumptions_delayed_effect(),
+      design_fixed_followup(),
+      by=NULL
+    ) |>
       head(2) |>
       tail(1) |>
       generate_delayed_effect()

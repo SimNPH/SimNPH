@@ -19,7 +19,11 @@ Apply Random Exponentially Distributed Censoring
 }
 \examples{
 # generate a sample with delayed effect
-one_simulation <- desing_skeleton_delayed_effect() |>
+one_simulation <- merge(
+    assumptions_delayed_effect(),
+    design_fixed_followup(),
+    by=NULL
+  ) |>
   head(1) |>
   generate_delayed_effect()
 
