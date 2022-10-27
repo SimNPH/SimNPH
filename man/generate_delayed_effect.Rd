@@ -2,14 +2,14 @@
 % Please edit documentation in R/generate_delayed_effect.R
 \name{generate_delayed_effect}
 \alias{generate_delayed_effect}
-\alias{desing_skeleton_delayed_effect}
+\alias{assumptions_delayed_effect}
 \alias{hr_after_onset_from_gAHR}
 \alias{true_summary_statistics_delayed_effect}
 \title{Generate Dataset with delayed effect}
 \usage{
 generate_delayed_effect(condition, fixed_objects = NULL)
 
-desing_skeleton_delayed_effect()
+assumptions_delayed_effect()
 
 hr_after_onset_from_gAHR(design, target_gAHR)
 
@@ -38,7 +38,7 @@ true_summary_statistics_delayed_effect(
 For generate_delayed_effect: A dataset with the columns t (time) and trt
 (1=treatment, 0=control), evt (event, currently TRUE for all observations)
 
-For desing_skeleton_delayed_effect: a design tibble with default values invisibly
+For assumptions_delayed_effect: a design tibble with default values invisibly
 
 For hr_after_onset_from_gAHR: the design data.frame passed as
 argument with the additional column hazard_trt.
@@ -57,7 +57,7 @@ passed as argument with the additional columns:
 \description{
 Generate Dataset with delayed effect
 
-Create design skeleton for use with generate_delayed_effect
+Create an empty assumtions data.frame for generate_delayed_effect
 
 Calculate hr after onset of treatment effect from gAHR
 
@@ -79,7 +79,7 @@ as the cutoff for the simulation used internally. If t_max is not given in
 this way the 1-(1/10000) quantile of the survival distribution in the control
 or treatment arm is used (which ever is larger).
 
-desing_skeleton_delayed_effect prints the code to generate a default
+assumptions_delayed_effect prints the code to generate a default
 design tibble for use with generate_delayed_effect and returns the
 evaluated code invisibly. This function is intended to be used to copy
 paste the code and edit the parameters.
@@ -89,7 +89,7 @@ paste the code and edit the parameters.
 \item \code{generate_delayed_effect}: simulates a dataset with delayed
 treatment effect
 
-\item \code{desing_skeleton_delayed_effect}: generate default design tibble
+\item \code{assumptions_delayed_effect}: generate default design tibble
 
 \item \code{hr_after_onset_from_gAHR}: Calculate hr after onset of treatment effect from gAHR
 
@@ -97,18 +97,30 @@ treatment effect
 }}
 
 \examples{
-one_simulation <- desing_skeleton_delayed_effect() |>
+one_simulation <- merge(
+    assumptions_delayed_effect(),
+    design_fixed_followup(),
+    by=NULL
+  ) |>
   head(1) |>
   generate_delayed_effect()
 head(one_simulation)
 tail(one_simulation)
-Design <- desing_skeleton_delayed_effect()
+Design <- assumptions_delayed_effect()
 Design
-my_design <- desing_skeleton_delayed_effect()
+my_design <- merge(
+    assumptions_delayed_effect(),
+    design_fixed_followup(),
+    by=NULL
+  )
 my_design$hr_trt <- NA
 my_design <- hr_after_onset_from_gAHR(my_design, 0.8)
 my_design
-my_design <- desing_skeleton_delayed_effect()
+my_design <- merge(
+    assumptions_delayed_effect(),
+    design_fixed_followup(),
+    by=NULL
+  )
 my_design$follwup <- 15
 my_design <- true_summary_statistics_delayed_effect(my_design, cutoff_stats=my_design$followup)
 my_design

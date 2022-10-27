@@ -102,7 +102,11 @@ create_summarise_function <- function(...){
 #'
 #' @examples
 #' # generate the design matrix and append the true summary statistics
-#' condition <- desing_skeleton_delayed_effect() |>
+#' condition <- merge(
+#'     assumptions_delayed_effect(),
+#'     design_fixed_followup(),
+#'     by=NULL
+#'   ) |>
 #'   tail(4) |>
 #'   head(1) |>
 #'   true_summary_statistics_delayed_effect(cutoff_stats = 15)

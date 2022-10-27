@@ -1,7 +1,11 @@
 test_that("group sequential tests work", {
 
   capture.output({
-    condition <- desing_skeleton_delayed_effect() |>
+    condition <-  merge(
+        assumptions_delayed_effect(),
+        design_fixed_followup(),
+        by=NULL
+      ) |>
       head(1)
   })
 
@@ -47,7 +51,11 @@ test_that("group sequential tests work", {
 
 test_that("summarising results from group sequential function works", {
   capture.output({
-    condition <- desing_skeleton_delayed_effect() |>
+    condition <- merge(
+      assumptions_delayed_effect(),
+      design_fixed_followup(),
+      by=NULL
+    ) |>
       head(1)
   })
 

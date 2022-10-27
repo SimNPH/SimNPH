@@ -21,7 +21,12 @@ dat, fixed_arguments.
 Analyse Dataset with the Fleming Harrington weighted Logrank Test
 }
 \examples{
-condition <- desing_skeleton_delayed_effect()[1, ]
+condition <- merge(
+    assumptions_delayed_effect(),
+    design_fixed_followup(),
+    by=NULL
+  ) |>
+  head(1)
 dat <- generate_delayed_effect(condition)
 # create two functions with different weights
 analyse_01 <- analyse_logrank_fh_weights(rho=0, gamma=1)

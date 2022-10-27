@@ -21,7 +21,11 @@ column p
 Analyse Dataset with an ANCOVA Type test on the RMST
 }
 \examples{
-condition <- desing_skeleton_delayed_effect() |>
+condition <- merge(
+    assumptions_delayed_effect(),
+    design_fixed_followup(),
+    by=NULL
+  ) |>
   head(1)
 dat <- generate_delayed_effect(condition)
 analyse_rmst(condition, dat)

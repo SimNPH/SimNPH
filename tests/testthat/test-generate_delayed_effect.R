@@ -1,41 +1,41 @@
-test_that("desing_skeleton_delayed_effect outputs correct tibble", {
+test_that("assumptions_delayed_effect outputs correct tibble", {
   capture_output(
     expect_invisible(
-      desing_skeleton_delayed_effect(),
-      label = "desing_skeleton_delayed_effect returns invisibly"
+      assumptions_delayed_effect(),
+      label = "assumptions_delayed_effect returns invisibly"
     )
   )
 
   expect_output(
-    desing_skeleton_delayed_effect(),
-    regexp = "^createDesign.*",
-    label = "desing_skeleton_delayed_effect prints something with createDesign"
+    assumptions_delayed_effect(),
+    regexp = "^expand\\.grid.*",
+    label = "assumptions_delayed_effect prints something with createDesign"
   )
 
   capture_output(
-    test_design <- desing_skeleton_delayed_effect()
+    test_design <- assumptions_delayed_effect()
   )
 
   expect_true(
     all(hasName(
       test_design,
-      c("n_trt", "n_ctrl", "delay", "hazard_ctrl", "hazard_trt")
+      c("delay", "hazard_ctrl", "hazard_trt", "random_withdrawal")
     )),
-    label = "output of desing_skeleton_delayed_effect has the right columns"
+    label = "output of assumptions_delayed_effect has the right columns"
   )
 
   expect_true(
-    test_design[, c("n_trt", "n_ctrl", "delay", "hazard_ctrl", "hazard_trt")] |>
+    test_design[, c("delay", "hazard_ctrl", "hazard_trt", "random_withdrawal")] |>
       sapply(is.numeric) |>
       all(),
-    label = "columns of output of desing_skeleton_delayed_effect have the right datatype"
+    label = "columns of output of assumptions_delayed_effect have the right datatype"
   )
 
 })
 
 test_that("test that generate_delayed_effect outputs correct tibble", {
   capture_output(
-    scenario <- desing_skeleton_delayed_effect()[2, ]
+    scenario <- merge(assumptions_delayed_effect(), design_fixed_followup(), by=NULL)[2, ]
   )
   one_simulation <- generate_delayed_effect(scenario)
 
@@ -63,8 +63,7 @@ test_that("test that generate_delayed_effect outputs correct tibble", {
 
 test_that("generate delayed effect fails on delay < 0", {
   capture_output(
-    scenario <- desing_skeleton_delayed_effect() |>
-      head(1)
+    scenario <- merge(assumptions_delayed_effect(), design_fixed_followup(), by=NULL)[1, ]
   )
 
   scenario$delay <- -1
@@ -74,10 +73,19 @@ test_that("generate delayed effect fails on delay < 0", {
   )
 })
 
+test_that("generate delayed effect uses t_max, if given in fixed_objects", {
+  capture_output(
+    scenario <- merge(assumptions_delayed_effect(), design_fixed_followup(), by=NULL)[1, ]
+  )
+
+  one_simulation <- generate_delayed_effect(scenario, fixed_objects = list(t_max=10))
+
+  expect(all(one_simulation$t <= 10), "all times lte t_max")
+})
+
 test_that("test that generate_delayed_effect outputs correct tibble with delay=0", {
   capture_output(
-    scenario <- desing_skeleton_delayed_effect() |>
-      head(1)
+    scenario <- merge(assumptions_delayed_effect(), design_fixed_followup(), by=NULL)[1, ]
   )
 
   one_simulation <- generate_delayed_effect(scenario)
@@ -131,13 +139,22 @@ test_that("test that true_summary_statistics_delayed_effect works", {
 
 test_that("test that true_summary_statistics_delayed_effect fails on delay < 0", {
   capture_output(
-    scenario <- desing_skeleton_delayed_effect() |>
-      head(1)
+    scenario <- merge(assumptions_delayed_effect(), design_fixed_followup(), by=NULL)[1, ]
   )
 
   scenario$delay <- -1
 
   expect_error(
     true_summary_statistics_delayed_effect(scenario)
+  )
+})
+
+test_that("test that true_summary_statistics_delayed_effect works, if t_max is given", {
+  capture_output(
+    scenario <- merge(assumptions_delayed_effect(), design_fixed_followup(), by=NULL)[1, ]
+  )
+
+  expect_s3_class(
+    true_summary_statistics_delayed_effect(scenario, fixed_objects=list(t_max=10)), "data.frame"
   )
 })
