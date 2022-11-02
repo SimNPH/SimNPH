@@ -34,9 +34,13 @@
 #' )
 #' abline(0,1)
 random_censoring_exp <- function(dat, rate){
-  censoring_time <- rexp(nrow(dat), rate = rate)
-  dat$evt[dat$t > censoring_time] <- FALSE
-  dat$t <- pmin(dat$t, censoring_time)
+  if(rate > 0){
+    censoring_time <- rexp(nrow(dat), rate = rate)
+    dat$evt[dat$t > censoring_time] <- FALSE
+    dat$t <- pmin(dat$t, censoring_time)
+  } else if (rate < 0){
+    stop(gettext("Rate of random censoring has to be >= 0"))
+  }
   dat
 }
 
