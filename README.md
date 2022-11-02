@@ -54,7 +54,8 @@ Please roughly keep to the [tidyverse styleguide](https://style.tidyverse.org/)
 
 When using functions from other packages (`nph`, `cmprsk`, ...) refer to them 
 by namespace (for example `nph::rSurv_fun`). In the `DESCRIPTION` file: don't 
-add the package under `Depends`, do add the package under `Suggests`.
+add the package under `Depends`, do add the package under `Suggests` or 
+`Imports`.
 
 ### Adding functions
 
@@ -63,13 +64,14 @@ descriptive name of the scenario they should simulate. Functions to analyse
 should be named like `analyse_` followed by the name of the test or model they
 implement.
 
-Generate functions should come with a `design_skeleton_...` function that
-outputs code and returns a `tibble` for an example design dataset to be used in
-`SimDesign` so users can copy paste the needed variable names and just fill in
-their values. Please add this function to the same file as the `generate_`
-function and document it in the documentation of the `generate_` function using
-the roxygen tag `@describein`. As a reference, look at
-`generate_delayed_effect.R`.
+Generate functions should come with an `assumptions_...` function that outputs
+code and returns a `tibble` for the columns in the desing dataset pertaining to
+the assumptions on the data generating model. Please implement those function in
+the same R file as the `generate_...` function and document it in the
+documentation of the `generate_` function using the roxygen tag `@describein`.
+As a reference, look at `generate_delayed_effect.R`.. The example columns
+pertaining to the experimental design should be implemented in `design.R` or in
+the respective `analyse_...` function if they only apply to one analysis method.
 
 Analyse functions have to return a list in order to work with the summarise
 functions. Lists can also include more complex objects, for example, the

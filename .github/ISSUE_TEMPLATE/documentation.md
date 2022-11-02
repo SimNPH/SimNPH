@@ -1,5 +1,5 @@
 ---
-name: Dokumentation
+name: Documentation
 about: Suggest an idea or improvement for the documentation of this project
 title: "[DOKU]"
 labels: documentation
