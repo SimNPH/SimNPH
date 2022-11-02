@@ -16,4 +16,10 @@ test_that("random censoring works", {
 
   expect(all(test_res$t <= test_data$t), "not all censored times less equal uncensored times")
   expect_named(test_res, c("t", "evt", "additional_column"))
+
+  expect_error(random_censoring_exp(test_data, -1))
+
+  test_res2 <- random_censoring_exp(test_data, 0)
+
+  expect_equal(test_data, test_res2)
 })
