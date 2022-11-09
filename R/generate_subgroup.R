@@ -115,3 +115,92 @@ invisible(
     eval()
 )
 }
+
+
+
+#' Calculate true summary statistics for scenarios with differential treatment effect in subgroup
+#'
+#' @param Design Design data.frame for subgroup
+#' @param cutoff_stats Cutoff time for rmst and average hazard ratios
+#' @param fixed_objects=NULL fixed objects not used for now
+#'
+#' @return For true_summary_statistics_subgroup: the design data.frame
+#'   passed as argument with the additional columns:
+#' * `rmst_trt` rmst in the treatment group
+#' * `median_surv_trt` median survival in the treatment group
+#' * `rmst_ctrl` rmst in the control group
+#' * `median_surv_ctrl` median survial in the control group
+#' * `gAHR` geometric average hazard ratio
+#' * `AHR` average hazard ratio
+#'
+#' @export
+#'
+#' @describeIn generate_subgroup  calculate true summary statistics for subgroup
+#'
+#' @examples
+#' my_design <- merge(
+#'     assumptions_subgroup(),
+#'     design_fixed_followup(),
+#'     by=NULL
+#'   )
+#' my_design$follwup <- 15
+#' my_design <- true_summary_statistics_subgroup(my_design, cutoff_stats=my_design$followup)
+#' my_design
+true_summary_statistics_subgroup <- function(Design, cutoff_stats=10, fixed_objects=NULL){
+
+  true_summary_statistics_subgroup_rowwise <- function(condition, cutoff_stats){
+
+    if(is.null(fixed_objects) || (!hasName(fixed_objects, "t_max"))){
+      # set t_max to 1-1/10000 quantile of control or treatment survival function
+      # whichever is later
+      t_max <- max(
+        log(10000) / condition$hazard_ctrl,
+        log(10000) / condition$hazard_trt
+      )
+    } else {
+      t_max <- fixed_objects$t_max
+    }
+
+    if (condition$prevalence < 0 || condition$prevalence > 1) {
+      stop(gettext("Subgroup prevalence has to be between 0 and 1"))
+    }
+
+    data_generating_model_trt <- alternative_pop_pchaz(
+      Tint = c(0, t_max),
+      lambdaMat1 = matrix(c(
+        condition$hazard_trt,
+        condition$hazard_subgroup
+      ), ncol=1),
+      lambdaMat2 = matrix(c(0, 0), ncol=1),
+      lambdaProgMat = matrix(c(0, 0), ncol=1),
+      p=c(1-condition$prevalence, condition$prevalence)
+    )
+
+    data_generating_model_ctrl <-  nph::pchaz(
+      c(0, t_max),
+      c(condition$hazard_ctrl)
+    )
+
+    res <- cbind(
+      condition,
+      internal_real_statistics_pchaz(
+        data_generating_model_trt,
+        data_generating_model_ctrl,
+        N_trt=condition$n_trt,
+        N_ctrl=condition$n_ctrl,
+        cutoff = cutoff_stats
+      )
+    )
+
+    row.names(res) <- NULL
+    res
+  }
+
+  Design <- Design |>
+    split(1:nrow(Design)) |>
+    mapply(FUN=true_summary_statistics_subgroup_rowwise, cutoff_stats = cutoff_stats, SIMPLIFY = FALSE)
+
+  Design <- do.call(rbind, Design)
+
+  Design
+}
