@@ -12,7 +12,7 @@
 #'   * n_ctrl number of patients in control arm
 #'   * hazard_ctrl hazard in the control arm
 #'   * hazard_trt hazard in the treatment arm for not cured patients
-#'   * hazard_subgroup hazard in for cured patients
+#'   * hazard_subgroup hazard in the subgroup in the treatment arm
 #'   * prevalence proportion of cured patients
 #'
 #' @return
@@ -30,9 +30,11 @@
 #'     by=NULL
 #'   ) |>
 #'   head(1) |>
-#'   generate_cure_mixture()
+#'   generate_subgroup()
 #' head(one_simulation)
 #' tail(one_simulation)
+
+# TODO: refactor such that subgroup indicator is also output (different generation and true summary statistics functions, like in generate progression)
 generate_subgroup <- function(condition, fixed_objects=NULL){
   # if t_max is not given in fixed_objects
   if(is.null(fixed_objects) || (!hasName(fixed_objects, "t_max"))){
@@ -83,12 +85,12 @@ generate_subgroup <- function(condition, fixed_objects=NULL){
   rbind(data_trt, data_ctrl)
 }
 
-#' Create an empty assumtions data.frame for generate_cure_mixture
+#' Create an empty assumtions data.frame for generate_subgroup
 #'
 #' @return For assumptions_subgroup: a design tibble with default values invisibly
 #'
 #' @details assumptions_subgroup prints the code to generate a default
-#'   design tibble for use with generate_cure_mixture and returns the
+#'   design tibble for use with generate_subgroup and returns the
 #'   evaluated code invisibly. This function is intended to be used to copy
 #'   paste the code and edit the parameters.
 #'
@@ -102,7 +104,7 @@ assumptions_subgroup <- function(){
   skel <- "expand.grid(
   hazard_ctrl       = 0.003795467,       # hazard under control (med. survi. 6m)
   hazard_trt        = 0.001265156,       # hazard under treatment (med. surv. 18m)
-  hazard_subgroup   = 9.488668e-05,      # hazard cured (med. surv. 20y)
+  hazard_subgroup   = 9.488668e-05,      # hazard for subgroup under treatment (med. surv. 20y)
   prevalence        = seq(0, 1, by=0.2), # proportion of patients belonging to subgroup
   random_withdrawal = 0.01               # rate of random withdrawal
 )
