@@ -1,3 +1,5 @@
+# TODO: update such that intercurrent events are also censored
+
 #' Add recruitment time to Dataset
 #'
 #' @param dat a simulated dataset

@@ -1,3 +1,5 @@
+# TODO: update such that intercurrent events are also censored
+
 #' Apply Random Exponentially Distributed Censoring
 #'
 #' @param rate time of end of enrollment
@@ -43,4 +45,6 @@ random_censoring_exp <- function(dat, rate){
   }
   dat
 }
+
+
 
