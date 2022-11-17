@@ -2,6 +2,7 @@
 
 export(admin_censoring_events)
 export(admin_censoring_time)
+export(analyse_ahr)
 export(analyse_coxph)
 export(analyse_group_sequential)
 export(analyse_logrank)
