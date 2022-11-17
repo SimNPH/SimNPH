@@ -4,25 +4,13 @@
 \alias{analyse_rmst_diff}
 \title{Analyse the Dataset using the difference in RMST}
 \usage{
-analyse_rmst_diff(condition, dat, fixed_objects = NULL)
+analyse_rmst_diff(max_time = NA)
 }
 \arguments{
-\item{condition}{condition of the simulation}
-
-\item{dat}{generated datasets}
-
-\item{fixed_objects}{other constants}
+\item{max_time}{time for which the RMST is calculated}
 }
 \value{
-a data frame with the columns
-\itemize{
-\item \code{p} p value of the test, see Details
-\item \code{rmst_diff} estimated differnce in RMST
-\item \code{rmst_diff_lower} adjusted lower bound of the confidence interval for differnce in RMST
-\item \code{rmst_diff_upper} adjusted upper bound of the confidence interval for differnce in RMST
-\item \code{N_pat} number of patients
-\item \code{N_evt} number of events
-}
+Returns an analysis function, that can be used in runSimulations
 }
 \description{
 Analyse the Dataset using the difference in RMST
@@ -30,6 +18,17 @@ Analyse the Dataset using the difference in RMST
 \details{
 The implementation from the nph package is used, see the documentation there
 for details.
+
+The data.frame returned by the created function includes the follwing
+columns:
+\itemize{
+\item \code{p} p value of the test, see Details
+\item \code{rmst_diff} estimated differnce in RMST
+\item \code{rmst_diff_lower} unadjusted lower bound of the confidence interval for differnce in RMST
+\item \code{rmst_diff_upper} unadjusted upper bound of the confidence interval for differnce in RMST
+\item \code{N_pat} number of patients
+\item \code{N_evt} number of events
+}
 }
 \examples{
 condition <- merge(
@@ -39,8 +38,8 @@ condition <- merge(
   ) |>
   head(1)
 dat <- generate_delayed_effect(condition)
-analyse_rmst_diff(condition, dat)
+analyse_rmst_diff()(condition, dat)
 }
 \seealso{
-\link\link{nph:nphparams}
+\link{nph:nphparams}
 }
