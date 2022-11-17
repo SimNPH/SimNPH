@@ -19,7 +19,8 @@ a data frame with the columns
 \item \code{p} p value of the score test
 \item \code{coef} coefficient for \code{trt}
 \item \code{hr} hazard ratio for \code{trt}
-\item \code{confint} 95\% confidence intervall for the hazard ratio for \code{trt}
+\item \code{hr_lower} lower 95\% confidence intervall boundary for the hazard ratio for \code{trt}
+\item \code{hr_upper}lower 95\% confidence intervall boundary for the hazard ratio for \code{trt}
 \item \code{N_pat} number of patients
 \item \code{N_evt} number of events
 }

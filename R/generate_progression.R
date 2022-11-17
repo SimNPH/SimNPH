@@ -82,12 +82,12 @@ generate_progression <- function(condition, fixed_objects=NULL){
   }
 
   t_evt_ctrl <- nph::rSurv_fun(
-      condition$n_ctrl,
-      nph::pchaz(
-        c(0, t_max),
-        c(condition$hazard_ctrl)
-      )
+    condition$n_ctrl,
+    nph::pchaz(
+      c(0, t_max),
+      c(condition$hazard_ctrl)
     )
+  )
 
   t_evt_trt <- nph::rSurv_fun(
     condition$n_trt,
@@ -188,9 +188,10 @@ generate_progression <- function(condition, fixed_objects=NULL){
 #' my_design_pfs <- true_summary_statistics_subgroup(my_design, "pfs", cutoff_stats=my_design$followup)
 #' my_design_os
 #' my_design_pfs
-true_summary_statistics_subgroup <- function(Design, what="os", cutoff_stats=10, fixed_objects=NULL){
+true_summary_statistics_progression <- function(Design, what="os", cutoff_stats=10, fixed_objects=NULL){
 
-  true_summary_statistics_progression_rowwise_pfs <- function(condition, cutoff_stats){
+  true_summary_statistics_progression_rowwise_pfs <- function(condition, cutoff_stats, fixed_objects=fixed_objects){
+
     # if t_max is not given in fixed_objects
     if(is.null(fixed_objects) || (!hasName(fixed_objects, "t_max"))){
       # set t_max to 1-1/10000 quantile of control or treatment survival function
@@ -234,40 +235,54 @@ true_summary_statistics_subgroup <- function(Design, what="os", cutoff_stats=10,
     res
   }
 
-  true_summary_statistics_progression_rowwise_os <- function(condition, cutoff_stats){
-    data_generating_model_ctrl <- nph::pchaz(
-      c(0, t_max),
-      lambda1 = condition$hazard_ctrl,
-      lambda2 = condition$hazard_after_prog,
-      lambdaProg = condition$prog_rate_ctrl
-    )
-
-    data_generating_model_trt <- nph::pchaz(
-      c(0, t_max),
-      lambda1 = condition$hazard_trt,
-      lambda2 = condition$hazard_after_prog,
-      lambdaProg = condition$prog_rate_trt
-    )
-
-    res <- cbind(
-      condition,
-      internal_real_statistics_pchaz(
-        data_generating_model_trt,
-        data_generating_model_ctrl,
-        N_trt=condition$n_trt,
-        N_ctrl=condition$n_ctrl,
-        cutoff = cutoff_stats
-      )
-    )
-
-    row.names(res) <- NULL
-    res
-  }
+  # true_summary_statistics_progression_rowwise_os <- function(condition, cutoff_stats){
+  #
+  #   # if t_max is not given in fixed_objects
+  #   if(is.null(fixed_objects) || (!hasName(fixed_objects, "t_max"))){
+  #     # set t_max to 1-1/10000 quantile of control or treatment survival function
+  #     # whichever is later
+  #     t_max <- max(
+  #       log(10000) / condition$hazard_ctrl,
+  #       log(10000) / condition$hazard_trt
+  #     )
+  #   } else {
+  #     t_max <- fixed_objects$t_max
+  #   }
+  #
+  #   data_generating_model_ctrl <- nph::subpop_pchaz(
+  #     c(0, t_max),
+  #     lambda1 = condition$hazard_ctrl,
+  #     lambda2 = condition$hazard_after_prog,
+  #     lambdaProg = condition$prog_rate_ctrl
+  #   )
+  #
+  #   data_generating_model_trt <- nph::subpop_pchaz(
+  #     c(0, t_max),
+  #     lambda1 = condition$hazard_trt,
+  #     lambda2 = condition$hazard_after_prog,
+  #     lambdaProg = condition$prog_rate_trt
+  #   )
+  #
+  #   res <- cbind(
+  #     condition,
+  #     internal_real_statistics_pchaz(
+  #       data_generating_model_trt,
+  #       data_generating_model_ctrl,
+  #       N_trt=condition$n_trt,
+  #       N_ctrl=condition$n_ctrl,
+  #       cutoff = cutoff_stats
+  #     )
+  #   )
+  #
+  #   row.names(res) <- NULL
+  #   res
+  # }
 
   true_summary_statistics_progression_rowwise <- switch(what,
-    "os"  = true_summary_statistics_progression_rowwise_os,
-    "pfs" = true_summary_statistics_progression_rowwise_pfs,
-    {stop(paste0(gettext("Invalid value for"), " what: ", what, " ", gettext('use "os" for overall survival or "pfs" for progression free survival.')))}
+                                                        # "os"  = true_summary_statistics_progression_rowwise_os,
+                                                        "os" = {stop(gettext("true summary statistics for overall survival with disease progression / treatment switching is not yet implemented."))},
+                                                        "pfs" = true_summary_statistics_progression_rowwise_pfs,
+                                                        {stop(paste0(gettext("Invalid value for"), " what: ", what, " ", gettext('use "os" for overall survival or "pfs" for progression free survival.')))}
   )
 
   Design <- Design |>

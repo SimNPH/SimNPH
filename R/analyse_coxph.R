@@ -8,7 +8,8 @@
 #' * `p` p value of the score test
 #' * `coef` coefficient for `trt`
 #' * `hr` hazard ratio for `trt`
-#' * `confint` 95% confidence intervall for the hazard ratio for `trt`
+#' * `hr_lower` lower 95% confidence intervall boundary for the hazard ratio for `trt`
+#' * `hr_upper`lower 95% confidence intervall boundary for the hazard ratio for `trt`
 #' * `N_pat` number of patients
 #' * `N_evt` number of events
 #'

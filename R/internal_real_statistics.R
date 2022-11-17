@@ -3,7 +3,11 @@ internal_real_statistics_pchaz <- function(data_gen_model_trt, data_gen_model_ct
   real_stats_one_group <- function(group, cutoff, milestones){
     res <- data.frame(
       rmst      = integrate(group$funs$surv_f, 0, cutoff)$value,
-      median_survival = uniroot(\(x) group$funs$surv_f(x) - 0.5, lower=0, upper=12, extendInt = "downX")$root
+      median_survival = if(group$funs$surv_f(max(group$t, cutoff)) < 0.5) {
+        uniroot(\(x) group$funs$surv_f(x) - 0.5, lower=0, upper=12, extendInt = "downX")$root
+      } else {
+        Inf
+      }
     )
 
     res
