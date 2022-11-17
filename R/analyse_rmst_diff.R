@@ -1,16 +1,8 @@
 #' Analyse the Dataset using the difference in RMST
 #'
-#' @param condition condition of the simulation
-#' @param dat generated datasets
-#' @param fixed_objects other constants
+#' @param max_time time for which the RMST is calculated
 #'
-#' @return a data frame with the columns
-#' * `p` p value of the test, see Details
-#' * `rmst_diff` estimated differnce in RMST
-#' * `rmst_diff_lower` adjusted lower bound of the confidence interval for differnce in RMST
-#' * `rmst_diff_upper` adjusted upper bound of the confidence interval for differnce in RMST
-#' * `N_pat` number of patients
-#' * `N_evt` number of events
+#' @return Returns an analysis function, that can be used in runSimulations
 #'
 #' @export
 #'
@@ -18,8 +10,18 @@
 #' The implementation from the nph package is used, see the documentation there
 #' for details.
 #'
+#' The data.frame returned by the created function includes the follwing
+#' columns:
+#'
+#' * `p` p value of the test, see Details
+#' * `rmst_diff` estimated differnce in RMST
+#' * `rmst_diff_lower` adjusted lower bound of the confidence interval for differnce in RMST
+#' * `rmst_diff_upper` adjusted upper bound of the confidence interval for differnce in RMST
+#' * `N_pat` number of patients
+#' * `N_evt` number of events
+#'
 #' @seealso
-#' \link[nph:nphparams]
+#' [nph:nphparams]
 #'
 #' @examples
 #' condition <- merge(
@@ -29,17 +31,18 @@
 #'   ) |>
 #'   head(1)
 #' dat <- generate_delayed_effect(condition)
-#' analyse_rmst_diff(condition, dat)
-analyse_rmst_diff <- function(condition, dat, fixed_objects = NULL){
-  model <- nph::nphparams(dat$t, dat$evt, dat$trt, param_type="RMST")
+#' analyse_rmst_diff()(condition, dat)
+analyse_rmst_diff <- function(max_time=NA){
+  function(condition, dat, fixed_objects = NULL){
+    model <- nph::nphparams(dat$t, dat$evt, dat$trt, param_type="RMST", param_par=max_time)
 
-  list(
-    p = model$tab$p_adjusted,
-    rmst_diff = model$tab$Estimate,
-    rmst_diff_lower = model$tab$lwr_adjusted,
-    rmst_diff_upper = model$tab$upr_adjusted,
-    N_pat=nrow(dat),
-    N_evt=sum(dat$evt)
-  )
+    list(
+      p = model$tab$p_adjusted,
+      rmst_diff = model$tab$Estimate,
+      rmst_diff_lower = model$tab$lwr_adjusted,
+      rmst_diff_upper = model$tab$upr_adjusted,
+      N_pat=nrow(dat),
+      N_evt=sum(dat$evt)
+    )
+  }
 }
-

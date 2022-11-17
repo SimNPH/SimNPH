@@ -4,17 +4,23 @@
 \alias{analyse_rmst_diff}
 \title{Analyse the Dataset using the difference in RMST}
 \usage{
-analyse_rmst_diff(condition, dat, fixed_objects = NULL)
+analyse_rmst_diff(max_time = NA)
 }
 \arguments{
-\item{condition}{condition of the simulation}
-
-\item{dat}{generated datasets}
-
-\item{fixed_objects}{other constants}
+\item{max_time}{time for which the RMST is calculated}
 }
 \value{
-a data frame with the columns
+Returns an analysis function, that can be used in runSimulations
+}
+\description{
+Analyse the Dataset using the difference in RMST
+}
+\details{
+The implementation from the nph package is used, see the documentation there
+for details.
+
+The data.frame returned by the created function includes the follwing
+columns:
 \itemize{
 \item \code{p} p value of the test, see Details
 \item \code{rmst_diff} estimated differnce in RMST
@@ -24,13 +30,6 @@ a data frame with the columns
 \item \code{N_evt} number of events
 }
 }
-\description{
-Analyse the Dataset using the difference in RMST
-}
-\details{
-The implementation from the nph package is used, see the documentation there
-for details.
-}
 \examples{
 condition <- merge(
     assumptions_delayed_effect(),
@@ -39,8 +38,8 @@ condition <- merge(
   ) |>
   head(1)
 dat <- generate_delayed_effect(condition)
-analyse_rmst_diff(condition, dat)
+analyse_rmst_diff()(condition, dat)
 }
 \seealso{
-\link\link{nph:nphparams}
+\link{nph:nphparams}
 }
