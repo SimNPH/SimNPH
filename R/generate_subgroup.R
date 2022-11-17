@@ -145,7 +145,6 @@ invisible(
 #'     design_fixed_followup(),
 #'     by=NULL
 #'   )
-#' my_design$follwup <- 15
 #' my_design <- true_summary_statistics_subgroup(my_design, cutoff_stats=my_design$followup)
 #' my_design
 true_summary_statistics_subgroup <- function(Design, cutoff_stats=10, fixed_objects=NULL){
