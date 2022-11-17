@@ -16,8 +16,8 @@
 #'
 #' * `p` p value of the test, see Details
 #' * `AHR`/`gAHR` estimated (geometric) average hazard ratio
-#' * `AHR_lower`/`gAHR_lower` adjusted lower bound of the confidence interval for the (geometric) average hazard ratio
-#' * `AHR_upper`/`gAHR_upper` adjusted upper bound of the confidence interval for the (geometric) average hazard ratio
+#' * `AHR_lower`/`gAHR_lower` unadjusted lower bound of the confidence interval for the (geometric) average hazard ratio
+#' * `AHR_upper`/`gAHR_upper` unadjusted upper bound of the confidence interval for the (geometric) average hazard ratio
 #' * `N_pat` number of patients
 #' * `N_evt` number of events
 #'
@@ -45,10 +45,10 @@ analyse_ahr <- function(max_time=NA, type="AHR"){
         model <- nph::nphparams(dat$t, dat$evt, dat$trt, param_type="avgHR", param_par=max_time)
 
         list(
-          p = model$tab$p_adjusted,
+          p = model$tab$p_unadj,
           AHR = model$tab$Estimate,
-          AHR_lower = model$tab$lwr_adjusted,
-          AHR_upper = model$tab$upr_adjusted,
+          AHR_lower = model$tab$lwr_unadj,
+          AHR_upper = model$tab$upr_unadj,
           N_pat=nrow(dat),
           N_evt=sum(dat$evt)
         )
@@ -59,10 +59,10 @@ analyse_ahr <- function(max_time=NA, type="AHR"){
         model <- nph::nphparams(dat$t, dat$evt, dat$trt, param_type="HR", param_par=max_time)
 
         list(
-          p = model$tab$p_adjusted,
+          p = model$tab$p_unadj,
           gAHR = model$tab$Estimate,
-          gAHR_lower = model$tab$lwr_adjusted,
-          gAHR_upper = model$tab$upr_adjusted,
+          gAHR_lower = model$tab$lwr_unadj,
+          gAHR_upper = model$tab$upr_unadj,
           N_pat=nrow(dat),
           N_evt=sum(dat$evt)
         )

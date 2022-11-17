@@ -15,8 +15,8 @@
 #'
 #' * `p` p value of the test, see Details
 #' * `diff_Q` estimated differnce in quantile of the suvivla functions
-#' * `diff_Q_lower` adjusted lower bound of the confidence interval for the differnce in quantile of the suvivla functions
-#' * `diff_Q_upper` adjusted upper bound of the confidence interval for the differnce in quantile of the suvivla functions
+#' * `diff_Q_lower` unadjusted lower bound of the confidence interval for the differnce in quantile of the suvivla functions
+#' * `diff_Q_upper` unadjusted upper bound of the confidence interval for the differnce in quantile of the suvivla functions
 #' * `quantile` quantile used for extimation
 #' * `N_pat` number of patients
 #' * `N_evt` number of events
@@ -38,10 +38,10 @@ analyse_diff_mean_survival <- function(quant=0.5){
     model <- nph::nphparams(dat$t, dat$evt, dat$trt, param_type="Q", param_par=quant)
 
     list(
-      p = model$tab$p_adjusted,
+      p = model$tab$p_unadj,
       diff_Q = model$tab$Estimate,
-      diff_Q_lower = model$tab$lwr_adjusted,
-      diff_Q_upper = model$tab$upr_adjusted,
+      diff_Q_lower = model$tab$lwr_unadj,
+      diff_Q_upper = model$tab$upr_unadj,
       quantile = quant,
       N_pat=nrow(dat),
       N_evt=sum(dat$evt)

@@ -24,8 +24,8 @@ columns:
 \itemize{
 \item \code{p} p value of the test, see Details
 \item \code{diff_Q} estimated differnce in quantile of the suvivla functions
-\item \code{diff_Q_lower} adjusted lower bound of the confidence interval for the differnce in quantile of the suvivla functions
-\item \code{diff_Q_upper} adjusted upper bound of the confidence interval for the differnce in quantile of the suvivla functions
+\item \code{diff_Q_lower} unadjusted lower bound of the confidence interval for the differnce in quantile of the suvivla functions
+\item \code{diff_Q_upper} unadjusted upper bound of the confidence interval for the differnce in quantile of the suvivla functions
 \item \code{quantile} quantile used for extimation
 \item \code{N_pat} number of patients
 \item \code{N_evt} number of events

@@ -24,8 +24,8 @@ columns:
 \itemize{
 \item \code{p} p value of the test, see Details
 \item \code{rmst_diff} estimated differnce in RMST
-\item \code{rmst_diff_lower} adjusted lower bound of the confidence interval for differnce in RMST
-\item \code{rmst_diff_upper} adjusted upper bound of the confidence interval for differnce in RMST
+\item \code{rmst_diff_lower} unadjusted lower bound of the confidence interval for differnce in RMST
+\item \code{rmst_diff_upper} unadjusted upper bound of the confidence interval for differnce in RMST
 \item \code{N_pat} number of patients
 \item \code{N_evt} number of events
 }

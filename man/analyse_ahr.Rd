@@ -26,8 +26,8 @@ columns:
 \itemize{
 \item \code{p} p value of the test, see Details
 \item \code{AHR}/\code{gAHR} estimated (geometric) average hazard ratio
-\item \code{AHR_lower}/\code{gAHR_lower} adjusted lower bound of the confidence interval for the (geometric) average hazard ratio
-\item \code{AHR_upper}/\code{gAHR_upper} adjusted upper bound of the confidence interval for the (geometric) average hazard ratio
+\item \code{AHR_lower}/\code{gAHR_lower} unadjusted lower bound of the confidence interval for the (geometric) average hazard ratio
+\item \code{AHR_upper}/\code{gAHR_upper} unadjusted upper bound of the confidence interval for the (geometric) average hazard ratio
 \item \code{N_pat} number of patients
 \item \code{N_evt} number of events
 }
