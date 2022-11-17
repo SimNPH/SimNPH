@@ -25,9 +25,9 @@ The data.frame returned by the created function includes the follwing
 columns:
 \itemize{
 \item \code{p} p value of the test, see Details
-\item \code{AHR}/\code{gAHR} estimated differnce in RMST
-\item \code{AHR_lower}/\code{gAHR_lower} adjusted lower bound of the confidence interval for differnce in RMST
-\item \code{AHR_upper}/\code{gAHR_upper} adjusted upper bound of the confidence interval for differnce in RMST
+\item \code{AHR}/\code{gAHR} estimated (geometric) average hazard ratio
+\item \code{AHR_lower}/\code{gAHR_lower} adjusted lower bound of the confidence interval for the (geometric) average hazard ratio
+\item \code{AHR_upper}/\code{gAHR_upper} adjusted upper bound of the confidence interval for the (geometric) average hazard ratio
 \item \code{N_pat} number of patients
 \item \code{N_evt} number of events
 }

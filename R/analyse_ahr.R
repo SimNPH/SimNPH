@@ -15,9 +15,9 @@
 #' columns:
 #'
 #' * `p` p value of the test, see Details
-#' * `AHR`/`gAHR` estimated differnce in RMST
-#' * `AHR_lower`/`gAHR_lower` adjusted lower bound of the confidence interval for differnce in RMST
-#' * `AHR_upper`/`gAHR_upper` adjusted upper bound of the confidence interval for differnce in RMST
+#' * `AHR`/`gAHR` estimated (geometric) average hazard ratio
+#' * `AHR_lower`/`gAHR_lower` adjusted lower bound of the confidence interval for the (geometric) average hazard ratio
+#' * `AHR_upper`/`gAHR_upper` adjusted upper bound of the confidence interval for the (geometric) average hazard ratio
 #' * `N_pat` number of patients
 #' * `N_evt` number of events
 #'
