@@ -26,7 +26,7 @@
 #'   followup = c(condition$interim_events, condition$followup),
 #'   followup_type = c("event", "time"),
 #'   alpha = c(0.025, 0.05),
-#'   analyse_functions = analyse_maxcombo
+#'   analyse_functions = analyse_maxcombo()
 #' )
 analyse_group_sequential <- function(followup, followup_type, alpha, analyse_functions){
 

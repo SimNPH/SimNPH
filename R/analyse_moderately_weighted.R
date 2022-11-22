@@ -1,6 +1,4 @@
-#' Create Analyse function for piecewise exponential model
-#'
-#' @param times interval boundaries for the piecewise exponential model
+#' Create Analyse function for the moderately weighted logrank test
 #'
 #' @return an analyse function that can be used in runSimulation
 #' @export
@@ -13,8 +11,8 @@
 #'  ) |>
 #'  head(1)
 #' dat <- generate_delayed_effect(condition)
-#' analyse_piecewise_exponential(times=c(90, 360))(condition, dat)
-analyse_piecewise_exponential <- function(times){
+#' analyse_moderately_weighted()(condition, dat)
+analyse_moderately_weighted <- function(){
   function(condition, dat, fixed_objects = NULL){
     result_tmp <- list(
       p = 1,

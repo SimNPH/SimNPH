@@ -73,8 +73,8 @@ result_1 <- runSimulation(
   replications = N_sim,
   generate = my_generator,
   analyse = list(
-    logrank  = analyse_logrank,
-    maxcombo = analyse_maxcombo
+    logrank  = analyse_logrank(),
+    maxcombo = analyse_maxcombo()
   ),
   summarise = Summarise,
   cl = cl,
@@ -98,13 +98,13 @@ Analyse <-  list(
     followup = c(condition$interim_events, condition$final_events),
     followup_type = c("event", "event"),
     alpha = nominal_alpha,
-    analyse_functions = analyse_logrank
+    analyse_functions = analyse_logrank()
   ),
   maxcombo_seq = analyse_group_sequential(
     followup = c(condition$interim_events, condition$final_events),
     followup_type = c("event", "event"),
     alpha = nominal_alpha,
-    analyse_functions = analyse_maxcombo
+    analyse_functions = analyse_maxcombo()
   )
 )
 
@@ -141,7 +141,7 @@ Summarise <- create_summarise_function(
   )
 
 Analyse <- list(
-  coxph = analyse_coxph
+  coxph = analyse_coxph()
 )
 
 times <- c(times, "test_3_setup"=Sys.time())

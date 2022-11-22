@@ -22,7 +22,7 @@ test_that("group sequential tests work", {
     followup = c(condition$interim_events, condition$followup),
     followup_type = c("event", "time"),
     alpha = c(0.025, 0.05),
-    analyse_functions = analyse_logrank
+    analyse_functions = analyse_logrank()
   )
 
   dat <- withr::with_seed(0, my_generator(condition))
@@ -72,7 +72,7 @@ test_that("summarising results from group sequential function works", {
     followup = c(condition$interim_events, condition$followup),
     followup_type = c("event", "time"),
     alpha = c(0.025, 0.05),
-    analyse_functions = analyse_logrank
+    analyse_functions = analyse_logrank()
   )
 
   dat <- withr::with_seed(0, replicate(2, my_generator(condition), simplify=FALSE))

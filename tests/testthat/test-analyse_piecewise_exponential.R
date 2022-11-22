@@ -1,4 +1,4 @@
-test_that("analyse_logrank outputs plausible data.frame for delayed effect", {
+test_that("analyse_piecewise_exponential outputs plausible data.frame for delayed effect", {
   capture_output(
     condition <- merge(
       assumptions_delayed_effect(),
@@ -8,7 +8,7 @@ test_that("analyse_logrank outputs plausible data.frame for delayed effect", {
       head(1)
   )
   dat <- generate_delayed_effect(condition)
-  res <- analyse_logrank()(condition, dat)
+  res <- analyse_piecewise_exponential(time=c(30, 360))(condition, dat)
 
   expect_true(hasName(res, "p"), label="result has the column p")
   expect_lte(res$p, 1, label="p value le 1")
