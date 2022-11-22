@@ -56,7 +56,7 @@ sim_results <- runSimulation(
   replications=10,
   generate=generate_delayed_effect,
   analyse=list(
-    coxph=analyse_coxph
+    coxph=analyse_coxph()
   ),
   summarise = summarise_all
 )

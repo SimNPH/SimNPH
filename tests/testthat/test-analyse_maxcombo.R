@@ -8,7 +8,7 @@ test_that("analyse_maxcombo outputs plausible data.frame for delayed effect", {
       head(1)
   )
   dat <- generate_delayed_effect(condition)
-  res <- analyse_maxcombo(condition, dat)
+  res <- analyse_maxcombo()(condition, dat)
 
   expect_true(hasName(res, "p"), label="result has the column p")
   expect_lte(res$p, 1, label="p value le 1")

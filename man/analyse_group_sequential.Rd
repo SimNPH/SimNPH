@@ -67,7 +67,7 @@ analyse_maxcombo_sequential <- analyse_group_sequential(
   followup = c(condition$interim_events, condition$followup),
   followup_type = c("event", "time"),
   alpha = c(0.025, 0.05),
-  analyse_functions = analyse_maxcombo
+  analyse_functions = analyse_maxcombo()
 )
 Summarise <- create_summarise_function(
   maxcombo_seq = summarise_group_sequential(),

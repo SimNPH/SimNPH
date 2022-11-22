@@ -4,18 +4,11 @@
 \alias{analyse_maxcombo}
 \title{Analyse Dataset with the Maxcombo Test}
 \usage{
-analyse_maxcombo(condition, dat, fixed_objects = NULL)
-}
-\arguments{
-\item{condition}{condition of the simulation}
-
-\item{dat}{generated datasets}
-
-\item{fixed_objects}{other constants}
+analyse_maxcombo()
 }
 \value{
-a dataframe with the combined p-value of the max combo test in the
-column p
+an analyse function that returns a data.frame with the combined
+p-value of the max combo test in the column p
 }
 \description{
 Analyse Dataset with the Maxcombo Test
@@ -28,5 +21,5 @@ condition <- merge(
   ) |>
   head(1)
 dat <- generate_delayed_effect(condition)
-analyse_maxcombo(condition, dat)
+analyse_maxcombo()(condition, dat)
 }

@@ -65,7 +65,7 @@ test_that("creating a summarise function for an estimator works", {
           replications=10,
           generate=generate_delayed_effect,
           analyse=list(
-            coxph=analyse_coxph
+            coxph=analyse_coxph()
           ),
           summarise = summarise_all,
           save = FALSE

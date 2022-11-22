@@ -125,7 +125,7 @@ create_summarise_function <- function(...){
 #'   replications=10,
 #'   generate=generate_delayed_effect,
 #'   analyse=list(
-#'     coxph=analyse_coxph
+#'     coxph=analyse_coxph()
 #'   ),
 #'   summarise = summarise_all
 #' )
@@ -205,7 +205,7 @@ summarise_estimator <- function(est, real, lower=NULL, upper=NULL, name=NULL){
 #'   replications=100,
 #'   generate=generate_delayed_effect,
 #'   analyse=list(
-#'     logrank=analyse_logrank
+#'     logrank=analyse_logrank()
 #'   ),
 #'   summarise = summarise_all
 #' )
