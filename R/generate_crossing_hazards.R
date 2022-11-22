@@ -1,0 +1,257 @@
+#' Generate Dataset with crossing hazards
+#'
+#' @param condition condition row of Design dataset
+#' @param fixed_objects fixed objects of Design dataset
+#'
+#' @details
+#' Condidtion has to contain the following columns:
+#'
+#'   * n_trt number of paitents in treatment arm
+#'   * n_ctrl number of patients in control arm
+#'   * crossing time of crossing of the hazards
+#'   * hazard_ctrl hazard in the control arm = hazard before onset of treatment
+#'     effect
+#'   * hazard_trt_before hazard in the treatment arm before onset of treatment effect
+#'   * hazard_trt_after hazard in the treatment arm afert onset of treatment effect
+#'
+#' If fixed_objects is given and contains an element `t_max`, then this is used
+#' as the cutoff for the simulation used internally. If t_max is not given in
+#' this way the 1-(1/10000) quantile of the survival distribution in the control
+#' or treatment arm is used (which ever is larger).
+#'
+#' @return
+#' For generate_crossing_hazards: A dataset with the columns t (time) and trt
+#' (1=treatment, 0=control), evt (event, currently TRUE for all observations)
+#'
+#' @export
+#' @describeIn generate_crossing_hazards simulates a dataset with crossing
+#'   hazards
+#'
+#' @examples
+#' one_simulation <- merge(
+#'     assumptions_crossing_hazards(),
+#'     design_fixed_followup(),
+#'     by=NULL
+#'   ) |>
+#'   head(1) |>
+#'   generate_crossing_hazards()
+#' head(one_simulation)
+#' tail(one_simulation)
+generate_crossing_hazards <- function(condition, fixed_objects=NULL){
+
+  # if t_max is not given in fixed_objects
+  if(is.null(fixed_objects) || (!hasName(fixed_objects, "t_max"))){
+    # set t_max to 1-1/10000 quantile of control or treatment survival function
+    # whichever is later
+    t_max <- max(
+      log(10000) / condition$hazard_ctrl,
+      log(10000) / condition$hazard_trt_after,
+      log(10000) / condition$hazard_trt_before
+    )
+  } else {
+    t_max <- fixed_objects$t_max
+  }
+
+  # simulate treatment group
+  if (condition$crossing < 0){
+    # if crossing is smaller than 0 stop with error
+    stop(gettext("Time of crossing has to be >= 0"))
+  } else if (condition$crossing == 0){
+    # if crossing is 0 leave out period bevore treatment effect
+    # (times have to be strictly monotonous for rSurv_fun)
+    data_trt <- data.frame(
+      t = nph::rSurv_fun(
+        condition$n_trt,
+        nph::pchaz(
+          c(0, t_max),
+          c(condition$hazard_trt_after)
+        )
+      ),
+      trt = 1,
+      evt = TRUE
+    )
+  } else {
+    # if crossing is positive simulate in the time intervals bevore and after
+    # treatment effect
+    data_trt <- data.frame(
+      t = nph::rSurv_fun(
+        condition$n_trt,
+        nph::pchaz(
+          c(0, condition$crossing, t_max),
+          c(condition$hazard_trt_before, condition$hazard_trt_after)
+        )
+      ),
+      trt = 1,
+      evt = TRUE
+    )
+  }
+
+  # simulate control group with constant hazard from 0 to t_max
+  data_ctrl <- data.frame(
+    t = nph::rSurv_fun(
+      condition$n_ctrl,
+      nph::pchaz(
+        c(0, t_max),
+        c(condition$hazard_ctrl)
+      )
+    ),
+    trt = 0,
+    evt = TRUE
+  )
+
+  rbind(data_trt, data_ctrl)
+}
+
+#' Create an empty assumtions data.frame for generate_crossing_hazards
+#'
+#' @return For assumptions_crossing_hazards: a design tibble with default values invisibly
+#'
+#' @details assumptions_crossing_hazards prints the code to generate a default
+#'   design tibble for use with generate_crossing_hazards and returns the
+#'   evaluated code invisibly. This function is intended to be used to copy
+#'   paste the code and edit the parameters.
+#'
+#' @export
+#' @describeIn generate_crossing_hazards generate default design tibble
+#'
+#' @examples
+#' Design <- assumptions_crossing_hazards()
+#' Design
+assumptions_crossing_hazards <- function(){
+  skel <- "expand.grid(
+  crossing=seq(0, 10, by=2),  # crossing of hazards after 0, 1, ..., 10 days
+  hazard_ctrl=0.05,        # hazard under control and before treatment effect
+  hazard_trt_before=0.025, # hazard before crossing of the hazard curves
+  hazard_trt_after=0.1,    # hazard after crossing of the hazard curves
+  random_withdrawal=0.01  # rate of random withdrawal
+)
+"
+
+cat(skel)
+invisible(
+  skel |>
+    str2expression() |>
+    eval()
+)
+}
+
+#' Calculate hr after onset of treatment effect from gAHR
+#'
+#' @param design design data.frame
+#' @param target_gAHR target geometric average hazard ratio
+#'
+#' @return For hr_after_onset_from_gAHR: the design data.frame passed as
+#'   argument with the additional column hazard_trt.
+#' @export
+#'
+#' @describeIn generate_crossing_hazards  Calculate hr after onset of treatment effect from gAHR
+#'
+#' @examples
+#' my_design <- merge(
+#'     assumptions_crossing_hazards(),
+#'     design_fixed_followup(),
+#'     by=NULL
+#'   )
+#' my_design$hr_trt <- NA
+#' my_design <- hr_after_onset_from_gAHR(my_design, 0.8)
+#' my_design
+hr_after_crossing_from_gAHR <- function(design, target_gAHR){
+
+}
+
+#' Calculate true summary statistics for scenarios with crossing hazards
+#'
+#' @param Design Design data.frame for crossing hazards
+#' @param cutoff_stats Cutoff time for rmst and average hazard ratios
+#' @param fixed_objects=NULL fixed objects not used for now
+#'
+#' @return For true_summary_statistics_crossing_hazards: the design data.frame
+#'   passed as argument with the additional columns:
+#' * `rmst_trt` rmst in the treatment group
+#' * `median_surv_trt` median survival in the treatment group
+#' * `rmst_ctrl` rmst in the control group
+#' * `median_surv_ctrl` median survial in the control group
+#' * `gAHR` geometric average hazard ratio
+#' * `AHR` average hazard ratio
+#'
+#' @export
+#'
+#' @describeIn generate_crossing_hazards  calculate true summary statistics for crossing hazards
+#'
+#' @examples
+#' my_design <- merge(
+#'     assumptions_crossing_hazards(),
+#'     design_fixed_followup(),
+#'     by=NULL
+#'   )
+#' my_design$follwup <- 15
+#' my_design <- true_summary_statistics_crossing_hazards(my_design, cutoff_stats=my_design$followup)
+#' my_design
+true_summary_statistics_crossing_hazards <- function(Design, cutoff_stats=10, fixed_objects=NULL){
+
+  true_summary_statistics_crossing_hazards_rowwise <- function(condition, cutoff_stats){
+
+    # if t_max is not given in fixed_objects
+    if(is.null(fixed_objects) || (!hasName(fixed_objects, "t_max"))){
+      # set t_max to 1-1/10000 quantile of control or treatment survival function
+      # whichever is later
+      t_max <- max(
+        log(10000) / condition$hazard_ctrl,
+        log(10000) / condition$hazard_trt_after,
+        log(10000) / condition$hazard_trt_before
+      )
+    } else {
+      t_max <- fixed_objects$t_max
+    }
+
+    # create functions for treatment group
+    if (condition$crossing < 0){
+      # if crossing is smaller than 0 stop with error
+      stop(gettext("Time of crossing has to be >= 0"))
+    } else if (condition$crossing == 0){
+      # if crossing is 0 leave out period bevore treatment effect
+      # (times have to be strictly monotonous for rSurv_fun)
+      data_generating_model_trt <- nph::pchaz(
+        c(0, t_max),
+        c(condition$hazard_trt_after)
+      )
+
+    } else {
+      # if crossing is positive create piecewise constant hazards and respective
+      # functions in the time intervals bevore and after treatment effect
+      data_generating_model_trt <- nph::pchaz(
+        c(0, condition$crossing, t_max),
+        c(condition$hazard_trt_before, condition$hazard_trt_after)
+      )
+
+    }
+
+    # create functions for control group with constant hazard from 0 to t_max
+    data_generating_model_ctrl <- nph::pchaz(
+      c(0, t_max),
+      c(condition$hazard_ctrl)
+    )
+
+    res <- cbind(
+      condition,
+      internal_real_statistics_pchaz(
+        data_generating_model_trt,
+        data_generating_model_ctrl,
+        N_trt=condition$n_trt,
+        N_ctrl=condition$n_ctrl,
+        cutoff = cutoff_stats
+      )
+    )
+
+    row.names(res) <- NULL
+    res
+  }
+
+  Design <- Design |>
+    split(1:nrow(Design)) |>
+    mapply(FUN=true_summary_statistics_crossing_hazards_rowwise, cutoff_stats = cutoff_stats, SIMPLIFY = FALSE)
+
+  Design <- do.call(rbind, Design)
+
+  Design
+}
