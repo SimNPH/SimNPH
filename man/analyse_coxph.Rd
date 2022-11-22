@@ -4,17 +4,10 @@
 \alias{analyse_coxph}
 \title{Analyse Dataset with the Cox Protportional Hazards Model}
 \usage{
-analyse_coxph(condition, dat, fixed_objects = NULL)
-}
-\arguments{
-\item{condition}{condition of the simulation}
-
-\item{dat}{generated datasets}
-
-\item{fixed_objects}{other constants}
+analyse_coxph()
 }
 \value{
-a data frame with the columns
+an analyse function that returns a data.frame with the columns
 \itemize{
 \item \code{p} p value of the score test
 \item \code{coef} coefficient for \code{trt}
@@ -36,5 +29,5 @@ condition <- merge(
   ) |>
   head(1)
 dat <- generate_delayed_effect(condition)
-analyse_coxph(condition, dat)
+analyse_coxph()(condition, dat)
 }

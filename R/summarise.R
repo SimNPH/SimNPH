@@ -89,7 +89,7 @@ create_summarise_function <- function(...){
 #'
 #' @return
 #'
-#' A data frame with the columns
+#' A function that can be used in Summarise that returns a data frame with the columns
 #'
 #' * bias the bias with respect to the true value
 #' * var the variance
@@ -125,7 +125,7 @@ create_summarise_function <- function(...){
 #'   replications=10,
 #'   generate=generate_delayed_effect,
 #'   analyse=list(
-#'     coxph=analyse_coxph
+#'     coxph=analyse_coxph()
 #'   ),
 #'   summarise = summarise_all
 #' )
@@ -160,6 +160,64 @@ summarise_estimator <- function(est, real, lower=NULL, upper=NULL, name=NULL){
       results_tmp$coverage <- mean( (lower <= real) & (upper >= real) )
       results_tmp$width    <- mean( abs(upper - lower) )
     }
+
+    results_tmp
+  }
+
+  attr(res, "name") <- name
+
+  res
+}
+
+#' Generic summarise function for tests
+#'
+#' @param alpha the significance level(s)
+#' @param name = NULL name for the summarise function, appended to the name of the analysis method in the final results
+#'
+#' @return
+#'
+#' A function that can be used in Summarise that returns a data frame with the columns
+#'
+#' * rejection_X
+#' * rejection_Y
+#' * ...
+#'
+#' Where X, Y, ... are the alpha levels given in the argument
+#'
+#' @export
+#'
+#' @examples
+#' condition <- merge(
+#'   assumptions_delayed_effect(),
+#'   design_fixed_followup(),
+#'   by=NULL
+#' ) |>
+#'   tail(4) |>
+#'   head(1)
+#'
+#' summarise_all <- create_summarise_function(
+#'   logrank=summarise_test(alpha=c(0.5, 0.9, 0.95, 0.99))
+#' )
+#'
+#' # runs simulations
+#' sim_results <- runSimulation(
+#'   design=condition,
+#'   replications=100,
+#'   generate=generate_delayed_effect,
+#'   analyse=list(
+#'     logrank=analyse_logrank()
+#'   ),
+#'   summarise = summarise_all
+#' )
+#'
+#' sim_results[, grepl("rejection", names(sim_results))]
+summarise_test <- function(alpha, name=NULL){
+  res <- function(condition, results, fixed_objects){
+    results_tmp <- outer(results$p, 1-alpha, FUN=`<`) |>
+      colMeans() |>
+      as.list() |>
+      as.data.frame() |>
+      setNames(paste0("rejection_", alpha))
 
     results_tmp
   }

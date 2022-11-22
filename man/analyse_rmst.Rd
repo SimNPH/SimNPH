@@ -4,18 +4,11 @@
 \alias{analyse_rmst}
 \title{Analyse Dataset with an ANCOVA Type test on the RMST}
 \usage{
-analyse_rmst(condition, dat, fixed_objects = NULL)
-}
-\arguments{
-\item{condition}{condition of the simulation}
-
-\item{dat}{generated datasets}
-
-\item{fixed_objects}{other constants}
+analyse_rmst()
 }
 \value{
-a dataframe with the p-value of the test in the
-column p
+an analysis function that returns a data.frame with the p-value of
+the test in the column p
 }
 \description{
 Analyse Dataset with an ANCOVA Type test on the RMST
@@ -28,5 +21,5 @@ condition <- merge(
   ) |>
   head(1)
 dat <- generate_delayed_effect(condition)
-analyse_rmst(condition, dat)
+analyse_rmst()(condition, dat)
 }
