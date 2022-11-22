@@ -18,7 +18,7 @@ summarise_estimator(est, real, lower = NULL, upper = NULL, name = NULL)
 \item{name}{= NULL name for the summarise function, appended to the name of the analysis method in the final results}
 }
 \value{
-A data frame with the columns
+A function that can be used in Summarise that returns a data frame with the columns
 \itemize{
 \item bias the bias with respect to the true value
 \item var the variance
