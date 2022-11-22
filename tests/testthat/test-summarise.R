@@ -87,3 +87,43 @@ test_that("creating a summarise function for an estimator works", {
   expect(all(is.na(sim_results[, c("coxph.coverage", "coxph.width")])), "summary results depending on the CI should be missing if no CI boundaries are given")
 
 })
+
+test_that("generic summarise for tests works", {
+  condition <- merge(
+    assumptions_delayed_effect(),
+    design_fixed_followup(),
+    by=NULL
+  ) |>
+    tail(4) |>
+    head(1)
+
+  summarise_all <- create_summarise_function(
+    logrank=summarise_test(alpha=c(0.95, 0.99)),
+    logrank=summarise_test(alpha=c(0.9), name="innovative")
+  )
+
+  # runs simulations
+  sim_results <- runSimulation(
+    design=condition,
+    replications=10,
+    generate=generate_delayed_effect,
+    analyse=list(
+      logrank=analyse_logrank()
+    ),
+    summarise = summarise_all
+  )
+
+  sim_results
+
+  expect(
+    all(hasName(sim_results, c("logrank.rejection_0.95", "logrank.rejection_0.99", "logrank.innovative.rejection_0.9"))),
+    "expected names not present in sim_results"
+  )
+
+  expect_gte(sim_results$logrank.rejection_0.95,           0)
+  expect_gte(sim_results$logrank.rejection_0.99,           0)
+  expect_gte(sim_results$logrank.innovative.rejection_0.9, 0)
+  expect_lte(sim_results$logrank.rejection_0.95,           1)
+  expect_lte(sim_results$logrank.rejection_0.99,           1)
+  expect_lte(sim_results$logrank.innovative.rejection_0.9, 1)
+})
