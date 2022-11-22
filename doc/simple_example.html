@@ -541,8 +541,8 @@ the powers of the two tests.</p>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">replications =</span> N_sim,</span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">generate =</span> my_generator,</span>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">analyse =</span> <span class="fu">list</span>(</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">logrank  =</span> analyse_logrank,</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">maxcombo =</span> analyse_maxcombo</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">logrank  =</span> <span class="fu">analyse_logrank</span>(),</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">maxcombo =</span> <span class="fu">analyse_maxcombo</span>()</span>
 <span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  ),</span>
 <span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">summarise =</span> Summarise,</span>
 <span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">cl =</span> cl,</span>
@@ -551,7 +551,7 @@ the powers of the two tests.</p>
 <span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
 <span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Number of parallel clusters in use: 8</span></span>
 <span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Simulation complete. Total execution time: 23.08s</span></span></code></pre></div>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Simulation complete. Total execution time: 22.39s</span></span></code></pre></div>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>res <span class="sc">|&gt;</span> </span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">subset</span>(<span class="at">select=</span><span class="fu">c</span>(<span class="st">&quot;delay&quot;</span>, <span class="st">&quot;maxcombo.rejection&quot;</span>, <span class="st">&quot;logrank.rejection&quot;</span>)) <span class="sc">|&gt;</span></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div>
@@ -576,23 +576,23 @@ the powers of the two tests.</p>
 </tr>
 <tr class="odd">
 <td align="right">4</td>
-<td align="right">0.99</td>
-<td align="right">0.86</td>
+<td align="right">1.00</td>
+<td align="right">0.87</td>
 </tr>
 <tr class="even">
 <td align="right">6</td>
-<td align="right">0.85</td>
-<td align="right">0.49</td>
+<td align="right">0.86</td>
+<td align="right">0.51</td>
 </tr>
 <tr class="odd">
 <td align="right">8</td>
-<td align="right">0.37</td>
-<td align="right">0.16</td>
+<td align="right">0.43</td>
+<td align="right">0.23</td>
 </tr>
 <tr class="even">
 <td align="right">10</td>
-<td align="right">0.18</td>
-<td align="right">0.09</td>
+<td align="right">0.19</td>
+<td align="right">0.10</td>
 </tr>
 </tbody>
 </table>
@@ -737,13 +737,13 @@ stage and the analyse functions to be used at each stage.</p>
 <span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">followup =</span> <span class="fu">c</span>(condition<span class="sc">$</span>interim_events, condition<span class="sc">$</span>final_events),</span>
 <span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">followup_type =</span> <span class="fu">c</span>(<span class="st">&quot;event&quot;</span>, <span class="st">&quot;event&quot;</span>),</span>
 <span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> nominal_alpha,</span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">analyse_functions =</span> analyse_logrank</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">analyse_functions =</span> <span class="fu">analyse_logrank</span>()</span>
 <span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>  ),</span>
 <span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">maxcombo_seq =</span> <span class="fu">analyse_group_sequential</span>(</span>
 <span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">followup =</span> <span class="fu">c</span>(condition<span class="sc">$</span>interim_events, condition<span class="sc">$</span>final_events),</span>
 <span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">followup_type =</span> <span class="fu">c</span>(<span class="st">&quot;event&quot;</span>, <span class="st">&quot;event&quot;</span>),</span>
 <span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> nominal_alpha,</span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">analyse_functions =</span> analyse_maxcombo</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">analyse_functions =</span> <span class="fu">analyse_maxcombo</span>()</span>
 <span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>  )</span>
 <span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
@@ -782,7 +782,7 @@ functions are included in the result.</p>
 <span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
 <span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Number of parallel clusters in use: 8</span></span>
 <span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Simulation complete. Total execution time: 26.15s</span></span></code></pre></div>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Simulation complete. Total execution time: 25.05s</span></span></code></pre></div>
 <div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>res <span class="sc">|&gt;</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">subset</span>(<span class="at">select=</span><span class="fu">c</span>(</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;delay&quot;</span>, </span>
@@ -822,67 +822,67 @@ functions are included in the result.</p>
 <td align="right">0</td>
 <td align="right">1.00</td>
 <td align="right">1.00</td>
-<td align="right">53.31</td>
-<td align="right">53.31</td>
-<td align="right">25.25</td>
-<td align="right">25.25</td>
-<td align="right">26.55981</td>
-<td align="right">26.55981</td>
+<td align="right">53.68</td>
+<td align="right">53.68</td>
+<td align="right">25.75</td>
+<td align="right">25.75</td>
+<td align="right">26.41036</td>
+<td align="right">26.41036</td>
 </tr>
 <tr class="even">
 <td align="right">2</td>
 <td align="right">1.00</td>
-<td align="right">0.91</td>
-<td align="right">60.93</td>
-<td align="right">71.00</td>
-<td align="right">37.75</td>
-<td align="right">45.25</td>
-<td align="right">30.31642</td>
-<td align="right">35.39262</td>
+<td align="right">0.94</td>
+<td align="right">61.62</td>
+<td align="right">67.51</td>
+<td align="right">38.25</td>
+<td align="right">42.50</td>
+<td align="right">30.51863</td>
+<td align="right">33.49385</td>
 </tr>
 <tr class="odd">
 <td align="right">4</td>
-<td align="right">0.85</td>
-<td align="right">0.51</td>
-<td align="right">68.51</td>
-<td align="right">70.60</td>
-<td align="right">47.25</td>
-<td align="right">49.00</td>
-<td align="right">34.12421</td>
-<td align="right">35.16487</td>
+<td align="right">0.81</td>
+<td align="right">0.50</td>
+<td align="right">69.49</td>
+<td align="right">70.67</td>
+<td align="right">47.75</td>
+<td align="right">48.75</td>
+<td align="right">34.63681</td>
+<td align="right">35.17115</td>
 </tr>
 <tr class="even">
 <td align="right">6</td>
-<td align="right">0.38</td>
-<td align="right">0.23</td>
-<td align="right">67.58</td>
-<td align="right">67.95</td>
-<td align="right">49.50</td>
+<td align="right">0.35</td>
+<td align="right">0.15</td>
+<td align="right">67.15</td>
+<td align="right">67.15</td>
 <td align="right">49.75</td>
-<td align="right">33.68659</td>
-<td align="right">33.85276</td>
+<td align="right">49.75</td>
+<td align="right">33.33241</td>
+<td align="right">33.33241</td>
 </tr>
 <tr class="odd">
 <td align="right">8</td>
-<td align="right">0.15</td>
-<td align="right">0.11</td>
-<td align="right">65.31</td>
-<td align="right">65.48</td>
-<td align="right">49.75</td>
+<td align="right">0.10</td>
+<td align="right">0.05</td>
+<td align="right">65.81</td>
+<td align="right">65.59</td>
 <td align="right">50.00</td>
-<td align="right">32.39474</td>
-<td align="right">32.50661</td>
+<td align="right">49.75</td>
+<td align="right">32.52227</td>
+<td align="right">32.38708</td>
 </tr>
 <tr class="even">
 <td align="right">10</td>
-<td align="right">0.12</td>
-<td align="right">0.09</td>
-<td align="right">64.95</td>
-<td align="right">64.95</td>
+<td align="right">0.03</td>
+<td align="right">0.03</td>
+<td align="right">65.40</td>
+<td align="right">65.40</td>
 <td align="right">50.00</td>
 <td align="right">50.00</td>
-<td align="right">31.95477</td>
-<td align="right">31.95477</td>
+<td align="right">32.31839</td>
+<td align="right">32.31839</td>
 </tr>
 </tbody>
 </table>
@@ -1076,7 +1076,7 @@ different summary statistics.</p>
 <div id="putting-it-all-together-2" class="section level2">
 <h2>Putting it all together</h2>
 <div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>Analyse <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">coxph =</span> analyse_coxph</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">coxph =</span> <span class="fu">analyse_coxph</span>()</span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">runSimulation</span>(</span>
@@ -1091,7 +1091,7 @@ different summary statistics.</p>
 <span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
 <span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Number of parallel clusters in use: 8</span></span>
 <span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Simulation complete. Total execution time: 14.08s</span></span></code></pre></div>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Simulation complete. Total execution time: 13.46s</span></span></code></pre></div>
 <div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>res <span class="sc">|&gt;</span></span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">subset</span>(<span class="at">select=</span><span class="fu">c</span>(</span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;delay&quot;</span>, <span class="st">&quot;coxph.HR.bias&quot;</span>, <span class="st">&quot;coxph.gAHR.bias&quot;</span>, <span class="st">&quot;coxph.HR.mse&quot;</span>, </span>
@@ -1122,57 +1122,57 @@ different summary statistics.</p>
 <tbody>
 <tr class="odd">
 <td align="right">0</td>
-<td align="right">0.0029061</td>
-<td align="right">-0.1970329</td>
-<td align="right">0.0011134</td>
-<td align="right">0.0399270</td>
-<td align="right">0.95</td>
+<td align="right">0.0014799</td>
+<td align="right">-0.1984591</td>
+<td align="right">0.0011228</td>
+<td align="right">0.0405066</td>
+<td align="right">0.96</td>
 <td align="right">0.03</td>
 </tr>
 <tr class="even">
 <td align="right">2</td>
-<td align="right">0.2170621</td>
-<td align="right">-0.1648326</td>
-<td align="right">0.0529692</td>
-<td align="right">0.0330231</td>
-<td align="right">0.01</td>
+<td align="right">0.2183214</td>
+<td align="right">-0.1635733</td>
+<td align="right">0.0543243</td>
+<td align="right">0.0334163</td>
+<td align="right">0.00</td>
 <td align="right">0.62</td>
 </tr>
 <tr class="odd">
 <td align="right">4</td>
-<td align="right">0.4296944</td>
-<td align="right">-0.1273570</td>
-<td align="right">0.1979480</td>
-<td align="right">0.0295305</td>
+<td align="right">0.4123407</td>
+<td align="right">-0.1447108</td>
+<td align="right">0.1852205</td>
+<td align="right">0.0361368</td>
 <td align="right">0.00</td>
-<td align="right">0.85</td>
+<td align="right">0.82</td>
 </tr>
 <tr class="even">
 <td align="right">6</td>
-<td align="right">0.6024770</td>
-<td align="right">-0.1019613</td>
-<td align="right">0.3870285</td>
-<td align="right">0.0344461</td>
+<td align="right">0.6055630</td>
+<td align="right">-0.0988752</td>
+<td align="right">0.3917296</td>
+<td align="right">0.0347993</td>
 <td align="right">0.00</td>
 <td align="right">0.89</td>
 </tr>
 <tr class="odd">
 <td align="right">8</td>
-<td align="right">0.7208284</td>
-<td align="right">-0.0969993</td>
-<td align="right">0.5468776</td>
-<td align="right">0.0366929</td>
+<td align="right">0.7295055</td>
+<td align="right">-0.0883222</td>
+<td align="right">0.5661071</td>
+<td align="right">0.0417297</td>
 <td align="right">0.00</td>
-<td align="right">0.96</td>
+<td align="right">0.95</td>
 </tr>
 <tr class="even">
 <td align="right">10</td>
-<td align="right">0.7599406</td>
-<td align="right">-0.1400594</td>
-<td align="right">0.6112216</td>
-<td align="right">0.0533285</td>
+<td align="right">0.8161129</td>
+<td align="right">-0.0838871</td>
+<td align="right">0.7243277</td>
+<td align="right">0.0653244</td>
 <td align="right">0.00</td>
-<td align="right">0.88</td>
+<td align="right">0.86</td>
 </tr>
 </tbody>
 </table>
