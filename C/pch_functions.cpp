@@ -114,6 +114,7 @@ NumericVector survFunCpp (const NumericVector& Tint, const NumericVector& lambda
   return result;
 }
 
+/*
 // [[Rcpp::export]]
 NumericVector quantFunCpp(const NumericVector& Tint, const NumericVector& lambda, const NumericVector& v){
   const int n = v.size();
@@ -136,9 +137,9 @@ NumericVector quantFunCpp(const NumericVector& Tint, const NumericVector& lambda
         break;
       }
     }
-
-    result[i] = (Tint[j-1] - log(v / Qint[j]) / lambda[j])
+    result[i] = (Tint[j-1] - log(v[i] / Qint[j]) / lambda[j])
   }
 
   return result;
 }
+*/
