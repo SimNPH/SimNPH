@@ -43,7 +43,7 @@ sim_results <- runSimulation(
   replications=100,
   generate=generate_delayed_effect,
   analyse=list(
-    logrank=analyse_logrank
+    logrank=analyse_logrank()
   ),
   summarise = summarise_all
 )

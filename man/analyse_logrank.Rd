@@ -4,17 +4,10 @@
 \alias{analyse_logrank}
 \title{Analyse Dataset with the Logrank Test}
 \usage{
-analyse_logrank(condition, dat, fixed_objects = NULL)
-}
-\arguments{
-\item{condition}{condition of the simulation}
-
-\item{dat}{generated datasets}
-
-\item{fixed_objects}{other constants}
+analyse_logrank()
 }
 \value{
-a data frame with the columns
+an analysis function that returns a data.frame with the columns
 \itemize{
 \item \code{p} p-value of the logrank test
 \item \code{N_pat} number of patients
@@ -32,5 +25,5 @@ condition <- merge(
   ) |>
   head(1)
 dat <- generate_delayed_effect(condition)
-analyse_logrank(condition, dat)
+analyse_logrank()(condition, dat)
 }
