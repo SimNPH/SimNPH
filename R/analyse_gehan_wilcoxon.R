@@ -14,8 +14,12 @@
 #' analyse_gehan_wilcoxon()(condition, dat)
 analyse_gehan_wilcoxon <- function(){
   function(condition, dat, fixed_objects = NULL){
+    # according to survival:::print.survdiff
+    model <- survival::survdiff(survival::Surv(t, evt) ~ trt, dat, rho=1)
+    df <- sum(model$exp > 0) -1
+
     result_tmp <- list(
-      p = 1,
+      p = pchisq(model$chisq, df, lower.tail = FALSE),
       N_pat=nrow(dat),
       N_evt=sum(dat$evt)
     )
