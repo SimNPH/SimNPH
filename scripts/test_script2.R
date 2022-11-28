@@ -1,11 +1,10 @@
 # How To use this test-script
 #
-# The installation of the packages can prompt for input in the console if some
-# packages are not yet installed.
-# It's best to run the lines with install.packages and remotes::install_git
-# interactively one time and then sourcing the whole file.
+# Please run the commented lines in the section "installation of packages"
+# before running the script to install the newest version of the package as well
+# as CRAN dependencies, if they're not already installed.
 #
-# Please don't run the rest of the file line by line, but source the whole
+# Please don't run the file line by line, but source the whole
 # script in one go since the script also measures running time of the
 # simulations.
 #
