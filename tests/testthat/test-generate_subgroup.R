@@ -111,18 +111,29 @@ test_that("test that true_summary_statistics_subgroup works", {
     hazard_trt=c(0.2, 0.02),
     hazard_subgroup=1e-4,
     random_withdrawal=0.01,
-    cutoff_stats=c(7, 15)
+    cutoff_stats=c(7, 15),
+    followup=18
   )
 
-  test_design <- test_design |>
+  test_design1 <- test_design |>
     true_summary_statistics_subgroup(cutoff_stats = test_design$cutoff_stats)
 
+  test_design2 <- test_design |>
+    true_summary_statistics_subgroup()
 
-  expect_named(test_design, c("n_trt", "n_ctrl", "prevalence", "hazard_ctrl", "hazard_trt", "hazard_subgroup", "random_withdrawal", "cutoff_stats", "rmst_trt", "median_survival_trt", "rmst_ctrl", "median_survival_ctrl", "gAHR", "AHR"))
+  test_design3  <- test_design |>
+    subset(select=c(-followup)) |>
+    true_summary_statistics_subgroup()
 
-  expect(all(test_design$gAHR[(test_design$prevalence == 0) & (test_design$hazard_ctrl == test_design$hazard_trt)] == 1), "all gAHR should be 1 for equal hazards and prevalence == 0")
-  expect(all(test_design$ AHR[(test_design$prevalence == 0) & (test_design$hazard_ctrl == test_design$hazard_trt)] == 1), "all AHR should be 1 for equal hazards and prevalence == 0")
+  expect_named(test_design1, c("n_trt", "n_ctrl", "prevalence", "hazard_ctrl", "hazard_trt", "hazard_subgroup", "random_withdrawal", "cutoff_stats", "followup", "rmst_trt", "median_survival_trt", "rmst_ctrl", "median_survival_ctrl", "gAHR", "AHR", "cutoff_used"))
 
+  expect(all(test_design1$gAHR[(test_design1$prevalence == 0) & (test_design1$hazard_ctrl == test_design1$hazard_trt)] == 1), "all gAHR should be 1 for equal hazards and prevalence == 0")
+
+  expect(all(test_design1$ AHR[(test_design1$prevalence == 0) & (test_design1$hazard_ctrl == test_design1$hazard_trt)] == 1), "all AHR should be 1 for equal hazards and prevalence == 0")
+
+  expect(all(test_design2$cutoff_used == test_design2$followup), "cutoff used defaults to followup")
+
+  expect(all(!is.na(test_design3$cutoff_used)), "cutoff is calculated if cutoff_stats and followup are missing")
 })
 
 test_that("test that true_summary_statistics_subgroup fails prevalence not in [0,1]", {
