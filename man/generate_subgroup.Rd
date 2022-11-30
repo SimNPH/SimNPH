@@ -10,7 +10,7 @@
 true_summary_statistics_progression(
   Design,
   what = "os",
-  cutoff_stats = 10,
+  cutoff_stats = NA_real_,
   fixed_objects = NULL
 )
 
@@ -20,14 +20,12 @@ assumptions_subgroup()
 
 true_summary_statistics_subgroup(
   Design,
-  cutoff_stats = 10,
+  cutoff_stats = NA_real_,
   fixed_objects = NULL
 )
 }
 \arguments{
 \item{Design}{Design data.frame for subgroup}
-
-\item{cutoff_stats}{Cutoff time for rmst and average hazard ratios}
 
 \item{fixed_objects}{fixed objects of Design dataset}
 
@@ -35,7 +33,9 @@ true_summary_statistics_subgroup(
 
 \item{what="os"}{True summary statistics for which estimand}
 
-\item{fixed_objects=NULL}{fixed objects not used for now}
+\item{cutoff_stats=NA_real_}{cutoff time, see details}
+
+\item{fixed_objects=NULL}{additional settings, see details}
 }
 \value{
 For true_summary_statistics_subgroup: the design data.frame
@@ -78,6 +78,16 @@ Calculate true summary statistics for scenarios with differential treatment effe
 \code{what} can be \code{"os"} for overall survival and \code{"pfs"} for progression free
 survival.
 
+The if \code{fixed_objects} contains \code{t_max} then this value is used as the
+maximum time to calculate function like survival, hazard, ... of the data
+generating models. If this is not given \code{t_max} is choosen as the minimum of
+the \code{1-(1/10000)} quantile of all survival distributions in the model.
+
+\code{cutoff_stats} is the time used to calculate the statistics like average
+hazard ratios and RMST, that are only calculated up to a certain point. It
+defaults to \code{NA_real_} in which case the variable \code{followup} from the Design
+dataset is used. If \code{followup} is also not set it uses \code{t_max}.
+
 Condidtion has to contain the following columns:
 \itemize{
 \item n_trt number of paitents in treatment arm
@@ -92,6 +102,16 @@ assumptions_subgroup prints the code to generate a default
 design tibble for use with generate_subgroup and returns the
 evaluated code invisibly. This function is intended to be used to copy
 paste the code and edit the parameters.
+
+The if \code{fixed_objects} contains \code{t_max} then this value is used as the
+maximum time to calculate function like survival, hazard, ... of the data
+generating models. If this is not given \code{t_max} is choosen as the minimum of
+the \code{1-(1/10000)} quantile of all survival distributions in the model.
+
+\code{cutoff_stats} is the time used to calculate the statistics like average
+hazard ratios and RMST, that are only calculated up to a certain point. It
+defaults to \code{NA_real_} in which case the variable \code{followup} from the Design
+dataset is used. If \code{followup} is also not set it uses \code{t_max}.
 }
 \section{Functions}{
 \itemize{
@@ -112,8 +132,8 @@ my_design <- merge(
     by=NULL
   )
 my_design$follwup <- 15
-my_design_os  <- true_summary_statistics_subgroup(my_design, "os",  cutoff_stats=my_design$followup)
-my_design_pfs <- true_summary_statistics_subgroup(my_design, "pfs", cutoff_stats=my_design$followup)
+my_design_os  <- true_summary_statistics_subgroup(my_design, "os")
+my_design_pfs <- true_summary_statistics_subgroup(my_design, "pfs")
 my_design_os
 my_design_pfs
 one_simulation <- merge(
@@ -132,6 +152,6 @@ my_design <- merge(
     design_fixed_followup(),
     by=NULL
   )
-my_design <- true_summary_statistics_subgroup(my_design, cutoff_stats=my_design$followup)
+my_design <- true_summary_statistics_subgroup(my_design)
 my_design
 }

@@ -119,22 +119,36 @@ test_that("test that true_summary_statistics_delayed_effect works", {
     delay=c(0,7),
     hazard_ctrl=0.2,
     hazard_trt=c(0.2, 0.02),
-    cutoff_stats=c(7, 15)
+    cutoff_stats=c(7, 15),
+    followup = 18
   )
 
-  test_design <- test_design |>
+  test_design1 <- test_design |>
     true_summary_statistics_delayed_effect(cutoff_stats = test_design$cutoff_stats)
 
+  test_design2 <- test_design |>
+    true_summary_statistics_delayed_effect()
 
-  expect_named(test_design, c("n_trt", "n_ctrl", "delay", "hazard_ctrl", "hazard_trt", "cutoff_stats", "rmst_trt", "median_survival_trt", "rmst_ctrl", "median_survival_ctrl", "gAHR", "AHR"))
+  test_design3  <- test_design |>
+    subset(select=c(-followup)) |>
+    true_summary_statistics_delayed_effect()
 
-  expect(all(test_design$AHR[test_design$hazard_ctrl == test_design$hazard_trt] == 1), "all average hazard ratios should be 1 for equal hazards")
-  expect(all(test_design$AHR[test_design$delay >= test_design$cutoff_stats] == 1), "all average hazard ratios should be 1 if effect starts after cutoff")
-  expect(all(test_design$AHR[(test_design$delay < test_design$cutoff_stats) & (test_design$hazard_ctrl > test_design$hazard_trt)] < 1), "all average hazard ratios should be less than 1 if there's an effect before cutoff")
+  expect_named(test_design1, c("n_trt", "n_ctrl", "delay", "hazard_ctrl", "hazard_trt", "cutoff_stats", "followup", "rmst_trt", "median_survival_trt", "rmst_ctrl", "median_survival_ctrl", "gAHR", "AHR", "cutoff_used"))
 
-  expect(all(test_design$gAHR[test_design$hazard_ctrl == test_design$hazard_trt] == 1), "all geometric average hazard ratios should be 1 for equal hazards")
-  expect(all(test_design$gAHR[test_design$delay >= test_design$cutoff_stats] == 1), "all geometric average hazard ratios should be 1 if effect starts after cutoff")
-  expect(all(test_design$gAHR[(test_design$delay < test_design$cutoff_stats) & (test_design$hazard_ctrl > test_design$hazard_trt)] < 1), "all geometric average hazard ratios should be less than 1 if there's an effect before cutoff")
+  expect(all(test_design1$AHR[test_design1$hazard_ctrl == test_design1$hazard_trt] == 1), "all average hazard ratios should be 1 for equal hazards")
+  expect(all(test_design1$AHR[test_design1$delay >= test_design1$cutoff_stats] == 1), "all average hazard ratios should be 1 if effect starts after cutoff")
+
+  expect(all(test_design1$AHR[(test_design1$delay < test_design1$cutoff_stats) & (test_design1$hazard_ctrl > test_design1$hazard_trt)] < 1), "all average hazard ratios should be less than 1 if there's an effect before cutoff")
+
+  expect(all(test_design1$gAHR[test_design1$hazard_ctrl == test_design1$hazard_trt] == 1), "all geometric average hazard ratios should be 1 for equal hazards")
+
+  expect(all(test_design1$gAHR[test_design1$delay >= test_design1$cutoff_stats] == 1), "all geometric average hazard ratios should be 1 if effect starts after cutoff")
+
+  expect(all(test_design1$gAHR[(test_design1$delay < test_design1$cutoff_stats) & (test_design1$hazard_ctrl > test_design1$hazard_trt)] < 1), "all geometric average hazard ratios should be less than 1 if there's an effect before cutoff")
+
+  expect(all(test_design2$cutoff_used == test_design2$followup), "cutoff used defaults to followup")
+
+  expect(all(!is.na(test_design3$cutoff_used)), "cutoff is calculated if cutoff_stats and followup are missing")
 })
 
 test_that("test that true_summary_statistics_delayed_effect fails on delay < 0", {

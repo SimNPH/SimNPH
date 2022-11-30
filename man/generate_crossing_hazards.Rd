@@ -15,7 +15,7 @@ hr_after_crossing_from_gAHR(design, target_gAHR)
 
 true_summary_statistics_crossing_hazards(
   Design,
-  cutoff_stats = 10,
+  cutoff_stats = NA_real_,
   fixed_objects = NULL
 )
 }
@@ -30,9 +30,9 @@ true_summary_statistics_crossing_hazards(
 
 \item{Design}{Design data.frame for crossing hazards}
 
-\item{cutoff_stats}{Cutoff time for rmst and average hazard ratios}
+\item{cutoff_stats=NA_real_}{cutoff time, see details}
 
-\item{fixed_objects=NULL}{fixed objects not used for now}
+\item{fixed_objects=NULL}{additional settings, see details}
 }
 \value{
 For generate_crossing_hazards: A dataset with the columns t (time) and trt
@@ -43,7 +43,7 @@ For assumptions_crossing_hazards: a design tibble with default values invisibly
 For hr_after_onset_from_gAHR: the design data.frame passed as
 argument with the additional column hazard_trt.
 
-For true_summary_statistics_crossing_hazards: the design data.frame
+For true_summary_statistics_delayed_effect: the design data.frame
 passed as argument with the additional columns:
 \itemize{
 \item \code{rmst_trt} rmst in the treatment group
@@ -84,6 +84,16 @@ assumptions_crossing_hazards prints the code to generate a default
 design tibble for use with generate_crossing_hazards and returns the
 evaluated code invisibly. This function is intended to be used to copy
 paste the code and edit the parameters.
+
+The if \code{fixed_objects} contains \code{t_max} then this value is used as the
+maximum time to calculate function like survival, hazard, ... of the data
+generating models. If this is not given \code{t_max} is choosen as the minimum of
+the \code{1-(1/10000)} quantile of all survival distributions in the model.
+
+\code{cutoff_stats} is the time used to calculate the statistics like average
+hazard ratios and RMST, that are only calculated up to a certain point. It
+defaults to \code{NA_real_} in which case the variable \code{followup} from the Design
+dataset is used. If \code{followup} is also not set it uses \code{t_max}.
 }
 \section{Functions}{
 \itemize{
@@ -123,6 +133,6 @@ my_design <- merge(
     by=NULL
   )
 my_design$follwup <- 15
-my_design <- true_summary_statistics_crossing_hazards(my_design, cutoff_stats=my_design$followup)
+my_design <- true_summary_statistics_crossing_hazards(my_design)
 my_design
 }
