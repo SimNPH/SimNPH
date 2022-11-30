@@ -156,8 +156,8 @@ generate_progression <- function(condition, fixed_objects=NULL){
 #'
 #' @param Design Design data.frame for subgroup
 #' @param what="os" True summary statistics for which estimand
-#' @param cutoff_stats Cutoff time for rmst and average hazard ratios
-#' @param fixed_objects=NULL fixed objects not used for now
+#' @param cutoff_stats=NA_real_ cutoff time, see details
+#' @param fixed_objects=NULL additional settings, see details
 #'
 #' @return For true_summary_statistics_subgroup: the design data.frame
 #'   passed as argument with the additional columns:
@@ -173,6 +173,16 @@ generate_progression <- function(condition, fixed_objects=NULL){
 #' `what` can be `"os"` for overall survival and `"pfs"` for progression free
 #' survival.
 #'
+#' The if `fixed_objects` contains `t_max` then this value is used as the
+#' maximum time to calculate function like survival, hazard, ... of the data
+#' generating models. If this is not given `t_max` is choosen as the minimum of
+#' the `1-(1/10000)` quantile of all survival distributions in the model.
+#'
+#' `cutoff_stats` is the time used to calculate the statistics like average
+#' hazard ratios and RMST, that are only calculated up to a certain point. It
+#' defaults to `NA_real_` in which case the variable `followup` from the Design
+#' dataset is used. If `followup` is also not set it uses `t_max`.
+#'
 #' @export
 #'
 #' @describeIn generate_subgroup  calculate true summary statistics for subgroup
@@ -184,11 +194,11 @@ generate_progression <- function(condition, fixed_objects=NULL){
 #'     by=NULL
 #'   )
 #' my_design$follwup <- 15
-#' my_design_os  <- true_summary_statistics_subgroup(my_design, "os",  cutoff_stats=my_design$followup)
-#' my_design_pfs <- true_summary_statistics_subgroup(my_design, "pfs", cutoff_stats=my_design$followup)
+#' my_design_os  <- true_summary_statistics_subgroup(my_design, "os")
+#' my_design_pfs <- true_summary_statistics_subgroup(my_design, "pfs")
 #' my_design_os
 #' my_design_pfs
-true_summary_statistics_progression <- function(Design, what="os", cutoff_stats=10, fixed_objects=NULL){
+true_summary_statistics_progression <- function(Design, what="os", cutoff_stats=NA_real_, fixed_objects=NULL){
 
   true_summary_statistics_progression_rowwise_pfs <- function(condition, cutoff_stats, fixed_objects=fixed_objects){
 
@@ -203,6 +213,15 @@ true_summary_statistics_progression <- function(Design, what="os", cutoff_stats=
     } else {
       t_max <- fixed_objects$t_max
     }
+
+    if(is.na(cutoff_stats)){
+      if(hasName(condition, "followup")){
+        cutoff_stats <- condition$followup
+      } else {
+        cutoff_stats <- t_max
+      }
+    }
+
 
     # create functions for control group with constant hazard from 0 to t_max
     # minimum of two exponential (constant hazards) distributions is again
@@ -228,7 +247,8 @@ true_summary_statistics_progression <- function(Design, what="os", cutoff_stats=
         N_trt=condition$n_trt,
         N_ctrl=condition$n_ctrl,
         cutoff = cutoff_stats
-      )
+      ),
+      cutoff_used=cutoff_stats
     )
 
     row.names(res) <- NULL
