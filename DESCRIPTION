@@ -24,7 +24,9 @@ Imports:
     purrr,
     rlang,
     tibble,
-    nph
+    nph,
+    Rcpp (>= 1.0.9)
+LinkingTo: Rcpp
 Config/testthat/edition: 3
 VignetteBuilder: knitr
 RoxygenNote: 7.2.0
