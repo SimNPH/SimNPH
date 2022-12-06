@@ -1,6 +1,8 @@
 #include <Rcpp.h>
 using namespace Rcpp;
 
+// [[Rcpp::interfaces(cpp)]]
+
 // all those functions assume that Tint is ordered and
 // that Tint and lambda have compatible sizes
 // this is checked in the R function that creates the calling R function
