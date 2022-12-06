@@ -40,6 +40,7 @@ export(true_summary_statistics_crossing_hazards)
 export(true_summary_statistics_delayed_effect)
 export(true_summary_statistics_progression)
 export(true_summary_statistics_subgroup)
+export(analyse_coxph_weighted)
 
 importFrom(Rcpp,evalCpp)
 useDynLib(SimNPH, .registration = TRUE)

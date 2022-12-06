@@ -1,0 +1,60 @@
+#' Analyse Dataset with weighted Cox regression
+#'
+#' @param type="SG" type of weights, see Details
+#'
+#' @return an analyse function that returns a data.frame with the columns
+#' * `p` p value of the score test
+#' * `coef` coefficient for `trt`
+#' * `hr` hazard ratio for `trt`
+#' * `hr_lower` lower 95% confidence intervall boundary for the hazard ratio for `trt`
+#' * `hr_upper`lower 95% confidence intervall boundary for the hazard ratio for `trt`
+#' * `N_pat` number of patients
+#' * `N_evt` number of events
+#'
+#' @export
+#'
+#' @details
+#'
+#' Type can be either "SG" or "S". For "SG" the weights are set to
+#' `S(t)*G(t)^(-1)`, for "S" `S(t)` is used. Here `S(t)` denotes the Kaplan
+#' Meier estimator for the event Times and `G(t)` denotes the Kaplan Meier
+#' estimator for the censoring times.
+#'
+#' @examples
+#' condition <- merge(
+#'     assumptions_delayed_effect(),
+#'     design_fixed_followup(),
+#'     by=NULL
+#'   ) |>
+#'   head(1)
+#' dat <- generate_delayed_effect(condition)
+#' analyse_coxph_weighted()(condition, dat)
+analyse_coxph_weighted <- function(type="SG"){
+  if(!(type %in% c("SG", "S"))){
+    stop('in analyse_coxph_weighted: invalid "type", currently implemented: "SG" and "G".')
+  }
+
+  function(condition, dat, fixed_objects = NULL){
+
+    S <- survfit(Surv(t, evt)~1, data=dat)
+    weights <- S$surv[match(dat$t, S$time)]
+
+    if(type=="SG"){
+      W <- survfit(Surv(t, !evt)~1, data=dat)
+      weights <- weights * ((W$surv[match(dat$t, W$time)])^(-1))
+    }
+
+    model <- survival::coxph(survival::Surv(t, evt) ~ trt, dat, robust=TRUE, weights=weights, subset=(weights!=0))
+    model_summary <- summary(model)
+
+    list(
+      p = 1-pchisq(model$score, 1),
+      coef = coefficients(model)["trt"],
+      hr   = exp(coefficients(model)["trt"]),
+      hr_lower = model_summary$conf.int[, "lower .95"],
+      hr_upper = model_summary$conf.int[, "upper .95"],
+      N_pat=nrow(dat),
+      N_evt=sum(dat$evt)
+    )
+  }
+}
