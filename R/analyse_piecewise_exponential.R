@@ -27,63 +27,52 @@ analyse_piecewise_exponential <- function(cuts){
 
   function(condition, dat, fixed_objects = NULL){
     dat2 <- survSplit(Surv(t, evt)~trt, data=dat, cut=cuts)
+    dat2$interval <- factor(dat2$tstart, levels=c(0, cuts), labels=interval_labels)
+    dat2$t_interval = dat2$t-dat2$tstart
 
-    # if no patients enter any interval, return NA for all intervals
-    # TODO: calculate values for intervals where it's possible
-    if(length(unique(dat2$tstart)) < n_intervals){
+    # exclude intervals with no events
+    intervals_with_events <- tapply(dat2$evt, dat2$interval, sum, default=0) |>
+      Filter(f=\(x){x>0}) |>
+      names()
 
-      na_tibble <- rep(NA_real_, n_intervals) |>
-        setNames(coef_labels) |>
-        t() |>
-        tibble::as_tibble()
+    dat3 <- dat2 |>
+      subset(interval %in% intervals_with_events)
 
-      list(
-        hr_s = na_tibble,
-        p_s =  na_tibble,
-        hr_s_lower = na_tibble,
-        hr_s_upper = na_tibble,
-        N_pat = nrow(dat),
-        N_evt = sum(dat$evt),
-        interval_table = table(dat2$tstart, dat2$evt)
-      )
-    } else {
-      dat2$interval <- factor(dat2$tstart, labels=interval_labels)
-      dat2$t_interval = dat2$t-dat2$tstart
+    model <- glm(evt ~ trt*interval-trt-1+offset(log(t_interval)), data=dat3, family=poisson())
 
-      model <- glm(evt ~ trt*interval-trt-1+offset(log(t_interval)), data=dat2, family=poisson())
+    summary <- summary(model)
 
-      summary <- summary(model)
+    # preparing output
+    # coef_labels also included the ones with no events
+    # since those are not in the model summary or confint, they are NA in the
+    # output
+    lower <- confint(model)[, 1]
+    lower <- lower[coef_labels]
+    names(lower) <- coef_labels
 
-      # preparing output
+    upper <- confint(model)[, 2]
+    upper <- upper[coef_labels]
+    names(upper) <- coef_labels
 
-      lower <- confint(model)[, 1]
-      lower <- lower[coef_labels]
-      names(lower) <- coef_labels
+    hr_s <- summary$coefficients[, "Estimate"]
+    hr_s <- hr_s[coef_labels]
+    names(hr_s) <- coef_labels
+    hr_s <- exp(hr_s)
 
-      upper <- confint(model)[, 2]
-      upper <- upper[coef_labels]
-      names(upper) <- coef_labels
-
-      hr_s <- summary$coefficients[, "Estimate"]
-      hr_s <- hr_s[coef_labels]
-      names(hr_s) <- coef_labels
-      hr_s <- exp(hr_s)
-
-      p_s <- summary$coefficients[, "Pr(>|z|)"]
-      p_s <- p_s[coef_labels]
-      names(p_s) <- coef_labels
+    p_s <- summary$coefficients[, "Pr(>|z|)"]
+    p_s <- p_s[coef_labels]
+    names(p_s) <- coef_labels
 
 
-      list(
-        hr_s = tibble::as_tibble(t(hr_s)),
-        p_s = tibble::as_tibble(t(p_s)),
-        hr_s_lower = tibble::as_tibble(t(lower)),
-        hr_s_upper = tibble::as_tibble(t(upper)),
-        N_pat = nrow(dat),
-        N_evt = sum(dat$evt),
-        interval_table = list(list(table(dat2$tstart, dat2$evt)))
-      )
-    }
+    list(
+      hr_s = tibble::as_tibble(t(hr_s)),
+      p_s = tibble::as_tibble(t(p_s)),
+      hr_s_lower = tibble::as_tibble(t(lower)),
+      hr_s_upper = tibble::as_tibble(t(upper)),
+      N_pat = nrow(dat),
+      N_evt = sum(dat$evt),
+      interval_table = table(dat2$interval, dat2$evt)
+    )
   }
 
 
