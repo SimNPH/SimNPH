@@ -7,12 +7,33 @@ test_that("analyse_piecewise_exponential outputs plausible data.frame for delaye
     ) |>
       head(1)
   )
+
   dat <- generate_delayed_effect(condition)
   my_analyse <- analyse_piecewise_exponential(cuts=c(30))
   res <- my_analyse(condition, dat)
 
+  dat2 <- data.frame(
+    t   = c(1, 1, 1, 10, 10, 10),
+    trt = c(1, 1, 0,  0,  0,  1),
+    evt = TRUE
+  )
+
+  my_analyse2 <- analyse_piecewise_exponential(cuts=c(2,9,11))
+  res2 <- my_analyse2(condition, dat2)
 
   expect_named(res, c("hr_s", "p_s", "hr_s_lower", "hr_s_upper", "N_pat", "N_evt", "interval_table"), ignore.order = TRUE)
   expect(all( (res$p_s >= 0) %in% c(TRUE, NA)), "all p values >= 0 or NA")
   expect(all( (res$p_s <= 1) %in% c(TRUE, NA)), "all p values <= 1 or NA")
+
+  expect(
+    all(
+      is.na(c(
+        res2$hr_s["trt:intervalI2"], res2$hr_s["trt:intervalI4"],
+        res2$p_s["trt:intervalI2"], res2$p_s["trt:intervalI4"],
+        res2$hr_s_upper["trt:intervalI2"], res2$hr_s_upper["trt:intervalI4"],
+        res2$hr_s_lower["trt:intervalI2"], res2$hr_s_lower["trt:intervalI4"]
+    ))
+  ),
+    "expect values for intervals without events to be NA"
+  )
 })
