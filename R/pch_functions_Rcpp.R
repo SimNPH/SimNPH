@@ -69,3 +69,16 @@ fast_surv_fun   <- function(Tint, lambda){
     .Call("_SimNPH_survFunCpp", PACKAGE="SimNPH", Tint, lambda, v)
   }
 }
+
+#' @export
+#'
+#' @describeIn fast_haz_fun fast quantile function
+#'
+#' @examples
+#' quant <- fast_quant_fun(c(0, 10, 20), c(10, 15, 7))
+#' quant(seq(0, 1, by=0.01))
+fast_quant_fun   <- function(Tint, lambda){
+  function(v){
+    .Call("_SimNPH_quantFunCpp", PACKAGE="SimNPH", Tint, lambda, v)
+  }
+}

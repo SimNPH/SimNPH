@@ -6,6 +6,7 @@
 \alias{fast_cdf_fun}
 \alias{fast_pdf_fun}
 \alias{fast_surv_fun}
+\alias{fast_quant_fun}
 \title{Fast C implementation of hazard, cumulative hazard, ... for piecewise constant hazards}
 \usage{
 fast_haz_fun(Tint, lambda)
@@ -17,6 +18,8 @@ fast_cdf_fun(Tint, lambda)
 fast_pdf_fun(Tint, lambda)
 
 fast_surv_fun(Tint, lambda)
+
+fast_quant_fun(Tint, lambda)
 }
 \arguments{
 \item{Tint}{time intervals on which the hazards are defined}
@@ -40,6 +43,8 @@ Fast C implementation of hazard, cumulative hazard, ... for piecewise constant h
 \item \code{fast_pdf_fun}: fast probability density function
 
 \item \code{fast_surv_fun}: fast survival function
+
+\item \code{fast_quant_fun}: fast quantile function
 }}
 
 \examples{
@@ -53,4 +58,6 @@ pdf <- fast_pdf_fun(c(0, 10, 20), c(10, 15, 7))
 pdf(seq(0, 30, by=0.1))
 surv <- fast_surv_fun(c(0, 10, 20), c(10, 15, 7))
 surv(seq(0, 30, by=0.1))
+quant <- fast_quant_fun(c(0, 10, 20), c(10, 15, 7))
+quant(seq(0, 1, by=0.01))
 }

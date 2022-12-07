@@ -129,6 +129,27 @@ namespace SimNPH {
         return Rcpp::as<NumericVector >(rcpp_result_gen);
     }
 
+    inline NumericVector quantFunCpp(const NumericVector& Tint, const NumericVector& lambda, const NumericVector& v) {
+        typedef SEXP(*Ptr_quantFunCpp)(SEXP,SEXP,SEXP);
+        static Ptr_quantFunCpp p_quantFunCpp = NULL;
+        if (p_quantFunCpp == NULL) {
+            validateSignature("NumericVector(*quantFunCpp)(const NumericVector&,const NumericVector&,const NumericVector&)");
+            p_quantFunCpp = (Ptr_quantFunCpp)R_GetCCallable("SimNPH", "_SimNPH_quantFunCpp");
+        }
+        RObject rcpp_result_gen;
+        {
+            RNGScope RCPP_rngScope_gen;
+            rcpp_result_gen = p_quantFunCpp(Shield<SEXP>(Rcpp::wrap(Tint)), Shield<SEXP>(Rcpp::wrap(lambda)), Shield<SEXP>(Rcpp::wrap(v)));
+        }
+        if (rcpp_result_gen.inherits("interrupted-error"))
+            throw Rcpp::internal::InterruptedException();
+        if (Rcpp::internal::isLongjumpSentinel(rcpp_result_gen))
+            throw Rcpp::LongjumpException(rcpp_result_gen);
+        if (rcpp_result_gen.inherits("try-error"))
+            throw Rcpp::exception(Rcpp::as<std::string>(rcpp_result_gen).c_str());
+        return Rcpp::as<NumericVector >(rcpp_result_gen);
+    }
+
 }
 
 #endif // RCPP_SimNPH_RCPPEXPORTS_H_GEN_

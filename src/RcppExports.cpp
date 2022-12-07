@@ -193,6 +193,42 @@ RcppExport SEXP _SimNPH_survFunCpp(SEXP TintSEXP, SEXP lambdaSEXP, SEXP vSEXP) {
     UNPROTECT(1);
     return rcpp_result_gen;
 }
+// quantFunCpp
+NumericVector quantFunCpp(const NumericVector& Tint, const NumericVector& lambda, const NumericVector& v);
+static SEXP _SimNPH_quantFunCpp_try(SEXP TintSEXP, SEXP lambdaSEXP, SEXP vSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< const NumericVector& >::type Tint(TintSEXP);
+    Rcpp::traits::input_parameter< const NumericVector& >::type lambda(lambdaSEXP);
+    Rcpp::traits::input_parameter< const NumericVector& >::type v(vSEXP);
+    rcpp_result_gen = Rcpp::wrap(quantFunCpp(Tint, lambda, v));
+    return rcpp_result_gen;
+END_RCPP_RETURN_ERROR
+}
+RcppExport SEXP _SimNPH_quantFunCpp(SEXP TintSEXP, SEXP lambdaSEXP, SEXP vSEXP) {
+    SEXP rcpp_result_gen;
+    {
+        Rcpp::RNGScope rcpp_rngScope_gen;
+        rcpp_result_gen = PROTECT(_SimNPH_quantFunCpp_try(TintSEXP, lambdaSEXP, vSEXP));
+    }
+    Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
+    if (rcpp_isInterrupt_gen) {
+        UNPROTECT(1);
+        Rf_onintr();
+    }
+    bool rcpp_isLongjump_gen = Rcpp::internal::isLongjumpSentinel(rcpp_result_gen);
+    if (rcpp_isLongjump_gen) {
+        Rcpp::internal::resumeJump(rcpp_result_gen);
+    }
+    Rboolean rcpp_isError_gen = Rf_inherits(rcpp_result_gen, "try-error");
+    if (rcpp_isError_gen) {
+        SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
+        UNPROTECT(1);
+        Rf_error(CHAR(rcpp_msgSEXP_gen));
+    }
+    UNPROTECT(1);
+    return rcpp_result_gen;
+}
 
 // validate (ensure exported C++ functions exist before calling them)
 static int _SimNPH_RcppExport_validate(const char* sig) { 
@@ -203,6 +239,7 @@ static int _SimNPH_RcppExport_validate(const char* sig) {
         signatures.insert("NumericVector(*cdfFunCpp)(const NumericVector&,const NumericVector&,const NumericVector&)");
         signatures.insert("NumericVector(*pdfFunCpp)(const NumericVector&,const NumericVector&,const NumericVector&)");
         signatures.insert("NumericVector(*survFunCpp)(const NumericVector&,const NumericVector&,const NumericVector&)");
+        signatures.insert("NumericVector(*quantFunCpp)(const NumericVector&,const NumericVector&,const NumericVector&)");
     }
     return signatures.find(sig) != signatures.end();
 }
@@ -214,6 +251,7 @@ RcppExport SEXP _SimNPH_RcppExport_registerCCallable() {
     R_RegisterCCallable("SimNPH", "_SimNPH_cdfFunCpp", (DL_FUNC)_SimNPH_cdfFunCpp_try);
     R_RegisterCCallable("SimNPH", "_SimNPH_pdfFunCpp", (DL_FUNC)_SimNPH_pdfFunCpp_try);
     R_RegisterCCallable("SimNPH", "_SimNPH_survFunCpp", (DL_FUNC)_SimNPH_survFunCpp_try);
+    R_RegisterCCallable("SimNPH", "_SimNPH_quantFunCpp", (DL_FUNC)_SimNPH_quantFunCpp_try);
     R_RegisterCCallable("SimNPH", "_SimNPH_RcppExport_validate", (DL_FUNC)_SimNPH_RcppExport_validate);
     return R_NilValue;
 }
@@ -224,6 +262,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_SimNPH_cdfFunCpp", (DL_FUNC) &_SimNPH_cdfFunCpp, 3},
     {"_SimNPH_pdfFunCpp", (DL_FUNC) &_SimNPH_pdfFunCpp, 3},
     {"_SimNPH_survFunCpp", (DL_FUNC) &_SimNPH_survFunCpp, 3},
+    {"_SimNPH_quantFunCpp", (DL_FUNC) &_SimNPH_quantFunCpp, 3},
     {"_SimNPH_RcppExport_registerCCallable", (DL_FUNC) &_SimNPH_RcppExport_registerCCallable, 0},
     {NULL, NULL, 0}
 };
