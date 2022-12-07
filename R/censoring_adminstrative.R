@@ -1,5 +1,3 @@
-# TODO: update such that intercurrent events are also censored
-
 #' Add recruitment time to Dataset
 #'
 #' @param dat a simulated dataset
@@ -56,16 +54,30 @@ recruitment_uniform <- function(dat, recruitment_until, recruitment_from=0){
 #' dat_censored <- admin_censoring_time(dat, 5)
 #' attr(dat_censored, "followup")
 admin_censoring_time <- function(dat, followup, keep_non_recruited = FALSE){
-  calendar_time <- dat$t + dat$rec_time
-  dat$t <- pmin(calendar_time, followup) - dat$rec_time
-  dat$evt[calendar_time > followup] <- FALSE
 
-  if(keep_non_recruited){
-    dat$evt[dat$t < 0] <- NA
-    dat$t[dat$t < 0] <- NA_real_
-  } else {
-    dat <- dat[dat$t >= 0, ]
+  # censor arbirtary paris of time and event variables
+  admin_censoring_time_internal <- function(dat, time_var, evt_var, keep=TRUE){
+    # if the time and evt var are present, censor, else return data unchanged
+    if(all(c(time_var, evt_var) %in% names(dat))){
+      calendar_time <- dat[[time_var]] + dat$rec_time
+      dat[[time_var]] <- pmin(calendar_time, followup) - dat$rec_time
+      dat[[evt_var]][calendar_time > followup] <- FALSE
+
+      if(keep){
+        dat[[evt_var]][dat[[time_var]] < 0] <- NA
+        dat[[time_var]][dat[[time_var]] < 0] <- NA_real_
+      } else {
+        dat <- dat[dat[[time_var]] >= 0, ]
+      }
+
+    }
+    dat
   }
+
+  dat <- dat |>
+    admin_censoring_time_internal("t", "evt", keep=keep_non_recruited) |>   # event
+    admin_censoring_time_internal("t_ice", "ice")  # intercurrent event, eg. progression
+
 
   attr(dat, "followup") <- followup
   dat

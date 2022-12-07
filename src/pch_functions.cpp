@@ -116,32 +116,28 @@ NumericVector survFunCpp (const NumericVector& Tint, const NumericVector& lambda
   return result;
 }
 
-/*
 // [[Rcpp::export]]
 NumericVector quantFunCpp(const NumericVector& Tint, const NumericVector& lambda, const NumericVector& v){
   const int n = v.size();
   const int m = Tint.size();
   NumericVector result(n);
-  NumericVector Qint(M);
+  NumericVector Fint(m);
 
   int i, j;
 
   // calculate at which quantiles the intervall limits lie
-  for(j=0; j < m; j++){
-
-  }
+  Fint = cdfFunCpp(Tint, lambda, Tint);
 
   // calculate the quantiles at the probabilities v
   for(i=0; i < n; i++){
     // find in which intervall the probability falls
     for(j=0; j < m; j++){
-      if(Qint[j] < v[i]){
+      if(Fint[j] > v[i]){
         break;
       }
     }
-    result[i] = (Tint[j-1] - log(v[i] / Qint[j]) / lambda[j])
+    result[i] = Tint[j-1]- log(1- (v[i]-Fint[j-1])/(1-Fint[j-1]) )/ (lambda[j-1]);
   }
 
   return result;
 }
-*/
