@@ -139,6 +139,7 @@ invisible(
 #'
 #' @param design design data.frame
 #' @param target_gAHR target geometric average hazard ratio
+#' @param cutoff time until which the gAHR should be calculated
 #'
 #' @return For hr_after_onset_from_gAHR: the design data.frame passed as
 #'   argument with the additional column hazard_trt.
@@ -155,7 +156,39 @@ invisible(
 #' my_design$hr_trt <- NA
 #' my_design <- hr_after_onset_from_gAHR(my_design, 0.8)
 #' my_design
-hr_after_crossing_from_gAHR <- function(design, target_gAHR){
+hr_after_crossing_from_gAHR <- function(design, target_gAHR, cutoff){
+# TODO refactor cutoff to default to followup from design
+
+  fast_gAHR <- function(hazard_trt, condition, cutoff, target_gAHR=1, N_trt=1, N_ctrl=1){
+    h1 <- fast_haz_fun(c(0, condition$crossing), c(condition$hazard_trt_before, hazard_trt_after))
+    h0 <- fast_haz_fun(c(0), c(condition$hazard_ctrl))
+
+    f1 <- fast_pdf_fun(c(0, condition$crossing), c(condition$hazard_trt_before, hazard_trt_after))
+    f0 <- fast_pdf_fun(c(0), c(condition$hazard_ctrl))
+
+    h  <- \(t){h1(t)+h0(t)}
+    f  <- \(t){(1/(N_trt+N_ctrl))*(N_trt*f1(t) + N_ctrl*f0(t))}
+    w  <- \(t){1} # Cox
+    # w  <- \(t){(1/(N_trt+N_ctrl))*(N_trt*group_1$funs$surv_f(t) + N_ctrl*group_2$funs$surv_f(t))} # WCox
+
+    gAHR <- exp(integrate(\(t){log(h1(t) / h0(t)) * f(t) * w(t)}, 0, cutoff)$value)
+    # AHR  <- integrate(\(t){(h1(t)/h(t)) * f(t) * w(t)}, 0, cutoff)$value / integrate(\(t){(h2(t)/h(t)) * f(t) * w(t)}, 0, cutoff)$value
+
+    gAHR-target_gAHR
+  }
+
+  get_hr_after <- function(condition){
+    condition$hazard_trt_after <- uniroot(fast_gAHR, interval = c(1e-8, 1), condition=condition, cutoff=cutoff, target_gAHR=target_gAHR)$root
+    condition
+  }
+
+  result <- design |>
+    split(1:nrow(design)) |>
+    lapply(get_hr_after) |>
+    do.call(what=rbind)
+
+  result
+
 
 }
 

@@ -136,6 +136,7 @@ invisible(
 #'
 #' @param design design data.frame
 #' @param target_gAHR target geometric average hazard ratio
+#' @param cutoff time until which the gAHR should be calculated
 #'
 #' @return For hr_after_onset_from_gAHR: the design data.frame passed as
 #'   argument with the additional column hazard_trt.
@@ -149,12 +150,118 @@ invisible(
 #'     design_fixed_followup(),
 #'     by=NULL
 #'   )
-#' my_design$hr_trt <- NA
-#' my_design <- hr_after_onset_from_gAHR(my_design, 0.8)
+#' my_design$hazard_trt <- NA
+#' my_design <- hr_after_onset_from_gAHR(my_design, 0.8, 200)
 #' my_design
-hr_after_onset_from_gAHR <- function(design, target_gAHR){
+hr_after_onset_from_gAHR <- function(design, target_gAHR, cutoff){
+# TODO refactor cutoff to default to followup from design
+
+  fast_gAHR <- function(hazard_trt, condition, cutoff, target_gAHR=1, N_trt=1, N_ctrl=1){
+    h1 <- fast_haz_fun(c(0, condition$delay), c(condition$hazard_ctrl, hazard_trt))
+    h0 <- fast_haz_fun(c(0), c(condition$hazard_ctrl))
+
+    f1 <- fast_pdf_fun(c(0, condition$delay), c(condition$hazard_ctrl, hazard_trt))
+    f0 <- fast_pdf_fun(c(0), c(condition$hazard_ctrl))
+
+    h  <- \(t){h1(t)+h0(t)}
+    f  <- \(t){(1/(N_trt+N_ctrl))*(N_trt*f1(t) + N_ctrl*f0(t))}
+    w  <- \(t){1} # Cox
+    # w  <- \(t){(1/(N_trt+N_ctrl))*(N_trt*group_1$funs$surv_f(t) + N_ctrl*group_2$funs$surv_f(t))} # WCox
+
+    gAHR <- exp(integrate(\(t){log(h1(t) / h0(t)) * f(t) * w(t)}, 0, cutoff)$value)
+    # AHR  <- integrate(\(t){(h1(t)/h(t)) * f(t) * w(t)}, 0, cutoff)$value / integrate(\(t){(h2(t)/h(t)) * f(t) * w(t)}, 0, cutoff)$value
+
+    gAHR-target_gAHR
+  }
+
+  get_hr_after <- function(condition){
+    condition$hazard_trt <- uniroot(fast_gAHR, interval = c(1e-8, 1), condition=condition, cutoff=cutoff, target_gAHR=target_gAHR)$root
+    condition
+  }
+
+  result <- design |>
+    split(1:nrow(design)) |>
+    lapply(get_hr_after) |>
+    do.call(what=rbind)
+
+  result
+
 
 }
+
+#' Calculate hr after onset of treatment effect from target power under PH
+#'
+#' @param design design data.frame
+#' @param target_ph_power target power under PH
+#' @param followup followup time for the calculation of the effect size under PH
+#' @param target_alpha=0.05 alpha level for the computation of the effect size under PH
+#'
+#' @return For hr_after_onset_from_PH_effect_size: the design data.frame passed as
+#'   argument with the additional column hazard_trt.
+#' @export
+#'
+#' @describeIn generate_delayed_effect  Calculate hr after onset of treatment effect from gAHR
+#'
+#' @details This function works as follows: first the hazard ratio to archive
+#'   the target power under proportional hazards is calculated with Schönfeld's
+#'   formula. Next, the median survival for the treatment arm is calculated. And
+#'   finally the hazard rate for the treatment arm after onset of treatment
+#'   effect is calculated to yield the same median survival.
+#'
+#' @examples
+#' #' my_design <- merge(
+#'     assumptions_delayed_effect(),
+#'     design_fixed_followup(),
+#'     by=NULL
+#'   )
+#' my_design$hazard_trt <- NA
+#' my_design$hazard_ctrl <- 0.1
+#' my_design <- hr_after_onset_from_PH_effect_size(my_design, 0.9, 200)
+#' my_design
+hr_after_onset_from_PH_effect_size <- function(design, target_ph_power, followup, target_alpha=0.05){
+  #TODO refactor followup to default to valur from design.
+
+  # hazard ratio required, inverted Schönfeld sample size formula
+  hr_required_schoenfeld <- function(Nevt, alpha=0.05, beta=0.2, p=0.5){
+    if(beta==0) return(0)
+    if(beta==1) return(1)
+    exp( (qnorm(beta) + qnorm(alpha)) / sqrt(p*(1-p)*Nevt) )
+  }
+
+  get_hr_after <- function(condition){
+    t_max <- log(100) / condition$hazard_ctrl
+
+    F_ctrl_followup <- fast_cdf_fun(0, condition$hazard_ctrl)(followup) # enter paramters for control arm
+    Nevt <- F_ctrl_followup * (condition$n_ctrl + condition$n_ctrl)
+    ph_hr <- hr_required_schoenfeld(Nevt, alpha=target_alpha, beta=target_ph_power, p=(condition$n_ctrl/(condition$n_ctrl + condition$n_trt)))
+
+    median_trt <- fast_quant_fun(0, condition$hazard_ctrl * ph_hr)(0.5)
+
+    if(median_trt <= condition$delay){
+      warning("Median survival is shorter than delay of treatment effect, calculation not possible")
+      condition$hazard_trt <- NA_real_
+      return(condition)
+    }
+
+    target_fun_hazard_after <- function(hazard_after){
+      sapply(hazard_after, \(h){
+        median_trt - fast_quant_fun(c(0, condition$delay), c(condition$hazard_ctrl, h))(0.5)
+      })
+    }
+
+    condition$hazard_trt <- uniroot(target_fun_hazard_after, interval=c(1e-8, condition$hazard_ctrl))$root
+    condition
+  }
+
+  result <- design |>
+    split(1:nrow(design)) |>
+    lapply(get_hr_after) |>
+    do.call(what=rbind)
+
+  result
+
+}
+
 
 #' Calculate true summary statistics for scenarios with delayed treatment effect
 #'

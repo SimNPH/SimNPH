@@ -4,6 +4,7 @@
 \alias{generate_delayed_effect}
 \alias{assumptions_delayed_effect}
 \alias{hr_after_onset_from_gAHR}
+\alias{hr_after_onset_from_PH_effect_size}
 \alias{true_summary_statistics_delayed_effect}
 \title{Generate Dataset with delayed effect}
 \usage{
@@ -11,7 +12,14 @@ generate_delayed_effect(condition, fixed_objects = NULL)
 
 assumptions_delayed_effect()
 
-hr_after_onset_from_gAHR(design, target_gAHR)
+hr_after_onset_from_gAHR(design, target_gAHR, cutoff)
+
+hr_after_onset_from_PH_effect_size(
+  design,
+  target_ph_power,
+  followup,
+  target_alpha = 0.05
+)
 
 true_summary_statistics_delayed_effect(
   Design,
@@ -28,7 +36,15 @@ true_summary_statistics_delayed_effect(
 
 \item{target_gAHR}{target geometric average hazard ratio}
 
+\item{cutoff}{time until which the gAHR should be calculated}
+
+\item{target_ph_power}{target power under PH}
+
+\item{followup}{followup time for the calculation of the effect size under PH}
+
 \item{Design}{Design data.frame for delayed effect}
+
+\item{target_alpha=0.05}{alpha level for the computation of the effect size under PH}
 
 \item{cutoff_stats=NA_real_}{cutoff time, see details}
 
@@ -41,6 +57,9 @@ For generate_delayed_effect: A dataset with the columns t (time) and trt
 For assumptions_delayed_effect: a design tibble with default values invisibly
 
 For hr_after_onset_from_gAHR: the design data.frame passed as
+argument with the additional column hazard_trt.
+
+For hr_after_onset_from_PH_effect_size: the design data.frame passed as
 argument with the additional column hazard_trt.
 
 For true_summary_statistics_delayed_effect: the design data.frame
@@ -60,6 +79,8 @@ Generate Dataset with delayed effect
 Create an empty assumtions data.frame for generate_delayed_effect
 
 Calculate hr after onset of treatment effect from gAHR
+
+Calculate hr after onset of treatment effect from target power under PH
 
 Calculate true summary statistics for scenarios with delayed treatment effect
 }
@@ -84,6 +105,12 @@ design tibble for use with generate_delayed_effect and returns the
 evaluated code invisibly. This function is intended to be used to copy
 paste the code and edit the parameters.
 
+This function works as follows: first the hazard ratio to archive
+the target power under proportional hazards is calculated with Schönfeld's
+formula. Next, the median survival for the treatment arm is calculated. And
+finally the hazard rate for the treatment arm after onset of treatment
+effect is calculated to yield the same median survival.
+
 The if \code{fixed_objects} contains \code{t_max} then this value is used as the
 maximum time to calculate function like survival, hazard, ... of the data
 generating models. If this is not given \code{t_max} is choosen as the minimum of
@@ -102,6 +129,8 @@ treatment effect
 \item \code{assumptions_delayed_effect}: generate default design tibble
 
 \item \code{hr_after_onset_from_gAHR}: Calculate hr after onset of treatment effect from gAHR
+
+\item \code{hr_after_onset_from_PH_effect_size}: Calculate hr after onset of treatment effect from gAHR
 
 \item \code{true_summary_statistics_delayed_effect}: calculate true summary statistics for delayed effect
 }}
@@ -123,8 +152,17 @@ my_design <- merge(
     design_fixed_followup(),
     by=NULL
   )
-my_design$hr_trt <- NA
-my_design <- hr_after_onset_from_gAHR(my_design, 0.8)
+my_design$hazard_trt <- NA
+my_design <- hr_after_onset_from_gAHR(my_design, 0.8, 200)
+my_design
+#' my_design <- merge(
+    assumptions_delayed_effect(),
+    design_fixed_followup(),
+    by=NULL
+  )
+my_design$hazard_trt <- NA
+my_design$hazard_ctrl <- 0.1
+my_design <- hr_after_onset_from_PH_effect_size(my_design, 0.9, 200)
 my_design
 my_design <- merge(
     assumptions_delayed_effect(),
