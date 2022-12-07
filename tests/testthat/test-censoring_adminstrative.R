@@ -57,6 +57,20 @@ test_that("administrative censoring after fixed time works", {
   expect_named(test_res, c("t", "evt", "rec_time", "additional_column"))
   expect(!is.null(attr(test_res, "followup")), "check followup attribute exists")
   expect(attr(test_res, "followup") == followup, "check followup attribute has the correct value")
+
+
+  test_data_ice <- test_data
+  test_data_ice$t_ice <- test_data_ice$t
+  test_data_ice$ice <- test_data$evt
+
+  test_res <- admin_censoring_time(test_data_ice, followup, keep_non_recruited = TRUE)
+
+  expect_equal(test_res$t_ice, c(10, 40, 50, 60, 99, NA), info="testing failure times in administrative censoring")
+  expect_equal(test_res$ice, c(TRUE, TRUE, TRUE, TRUE, FALSE, NA), info="testing event indicators in administrative censoring")
+  expect_equal(test_res$rec_time, test_data_ice$rec_time, info="check that rec_times is not changed")
+  expect_named(test_res, c("t", "evt", "rec_time", "additional_column", "t_ice", "ice"))
+  expect(!is.null(attr(test_res, "followup")), "check followup attribute exists")
+  expect(attr(test_res, "followup") == followup, "check followup attribute has the correct value")
 })
 
 test_that("administrative censoring after fixed number of events", {

@@ -1,5 +1,3 @@
-# TODO: update such that intercurrent events are also censored
-
 #' Apply Random Exponentially Distributed Censoring
 #'
 #' @param rate time of end of enrollment
@@ -36,10 +34,19 @@
 #' )
 #' abline(0,1)
 random_censoring_exp <- function(dat, rate){
+  censor_fixed_time_internal <- function(dat, time_var, evt_var, cen_time){
+    if(all(c(time_var, evt_var) %in% names(dat))){
+      dat[[evt_var]][ dat[[time_var]] > cen_time ] <- FALSE
+      dat[[time_var]] <- pmin(dat[[time_var]], cen_time)
+    }
+    dat
+  }
+
   if(rate > 0){
     censoring_time <- rexp(nrow(dat), rate = rate)
-    dat$evt[dat$t > censoring_time] <- FALSE
-    dat$t <- pmin(dat$t, censoring_time)
+    dat <- dat |>
+      censor_fixed_time_internal("t", "evt", censoring_time) |>
+      censor_fixed_time_internal("t_ice", "ice", censoring_time)
   } else if (rate < 0){
     stop(gettext("Rate of random censoring has to be >= 0"))
   }
