@@ -30,6 +30,23 @@ test_that("creating summarise function from many functions works", {
   expect_type(summary, "list")
   expect_s3_class(summary, "data.frame")
   expect_named(summary, c("method1.mean_val_1.val", "method2.val", "method1.val"))
+
+
+  Summarise_err <- create_summarise_function(
+    method1 = `attr<-`(function(condition, results, fixed_objects){
+      data.frame(val=mean(results$value1))
+    }, "name", "mean_val_1"),
+    method2 = function(condition, results, fixed_objects){
+      data.frame(val=mean(results$value2))
+    },
+    method1 = function(condition, results, fixed_objects){
+      stop("test")
+    }
+  )
+
+  summary_2 <- Summarise_err(condition, results)
+  expect_named(summary_2, c("method1.mean_val_1.val", "method2.val", "method1.err"))
+  expect_equal(summary_2$method1.err, "test")
 })
 
 test_that("creating a summarise function for an estimator works", {
@@ -89,31 +106,34 @@ test_that("creating a summarise function for an estimator works", {
 })
 
 test_that("generic summarise for tests works", {
-  condition <- merge(
-    assumptions_delayed_effect(),
-    design_fixed_followup(),
-    by=NULL
-  ) |>
-    tail(4) |>
-    head(1)
-
+  capture.output(
+    condition <- merge(
+      assumptions_delayed_effect(),
+      design_fixed_followup(),
+      by=NULL
+    ) |>
+      tail(4) |>
+      head(1)
+  )
   summarise_all <- create_summarise_function(
     logrank=summarise_test(alpha=c(0.95, 0.99)),
     logrank=summarise_test(alpha=c(0.9), name="innovative")
   )
 
   # runs simulations
-  sim_results <- runSimulation(
-    design=condition,
-    replications=10,
-    generate=generate_delayed_effect,
-    analyse=list(
-      logrank=analyse_logrank()
-    ),
-    summarise = summarise_all
+  capture.output(
+    suppressMessages(
+      sim_results <- runSimulation(
+        design=condition,
+        replications=10,
+        generate=generate_delayed_effect,
+        analyse=list(
+          logrank=analyse_logrank()
+        ),
+        summarise = summarise_all
+      )
+    )
   )
-
-  sim_results
 
   expect(
     all(hasName(sim_results, c("logrank.rejection_0.95", "logrank.rejection_0.99", "logrank.innovative.rejection_0.9"))),
