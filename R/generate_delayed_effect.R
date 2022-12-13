@@ -252,13 +252,19 @@ hr_after_onset_from_PH_effect_size <- function(design, target_power_ph=NA_real_,
       }
     }
 
+    if(target_power_ph == 0){
+      condition$hazard_trt <- condition$hazard_ctrl
+      return(condition)
+    }
+
     F_ctrl_followup <- fast_cdf_fun(0, condition$hazard_ctrl)(followup) # enter paramters for control arm
     Nevt <- F_ctrl_followup * (condition$n_ctrl + condition$n_ctrl)
-    ph_hr <- hr_required_schoenfeld(Nevt, alpha=target_alpha, beta=target_power_ph, p=(condition$n_ctrl/(condition$n_ctrl + condition$n_trt)))
+    ph_hr <- hr_required_schoenfeld(Nevt, alpha=target_alpha, beta=(1-target_power_ph), p=(condition$n_ctrl/(condition$n_ctrl + condition$n_trt)))
 
-    median_trt <- fast_quant_fun(0, condition$hazard_ctrl * ph_hr)(0.5)
+    median_trt  <- fast_quant_fun(0, condition$hazard_ctrl * ph_hr)(0.5)
+    median_ctrl <- fast_quant_fun(0, condition$hazard_ctrl        )(0.5)
 
-    if(median_trt <= condition$delay){
+    if(median_trt <= condition$delay || median_ctrl <= condition$delay){
       warning("Median survival is shorter than delay of treatment effect, calculation not possible")
       condition$hazard_trt <- NA_real_
       return(condition)
