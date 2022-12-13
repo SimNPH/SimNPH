@@ -153,8 +153,7 @@ invisible(
 #' my_design$hazard_trt <- NA
 #' my_design <- hr_after_onset_from_gAHR(my_design, 0.8, 200)
 #' my_design
-hr_after_onset_from_gAHR <- function(design, target_gAHR, cutoff){
-# TODO refactor cutoff to default to followup from design
+hr_after_onset_from_gAHR <- function(design, target_gAHR, cutoff=NA_real_){
 
   fast_gAHR <- function(hazard_trt, condition, cutoff, target_gAHR=1, N_trt=1, N_ctrl=1){
     h1 <- fast_haz_fun(c(0, condition$delay), c(condition$hazard_ctrl, hazard_trt))
@@ -163,25 +162,30 @@ hr_after_onset_from_gAHR <- function(design, target_gAHR, cutoff){
     f1 <- fast_pdf_fun(c(0, condition$delay), c(condition$hazard_ctrl, hazard_trt))
     f0 <- fast_pdf_fun(c(0), c(condition$hazard_ctrl))
 
-    h  <- \(t){h1(t)+h0(t)}
     f  <- \(t){(1/(N_trt+N_ctrl))*(N_trt*f1(t) + N_ctrl*f0(t))}
     w  <- \(t){1} # Cox
-    # w  <- \(t){(1/(N_trt+N_ctrl))*(N_trt*group_1$funs$surv_f(t) + N_ctrl*group_2$funs$surv_f(t))} # WCox
 
     gAHR <- exp(integrate(\(t){log(h1(t) / h0(t)) * f(t) * w(t)}, 0, cutoff)$value)
-    # AHR  <- integrate(\(t){(h1(t)/h(t)) * f(t) * w(t)}, 0, cutoff)$value / integrate(\(t){(h2(t)/h(t)) * f(t) * w(t)}, 0, cutoff)$value
 
     gAHR-target_gAHR
   }
 
-  get_hr_after <- function(condition){
+  get_hr_after <- function(condition, cutoff=cutoff){
+    if(is.na(cutoff)){
+      if(hasName(condition, "followup")){
+        cutoff <- condition$followup
+      } else {
+        stop(gettext("cutoff not given and followup not present in design"))
+      }
+    }
+
     condition$hazard_trt <- uniroot(fast_gAHR, interval = c(1e-8, 1), condition=condition, cutoff=cutoff, target_gAHR=target_gAHR)$root
     condition
   }
 
   result <- design |>
     split(1:nrow(design)) |>
-    lapply(get_hr_after) |>
+    lapply(get_hr_after, cutoff=cutoff) |>
     do.call(what=rbind)
 
   result
@@ -189,51 +193,68 @@ hr_after_onset_from_gAHR <- function(design, target_gAHR, cutoff){
 
 }
 
-#' Calculate hr after onset of treatment effect from target power under PH
+#' Calculate hr after onset of treatment effect
 #'
 #' @param design design data.frame
-#' @param target_ph_power target power under PH
-#' @param followup followup time for the calculation of the effect size under PH
-#' @param target_alpha=0.05 alpha level for the computation of the effect size under PH
+#' @param target_power_ph target power under proportional hazards
+#' @param followup=NA_real_ time until which the gAHR should be calculated, defaults to `condition$followup`
+#' @param target_alpha=0.05 target alpha level for the power calculation
 #'
 #' @return For hr_after_onset_from_PH_effect_size: the design data.frame passed as
 #'   argument with the additional column hazard_trt.
 #' @export
 #'
-#' @describeIn generate_delayed_effect  Calculate hr after onset of treatment effect from gAHR
+#' @describeIn generate_delayed_effect Calculate hr after onset of treatment effect of the hazards from PH effect size
 #'
-#' @details This function works as follows: first the hazard ratio to archive
-#'   the target power under proportional hazards is calculated with Schönfeld's
-#'   formula. Next, the median survival for the treatment arm is calculated. And
-#'   finally the hazard rate for the treatment arm after onset of treatment
-#'   effect is calculated to yield the same median survival.
+#' @details `hr_after_onset_from_PH_effect_size` calculates the hazard ratio
+#'   after onset of treatment effect as follows: First, the hazard ratio needed
+#'   to archive the desired power under proportional hazards is calculated by
+#'   inverting Schönfeld's sample size formula. Second the median survival times
+#'   for both arm under this hazard ratio and proportional hazards are
+#'   calculated. Finally the hazard rate of the treatment arm after onset of
+#'   treatment effect is set such that the median survival time is the same as
+#'   the one calculated under proportional hazards.
+#'
+#'   This is a heuristic and to some extent arbitrary approach to calculate
+#'   hazard ratios that correspond to reasonable and realistic scenarios.
 #'
 #' @examples
-#' #' my_design <- merge(
-#'     assumptions_delayed_effect(),
+#' my_design <- merge(
+#'     assumptions_crossing_hazards(),
 #'     design_fixed_followup(),
 #'     by=NULL
 #'   )
 #' my_design$hazard_trt <- NA
-#' my_design$hazard_ctrl <- 0.1
-#' my_design <- hr_after_onset_from_PH_effect_size(my_design, 0.9, 200)
+#' my_design <- hr_after_onset_from_PH_effect_size(my_design, target_power_ph=0.9)
 #' my_design
-hr_after_onset_from_PH_effect_size <- function(design, target_ph_power, followup, target_alpha=0.05){
-  #TODO refactor followup to default to valur from design.
-
+hr_after_onset_from_PH_effect_size <- function(design, target_power_ph=NA_real_, followup=NA_real_, target_alpha=0.05){
   # hazard ratio required, inverted Schönfeld sample size formula
   hr_required_schoenfeld <- function(Nevt, alpha=0.05, beta=0.2, p=0.5){
-    if(beta==0) return(0)
-    if(beta==1) return(1)
     exp( (qnorm(beta) + qnorm(alpha)) / sqrt(p*(1-p)*Nevt) )
   }
 
-  get_hr_after <- function(condition){
+  get_hr_after <- function(condition, target_power_ph=NA_real_, followup=followup){
     t_max <- log(100) / condition$hazard_ctrl
+
+    if(is.na(followup)){
+      if(hasName(condition, "followup")){
+        followup <- condition$followup
+      } else {
+        stop(gettext("followup not given and followup not present in design"))
+      }
+    }
+
+    if(is.na(target_power_ph)){
+      if(hasName(condition, "effect_size_ph")){
+        target_power_ph <- condition$effect_size_ph
+      } else {
+        stop(gettext("target_ph_power not given and effect_size_ph not present in design"))
+      }
+    }
 
     F_ctrl_followup <- fast_cdf_fun(0, condition$hazard_ctrl)(followup) # enter paramters for control arm
     Nevt <- F_ctrl_followup * (condition$n_ctrl + condition$n_ctrl)
-    ph_hr <- hr_required_schoenfeld(Nevt, alpha=target_alpha, beta=target_ph_power, p=(condition$n_ctrl/(condition$n_ctrl + condition$n_trt)))
+    ph_hr <- hr_required_schoenfeld(Nevt, alpha=target_alpha, beta=target_power_ph, p=(condition$n_ctrl/(condition$n_ctrl + condition$n_trt)))
 
     median_trt <- fast_quant_fun(0, condition$hazard_ctrl * ph_hr)(0.5)
 
@@ -255,7 +276,7 @@ hr_after_onset_from_PH_effect_size <- function(design, target_ph_power, followup
 
   result <- design |>
     split(1:nrow(design)) |>
-    lapply(get_hr_after) |>
+    lapply(get_hr_after, target_power_ph=target_power_ph, followup=followup) |>
     do.call(what=rbind)
 
   result

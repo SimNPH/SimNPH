@@ -4,6 +4,7 @@
 \alias{generate_crossing_hazards}
 \alias{assumptions_crossing_hazards}
 \alias{hr_after_crossing_from_gAHR}
+\alias{hr_after_crossing_from_PH_effect_size}
 \alias{true_summary_statistics_crossing_hazards}
 \title{Generate Dataset with crossing hazards}
 \usage{
@@ -11,7 +12,14 @@ generate_crossing_hazards(condition, fixed_objects = NULL)
 
 assumptions_crossing_hazards()
 
-hr_after_crossing_from_gAHR(design, target_gAHR)
+hr_after_crossing_from_gAHR(design, target_gAHR, cutoff = NA_real_)
+
+hr_after_crossing_from_PH_effect_size(
+  design,
+  target_power_ph = NA_real_,
+  followup = NA_real_,
+  target_alpha = 0.05
+)
 
 true_summary_statistics_crossing_hazards(
   Design,
@@ -28,7 +36,15 @@ true_summary_statistics_crossing_hazards(
 
 \item{target_gAHR}{target geometric average hazard ratio}
 
+\item{target_power_ph}{target power under proportional hazards}
+
 \item{Design}{Design data.frame for crossing hazards}
+
+\item{cutoff=NA_real_}{time until which the gAHR should be calculated, defaults to \code{condition$followup}}
+
+\item{followup=NA_real_}{time until which the gAHR should be calculated, defaults to \code{condition$followup}}
+
+\item{target_alpha=0.05}{target alpha level for the power calculation}
 
 \item{cutoff_stats=NA_real_}{cutoff time, see details}
 
@@ -40,7 +56,10 @@ For generate_crossing_hazards: A dataset with the columns t (time) and trt
 
 For assumptions_crossing_hazards: a design tibble with default values invisibly
 
-For hr_after_onset_from_gAHR: the design data.frame passed as
+For hr_after_crossing_from_gAHR: the design data.frame passed as
+argument with the additional column hazard_trt.
+
+For hr_after_crossing_from_PH_effect_size: the design data.frame passed as
 argument with the additional column hazard_trt.
 
 For true_summary_statistics_delayed_effect: the design data.frame
@@ -59,7 +78,9 @@ Generate Dataset with crossing hazards
 
 Create an empty assumtions data.frame for generate_crossing_hazards
 
-Calculate hr after onset of treatment effect from gAHR
+Calculate hr after crossing of hazards from gAHT
+
+Calculate hr after crossing the hazard functions
 
 Calculate true summary statistics for scenarios with crossing hazards
 }
@@ -85,6 +106,18 @@ design tibble for use with generate_crossing_hazards and returns the
 evaluated code invisibly. This function is intended to be used to copy
 paste the code and edit the parameters.
 
+\code{hr_after_crossing_from_PH_effect_size} calculates the hazard ratio
+after crossing of hazards as follows: First, the hazard ratio needed
+to archive the desired power under proportional hazards is calculated by
+inverting Schönfeld's sample size formula. Second the median survival times
+for both arm under this hazard ratio and proportional hazards are
+calculated. Finally the hazard rate of the treatment arm after crossing of
+hazards is set such that the median survival time is the same as the one
+calculated under proportional hazards.
+
+This is a heuristic and to some extent arbitrary approach to calculate
+hazard ratios that correspond to reasonable and realistic scenarios.
+
 The if \code{fixed_objects} contains \code{t_max} then this value is used as the
 maximum time to calculate function like survival, hazard, ... of the data
 generating models. If this is not given \code{t_max} is choosen as the minimum of
@@ -102,7 +135,9 @@ hazards
 
 \item \code{assumptions_crossing_hazards}: generate default design tibble
 
-\item \code{hr_after_crossing_from_gAHR}: Calculate hr after onset of treatment effect from gAHR
+\item \code{hr_after_crossing_from_gAHR}: Calculate hr after crossing of hazards from gAHR
+
+\item \code{hr_after_crossing_from_PH_effect_size}: Calculate hr after crossing of the hazards from PH effect size
 
 \item \code{true_summary_statistics_crossing_hazards}: calculate true summary statistics for crossing hazards
 }}
@@ -120,12 +155,20 @@ tail(one_simulation)
 Design <- assumptions_crossing_hazards()
 Design
 my_design <- merge(
+    assumptions_delayed_effect(),
+    design_fixed_followup(),
+    by=NULL
+  )
+my_design$hazard_trt <- NA
+my_design <- hr_after_crossing_from_gAHR(my_design, 0.8, 200)
+my_design
+my_design <- merge(
     assumptions_crossing_hazards(),
     design_fixed_followup(),
     by=NULL
   )
-my_design$hr_trt <- NA
-my_design <- hr_after_onset_from_gAHR(my_design, 0.8)
+my_design$hazard_trt <- NA
+my_design <- hr_after_crossing_from_PH_effect_size(my_design, target_power_ph=0.9)
 my_design
 my_design <- merge(
     assumptions_crossing_hazards(),
