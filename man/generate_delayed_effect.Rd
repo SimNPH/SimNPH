@@ -12,12 +12,12 @@ generate_delayed_effect(condition, fixed_objects = NULL)
 
 assumptions_delayed_effect()
 
-hr_after_onset_from_gAHR(design, target_gAHR, cutoff)
+hr_after_onset_from_gAHR(design, target_gAHR, cutoff = NA_real_)
 
 hr_after_onset_from_PH_effect_size(
   design,
-  target_ph_power,
-  followup,
+  target_power_ph = NA_real_,
+  followup = NA_real_,
   target_alpha = 0.05
 )
 
@@ -38,13 +38,13 @@ true_summary_statistics_delayed_effect(
 
 \item{cutoff}{time until which the gAHR should be calculated}
 
-\item{target_ph_power}{target power under PH}
-
-\item{followup}{followup time for the calculation of the effect size under PH}
+\item{target_power_ph}{target power under proportional hazards}
 
 \item{Design}{Design data.frame for delayed effect}
 
-\item{target_alpha=0.05}{alpha level for the computation of the effect size under PH}
+\item{followup=NA_real_}{time until which the gAHR should be calculated, defaults to \code{condition$followup}}
+
+\item{target_alpha=0.05}{target alpha level for the power calculation}
 
 \item{cutoff_stats=NA_real_}{cutoff time, see details}
 
@@ -80,7 +80,7 @@ Create an empty assumtions data.frame for generate_delayed_effect
 
 Calculate hr after onset of treatment effect from gAHR
 
-Calculate hr after onset of treatment effect from target power under PH
+Calculate hr after onset of treatment effect
 
 Calculate true summary statistics for scenarios with delayed treatment effect
 }
@@ -105,11 +105,17 @@ design tibble for use with generate_delayed_effect and returns the
 evaluated code invisibly. This function is intended to be used to copy
 paste the code and edit the parameters.
 
-This function works as follows: first the hazard ratio to archive
-the target power under proportional hazards is calculated with Schönfeld's
-formula. Next, the median survival for the treatment arm is calculated. And
-finally the hazard rate for the treatment arm after onset of treatment
-effect is calculated to yield the same median survival.
+\code{hr_after_onset_from_PH_effect_size} calculates the hazard ratio
+after onset of treatment effect as follows: First, the hazard ratio needed
+to archive the desired power under proportional hazards is calculated by
+inverting Schönfeld's sample size formula. Second the median survival times
+for both arm under this hazard ratio and proportional hazards are
+calculated. Finally the hazard rate of the treatment arm after onset of
+treatment effect is set such that the median survival time is the same as
+the one calculated under proportional hazards.
+
+This is a heuristic and to some extent arbitrary approach to calculate
+hazard ratios that correspond to reasonable and realistic scenarios.
 
 The if \code{fixed_objects} contains \code{t_max} then this value is used as the
 maximum time to calculate function like survival, hazard, ... of the data
@@ -130,7 +136,7 @@ treatment effect
 
 \item \code{hr_after_onset_from_gAHR}: Calculate hr after onset of treatment effect from gAHR
 
-\item \code{hr_after_onset_from_PH_effect_size}: Calculate hr after onset of treatment effect from gAHR
+\item \code{hr_after_onset_from_PH_effect_size}: Calculate hr after onset of treatment effect of the hazards from PH effect size
 
 \item \code{true_summary_statistics_delayed_effect}: calculate true summary statistics for delayed effect
 }}
@@ -155,14 +161,13 @@ my_design <- merge(
 my_design$hazard_trt <- NA
 my_design <- hr_after_onset_from_gAHR(my_design, 0.8, 200)
 my_design
-#' my_design <- merge(
-    assumptions_delayed_effect(),
+my_design <- merge(
+    assumptions_crossing_hazards(),
     design_fixed_followup(),
     by=NULL
   )
 my_design$hazard_trt <- NA
-my_design$hazard_ctrl <- 0.1
-my_design <- hr_after_onset_from_PH_effect_size(my_design, 0.9, 200)
+my_design <- hr_after_onset_from_PH_effect_size(my_design, target_power_ph=0.9)
 my_design
 my_design <- merge(
     assumptions_delayed_effect(),

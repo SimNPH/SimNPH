@@ -66,7 +66,13 @@ create_summarise_function <- function(...){
     # call summarise functions on the results of the corresponding analysis methods
     aggregate_results <- purrr::imap_dfc(summarise_functions, function(f,i){
       if(i %in% names(results_t)){
-        res <- f(condition, results_t[[i]], fixed_objects)
+        res <- tryCatch(
+          f(condition, results_t[[i]], fixed_objects),
+          error = function(e){
+            data.frame(
+              err=e$message
+            )
+          })
         names(res) <- paste(attr(f, "name"), names(res), sep=".")
         res
       } else {
