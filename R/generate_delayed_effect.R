@@ -58,10 +58,7 @@ generate_delayed_effect <- function(condition, fixed_objects=NULL){
     # if delay is 0 leave out period bevore treatment effect
     # (times have to be strictly monotonous for rSurv_fun)
     data_trt <- data.frame(
-      t = runif(condition$n_trt) |>
-        fast_quant_fun(c(0), c(condition$hazard_trt))() |>
-        ceiling() |>
-        pmin(t_max),
+      t = fast_rng_fun(c(0), c(condition$hazard_trt))(condition$n_trt),
       trt = 1,
       evt = TRUE
     )
@@ -69,10 +66,7 @@ generate_delayed_effect <- function(condition, fixed_objects=NULL){
     # if delay is positive simulate in the time intervals bevore and after
     # treatment effect
     data_trt <- data.frame(
-      t = runif(condition$n_trt) |>
-        fast_quant_fun(c(0, condition$delay), c(condition$hazard_ctrl, condition$hazard_trt))() |>
-        ceiling() |>
-        pmin(t_max),
+      t = fast_rng_fun(c(0, condition$delay), c(condition$hazard_ctrl, condition$hazard_trt))(condition$n_trt),
       trt = 1,
       evt = TRUE
     )
@@ -80,10 +74,7 @@ generate_delayed_effect <- function(condition, fixed_objects=NULL){
 
   # simulate control group with constant hazard from 0 to t_max
   data_ctrl <- data.frame(
-    t = runif(condition$n_ctrl) |>
-      fast_quant_fun(c(0), c(condition$hazard_ctrl))() |>
-      ceiling() |>
-      pmin(t_max),
+    t = fast_rng_fun(c(0), c(condition$hazard_ctrl))(condition$n_ctrl),
     trt = 0,
     evt = TRUE
   )

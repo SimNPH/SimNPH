@@ -7,6 +7,7 @@
 \alias{fast_pdf_fun}
 \alias{fast_surv_fun}
 \alias{fast_quant_fun}
+\alias{fast_rng_fun}
 \title{Fast C implementation of hazard, cumulative hazard, ... for piecewise constant hazards}
 \usage{
 fast_haz_fun(Tint, lambda)
@@ -20,17 +21,27 @@ fast_pdf_fun(Tint, lambda)
 fast_surv_fun(Tint, lambda)
 
 fast_quant_fun(Tint, lambda)
+
+fast_rng_fun(Tint, lambda, discrete = TRUE)
 }
 \arguments{
-\item{Tint}{time intervals on which the hazards are defined}
+\item{Tint}{left points of the time intervals the hazards are defined on}
 
 \item{lambda}{hazards in the time intervals}
+
+\item{discrete=TRUE}{should surivial times be rounded down to the next whole day}
 }
 \value{
 A function with one parameter, a vector of times where the function should be evaluated.
+
+for fast_rng_fun: a function with the argument that draws \code{n} samples
+from the survival distribution
 }
 \description{
 Fast C implementation of hazard, cumulative hazard, ... for piecewise constant hazards
+}
+\details{
+the last time interval extends to +Inf
 }
 \section{Functions}{
 \itemize{
@@ -45,6 +56,8 @@ Fast C implementation of hazard, cumulative hazard, ... for piecewise constant h
 \item \code{fast_surv_fun}: fast survival function
 
 \item \code{fast_quant_fun}: fast quantile function
+
+\item \code{fast_rng_fun}: fast random numbers from survival distribution
 }}
 
 \examples{
@@ -60,4 +73,6 @@ surv <- fast_surv_fun(c(0, 10, 20), c(10, 15, 7))
 surv(seq(0, 30, by=0.1))
 quant <- fast_quant_fun(c(0, 10, 20), c(10, 15, 7))
 quant(seq(0, 1, by=0.01))
+rng <- fast_rng_fun(c(0, 10, 20), c(10, 15, 7))
+rng(100)
 }
