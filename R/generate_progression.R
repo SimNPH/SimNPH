@@ -66,70 +66,39 @@ invisible(
 #'   generate_progression()
 #' head(one_simulation)
 #' tail(one_simulation)
-
-# TODO: update t_max calculation such that lower hazard after intercurrent event (cure) gives reasonable t_max
 generate_progression <- function(condition, fixed_objects=NULL){
-  # if t_max is not given in fixed_objects
-  if(is.null(fixed_objects) || (!hasName(fixed_objects, "t_max"))){
-    # set t_max to 1-1/10000 quantile of control or treatment survival function
-    # whichever is later
-    t_max <- max(
-      log(10000) / condition$hazard_ctrl,
-      log(10000) / condition$hazard_trt
-    )
-  } else {
-    t_max <- fixed_objects$t_max
-  }
 
-  t_evt_ctrl <- nph::rSurv_fun(
-    condition$n_ctrl,
-    nph::pchaz(
-      c(0, t_max),
+  t_evt_ctrl <- fast_rng_fun(
+      c(0),
       c(condition$hazard_ctrl)
-    )
-  )
+    )(condition$n_ctrl)
 
-  t_evt_trt <- nph::rSurv_fun(
-    condition$n_trt,
-    nph::pchaz(
-      c(0, t_max),
+  t_evt_trt <- fast_rng_fun(
+      c(0),
       c(condition$hazard_trt)
-    )
-  )
+    )(condition$n_trt)
 
-  t_prog_ctrl <- nph::rSurv_fun(
-    condition$n_ctrl,
-    nph::pchaz(
-      c(0, t_max),
+  t_prog_ctrl <- fast_rng_fun(
+      c(0),
       c(condition$prog_rate_ctrl)
-    )
-  )
+    )(condition$n_ctrl)
 
-  t_prog_trt <- nph::rSurv_fun(
-    condition$n_trt,
-    nph::pchaz(
-      c(0, t_max),
+  t_prog_trt <- fast_rng_fun(
+      c(0),
       c(condition$prog_rate_trt)
-    )
-  )
+    )(condition$n_trt)
 
-  t_evt_after_prog_ctrl <- nph::rSurv_fun(
-    condition$n_ctrl,
-    nph::pchaz(
-      c(0, t_max),
+  t_evt_after_prog_ctrl <- fast_rng_fun(
+      c(0),
       c(condition$hazard_after_prog)
-    )
-  )
+    )(condition$n_ctrl)
 
   t_evt_after_prog_ctrl <- t_prog_ctrl + t_evt_after_prog_ctrl
 
-  t_evt_after_prog_trt <- nph::rSurv_fun(
-    condition$n_ctrl,
-    nph::pchaz(
-      c(0, t_max),
+  t_evt_after_prog_trt <- fast_rng_fun(
+      c(0),
       c(condition$hazard_after_prog)
-    )
-  )
+    )(condition$n_ctrl)
 
   t_evt_after_prog_trt <- t_prog_trt + t_evt_after_prog_trt
 

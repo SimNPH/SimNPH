@@ -73,16 +73,6 @@ test_that("generate_crossing_hazards fails on crossing < 0", {
   )
 })
 
-test_that("generate_crossing_hazards uses t_max, if given in fixed_objects", {
-  capture_output(
-    scenario <- merge(assumptions_crossing_hazards(), design_fixed_followup(), by=NULL)[1, ]
-  )
-
-  one_simulation <- generate_crossing_hazards(scenario, fixed_objects = list(t_max=10))
-
-  expect(all(one_simulation$t <= 10), "all times lte t_max")
-})
-
 test_that("test that generate_crossing_hazards outputs correct tibble with delay=0", {
   capture_output(
     scenario <- merge(assumptions_crossing_hazards(), design_fixed_followup(), by=NULL)[1, ]

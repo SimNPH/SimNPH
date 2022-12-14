@@ -35,6 +35,7 @@
 #' tail(one_simulation)
 
 # TODO: refactor such that subgroup indicator is also output (different generation and true summary statistics functions, like in generate progression)
+# TODO: when refactoring change rSurv_fun to fast_rng_fun
 generate_subgroup <- function(condition, fixed_objects=NULL){
   # if t_max is not given in fixed_objects
   if(is.null(fixed_objects) || (!hasName(fixed_objects, "t_max"))){

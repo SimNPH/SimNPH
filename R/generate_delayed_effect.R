@@ -56,7 +56,6 @@ generate_delayed_effect <- function(condition, fixed_objects=NULL){
     stop(gettext("Delay has to be >= 0"))
   } else if (condition$delay == 0){
     # if delay is 0 leave out period bevore treatment effect
-    # (times have to be strictly monotonous for rSurv_fun)
     data_trt <- data.frame(
       t = fast_rng_fun(c(0), c(condition$hazard_trt))(condition$n_trt),
       trt = 1,
@@ -342,7 +341,6 @@ true_summary_statistics_delayed_effect <- function(Design, cutoff_stats=NA_real_
       stop(gettext("Delay has to be >= 0"))
     } else if (condition$delay == 0){
       # if delay is 0 leave out period bevore treatment effect
-      # (times have to be strictly monotonous for rSurv_fun)
       data_generating_model_trt <- nph::pchaz(
         c(0, t_max),
         c(condition$hazard_trt)
