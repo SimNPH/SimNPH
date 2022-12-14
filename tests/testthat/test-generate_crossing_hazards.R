@@ -202,3 +202,65 @@ test_that("test that true_summary_statistics_crossing_hazards works, if t_max is
     true_summary_statistics_crossing_hazards(scenario, fixed_objects=list(t_max=10)), "data.frame"
   )
 })
+
+
+test_that("test that hr_after_onset_from_gAHR works", {
+  capture.output(
+    my_design <- merge(
+      assumptions_crossing_hazards(),
+      design_fixed_followup(),
+      by=NULL
+    )
+  )
+
+  my_design$hazard_trt_after <- NA
+  my_design$hazard_ctrl <- 0.1
+
+  my_design_A <- hr_after_crossing_from_gAHR(my_design, 0.95)
+  my_design_B <- hr_after_crossing_from_gAHR(my_design, 0.95, cutoff = 150)
+
+  my_design$followup <- NULL
+
+  expect_error(hr_after_crossing_from_gAHR(my_design, 0.95))
+  expect(all(!is.na(my_design_A$hazard_trt_after)), "hazard_trt_after not missing")
+  expect(all(!is.na(my_design_B$hazard_trt_after)), "hazard_trt_after not missing")
+})
+
+test_that("test that hr_after_onset_from_PH_effect_size works", {
+  capture.output(
+    my_design <- merge(
+      assumptions_crossing_hazards(),
+      design_fixed_followup(),
+      by=NULL
+    )
+  )
+
+  my_design$hazard_trt_after <- NA
+  my_design$hazard_ctrl <- 0.1
+
+  suppressWarnings(
+    expect_warning(
+      my_design_B <- hr_after_crossing_from_PH_effect_size(my_design, 0.9)
+    )
+  )
+
+  expect_error(
+    my_design_C <- hr_after_crossing_from_PH_effect_size(my_design, followup = 200)
+  )
+
+  my_design$effect_size_ph <- 0.9
+  suppressWarnings(
+    expect_warning(
+      my_design_D <- hr_after_crossing_from_PH_effect_size(my_design, followup=200)
+    )
+  )
+
+  my_design$followup <- NULL
+  expect_error(hr_after_crossing_from_PH_effect_size(my_design, 0.9))
+
+  expect_equal(is.na(my_design_B$hazard_trt_after), c(F, F, F, F, T, T))
+})
+
+
+
+
