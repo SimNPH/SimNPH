@@ -39,34 +39,17 @@
 #' tail(one_simulation)
 generate_crossing_hazards <- function(condition, fixed_objects=NULL){
 
-  # if t_max is not given in fixed_objects
-  if(is.null(fixed_objects) || (!hasName(fixed_objects, "t_max"))){
-    # set t_max to 1-1/10000 quantile of control or treatment survival function
-    # whichever is later
-    t_max <- max(
-      log(10000) / condition$hazard_ctrl,
-      log(10000) / condition$hazard_trt_after,
-      log(10000) / condition$hazard_trt_before
-    )
-  } else {
-    t_max <- fixed_objects$t_max
-  }
-
   # simulate treatment group
   if (condition$crossing < 0){
     # if crossing is smaller than 0 stop with error
     stop(gettext("Time of crossing has to be >= 0"))
   } else if (condition$crossing == 0){
     # if crossing is 0 leave out period bevore treatment effect
-    # (times have to be strictly monotonous for rSurv_fun)
     data_trt <- data.frame(
-      t = nph::rSurv_fun(
-        condition$n_trt,
-        nph::pchaz(
-          c(0, t_max),
-          c(condition$hazard_trt_after)
-        )
-      ),
+      t = fast_rng_fun(
+        c(0),
+        c(condition$hazard_trt_after)
+      )(condition$n_trt),
       trt = 1,
       evt = TRUE
     )
@@ -74,27 +57,21 @@ generate_crossing_hazards <- function(condition, fixed_objects=NULL){
     # if crossing is positive simulate in the time intervals bevore and after
     # treatment effect
     data_trt <- data.frame(
-      t = nph::rSurv_fun(
-        condition$n_trt,
-        nph::pchaz(
-          c(0, condition$crossing, t_max),
-          c(condition$hazard_trt_before, condition$hazard_trt_after)
-        )
-      ),
+      t = fast_rng_fun(
+        c(0, condition$crossing),
+        c(condition$hazard_trt_before, condition$hazard_trt_after)
+      )(condition$n_trt),
       trt = 1,
       evt = TRUE
     )
   }
 
-  # simulate control group with constant hazard from 0 to t_max
+  # simulate control group with constant hazard from 0
   data_ctrl <- data.frame(
-    t = nph::rSurv_fun(
-      condition$n_ctrl,
-      nph::pchaz(
-        c(0, t_max),
+    t = fast_rng_fun(
+        c(0),
         c(condition$hazard_ctrl)
-      )
-    ),
+      )(condition$n_trt),
     trt = 0,
     evt = TRUE
   )
@@ -362,7 +339,6 @@ true_summary_statistics_crossing_hazards <- function(Design, cutoff_stats=NA_rea
       stop(gettext("Time of crossing has to be >= 0"))
     } else if (condition$crossing == 0){
       # if crossing is 0 leave out period bevore treatment effect
-      # (times have to be strictly monotonous for rSurv_fun)
       data_generating_model_trt <- nph::pchaz(
         c(0, t_max),
         c(condition$hazard_trt_after)
