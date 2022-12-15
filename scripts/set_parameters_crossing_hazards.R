@@ -65,6 +65,13 @@ design <- design |>
 design <- design |>
   subset(!is.na(hazard_trt_after))
 
+
+# Calculating True Summary Statistics -------------------------------------
+
+design <- design |>
+  true_summary_statistics_crossing_hazards()
+
+
 # Saving ------------------------------------------------------------------
 
 filename <- paste0("data/parameters/crossing_hazards_", format(Sys.Date(), "%Y-%m-%d"), ".csv")

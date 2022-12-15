@@ -399,36 +399,26 @@ true_summary_statistics_delayed_effect <- function(Design, cutoff_stats=NA_real_
       stop(gettext("Delay has to be >= 0"))
     } else if (condition$delay == 0){
       # if delay is 0 leave out period bevore treatment effect
-      data_generating_model_trt <- nph::pchaz(
-        c(0, t_max),
-        c(condition$hazard_trt)
+      real_stats <- fast_real_statistics_pchaz(
+         Tint_trt = 0,  lambda_trt = condition$hazard_trt,
+        Tint_ctrl = 0, lambda_ctrl = condition$hazard_ctrl,
+        cutoff = cutoff_stats, N_trt = condition$n_trt, N_ctrl = condition$n_ctrl
       )
 
     } else {
       # if delay is positive create piecewise constant hazards and respective
       # functions in the time intervals bevore and after treatment effect
-      data_generating_model_trt <- nph::pchaz(
-        c(0, condition$delay, t_max),
-        c(condition$hazard_ctrl, condition$hazard_trt)
+      real_stats <- fast_real_statistics_pchaz(
+        Tint_trt = c(0, condition$delay),  lambda_trt = c(condition$hazard_ctrl, condition$hazard_trt),
+        Tint_ctrl = 0, lambda_ctrl = condition$hazard_ctrl,
+        cutoff = cutoff_stats, N_trt = condition$n_trt, N_ctrl = condition$n_ctrl
       )
 
     }
 
-    # create functions for control group with constant hazard from 0 to t_max
-    data_generating_model_ctrl <- nph::pchaz(
-      c(0, t_max),
-      c(condition$hazard_ctrl)
-    )
-
     res <- cbind(
       condition,
-      internal_real_statistics_pchaz(
-        data_generating_model_trt,
-        data_generating_model_ctrl,
-        N_trt=condition$n_trt,
-        N_ctrl=condition$n_ctrl,
-        cutoff = cutoff_stats
-      ),
+      real_stats,
       cutoff_used=cutoff_stats
     )
 

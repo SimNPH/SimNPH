@@ -62,6 +62,11 @@ design <- design |>
 design <- design |>
   subset(!is.na(hazard_trt))
 
+# Calculating True Summary Statistics -------------------------------------
+
+design <- design |>
+  true_summary_statistics_delayed_effect()
+
 # Saving ------------------------------------------------------------------
 
 filename <- paste0("data/parameters/delayed_effect_", format(Sys.Date(), "%Y-%m-%d"), ".csv")

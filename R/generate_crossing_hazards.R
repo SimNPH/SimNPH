@@ -410,36 +410,26 @@ true_summary_statistics_crossing_hazards <- function(Design, cutoff_stats=NA_rea
       stop(gettext("Time of crossing has to be >= 0"))
     } else if (condition$crossing == 0){
       # if crossing is 0 leave out period bevore treatment effect
-      data_generating_model_trt <- nph::pchaz(
-        c(0, t_max),
-        c(condition$hazard_trt_after)
+      real_stats <- fast_real_statistics_pchaz(
+        Tint_trt = 0, lambda_trt  = condition$hazard_trt_after,
+        Tint_ctrl= 0, lambda_ctrl = condition$hazard_ctrl,
+        cutoff = cutoff_stats, N_trt = condition$n_trt, N_ctrl = condition$n_ctrl
       )
 
     } else {
       # if crossing is positive create piecewise constant hazards and respective
       # functions in the time intervals bevore and after treatment effect
-      data_generating_model_trt <- nph::pchaz(
-        c(0, condition$crossing, t_max),
-        c(condition$hazard_trt_before, condition$hazard_trt_after)
+      real_stats <- fast_real_statistics_pchaz(
+        Tint_trt = c(0, condition$crossing), lambda_trt  = c(condition$hazard_trt_before, condition$hazard_trt_after),
+        Tint_ctrl= 0, lambda_ctrl = condition$hazard_ctrl,
+        cutoff = cutoff_stats, N_trt = condition$n_trt, N_ctrl = condition$n_ctrl
       )
-
     }
 
-    # create functions for control group with constant hazard from 0 to t_max
-    data_generating_model_ctrl <- nph::pchaz(
-      c(0, t_max),
-      c(condition$hazard_ctrl)
-    )
 
     res <- cbind(
       condition,
-      internal_real_statistics_pchaz(
-        data_generating_model_trt,
-        data_generating_model_ctrl,
-        N_trt=condition$n_trt,
-        N_ctrl=condition$n_ctrl,
-        cutoff = cutoff_stats
-      ),
+      real_stats,
       cutoff_used=cutoff_stats
     )
 

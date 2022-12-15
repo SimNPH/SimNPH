@@ -36,3 +36,44 @@ internal_real_statistics_pchaz <- function(data_gen_model_trt, data_gen_model_ct
 }
 
 
+fast_real_statistics <- function(
+    haz_trt,  pdf_trt,  surv_trt, quant_trt,
+    haz_ctrl, pdf_ctrl, surv_ctrl, quant_ctrl,
+    N_trt=1, N_ctrl=1, cutoff=1000
+){
+
+  h  <- \(t){haz_trt(t)+haz_ctrl(t)}
+  f  <- \(t){(1/(N_trt+N_ctrl))*(N_trt*pdf_trt(t) + N_ctrl*pdf_ctrl(t))}
+
+  res <- data.frame(
+    rmst_trt            = integrate(surv_trt, 0, cutoff)$value,
+    median_survival_trt = quant_trt(0.5),
+    rmst_ctrl           = integrate(surv_ctrl, 0, cutoff)$value,
+    median_survival_ctrl= quant_ctrl(0.5),
+    gAHR                = exp(integrate(\(t){log(haz_trt(t) / haz_ctrl(t)) * f(t) }, 0, cutoff)$value),
+    AHR                 = integrate(\(t){(haz_trt(t)/h(t)) * f(t) }, 0, cutoff)$value /
+      integrate(\(t){(haz_ctrl(t)/h(t)) * f(t)}, 0, cutoff)$value
+  )
+
+  res
+}
+
+fast_real_statistics_pchaz <- function(
+    Tint_trt,  lambda_trt,
+    Tint_ctrl, lambda_ctrl,
+    N_trt=1, N_ctrl=1, cutoff=1000
+){
+
+  fast_real_statistics(
+    haz_trt    =   fast_haz_fun( Tint_trt,  lambda_trt),
+    pdf_trt    =   fast_pdf_fun( Tint_trt,  lambda_trt),
+    surv_trt   =  fast_surv_fun( Tint_trt,  lambda_trt),
+    quant_trt  = fast_quant_fun( Tint_trt,  lambda_trt),
+    haz_ctrl   =   fast_haz_fun(Tint_ctrl, lambda_ctrl),
+    pdf_ctrl   =   fast_pdf_fun(Tint_ctrl, lambda_ctrl),
+    surv_ctrl  =  fast_surv_fun(Tint_ctrl, lambda_ctrl),
+    quant_ctrl = fast_quant_fun(Tint_ctrl, lambda_ctrl),
+    N_trt=N_trt, N_ctrl=N_ctrl, cutoff=cutoff
+  )
+}
+
