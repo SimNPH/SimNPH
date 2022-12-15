@@ -5,6 +5,7 @@
 \alias{assumptions_crossing_hazards}
 \alias{hr_after_crossing_from_gAHR}
 \alias{hr_after_crossing_from_PH_effect_size}
+\alias{cen_rate_from_cen_prop_crossing_hazards}
 \alias{true_summary_statistics_crossing_hazards}
 \title{Generate Dataset with crossing hazards}
 \usage{
@@ -20,6 +21,8 @@ hr_after_crossing_from_PH_effect_size(
   followup = NA_real_,
   target_alpha = 0.05
 )
+
+cen_rate_from_cen_prop_crossing_hazards(design)
 
 true_summary_statistics_crossing_hazards(
   Design,
@@ -62,7 +65,10 @@ argument with the additional column hazard_trt.
 For hr_after_crossing_from_PH_effect_size: the design data.frame passed as
 argument with the additional column hazard_trt.
 
-For true_summary_statistics_delayed_effect: the design data.frame
+for cen_rate_from_cen_prop_crossing_hazards: design data.frame with the
+additional column random_withdrawal
+
+For true_summary_statistics_crossing_hazards: the design data.frame
 passed as argument with the additional columns:
 \itemize{
 \item \code{rmst_trt} rmst in the treatment group
@@ -118,6 +124,11 @@ calculated under proportional hazards.
 This is a heuristic and to some extent arbitrary approach to calculate
 hazard ratios that correspond to reasonable and realistic scenarios.
 
+cen_rate_from_cen_prop_crossing_hazards takes the proportion of
+censored patients from the column \code{censoring_prop}. This column describes
+the proportion of patients who are censored randomly before experiencing an
+event, without regard to administrative censoring.
+
 The if \code{fixed_objects} contains \code{t_max} then this value is used as the
 maximum time to calculate function like survival, hazard, ... of the data
 generating models. If this is not given \code{t_max} is choosen as the minimum of
@@ -139,6 +150,8 @@ hazards
 
 \item \code{hr_after_crossing_from_PH_effect_size}: Calculate hr after crossing of the hazards from PH effect size
 
+\item \code{cen_rate_from_cen_prop_crossing_hazards}: calculate censoring rate from censoring proportion
+
 \item \code{true_summary_statistics_crossing_hazards}: calculate true summary statistics for crossing hazards
 }}
 
@@ -155,7 +168,7 @@ tail(one_simulation)
 Design <- assumptions_crossing_hazards()
 Design
 my_design <- merge(
-    assumptions_delayed_effect(),
+    assumptions_crossing_hazards(),
     design_fixed_followup(),
     by=NULL
   )
@@ -170,6 +183,16 @@ my_design <- merge(
 my_design$hazard_trt <- NA
 my_design <- hr_after_crossing_from_PH_effect_size(my_design, target_power_ph=0.9)
 my_design
+design <- expand.grid(
+  crossing=seq(0, 10, by=5),         # crossing at 0, 1, ..., 10 days
+  hazard_ctrl=0.2,                   # hazard under control and before treatment effect
+  hazard_trt=0.02,                   # hazard after onset of treatment effect
+  censoring_prop=c(0.1, 0.25, 0.01), # 10\%, 25\%, 1\% random censoring
+  followup=100,                      # followup of 100 days
+  n_trt=50,                          # 50 patients treatment
+  n_ctrl=50                          # 50 patients control
+)
+cen_rate_from_cen_prop_crossing_hazards(design)
 my_design <- merge(
     assumptions_crossing_hazards(),
     design_fixed_followup(),

@@ -126,7 +126,7 @@ invisible(
 #'
 #' @examples
 #' my_design <- merge(
-#'     assumptions_delayed_effect(),
+#'     assumptions_crossing_hazards(),
 #'     design_fixed_followup(),
 #'     by=NULL
 #'   )
@@ -231,18 +231,14 @@ hr_after_crossing_from_PH_effect_size <- function(design, target_power_ph=NA_rea
       }
     }
 
-    if(target_power_ph == 0){
-      condition$hazard_trt <- condition$hazard_ctrl
-      return(condition)
-    }
-
     F_ctrl_followup <- fast_cdf_fun(0, condition$hazard_ctrl)(followup) # enter paramters for control arm
     Nevt <- F_ctrl_followup * (condition$n_ctrl + condition$n_ctrl)
     ph_hr <- hr_required_schoenfeld(Nevt, alpha=target_alpha, beta=(1-target_power_ph), p=(condition$n_ctrl/(condition$n_ctrl + condition$n_trt)))
 
     median_trt <- fast_quant_fun(0, condition$hazard_ctrl * ph_hr)(0.5)
+    median_ctrl <- fast_quant_fun(0, condition$hazard_ctrl        )(0.5)
 
-    if(median_trt <= condition$crossing){
+    if(median_trt <= condition$crossing || median_ctrl <= condition$crossing){
       warning("Median survival reached before crossing of the hazards curves, calculation not possible")
       condition$hazard_trt_after <- NA_real_
       return(condition)
@@ -267,13 +263,84 @@ hr_after_crossing_from_PH_effect_size <- function(design, target_power_ph=NA_rea
 
 }
 
+#' @describeIn generate_crossing_hazards calculate censoring rate from censoring proportion
+#'
+#' @return for cen_rate_from_cen_prop_crossing_hazards: design data.frame with the
+#'   additional column random_withdrawal
+#' @export
+#'
+#' @details cen_rate_from_cen_prop_crossing_hazards takes the proportion of
+#'   censored patients from the column `censoring_prop`. This column describes
+#'   the proportion of patients who are censored randomly before experiencing an
+#'   event, without regard to administrative censoring.
+#'
+#' @examples
+#' design <- expand.grid(
+#'   crossing=seq(0, 10, by=5),         # crossing at 0, 1, ..., 10 days
+#'   hazard_ctrl=0.2,                   # hazard under control and before treatment effect
+#'   hazard_trt=0.02,                   # hazard after onset of treatment effect
+#'   censoring_prop=c(0.1, 0.25, 0.01), # 10%, 25%, 1% random censoring
+#'   followup=100,                      # followup of 100 days
+#'   n_trt=50,                          # 50 patients treatment
+#'   n_ctrl=50                          # 50 patients control
+#' )
+#' cen_rate_from_cen_prop_crossing_hazards(design)
+cen_rate_from_cen_prop_crossing_hazards <- function(design){
+
+  rowwise_fun <- function(condition){
+    if(is.na(condition$hazard_trt_after)){
+      return(NA_real_)
+    }
+
+    if(condition$censoring_prop == 0){
+      condition$random_withdrawal <- 0.
+      return(condition)
+    }
+
+    t_max <- condition$followup * 10
+
+    a <- condition$n_trt / (condition$n_trt + condition$n_ctrl)
+    b <- 1-a
+
+    cumhaz_trt <- fast_cumhaz_fun(
+      c(                          0,         condition$crossing),
+      c(condition$hazard_trt_before, condition$hazard_trt_after)
+    )
+
+    cumhaz_ctrl <- fast_cumhaz_fun(
+      c(                    0),
+      c(condition$hazard_ctrl)
+    )
+
+    target_fun <- Vectorize(\(r){
+      cumhaz_censoring <- fast_cumhaz_fun(0, r)
+      prob_cen_ctrl <- cumhaz_censoring(t_max)/(cumhaz_censoring(t_max) + cumhaz_ctrl(t_max))
+      prob_cen_trt  <- cumhaz_censoring(t_max)/(cumhaz_censoring(t_max) + cumhaz_trt(t_max))
+      prob_cen <- a*prob_cen_trt + b*prob_cen_ctrl
+      prob_cen-condition$censoring_prop
+    })
+
+    condition$random_withdrawal <- uniroot(target_fun, interval=c(0, 1e-6), extendInt = "upX", tol=.Machine$double.eps)$root
+
+    condition
+  }
+
+  result <- design |>
+    split(1:nrow(design)) |>
+    lapply(rowwise_fun) |>
+    do.call(what=rbind)
+
+  result
+
+}
+
 #' Calculate true summary statistics for scenarios with crossing hazards
 #'
 #' @param Design Design data.frame for crossing hazards
 #' @param cutoff_stats=NA_real_ cutoff time, see details
 #' @param fixed_objects=NULL additional settings, see details
 #'
-#' @return For true_summary_statistics_delayed_effect: the design data.frame
+#' @return For true_summary_statistics_crossing_hazards: the design data.frame
 #'   passed as argument with the additional columns:
 #' * `rmst_trt` rmst in the treatment group
 #' * `median_surv_trt` median survival in the treatment group

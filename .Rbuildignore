@@ -7,3 +7,6 @@
 ^codecov\.yml$
 ^scripts$
 ^data$
+^.github$
+^notes_drafts_etc$
+^testdata$

@@ -1,18 +1,3 @@
-#' check if Tint and lambda arguments are ok
-#'
-#' @param Tint Tint argument to fast_... functions
-#' @param lambda lambda argument to fast_... functions
-#'
-#' @return
-#' TRUE invisible
-#'
-#' @details throws an error and of the following occur:
-#'   * Tint is not sorted
-#'   * any lambda are smaller than 0
-#'   * the lengths of the vectors differ
-#'
-#' @examples
-#' check_tint_lambda(c(0,1,2), c(0.1, 0.2, 0.1))
 check_tint_lambda <- function(Tint, lambda){
   stopifnot(!is.unsorted(Tint))
   stopifnot(all(lambda >= 0))
