@@ -102,6 +102,8 @@ analyse_group_sequential <- function(followup, followup_type, alpha, analyse_fun
 #'  * `n_pat` the mean number of patients recruited
 #'  * `n_evt` the mean number of observed events
 #'  * `followup` the mean followup time
+#'  * columns starting with sd_ with the standard deviations of the
+#'    corresponding statistics
 #'
 #' @export
 #'
@@ -116,7 +118,10 @@ summarise_group_sequential <- function(name=NULL){
       "rejection" = mean(is.finite(results$rejected_at_stage)),
       "n_pat" = mean(results$N_pat),
       "n_evt" = mean(results$N_evt),
-      "followup" = mean(results$followup)
+      "followup" = mean(results$followup),
+      "sd_npat" = sd(results$N_pat),
+      "sd_nevt" = sd(results$N_evt),
+      "sd_followup" = sd(results$followup)
     )
   }
 

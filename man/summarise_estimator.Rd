@@ -26,6 +26,8 @@ A function that can be used in Summarise that returns a data frame with the colu
 \item mae the mean absolute error with respect to the true value
 \item coverage the coverage of the confidence interval
 \item width the mean width of the confidence interval
+\item columns starting with sd_ with the standard deviations of the corresponding
+statistics
 }
 }
 \description{

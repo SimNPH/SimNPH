@@ -91,14 +91,14 @@ test_that("creating a summarise function for an estimator works", {
     )
   )
 
-  expected_names <- expand.grid("coxph.", c("bias", "var", "mse", "mae", "coverage", "width"), c("gAHR.", "hr.", "", "1.")) |>
+  expected_names <- expand.grid("coxph.", c("bias", "sd_bias", "var", "mse", "sd_mse", "mae", "sd_mae", "coverage", "width", "sd_width"), c("gAHR.", "hr.", "", "1.")) |>
     subset(select=c(1,3,2)) |>
     apply(1, paste, collapse="") |>
     unname()
 
   expected_names <- c(names(condition), expected_names, c("REPLICATIONS", "SIM_TIME", "COMPLETED", "SEED"))
 
-  expect_named(sim_results, expected_names)
+  expect_named(sim_results, expected_names, ignore.order = TRUE)
 
   expect(all(is.na(sim_results[, c("coxph.1.mse", "coxph.1.mae", "coxph.1.bias", "coxph.1.coverage")])), "summary results depending on the true value should be missing when the true value is not given")
   expect(all(is.na(sim_results[, c("coxph.coverage", "coxph.width")])), "summary results depending on the CI should be missing if no CI boundaries are given")
