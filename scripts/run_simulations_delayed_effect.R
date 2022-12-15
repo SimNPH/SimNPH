@@ -21,8 +21,6 @@ clusterEvalQ(cl, {
 # load parameters
 design <- read.table("data/parameters/delayed_effect_2022-12-15.csv", sep=",", dec=".", header=TRUE)
 
-design <- design[sample(1:nrow(design), 1), ]
-
 # define generator
 my_generator <- function(condition, fixed_objects=NULL){
   generate_delayed_effect(condition, fixed_objects) |>
@@ -100,13 +98,13 @@ my_analyse <- list(
 # define summaries --------------------------------------------------------
 
 my_summarise <- create_summarise_function(
-  ahr = summarise_estimator(est=AHR, real=0),
-  gahr = summarise_estimator(est=gAHR, real=0),
-  mean_surv = summarise_estimator(est=diff_Q, real=0),
-  milestone = summarise_estimator(est=milestone_surv_ratio[1], real=0, name="milestone_1"),
-  milestone = summarise_estimator(est=milestone_surv_ratio[2], real=0, name="milestone_2"),
-  rmst = summarise_estimator(est=rmst_diff, real=0),
-  cox = summarise_estimator(est=hr, lower = hr_lower, upper=hr_upper),
+  ahr = summarise_estimator(est=AHR, real=AHR),
+  gahr = summarise_estimator(est=gAHR, real=gAHR),
+  mean_surv = summarise_estimator(est=diff_Q, real=median_survival_trt/median_survival_ctrl),
+  milestone = summarise_estimator(est=milestone_surv_ratio[1], real=NA_real_, name="milestone_1"), # todo real value
+  milestone = summarise_estimator(est=milestone_surv_ratio[2], real=NA_real_, name="milestone_2"), # todo real value
+  rmst = summarise_estimator(est=rmst_diff, real=rmst_trt-rmst_ctrl),
+  cox = summarise_estimator(est=hr, real=NA_real_, lower = hr_lower, upper=hr_upper), # todo real value
   peto_peto = summarise_test(alpha),
   fh = summarise_test(alpha),
   logrank = summarise_test(alpha),
