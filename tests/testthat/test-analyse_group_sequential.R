@@ -86,6 +86,6 @@ test_that("summarising results from group sequential function works", {
   aggregate_results <- summarise_group_sequential()(condition, results)
 
   expect_s3_class(aggregate_results, "data.frame")
-  expect_named(aggregate_results, c("rejection", "n_pat", "n_evt", "followup"), ignore.order = TRUE)
+  expect_named(aggregate_results, c("rejection", "n_pat", "n_evt", "followup", "sd_nevt", "sd_followup", "sd_npat"), ignore.order = TRUE)
   expect_equal(nrow(aggregate_results), 1)
 })

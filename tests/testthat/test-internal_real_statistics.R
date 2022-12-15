@@ -28,14 +28,26 @@ test_that("internal function for real summary statistics outputs correct values"
   result_2 <- internal_real_statistics_pchaz(treatment, treatment)
   result_3 <- internal_real_statistics_pchaz(control, control)
 
+  result_1_b <- fast_real_statistics_pchaz(treatment$Tint[-3], treatment$lambda, control$Tint[-2], control$lambda)
+  result_2_b <- fast_real_statistics_pchaz(treatment$Tint[-3], treatment$lambda, treatment$Tint[-3], treatment$lambda)
+  result_3_b <- fast_real_statistics_pchaz(control$Tint[-2], control$lambda, control$Tint[-2], control$lambda)
+
   # correct class, names, etc.
   expect_s3_class(result_1, "data.frame")
   expect_named(result_1, c("rmst_trt", "median_survival_trt", "rmst_ctrl", "median_survival_ctrl", "gAHR", "AHR"))
+
+  expect_s3_class(result_1_b, "data.frame")
+  expect_named(result_1_b, c("rmst_trt", "median_survival_trt", "rmst_ctrl", "median_survival_ctrl", "gAHR", "AHR"))
 
   # AHR has to be one, if treatment and control have the same distribution
   expect_equal(result_2$gAHR, 1)
   expect_equal(result_2$AHR, 1)
   expect_equal(result_3$gAHR, 1)
   expect_equal(result_3$AHR, 1)
+
+  expect_equal(result_2_b$gAHR, 1)
+  expect_equal(result_2_b$AHR, 1)
+  expect_equal(result_3_b$gAHR, 1)
+  expect_equal(result_3_b$AHR, 1)
 
 })

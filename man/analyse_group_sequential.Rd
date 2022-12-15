@@ -37,6 +37,8 @@ SimDesign::runSimulation and that returns a \code{data.frame} with the columns
 \item \code{n_pat} the mean number of patients recruited
 \item \code{n_evt} the mean number of observed events
 \item \code{followup} the mean followup time
+\item columns starting with sd_ with the standard deviations of the
+corresponding statistics
 }
 }
 \description{

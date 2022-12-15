@@ -103,6 +103,8 @@ create_summarise_function <- function(...){
 #' * mae the mean absolute error with respect to the true value
 #' * coverage the coverage of the confidence interval
 #' * width the mean width of the confidence interval
+#' * columns starting with sd_ with the standard deviations of the corresponding
+#'   statistics
 #'
 #' @export
 #'
@@ -155,16 +157,21 @@ summarise_estimator <- function(est, real, lower=NULL, upper=NULL, name=NULL){
 
     results_tmp <- data.frame(
       bias     = mean(est - real),
+      sd_bias  = sd(est-real),
       var      = var(est),
       mse      = mean((est-real)^2),
+      sd_mse   = sd((est-real)^2),
       mae      = mean(abs(est-real)),
+      sd_mae   = sd(abs(est-real)),
       coverage = NA_real_,
-      width    = NA_real_
+      width    = NA_real_,
+      sd_width = NA_real_
     )
 
     if(!is.null(lower) && !is.null(upper)){
       results_tmp$coverage <- mean( (lower <= real) & (upper >= real) )
       results_tmp$width    <- mean( abs(upper - lower) )
+      results_tmp$sd_width <- sd( abs(upper - lower) )
     }
 
     results_tmp

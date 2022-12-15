@@ -252,5 +252,22 @@ test_that("test that hr_after_onset_from_PH_effect_size works", {
 })
 
 
+test_that("cen_rate_from_cen_prop_crossing_hazards works", {
+  design <- expand.grid(
+    crossing=seq(0, 10, by=5),
+    hazard_ctrl=0.2,
+    hazard_trt_after=c(0.02, NA),
+    hazard_trt_before=c(0.5, 0.2),
+    censoring_prop=c(0.1, 0.25, 0.01, 0),
+    followup=100,
+    n_trt=50,
+    n_ctrl=50
+  )
 
+  result <- cen_rate_from_cen_prop_crossing_hazards(design)
+
+  expect(all(is.na(design$hazard_trt)==is.na(result$random_withdrawal)), "NA iff treatment hazard is NA")
+  expect(all(result$random_withdrawal>=0, na.rm = TRUE), "all rates >= 0")
+  expect(all(result$random_withdrawal[design$censoring_prop == 0]==0, na.rm = TRUE), "rate 0 if proportion 0")
+})
 
