@@ -237,8 +237,12 @@ hr_after_crossing_from_PH_effect_size <- function(design, target_power_ph=NA_rea
 
     median_trt <- fast_quant_fun(0, condition$hazard_ctrl * ph_hr)(0.5)
     median_ctrl <- fast_quant_fun(0, condition$hazard_ctrl        )(0.5)
+    median_trt_before <- fast_quant_fun(0, condition$hazard_trt_before)(0.5)
 
-    if(median_trt <= condition$crossing || median_ctrl <= condition$crossing){
+    if(median_trt <= condition$crossing ||
+       median_ctrl <= condition$crossing ||
+       median_trt_before <= condition$crossing
+       ){
       warning("Median survival reached before crossing of the hazards curves, calculation not possible")
       condition$hazard_trt_after <- NA_real_
       return(condition)
@@ -246,7 +250,7 @@ hr_after_crossing_from_PH_effect_size <- function(design, target_power_ph=NA_rea
 
     target_fun_hazard_after <- function(hazard_after){
       sapply(hazard_after, \(h){
-        median_trt - fast_quant_fun(c(0, condition$crossing), c(condition$hazard_ctrl, h))(0.5)
+        median_trt - fast_quant_fun(c(0, condition$crossing), c(condition$hazard_trt_before, h))(0.5)
       })
     }
 

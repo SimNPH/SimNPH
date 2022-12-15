@@ -24,9 +24,13 @@ options <- expand.grid(
 assumptions <- expand.grid(
   hazard_ctrl = nph::m2r(c(36, 12, 6)),
   censoring_prop = c(0, 0.1, 0.3),
-  delay = m2d(seq(0,9, by=2)),
-  effect_size_ph = c(0, 0.5, 0.8, 0.9)
-)
+  crossing = m2d(seq(0,9, by=2)),
+  effect_size_ph = c(0.5, 0.8, 0.9),
+  hr_before = c(1.5, 3)
+) |>
+  within({
+    hazard_trt_before = hazard_ctrl * hr_before
+  })
 
 
 # Merging Options and Assumptions -----------------------------------------
@@ -48,22 +52,21 @@ design <- design |>
   within({
     followup <- log(6) / hazard_ctrl
   }) |>
-  hr_after_onset_from_PH_effect_size()
+  hr_after_crossing_from_PH_effect_size()
 
 # rate of random censoring
 design <- design |>
-  cen_rate_from_cen_prop_delayed_effect()
-
+  cen_rate_from_cen_prop_crossing_hazards()
 
 # Excluding Scenarios which did not give Reasonable Parameter Value--------
 
 # Excluding Scenarios for which a hazard in the treatment arm could not be calculated.
 # This happens when the median of the survival functions is before onset of treatment effect.
 design <- design |>
-  subset(!is.na(hazard_trt))
+  subset(!is.na(hazard_trt_after))
 
 # Saving ------------------------------------------------------------------
 
-filename <- paste0("data/parameters/delayed_effect_", format(Sys.Date(), "%Y-%m-%d"), ".csv")
+filename <- paste0("data/parameters/crossing_hazards_", format(Sys.Date(), "%Y-%m-%d"), ".csv")
 write.table(design, file=filename, quote=FALSE, sep=", ", dec=".", row.names = FALSE, col.names = TRUE)
 
