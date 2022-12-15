@@ -13,4 +13,6 @@ test_that("analyse_modelstly_weighted outputs plausible data.frame for delayed e
   expect_true(hasName(res, "p"), label="result has the column p")
   expect_lte(res$p, 1, label="p value le 1")
   expect_gte(res$p, 0, label="p value ge 0")
+
+  expect_error(analyse_modelstly_weighted(c(10, 20)))
 })

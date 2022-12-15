@@ -15,11 +15,17 @@
 #' dat <- generate_delayed_effect(condition)
 #' analyse_modelstly_weighted(20)(condition, dat)
 analyse_modelstly_weighted <- function(t_star){
+
+  if(length(t_star) != 1){
+    stop("length(t_star) != 1, please provide a scalar cutoff time.")
+  }
+
   function(condition, dat, fixed_objects = NULL){
     # estimated survival functions
     model_km <- survival::survfit(survival::Surv(t, evt)~1, dat)
     s_t_star <- summary(model_km, times=t_star)$surv
-    s_t <- summary(model_km, times=sort(unique(dat$t)))$surv
+    model_summary <- summary(model_km, times=sort(unique(dat$t)))
+    s_t <- model_summary$surv[model_summary$n.event != 0]
 
     # event time weights
     w_t <- 1/pmax(s_t_star, s_t)
