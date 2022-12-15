@@ -38,18 +38,6 @@
 #' tail(one_simulation)
 generate_delayed_effect <- function(condition, fixed_objects=NULL){
 
-  # if t_max is not given in fixed_objects
-  if(is.null(fixed_objects) || (!hasName(fixed_objects, "t_max"))){
-    # set t_max to 1-1/10000 quantile of control or treatment survival function
-    # whichever is later
-    t_max <- max(
-      log(10000) / condition$hazard_ctrl,
-      log(10000) / condition$hazard_trt
-    )
-  } else {
-    t_max <- fixed_objects$t_max
-  }
-
   # simulate treatment group
   if (condition$delay < 0){
     # if delay is smaller than 0 stop with error
@@ -71,7 +59,7 @@ generate_delayed_effect <- function(condition, fixed_objects=NULL){
     )
   }
 
-  # simulate control group with constant hazard from 0 to t_max
+  # simulate control group with constant hazard from 0
   data_ctrl <- data.frame(
     t = fast_rng_fun(c(0), c(condition$hazard_ctrl))(condition$n_ctrl),
     trt = 0,
@@ -270,6 +258,76 @@ hr_after_onset_from_PH_effect_size <- function(design, target_power_ph=NA_real_,
 
 }
 
+#' @describeIn generate_delayed_effect calculate censoring rate from censoring proportion
+#'
+#' @return for cen_rate_from_cen_prop_delayed_effect: design data.frame with the
+#'   additional column random_withdrawal
+#' @export
+#'
+#' @details cen_rate_from_cen_prop_delayed_effect takes the proportion of
+#'   censored patients from the column `censoring_prop`. This column describes
+#'   the proportion of patients who are censored randomly before experiencing an
+#'   event, without regard to administrative censoring.
+#'
+#' @examples
+#' design <- expand.grid(
+#'   delay=seq(0, 10, by=5),            # delay of 0, 1, ..., 10 days
+#'   hazard_ctrl=0.2,                   # hazard under control and before treatment effect
+#'   hazard_trt=0.02,                   # hazard after onset of treatment effect
+#'   censoring_prop=c(0.1, 0.25, 0.01), # 10%, 25%, 1% random censoring
+#'   followup=100,                      # followup of 100 days
+#'   n_trt=50,                          # 50 patients treatment
+#'   n_ctrl=50                          # 50 patients control
+#' )
+#' cen_rate_from_cen_prop_delayed_effect(design)
+cen_rate_from_cen_prop_delayed_effect <- function(design){
+
+  rowwise_fun <- function(condition){
+    if(is.na(condition$hazard_trt)){
+      return(NA_real_)
+    }
+
+    if(condition$censoring_prop == 0){
+      condition$random_withdrawal <- 0.
+      return(condition)
+    }
+
+    t_max <- condition$followup * 10
+
+    a <- condition$n_trt / (condition$n_trt + condition$n_ctrl)
+    b <- 1-a
+
+    cumhaz_trt <- fast_cumhaz_fun(
+      c(                    0,      condition$delay),
+      c(condition$hazard_ctrl, condition$hazard_trt)
+    )
+
+    cumhaz_ctrl <- fast_cumhaz_fun(
+      c(                    0),
+      c(condition$hazard_ctrl)
+    )
+
+    target_fun <- Vectorize(\(r){
+      cumhaz_censoring <- fast_cumhaz_fun(0, r)
+      prob_cen_ctrl <- cumhaz_censoring(t_max)/(cumhaz_censoring(t_max) + cumhaz_ctrl(t_max))
+      prob_cen_trt  <- cumhaz_censoring(t_max)/(cumhaz_censoring(t_max) + cumhaz_trt(t_max))
+      prob_cen <- a*prob_cen_trt + b*prob_cen_ctrl
+      prob_cen-condition$censoring_prop
+    })
+
+    condition$random_withdrawal <- uniroot(target_fun, interval=c(0, 1e-6), extendInt = "upX", tol=.Machine$double.eps)$root
+
+    condition
+  }
+
+  result <- design |>
+    split(1:nrow(design)) |>
+    lapply(rowwise_fun) |>
+    do.call(what=rbind)
+
+  result
+
+}
 
 #' Calculate true summary statistics for scenarios with delayed treatment effect
 #'

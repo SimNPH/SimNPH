@@ -6,3 +6,4 @@
 ^Meta$
 ^codecov\.yml$
 ^scripts$
+^data$

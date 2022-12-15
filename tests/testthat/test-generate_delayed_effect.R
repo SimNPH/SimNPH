@@ -73,16 +73,6 @@ test_that("generate delayed effect fails on delay < 0", {
   )
 })
 
-test_that("generate delayed effect uses t_max, if given in fixed_objects", {
-  capture_output(
-    scenario <- merge(assumptions_delayed_effect(), design_fixed_followup(), by=NULL)[1, ]
-  )
-
-  one_simulation <- generate_delayed_effect(scenario, fixed_objects = list(t_max=10))
-
-  expect(all(one_simulation$t <= 10), "all times lte t_max")
-})
-
 test_that("test that generate_delayed_effect outputs correct tibble with delay=0", {
   capture_output(
     scenario <- merge(assumptions_delayed_effect(), design_fixed_followup(), by=NULL)[1, ]
@@ -212,6 +202,10 @@ test_that("test that hr_after_onset_from_PH_effect_size works", {
     )
   )
 
+
+  my_design_E <- hr_after_onset_from_PH_effect_size(my_design, 0)
+  expect_equal(my_design_E$hazard_trt, my_design$hazard_ctrl)
+
   expect_error(
     my_design_C <- hr_after_onset_from_PH_effect_size(my_design, followup = 200)
   )
@@ -229,3 +223,20 @@ test_that("test that hr_after_onset_from_PH_effect_size works", {
   expect_equal(is.na(my_design_B$hazard_trt), c(F, F, F, F, T, T))
 })
 
+test_that("cen_rate_from_cen_prop_delayed_effect works", {
+  design <- expand.grid(
+   delay=seq(0, 10, by=5),
+   hazard_ctrl=0.2,
+   hazard_trt=c(0.02, NA),
+   censoring_prop=c(0.1, 0.25, 0.01, 0),
+   followup=100,
+   n_trt=50,
+   n_ctrl=50
+  )
+
+  result <- cen_rate_from_cen_prop_delayed_effect(design)
+
+  expect(all(is.na(design$hazard_trt)==is.na(result$random_withdrawal)), "NA iff treatment hazard is NA")
+  expect(all(result$random_withdrawal>=0, na.rm = TRUE), "all rates >= 0")
+  expect(all(result$random_withdrawal[design$censoring_prop == 0]==0, na.rm = TRUE), "rate 0 if proportion 0")
+})
