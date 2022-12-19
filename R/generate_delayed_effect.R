@@ -333,6 +333,7 @@ cen_rate_from_cen_prop_delayed_effect <- function(design){
 #'
 #' @param Design Design data.frame for delayed effect
 #' @param cutoff_stats=NA_real_ cutoff time, see details
+#' @param milestones=NULL (optionally named) vector of times at which milestone survival should be calculated
 #' @param fixed_objects=NULL additional settings, see details
 #'
 #' @return For true_summary_statistics_delayed_effect: the design data.frame
@@ -369,9 +370,9 @@ cen_rate_from_cen_prop_delayed_effect <- function(design){
 #' my_design$followup <- 15
 #' my_design <- true_summary_statistics_delayed_effect(my_design)
 #' my_design
-true_summary_statistics_delayed_effect <- function(Design, cutoff_stats=NA_real_, fixed_objects=NULL){
+true_summary_statistics_delayed_effect <- function(Design, cutoff_stats=NA_real_, milestones=NULL, fixed_objects=NULL){
 
-  true_summary_statistics_delayed_effect_rowwise <- function(condition, cutoff_stats){
+  true_summary_statistics_delayed_effect_rowwise <- function(condition, cutoff_stats, milestones){
 
     # if t_max is not given in fixed_objects
     if(is.null(fixed_objects) || (!hasName(fixed_objects, "t_max"))){
@@ -402,7 +403,7 @@ true_summary_statistics_delayed_effect <- function(Design, cutoff_stats=NA_real_
       real_stats <- fast_real_statistics_pchaz(
          Tint_trt = 0,  lambda_trt = condition$hazard_trt,
         Tint_ctrl = 0, lambda_ctrl = condition$hazard_ctrl,
-        cutoff = cutoff_stats, N_trt = condition$n_trt, N_ctrl = condition$n_ctrl
+        cutoff = cutoff_stats, N_trt = condition$n_trt, N_ctrl = condition$n_ctrl, milestones=milestones
       )
 
     } else {
@@ -411,7 +412,7 @@ true_summary_statistics_delayed_effect <- function(Design, cutoff_stats=NA_real_
       real_stats <- fast_real_statistics_pchaz(
         Tint_trt = c(0, condition$delay),  lambda_trt = c(condition$hazard_ctrl, condition$hazard_trt),
         Tint_ctrl = 0, lambda_ctrl = condition$hazard_ctrl,
-        cutoff = cutoff_stats, N_trt = condition$n_trt, N_ctrl = condition$n_ctrl
+        cutoff = cutoff_stats, N_trt = condition$n_trt, N_ctrl = condition$n_ctrl, milestones=milestones
       )
 
     }
@@ -429,7 +430,7 @@ true_summary_statistics_delayed_effect <- function(Design, cutoff_stats=NA_real_
 
   Design <- Design |>
     split(1:nrow(Design)) |>
-    mapply(FUN=true_summary_statistics_delayed_effect_rowwise, cutoff_stats = cutoff_stats, SIMPLIFY = FALSE)
+    mapply(FUN=true_summary_statistics_delayed_effect_rowwise, cutoff_stats = cutoff_stats, MoreArgs = list(milestones=milestones), SIMPLIFY = FALSE)
 
   Design <- do.call(rbind, Design)
 

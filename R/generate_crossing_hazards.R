@@ -342,6 +342,7 @@ cen_rate_from_cen_prop_crossing_hazards <- function(design){
 #'
 #' @param Design Design data.frame for crossing hazards
 #' @param cutoff_stats=NA_real_ cutoff time, see details
+#' @param milestones=NULL (optionally named) vector of times at which milestone survival should be calculated
 #' @param fixed_objects=NULL additional settings, see details
 #'
 #' @return For true_summary_statistics_crossing_hazards: the design data.frame
@@ -378,9 +379,9 @@ cen_rate_from_cen_prop_crossing_hazards <- function(design){
 #' my_design$follwup <- 15
 #' my_design <- true_summary_statistics_crossing_hazards(my_design)
 #' my_design
-true_summary_statistics_crossing_hazards <- function(Design, cutoff_stats=NA_real_, fixed_objects=NULL){
+true_summary_statistics_crossing_hazards <- function(Design, cutoff_stats=NA_real_, milestones=NULL, fixed_objects=NULL){
 
-  true_summary_statistics_crossing_hazards_rowwise <- function(condition, cutoff_stats){
+  true_summary_statistics_crossing_hazards_rowwise <- function(condition, cutoff_stats, milestones){
 
     # if t_max is not given in fixed_objects
     if(is.null(fixed_objects) || (!hasName(fixed_objects, "t_max"))){
@@ -413,7 +414,7 @@ true_summary_statistics_crossing_hazards <- function(Design, cutoff_stats=NA_rea
       real_stats <- fast_real_statistics_pchaz(
         Tint_trt = 0, lambda_trt  = condition$hazard_trt_after,
         Tint_ctrl= 0, lambda_ctrl = condition$hazard_ctrl,
-        cutoff = cutoff_stats, N_trt = condition$n_trt, N_ctrl = condition$n_ctrl
+        cutoff = cutoff_stats, N_trt = condition$n_trt, N_ctrl = condition$n_ctrl, milestones = milestones
       )
 
     } else {
@@ -422,7 +423,7 @@ true_summary_statistics_crossing_hazards <- function(Design, cutoff_stats=NA_rea
       real_stats <- fast_real_statistics_pchaz(
         Tint_trt = c(0, condition$crossing), lambda_trt  = c(condition$hazard_trt_before, condition$hazard_trt_after),
         Tint_ctrl= 0, lambda_ctrl = condition$hazard_ctrl,
-        cutoff = cutoff_stats, N_trt = condition$n_trt, N_ctrl = condition$n_ctrl
+        cutoff = cutoff_stats, N_trt = condition$n_trt, N_ctrl = condition$n_ctrl, milestones = milestones
       )
     }
 
@@ -439,7 +440,7 @@ true_summary_statistics_crossing_hazards <- function(Design, cutoff_stats=NA_rea
 
   Design <- Design |>
     split(1:nrow(Design)) |>
-    mapply(FUN=true_summary_statistics_crossing_hazards_rowwise, cutoff_stats = cutoff_stats, SIMPLIFY = FALSE)
+    mapply(FUN=true_summary_statistics_crossing_hazards_rowwise, cutoff_stats = cutoff_stats, MoreArgs = list(milestones=milestones), SIMPLIFY = FALSE)
 
   Design <- do.call(rbind, Design)
 
