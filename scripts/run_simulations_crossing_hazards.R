@@ -1,8 +1,10 @@
-# 1. download the whole package from github via git or as zip
-# 2. install by changing into the root folder of the package and running
-#    devtools::install(".", upgrade="never", build=TRUE, quick=TRUE, dependencies=TRUE)
-# 3. restart R and run this script
-# 4. send me results and/or errors, saved in the data folder
+
+package_url <- "https://github.com/SimNPH/SimNPH/archive/refs/tags/sims_delayed_crossing.zip"
+download.file(package_url, destfile = "sims_delayed_crossing.zip")
+dir.create("sims_delayed_crossing")
+unzip("sims_delayed_crossing.zip", exdir = "sims_delayed_crossing")
+setwd("sims_delayed_crossing/SimNPH-sims_delayed_crossing/")
+devtools::install(".", upgrade="never", build=TRUE, quick=TRUE, dependencies=TRUE)
 
 library(SimNPH)
 library(SimDesign)
