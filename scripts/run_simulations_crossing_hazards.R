@@ -34,11 +34,11 @@ clusterEvalQ(cl, {
 # setup data generation ---------------------------------------------------
 
 # load parameters
-design <- read.table("data/parameters/delayed_effect_2022-12-19.csv", sep=",", dec=".", header=TRUE)
+design <- read.table("data/parameters/crossing_hazards_2022-12-19.csv", sep=",", dec=".", header=TRUE)
 
 # define generator
 my_generator <- function(condition, fixed_objects=NULL){
-  generate_delayed_effect(condition, fixed_objects) |>
+  generate_crossing_hazards(condition, fixed_objects) |>
     recruitment_uniform(condition$recruitment) |>
     random_censoring_exp(condition$random_withdrawal) |>
     admin_censoring_events(condition$final_events)
@@ -140,7 +140,7 @@ my_summarise <- create_summarise_function(
 
 # run ---------------------------------------------------------------------
 
-save_folder <- paste0(paste0("data/simulation_delayed_effect_", Sys.info()["nodename"], "_", strftime(Sys.time(), "%Y-%m-%d_%H%M%S")))
+save_folder <- paste0(paste0("data/simulation_crossing_hazards_", Sys.info()["nodename"], "_", strftime(Sys.time(), "%Y-%m-%d_%H%M%S")))
 dir.create(save_folder)
 
 results <- runSimulation(

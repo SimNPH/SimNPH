@@ -65,7 +65,7 @@ design <- design |>
 # Calculating True Summary Statistics -------------------------------------
 
 design <- design |>
-  true_summary_statistics_delayed_effect()
+  true_summary_statistics_delayed_effect(milestones = m2d(c(ms_surv_8=8, ms_surv_12=12)))
 
 # Saving ------------------------------------------------------------------
 
