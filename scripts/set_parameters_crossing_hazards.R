@@ -69,7 +69,7 @@ design <- design |>
 # Calculating True Summary Statistics -------------------------------------
 
 design <- design |>
-  true_summary_statistics_crossing_hazards()
+  true_summary_statistics_crossing_hazards(milestones = m2d(c(ms_surv_8=8, ms_surv_12=12)))
 
 
 # Saving ------------------------------------------------------------------
