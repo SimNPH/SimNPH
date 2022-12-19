@@ -124,7 +124,12 @@ test_that("test that true_summary_statistics_crossing_hazards works", {
     subset(select=c(-followup)) |>
     true_summary_statistics_crossing_hazards()
 
+  test_design4 <- test_design |>
+    true_summary_statistics_crossing_hazards(cutoff_stats = test_design$cutoff_stats, milestones=c("milestone1"=10))
+
   expect_named(test_design1, c("n_trt", "n_ctrl", "crossing", "hazard_ctrl", "hazard_trt_before", "hazard_trt_after", "cutoff_stats", "followup", "rmst_trt", "median_survival_trt", "rmst_ctrl", "median_survival_ctrl", "gAHR", "AHR", "cutoff_used"))
+
+  expect_named(test_design4, c("n_trt", "n_ctrl", "crossing", "hazard_ctrl", "hazard_trt_before", "hazard_trt_after", "cutoff_stats", "followup", "rmst_trt", "median_survival_trt", "rmst_ctrl", "median_survival_ctrl", "gAHR", "AHR", "milestone1_trt", "milestone1_ctrl", "cutoff_used"))
 
   expect(
     with(

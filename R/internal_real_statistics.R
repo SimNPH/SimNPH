@@ -39,7 +39,7 @@ internal_real_statistics_pchaz <- function(data_gen_model_trt, data_gen_model_ct
 fast_real_statistics <- function(
     haz_trt,  pdf_trt,  surv_trt, quant_trt,
     haz_ctrl, pdf_ctrl, surv_ctrl, quant_ctrl,
-    N_trt=1, N_ctrl=1, cutoff=1000
+    N_trt=1, N_ctrl=1, cutoff=1000, milestones=NULL
 ){
 
   h  <- \(t){haz_trt(t)+haz_ctrl(t)}
@@ -55,13 +55,40 @@ fast_real_statistics <- function(
       integrate(\(t){(haz_ctrl(t)/h(t)) * f(t)}, 0, cutoff)$value
   )
 
+  if(!is.null(milestones)){
+    if(is.null(names(milestones))){
+      my_colnames <- paste0("milestone_surv_", milestones)
+    } else {
+      my_colnames <- names(milestones)
+    }
+
+    milestones_trt <- milestones |>
+      surv_trt() |>
+      setNames(paste0(my_colnames, "_trt")) |>
+      t() |>
+      as.data.frame()
+
+    milestones_ctrl <- milestones |>
+      surv_ctrl() |>
+      setNames(paste0(my_colnames, "_ctrl")) |>
+      t() |>
+      as.data.frame()
+
+    res <- cbind(
+      res,
+      milestones_trt,
+      milestones_ctrl
+    )
+
+  }
+
   res
 }
 
 fast_real_statistics_pchaz <- function(
     Tint_trt,  lambda_trt,
     Tint_ctrl, lambda_ctrl,
-    N_trt=1, N_ctrl=1, cutoff=1000
+    N_trt=1, N_ctrl=1, cutoff=1000, milestones=NULL
 ){
 
   fast_real_statistics(
@@ -73,7 +100,7 @@ fast_real_statistics_pchaz <- function(
     pdf_ctrl   =   fast_pdf_fun(Tint_ctrl, lambda_ctrl),
     surv_ctrl  =  fast_surv_fun(Tint_ctrl, lambda_ctrl),
     quant_ctrl = fast_quant_fun(Tint_ctrl, lambda_ctrl),
-    N_trt=N_trt, N_ctrl=N_ctrl, cutoff=cutoff
+    N_trt=N_trt, N_ctrl=N_ctrl, cutoff=cutoff, milestones=milestones
   )
 }
 

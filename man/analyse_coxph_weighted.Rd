@@ -25,10 +25,10 @@ an analyse function that returns a data.frame with the columns
 Analyse Dataset with weighted Cox regression
 }
 \details{
-Type can be either "SG" or "S". For "SG" the weights are set to
-\code{S(t)*G(t)^(-1)}, for "S" \code{S(t)} is used. Here \code{S(t)} denotes the Kaplan
-Meier estimator for the event Times and \code{G(t)} denotes the Kaplan Meier
-estimator for the censoring times.
+Type can be "SG", "S" or "G". For "SG" the weights are set to
+\code{S(t)*G(t)^(-1)}, for "S" \code{S(t)} is used, for "G", \code{G(t)^(-1)} is used. Here
+\code{S(t)} denotes the Kaplan Meier estimator for the event Times and \code{G(t)}
+denotes the Kaplan Meier estimator for the censoring times.
 }
 \examples{
 condition <- merge(

@@ -4,10 +4,13 @@
 \alias{analyse_piecewise_exponential}
 \title{Create Analyse function for piecewise exponential model}
 \usage{
-analyse_piecewise_exponential(cuts)
+analyse_piecewise_exponential(cuts, testing_only = FALSE)
 }
 \arguments{
 \item{cuts}{interval boundaries for the piecewise exponential model}
+
+\item{testing_only=FALSE}{if set to true omits all statistics in the
+intervals and just returns the p value of the global test.}
 }
 \value{
 an analyse function that can be used in runSimulation

@@ -27,6 +27,7 @@ cen_rate_from_cen_prop_crossing_hazards(design)
 true_summary_statistics_crossing_hazards(
   Design,
   cutoff_stats = NA_real_,
+  milestones = NULL,
   fixed_objects = NULL
 )
 }
@@ -50,6 +51,8 @@ true_summary_statistics_crossing_hazards(
 \item{target_alpha=0.05}{target alpha level for the power calculation}
 
 \item{cutoff_stats=NA_real_}{cutoff time, see details}
+
+\item{milestones=NULL}{(optionally named) vector of times at which milestone survival should be calculated}
 
 \item{fixed_objects=NULL}{additional settings, see details}
 }
