@@ -46,11 +46,14 @@ analyse_piecewise_exponential <- function(cuts){
     # coef_labels also included the ones with no events
     # since those are not in the model summary or confint, they are NA in the
     # output
-    lower <- confint(model)[, 1]
+
+    tmp_confint <- confint(model)
+
+    lower <- tmp_confint[, 1]
     lower <- lower[coef_labels]
     names(lower) <- coef_labels
 
-    upper <- confint(model)[, 2]
+    upper <- tmp_confint[, 2]
     upper <- upper[coef_labels]
     names(upper) <- coef_labels
 
