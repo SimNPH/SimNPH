@@ -21,7 +21,16 @@ test_that("analyse_piecewise_exponential outputs plausible data.frame for delaye
   my_analyse2 <- analyse_piecewise_exponential(cuts=c(2,9,11))
   res2 <- my_analyse2(condition, dat2)
 
-  expect_named(res, c("hr_s", "p_s", "hr_s_lower", "hr_s_upper", "N_pat", "N_evt", "interval_table"), ignore.order = TRUE)
+  my_analyse3 <- analyse_piecewise_exponential(cuts=c(2, 9, 11), testing_only = TRUE)
+  res3 <- my_analyse3(condition, dat2)
+
+  my_analyse4 <- analyse_piecewise_exponential(cuts=c(30), testing_only = TRUE)
+  res4 <- my_analyse4(condition, dat2)
+
+  my_analyse5 <- analyse_piecewise_exponential(cuts=c(30))
+  res5 <- my_analyse5(condition, dat2)
+
+  expect_named(res, c("p", "hr_s", "p_s", "hr_s_lower", "hr_s_upper", "N_pat", "N_evt", "interval_table"), ignore.order = TRUE)
   expect(all( (res$p_s >= 0) %in% c(TRUE, NA)), "all p values >= 0 or NA")
   expect(all( (res$p_s <= 1) %in% c(TRUE, NA)), "all p values <= 1 or NA")
 
@@ -36,4 +45,6 @@ test_that("analyse_piecewise_exponential outputs plausible data.frame for delaye
   ),
     "expect values for intervals without events to be NA"
   )
+
+  expect_named(res3, "p")
 })
