@@ -125,6 +125,7 @@ invisible(
 #'
 #' @param Design Design data.frame for subgroup
 #' @param cutoff_stats=NA_real_ cutoff time, see details
+#' @param milestones=NULL (optionally named) vector of times at which milestone survival should be calculated
 #' @param fixed_objects=NULL additional settings, see details
 #'
 #' @return For true_summary_statistics_subgroup: the design data.frame
@@ -160,9 +161,9 @@ invisible(
 #'   )
 #' my_design <- true_summary_statistics_subgroup(my_design)
 #' my_design
-true_summary_statistics_subgroup <- function(Design, cutoff_stats=NA_real_, fixed_objects=NULL){
+true_summary_statistics_subgroup <- function(Design, cutoff_stats=NA_real_, milestones=NULL, fixed_objects=NULL){
 
-  true_summary_statistics_subgroup_rowwise <- function(condition, cutoff_stats){
+  true_summary_statistics_subgroup_rowwise <- function(condition, cutoff_stats, milestones){
 
     if(is.null(fixed_objects) || (!hasName(fixed_objects, "t_max"))){
       # set t_max to 1-1/10000 quantile of control or treatment survival function
@@ -187,31 +188,56 @@ true_summary_statistics_subgroup <- function(Design, cutoff_stats=NA_real_, fixe
       stop(gettext("Subgroup prevalence has to be between 0 and 1"))
     }
 
-    data_generating_model_trt <- alternative_pop_pchaz(
-      Tint = c(0, t_max),
-      lambdaMat1 = matrix(c(
-        condition$hazard_trt,
-        condition$hazard_subgroup
-      ), ncol=1),
-      lambdaMat2 = matrix(c(0, 0), ncol=1),
-      lambdaProgMat = matrix(c(0, 0), ncol=1),
-      p=c(1-condition$prevalence, condition$prevalence)
+    haz_trt   <-   mixture_haz_fun(
+      c(1-condition$prevalence, condition$prevalence),
+      pdfs = list(
+        fast_pdf_fun(0, condition$hazard_trt),
+        fast_pdf_fun(0, condition$hazard_subgroup)
+      ),
+      survs = list(
+        fast_surv_fun(0, condition$hazard_trt),
+        fast_surv_fun(0, condition$hazard_subgroup)
+      )
     )
 
-    data_generating_model_ctrl <-  nph::pchaz(
-      c(0, t_max),
-      c(condition$hazard_ctrl)
+    pdf_trt   <-   mixture_pdf_fun(
+      c(1-condition$prevalence, condition$prevalence),
+      list(
+        fast_pdf_fun(0, condition$hazard_trt),
+        fast_pdf_fun(0, condition$hazard_subgroup)
+      )
+    )
+
+    surv_trt  <-  mixture_surv_fun(
+      c(1-condition$prevalence, condition$prevalence),
+      list(
+        fast_surv_fun(0, condition$hazard_trt),
+        fast_surv_fun(0, condition$hazard_subgroup)
+      )
+    )
+
+    quant_trt <- mixture_quant_fun(
+      c(1-condition$prevalence, condition$prevalence),
+      list(
+        fast_cdf_fun(0, condition$hazard_trt),
+        fast_cdf_fun(0, condition$hazard_subgroup)
+      )
+    )
+
+    haz_ctrl   <-   fast_haz_fun(0, condition$hazard_ctrl)
+    pdf_ctrl   <-   fast_pdf_fun(0, condition$hazard_ctrl)
+    surv_ctrl  <-  fast_surv_fun(0, condition$hazard_ctrl)
+    quant_ctrl <- fast_quant_fun(0, condition$hazard_ctrl)
+
+    real_stats <- fast_real_statistics(
+      haz_trt,  pdf_trt,  surv_trt, quant_trt,
+      haz_ctrl, pdf_ctrl, surv_ctrl, quant_ctrl,
+      N_trt=condition$n_trt, N_ctrl=condition$n_ctrl, cutoff=cutoff_stats, milestones=NULL
     )
 
     res <- cbind(
       condition,
-      internal_real_statistics_pchaz(
-        data_generating_model_trt,
-        data_generating_model_ctrl,
-        N_trt=condition$n_trt,
-        N_ctrl=condition$n_ctrl,
-        cutoff = cutoff_stats
-      ),
+      real_stats,
       cutoff_used=cutoff_stats
     )
 
@@ -221,7 +247,7 @@ true_summary_statistics_subgroup <- function(Design, cutoff_stats=NA_real_, fixe
 
   Design <- Design |>
     split(1:nrow(Design)) |>
-    mapply(FUN=true_summary_statistics_subgroup_rowwise, cutoff_stats = cutoff_stats, SIMPLIFY = FALSE)
+    mapply(FUN=true_summary_statistics_subgroup_rowwise, cutoff_stats = cutoff_stats, MoreArgs = list(milestones=milestones), SIMPLIFY = FALSE)
 
   Design <- do.call(rbind, Design)
 

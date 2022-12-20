@@ -21,6 +21,7 @@ assumptions_subgroup()
 true_summary_statistics_subgroup(
   Design,
   cutoff_stats = NA_real_,
+  milestones = NULL,
   fixed_objects = NULL
 )
 }
@@ -34,6 +35,8 @@ true_summary_statistics_subgroup(
 \item{what="os"}{True summary statistics for which estimand}
 
 \item{cutoff_stats=NA_real_}{cutoff time, see details}
+
+\item{milestones=NULL}{(optionally named) vector of times at which milestone survival should be calculated}
 
 \item{fixed_objects=NULL}{additional settings, see details}
 }
