@@ -1,7 +1,7 @@
 Package: SimNPH
 Type: Package
 Title: Helper Functions to Simulate non Proprotional Hazards
-Version: 0.1.0
+Version: 0.1.1
 Author: Tobias Fellinger
 Maintainer: Tobias Fellinger <tobias.fellinger@ages.at>
 Description: This package provides helper functions to simulate and analyse time to event datasets with non-proportional hazards. It includes functions to generate datasets in common scenarios with non proportional hazards and functions that implement common tests and models for analysis. All functions can readily be used in the framework of the SimDesign package.

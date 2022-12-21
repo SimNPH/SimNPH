@@ -52,7 +52,7 @@ test_that("test that generate_subgroup outputs correct tibble", {
   expect_true(
     all(hasName(
       one_simulation,
-      c("t", "trt", "evt")
+      c("t", "trt", "evt", "subgroup")
     )),
     label = "simulated dataset has the right columns"
   )
@@ -87,19 +87,6 @@ test_that("generate_subgroup fails on proportion not between 0 and 1", {
     generate_subgroup(scenario)
   )
 })
-
-
-test_that("generate_subgroup uses t_max, if given in fixed_objects", {
-  capture_output(
-    scenario <- merge(assumptions_subgroup(), design_fixed_followup(), by=NULL)[1, ]
-  )
-
-  one_simulation <- generate_subgroup(scenario, fixed_objects = list(t_max=10))
-
-  expect(all(one_simulation$t <= 10), "all times lte t_max")
-})
-
-
 
 
 test_that("test that true_summary_statistics_subgroup works", {
