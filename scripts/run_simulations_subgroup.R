@@ -1,12 +1,19 @@
-
 package_url <- "https://github.com/SimNPH/SimNPH/archive/refs/tags/sims_subgroup.zip"
 download.file(package_url, destfile = "sims_subgroup.zip")
-dir.create("sims_subgroup.zip")
-unzip("sims_subgroup.zip.zip", exdir = "sims_subgroup.zip")
-setwd("sims_subgroup.zip/SimNPH-sims_subgroup.zip/")
-devtools::install(".", upgrade="never", build=TRUE, quick=TRUE, dependencies=TRUE)
+dir.create("sims_subgroup")
+unzip("sims_subgroup.zip", exdir = "sims_subgroup")
+setwd("sims_subgroup/SimNPH-sims_subgroup/")
 
-library(SimNPH)
+# installing package to local library to not interfere with other versions
+# running in the same filesystem
+dir.create("local_lib")
+withr::with_libpaths(
+  "local_lib",
+  devtools::install(".", upgrade="never", build=TRUE, quick=TRUE, dependencies=TRUE),
+  action="prefix"
+  )
+
+withr::with_libpaths("local_lib", library("SimNPH"))
 library(SimDesign)
 library(parallel)
 
@@ -28,7 +35,7 @@ cl <- makeCluster(n_cores)
 
 clusterEvalQ(cl, {
   library(SimDesign)
-  library(SimNPH)
+  withr::with_libpaths("local_lib", library("SimNPH"))
   library(parallel)
 })
 
