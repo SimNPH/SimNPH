@@ -25,7 +25,7 @@ assumptions <- expand.grid(
   hazard_ctrl = nph::m2r(c(36, 12, 6)),
   censoring_prop = c(0, 0.1, 0.3),
   crossing = m2d(seq(0,9, by=2)),
-  effect_size_ph = c(0.5, 0.8, 0.9),
+  effect_size_ph = c(0, 0.5, 0.8, 0.9),
   hr_before = c(1.5, 3)
 ) |>
   within({
