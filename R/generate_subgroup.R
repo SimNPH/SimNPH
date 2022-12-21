@@ -1,5 +1,3 @@
-# TODO: refactor/reparametrize to subgroup, prevalence and hr in subgroup and total pop
-
 #' Generate Dataset with different treatment effect in subgroup
 #'
 #' @param condition condition row of Design dataset
@@ -33,57 +31,35 @@
 #'   generate_subgroup()
 #' head(one_simulation)
 #' tail(one_simulation)
-
-# TODO: refactor such that subgroup indicator is also output (different generation and true summary statistics functions, like in generate progression)
-# TODO: when refactoring change rSurv_fun to fast_rng_fun
 generate_subgroup <- function(condition, fixed_objects=NULL){
-  # if t_max is not given in fixed_objects
-  if(is.null(fixed_objects) || (!hasName(fixed_objects, "t_max"))){
-    # set t_max to 1-1/10000 quantile of control or treatment survival function
-    # whichever is later
-    t_max <- max(
-      log(10000) / condition$hazard_ctrl,
-      log(10000) / condition$hazard_trt
-    )
-  } else {
-    t_max <- fixed_objects$t_max
-  }
-
   if (condition$prevalence < 0 || condition$prevalence > 1) {
     stop(gettext("Subgroup prevalence has to be between 0 and 1"))
   }
 
-  data_trt <- data.frame(
-    t = nph::rSurv_fun(
-      condition$n_trt,
-      nph::pop_pchaz(
-        Tint = c(0, t_max),
-        lambdaMat1 = matrix(c(
-          condition$hazard_trt,
-          condition$hazard_subgroup
-        ), ncol=1),
-        lambdaMat2 = matrix(c(0, 0), ncol=1),
-        lambdaProgMat = matrix(c(0, 0), ncol=1),
-        p=c(1-condition$prevalence, condition$prevalence)
-      )
-    ),
+  counts <- rmultinom(1, condition$n_trt, prob=c(condition$prevalence, 1-condition$prevalence))
+
+  data_subgroup <- data.frame(
+    t = fast_rng_fun(0, condition$hazard_subgroup)(counts[1]),
     trt = 1,
-    evt = TRUE
+    evt = TRUE,
+    subgroup = 1
+  )
+
+  data_trt <- data.frame(
+    t = fast_rng_fun(0, condition$hazard_subgroup)(counts[2]),
+    trt = 1,
+    evt = TRUE,
+    subgroup = 0
   )
 
   data_ctrl <- data.frame(
-    t = nph::rSurv_fun(
-      condition$n_ctrl,
-      nph::pchaz(
-        c(0, t_max),
-        c(condition$hazard_ctrl)
-      )
-    ),
+    t = fast_rng_fun(0, condition$hazard_ctrl)(condition$n_ctrl),
     trt = 0,
-    evt = TRUE
+    evt = TRUE,
+    subgroup = rbinom(condition$n_ctrl, 1, condition$prevalence)
   )
 
-  rbind(data_trt, data_ctrl)
+  rbind(data_trt, data_subgroup, data_ctrl)
 }
 
 #' Create an empty assumtions data.frame for generate_subgroup
@@ -125,6 +101,7 @@ invisible(
 #'
 #' @param Design Design data.frame for subgroup
 #' @param cutoff_stats=NA_real_ cutoff time, see details
+#' @param milestones=NULL (optionally named) vector of times at which milestone survival should be calculated
 #' @param fixed_objects=NULL additional settings, see details
 #'
 #' @return For true_summary_statistics_subgroup: the design data.frame
@@ -160,9 +137,9 @@ invisible(
 #'   )
 #' my_design <- true_summary_statistics_subgroup(my_design)
 #' my_design
-true_summary_statistics_subgroup <- function(Design, cutoff_stats=NA_real_, fixed_objects=NULL){
+true_summary_statistics_subgroup <- function(Design, cutoff_stats=NA_real_, milestones=NULL, fixed_objects=NULL){
 
-  true_summary_statistics_subgroup_rowwise <- function(condition, cutoff_stats){
+  true_summary_statistics_subgroup_rowwise <- function(condition, cutoff_stats, milestones){
 
     if(is.null(fixed_objects) || (!hasName(fixed_objects, "t_max"))){
       # set t_max to 1-1/10000 quantile of control or treatment survival function
@@ -187,31 +164,56 @@ true_summary_statistics_subgroup <- function(Design, cutoff_stats=NA_real_, fixe
       stop(gettext("Subgroup prevalence has to be between 0 and 1"))
     }
 
-    data_generating_model_trt <- alternative_pop_pchaz(
-      Tint = c(0, t_max),
-      lambdaMat1 = matrix(c(
-        condition$hazard_trt,
-        condition$hazard_subgroup
-      ), ncol=1),
-      lambdaMat2 = matrix(c(0, 0), ncol=1),
-      lambdaProgMat = matrix(c(0, 0), ncol=1),
-      p=c(1-condition$prevalence, condition$prevalence)
+    haz_trt   <-   mixture_haz_fun(
+      c(1-condition$prevalence, condition$prevalence),
+      pdfs = list(
+        fast_pdf_fun(0, condition$hazard_trt),
+        fast_pdf_fun(0, condition$hazard_subgroup)
+      ),
+      survs = list(
+        fast_surv_fun(0, condition$hazard_trt),
+        fast_surv_fun(0, condition$hazard_subgroup)
+      )
     )
 
-    data_generating_model_ctrl <-  nph::pchaz(
-      c(0, t_max),
-      c(condition$hazard_ctrl)
+    pdf_trt   <-   mixture_pdf_fun(
+      c(1-condition$prevalence, condition$prevalence),
+      list(
+        fast_pdf_fun(0, condition$hazard_trt),
+        fast_pdf_fun(0, condition$hazard_subgroup)
+      )
+    )
+
+    surv_trt  <-  mixture_surv_fun(
+      c(1-condition$prevalence, condition$prevalence),
+      list(
+        fast_surv_fun(0, condition$hazard_trt),
+        fast_surv_fun(0, condition$hazard_subgroup)
+      )
+    )
+
+    quant_trt <- mixture_quant_fun(
+      c(1-condition$prevalence, condition$prevalence),
+      list(
+        fast_cdf_fun(0, condition$hazard_trt),
+        fast_cdf_fun(0, condition$hazard_subgroup)
+      )
+    )
+
+    haz_ctrl   <-   fast_haz_fun(0, condition$hazard_ctrl)
+    pdf_ctrl   <-   fast_pdf_fun(0, condition$hazard_ctrl)
+    surv_ctrl  <-  fast_surv_fun(0, condition$hazard_ctrl)
+    quant_ctrl <- fast_quant_fun(0, condition$hazard_ctrl)
+
+    real_stats <- fast_real_statistics(
+      haz_trt,  pdf_trt,  surv_trt, quant_trt,
+      haz_ctrl, pdf_ctrl, surv_ctrl, quant_ctrl,
+      N_trt=condition$n_trt, N_ctrl=condition$n_ctrl, cutoff=cutoff_stats, milestones=NULL
     )
 
     res <- cbind(
       condition,
-      internal_real_statistics_pchaz(
-        data_generating_model_trt,
-        data_generating_model_ctrl,
-        N_trt=condition$n_trt,
-        N_ctrl=condition$n_ctrl,
-        cutoff = cutoff_stats
-      ),
+      real_stats,
       cutoff_used=cutoff_stats
     )
 
@@ -221,9 +223,187 @@ true_summary_statistics_subgroup <- function(Design, cutoff_stats=NA_real_, fixe
 
   Design <- Design |>
     split(1:nrow(Design)) |>
-    mapply(FUN=true_summary_statistics_subgroup_rowwise, cutoff_stats = cutoff_stats, SIMPLIFY = FALSE)
+    mapply(FUN=true_summary_statistics_subgroup_rowwise, cutoff_stats = cutoff_stats, MoreArgs = list(milestones=milestones), SIMPLIFY = FALSE)
 
   Design <- do.call(rbind, Design)
 
   Design
+}
+
+
+#' Calculate hazards in treatment arm in subgroup and compliment
+#'
+#' @param design design data.frame
+#' @param target_power_ph target power under proportional hazards
+#' @param followup=NA_real_ time until which the gAHR should be calculated, defaults to `condition$followup`
+#' @param target_alpha=0.05 target alpha level for the power calculation
+#'
+#' @return For hazard_subgroup_from_PH_effect_size: the design data.frame passed as
+#'   argument with the additional columns hazard_trt and hazard_subgroup.
+#' @export
+#'
+#' @describeIn generate_subgroup Calculate hazards in treatement arm
+#'
+#' @details `hazard_subgroup_from_PH_effect_size` calculates the hazard rate in
+#'   the subgroup and the compliment of the subgroup in the treatment arm as
+#'   follows: First, the hazard ratio needed to archive the desired power under
+#'   proportional hazards is calculated by inverting Schönfeld's sample size
+#'   formula. Second the median survival times for both arms under this hazard
+#'   ratio and proportional hazards are calculated. Finally the hazard rate of
+#'   the treatment arm in the subgroup and its complement are set such that the
+#'   median survival time is the same as the one calculated under proportional
+#'   hazards.
+#'
+#'   This is a heuristic and to some extent arbitrary approach to calculate
+#'   hazard ratios that correspond to reasonable and realistic scenarios.
+#'
+#' @examples
+#' my_design <- merge(
+#'     assumptions_subgroup(),
+#'     design_fixed_followup(),
+#'     by=NULL
+#'   )
+#' my_design$hazard_trt <- NA
+#' my_design$hazard_subgroup <- NA
+#' my_design$hr_subgroup_relative <- 0.9
+#' my_design <- hazard_subgroup_from_PH_effect_size(my_design, target_power_ph=0.9)
+#' my_design
+hazard_subgroup_from_PH_effect_size <- function(design, target_power_ph=NA_real_, followup=NA_real_, target_alpha=0.05){
+  # hazard ratio required, inverted Schönfeld sample size formula
+  hr_required_schoenfeld <- function(Nevt, alpha=0.05, beta=0.2, p=0.5){
+    exp( (qnorm(beta) + qnorm(alpha)) / sqrt(p*(1-p)*Nevt) )
+  }
+
+  get_hr_after <- function(condition, target_power_ph=NA_real_, followup=followup){
+    t_max <- log(100) / condition$hazard_ctrl
+
+    if(is.na(followup)){
+      if(hasName(condition, "followup")){
+        followup <- condition$followup
+      } else {
+        stop(gettext("followup not given and followup not present in design"))
+      }
+    }
+
+    if(is.na(target_power_ph)){
+      if(hasName(condition, "effect_size_ph")){
+        target_power_ph <- condition$effect_size_ph
+      } else {
+        stop(gettext("target_ph_power not given and effect_size_ph not present in design"))
+      }
+    }
+
+    if(target_power_ph == 0){
+      condition$hazard_trt <- condition$hazard_ctrl
+    }
+
+    F_ctrl_followup <- fast_cdf_fun(0, condition$hazard_ctrl)(followup) # enter paramters for control arm
+    Nevt <- F_ctrl_followup * (condition$n_ctrl + condition$n_trt)
+    ph_hr <- hr_required_schoenfeld(Nevt, alpha=target_alpha, beta=(1-target_power_ph), p=(condition$n_ctrl/(condition$n_ctrl + condition$n_trt)))
+
+    median_trt  <- fast_quant_fun(0, condition$hazard_ctrl * ph_hr)(0.5)
+    median_ctrl <- fast_quant_fun(0, condition$hazard_ctrl        )(0.5)
+
+    if(target_power_ph == 0){
+      median_trt <- median_ctrl
+    }
+
+    target_fun_hazards_subgroups <- function(hazard_compliment){
+      sapply(hazard_compliment, \(h){
+        my_quant_fun <- mixture_quant_fun(
+          c(condition$prevalence, 1-condition$prevalence),
+          cdfs = list(
+            fast_cdf_fun(0, h*condition$hr_subgroup_relative),
+            fast_cdf_fun(0, h)
+          ))
+        median_trt - my_quant_fun(0.5)
+      })
+    }
+
+    condition$hazard_trt <- uniroot(target_fun_hazards_subgroups, interval=c(1e-8, condition$hazard_ctrl*100))$root
+    condition$hazard_subgroup <- condition$hazard_trt * condition$hr_subgroup_relative
+    condition
+  }
+
+  result <- design |>
+    split(1:nrow(design)) |>
+    lapply(get_hr_after, target_power_ph=target_power_ph, followup=followup) |>
+    do.call(what=rbind)
+
+  result
+}
+
+#' @describeIn generate_subgroup calculate censoring rate from censoring proportion
+#'
+#' @return for cen_rate_from_cen_prop_subgroup: design data.frame with the
+#'   additional column random_withdrawal
+#' @export
+#'
+#' @details cen_rate_from_cen_prop_subgroup takes the proportion of
+#'   censored patients from the column `censoring_prop`. This column describes
+#'   the proportion of patients who are censored randomly before experiencing an
+#'   event, without regard to administrative censoring.
+#'
+#' @examples
+#' design <- expand.grid(
+#'   hazard_ctrl=0.2,                   # hazard under control and before treatment effect
+#'   hazard_trt=0.02,                   # hazard after onset of treatment effect
+#'   hazard_subgroup=0.01,              # hazard in the subgroup in treatment
+#'   prevalence = c(0.2, 0.5),           # subgroup prevalence
+#'   censoring_prop=c(0.1, 0.25, 0.01), # 10%, 25%, 1% random censoring
+#'   followup=100,                      # followup of 100 days
+#'   n_trt=50,                          # 50 patients treatment
+#'   n_ctrl=50                          # 50 patients control
+#' )
+#' cen_rate_from_cen_prop_subgroup(design)
+cen_rate_from_cen_prop_subgroup <- function(design){
+
+  rowwise_fun <- function(condition){
+    if(is.na(condition$hazard_trt)){
+      return(NA_real_)
+    }
+
+    if(condition$censoring_prop == 0){
+      condition$random_withdrawal <- 0.
+      return(condition)
+    }
+
+    t_max <- condition$followup * 10
+
+    a <- condition$n_trt / (condition$n_trt + condition$n_ctrl)
+    b <- 1-a
+
+    cumhaz_trt <- mixture_cumhaz_fun(
+      c(condition$prevalence, 1-condition$prevalence),
+      survs = list(
+        fast_surv_fun(0, condition$hazard_subgroup),
+        fast_surv_fun(0, condition$hazard_trt)
+      )
+    )
+
+    cumhaz_ctrl <- fast_cumhaz_fun(
+      c(                    0),
+      c(condition$hazard_ctrl)
+    )
+
+    target_fun <- Vectorize(\(r){
+      cumhaz_censoring <- fast_cumhaz_fun(0, r)
+      prob_cen_ctrl <- cumhaz_censoring(t_max)/(cumhaz_censoring(t_max) + cumhaz_ctrl(t_max))
+      prob_cen_trt  <- cumhaz_censoring(t_max)/(cumhaz_censoring(t_max) + cumhaz_trt(t_max))
+      prob_cen <- a*prob_cen_trt + b*prob_cen_ctrl
+      prob_cen-condition$censoring_prop
+    })
+
+    condition$random_withdrawal <- uniroot(target_fun, interval=c(0, 1e-6), extendInt = "upX", tol=.Machine$double.eps)$root
+
+    condition
+  }
+
+  result <- design |>
+    split(1:nrow(design)) |>
+    lapply(rowwise_fun) |>
+    do.call(what=rbind)
+
+  result
+
 }

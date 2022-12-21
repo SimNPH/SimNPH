@@ -5,6 +5,8 @@
 \alias{generate_subgroup}
 \alias{assumptions_subgroup}
 \alias{true_summary_statistics_subgroup}
+\alias{hazard_subgroup_from_PH_effect_size}
+\alias{cen_rate_from_cen_prop_subgroup}
 \title{Calculate true summary statistics for scenarios with differential treatment effect in subgroup}
 \usage{
 true_summary_statistics_progression(
@@ -21,8 +23,18 @@ assumptions_subgroup()
 true_summary_statistics_subgroup(
   Design,
   cutoff_stats = NA_real_,
+  milestones = NULL,
   fixed_objects = NULL
 )
+
+hazard_subgroup_from_PH_effect_size(
+  design,
+  target_power_ph = NA_real_,
+  followup = NA_real_,
+  target_alpha = 0.05
+)
+
+cen_rate_from_cen_prop_subgroup(design)
 }
 \arguments{
 \item{Design}{Design data.frame for subgroup}
@@ -31,11 +43,21 @@ true_summary_statistics_subgroup(
 
 \item{condition}{condition row of Design dataset}
 
+\item{design}{design data.frame}
+
+\item{target_power_ph}{target power under proportional hazards}
+
 \item{what="os"}{True summary statistics for which estimand}
 
 \item{cutoff_stats=NA_real_}{cutoff time, see details}
 
+\item{milestones=NULL}{(optionally named) vector of times at which milestone survival should be calculated}
+
 \item{fixed_objects=NULL}{additional settings, see details}
+
+\item{followup=NA_real_}{time until which the gAHR should be calculated, defaults to \code{condition$followup}}
+
+\item{target_alpha=0.05}{target alpha level for the power calculation}
 }
 \value{
 For true_summary_statistics_subgroup: the design data.frame
@@ -64,6 +86,12 @@ passed as argument with the additional columns:
 \item \code{gAHR} geometric average hazard ratio
 \item \code{AHR} average hazard ratio
 }
+
+For hazard_subgroup_from_PH_effect_size: the design data.frame passed as
+argument with the additional columns hazard_trt and hazard_subgroup.
+
+for cen_rate_from_cen_prop_subgroup: design data.frame with the
+additional column random_withdrawal
 }
 \description{
 Calculate true summary statistics for scenarios with differential treatment effect in subgroup
@@ -73,6 +101,8 @@ Generate Dataset with different treatment effect in subgroup
 Create an empty assumtions data.frame for generate_subgroup
 
 Calculate true summary statistics for scenarios with differential treatment effect in subgroup
+
+Calculate hazards in treatment arm in subgroup and compliment
 }
 \details{
 \code{what} can be \code{"os"} for overall survival and \code{"pfs"} for progression free
@@ -112,6 +142,24 @@ the \code{1-(1/10000)} quantile of all survival distributions in the model.
 hazard ratios and RMST, that are only calculated up to a certain point. It
 defaults to \code{NA_real_} in which case the variable \code{followup} from the Design
 dataset is used. If \code{followup} is also not set it uses \code{t_max}.
+
+\code{hazard_subgroup_from_PH_effect_size} calculates the hazard rate in
+the subgroup and the compliment of the subgroup in the treatment arm as
+follows: First, the hazard ratio needed to archive the desired power under
+proportional hazards is calculated by inverting Schönfeld's sample size
+formula. Second the median survival times for both arms under this hazard
+ratio and proportional hazards are calculated. Finally the hazard rate of
+the treatment arm in the subgroup and its complement are set such that the
+median survival time is the same as the one calculated under proportional
+hazards.
+
+This is a heuristic and to some extent arbitrary approach to calculate
+hazard ratios that correspond to reasonable and realistic scenarios.
+
+cen_rate_from_cen_prop_subgroup takes the proportion of
+censored patients from the column \code{censoring_prop}. This column describes
+the proportion of patients who are censored randomly before experiencing an
+event, without regard to administrative censoring.
 }
 \section{Functions}{
 \itemize{
@@ -123,6 +171,10 @@ patients
 \item \code{assumptions_subgroup}: generate default assumptions tibble
 
 \item \code{true_summary_statistics_subgroup}: calculate true summary statistics for subgroup
+
+\item \code{hazard_subgroup_from_PH_effect_size}: Calculate hazards in treatement arm
+
+\item \code{cen_rate_from_cen_prop_subgroup}: calculate censoring rate from censoring proportion
 }}
 
 \examples{
@@ -154,4 +206,25 @@ my_design <- merge(
   )
 my_design <- true_summary_statistics_subgroup(my_design)
 my_design
+my_design <- merge(
+    assumptions_subgroup(),
+    design_fixed_followup(),
+    by=NULL
+  )
+my_design$hazard_trt <- NA
+my_design$hazard_subgroup <- NA
+my_design$hr_subgroup_relative <- 0.9
+my_design <- hazard_subgroup_from_PH_effect_size(my_design, target_power_ph=0.9)
+my_design
+design <- expand.grid(
+  hazard_ctrl=0.2,                   # hazard under control and before treatment effect
+  hazard_trt=0.02,                   # hazard after onset of treatment effect
+  hazard_subgroup=0.01,              # hazard in the subgroup in treatment
+  prevalence = c(0.2, 0.5),           # subgroup prevalence
+  censoring_prop=c(0.1, 0.25, 0.01), # 10\%, 25\%, 1\% random censoring
+  followup=100,                      # followup of 100 days
+  n_trt=50,                          # 50 patients treatment
+  n_ctrl=50                          # 50 patients control
+)
+cen_rate_from_cen_prop_subgroup(design)
 }

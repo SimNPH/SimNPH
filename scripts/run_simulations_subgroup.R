@@ -1,16 +1,16 @@
 
-package_url <- "https://github.com/SimNPH/SimNPH/archive/refs/tags/sims_delayed_crossing.zip"
-download.file(package_url, destfile = "sims_delayed_crossing.zip")
-dir.create("sims_delayed_crossing")
-unzip("sims_delayed_crossing.zip", exdir = "sims_delayed_crossing")
-setwd("sims_delayed_crossing/SimNPH-sims_delayed_crossing/")
+package_url <- "https://github.com/SimNPH/SimNPH/archive/refs/tags/sims_subgroup.zip"
+download.file(package_url, destfile = "sims_subgroup.zip")
+dir.create("sims_subgroup.zip")
+unzip("sims_subgroup.zip.zip", exdir = "sims_subgroup.zip")
+setwd("sims_subgroup.zip/SimNPH-sims_subgroup.zip/")
 devtools::install(".", upgrade="never", build=TRUE, quick=TRUE, dependencies=TRUE)
 
 library(SimNPH)
 library(SimDesign)
 library(parallel)
 
-if(packageVersion("SimNPH") != "0.1.0"){
+if(packageVersion("SimNPH") != "0.1.1"){
   stop("Please run the simulations with the correct vesion of the SimNPH package for reproducability.")
 }
 
@@ -36,11 +36,11 @@ clusterEvalQ(cl, {
 # setup data generation ---------------------------------------------------
 
 # load parameters
-design <- read.table("data/parameters/crossing_hazards_2022-12-21.csv", sep=",", dec=".", header=TRUE)
+design <- read.table("data/parameters/subgroup_2022-12-21.csv", sep=",", dec=".", header=TRUE)
 
 # define generator
 my_generator <- function(condition, fixed_objects=NULL){
-  generate_crossing_hazards(condition, fixed_objects) |>
+  generate_subgroup(condition, fixed_objects) |>
     recruitment_uniform(condition$recruitment) |>
     random_censoring_exp(condition$random_withdrawal) |>
     admin_censoring_events(condition$final_events)
@@ -142,7 +142,7 @@ my_summarise <- create_summarise_function(
 
 # run ---------------------------------------------------------------------
 
-save_folder <- paste0(paste0("data/simulation_crossing_hazards_", Sys.info()["nodename"], "_", strftime(Sys.time(), "%Y-%m-%d_%H%M%S")))
+save_folder <- paste0(paste0("data/simulation_subgroup_", Sys.info()["nodename"], "_", strftime(Sys.time(), "%Y-%m-%d_%H%M%S")))
 dir.create(save_folder)
 
 results <- runSimulation(
