@@ -1,16 +1,23 @@
+package_url <- "https://github.com/SimNPH/SimNPH/archive/refs/tags/sims_crossing.zip"
+download.file(package_url, destfile = "sims_crossing.zip")
+dir.create("sims_crossing")
+unzip("sims_crossing.zip", exdir = "sims_crossing")
+setwd("sims_crossing/SimNPH-sims_crossing/")
 
-package_url <- "https://github.com/SimNPH/SimNPH/archive/refs/tags/sims_delayed_crossing.zip"
-download.file(package_url, destfile = "sims_delayed_crossing.zip")
-dir.create("sims_delayed_crossing")
-unzip("sims_delayed_crossing.zip", exdir = "sims_delayed_crossing")
-setwd("sims_delayed_crossing/SimNPH-sims_delayed_crossing/")
-devtools::install(".", upgrade="never", build=TRUE, quick=TRUE, dependencies=TRUE)
+# installing package to local library to not interfere with other versions
+# running in the same filesystem
+dir.create("local_lib")
+withr::with_libpaths(
+  "local_lib",
+  devtools::install(".", build=TRUE, quick=TRUE, dependencies=TRUE),
+  action="prefix"
+)
 
-library(SimNPH)
+withr::with_libpaths("local_lib", library("SimNPH"))
 library(SimDesign)
 library(parallel)
 
-if(packageVersion("SimNPH") != "0.1.0"){
+if(packageVersion("SimNPH") != "0.1.2"){
   stop("Please run the simulations with the correct vesion of the SimNPH package for reproducability.")
 }
 
@@ -28,7 +35,7 @@ cl <- makeCluster(n_cores)
 
 clusterEvalQ(cl, {
   library(SimDesign)
-  library(SimNPH)
+  withr::with_libpaths("local_lib", library("SimNPH"))
   library(parallel)
 })
 
