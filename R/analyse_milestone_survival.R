@@ -45,7 +45,7 @@ analyse_milestone_survival <- function(times, what="quot", package="nph"){
 
   if (package == "nph" & what == "quot") {
     function(condition, dat, fixed_objects = NULL){
-      model <- nph::nphparams(dat$t, dat$evt, dat$trt, param_type="logS", param_par=times)
+      model <- trycatch_nphparams(nph::nphparams(dat$t, dat$evt, dat$trt, param_type="logS", param_par=times))
 
       list(
         p = model$tab$p_unadj,
@@ -59,7 +59,7 @@ analyse_milestone_survival <- function(times, what="quot", package="nph"){
     }
   } else if(package == "nph" & what == "diff") {
     function(condition, dat, fixed_objects = NULL){
-      model <- nph::nphparams(dat$t, dat$evt, dat$trt, param_type="S", param_par=times)
+      model <- trycatch_nphparams(nph::nphparams(dat$t, dat$evt, dat$trt, param_type="S", param_par=times))
 
       list(
         p = model$tab$p_unadj,

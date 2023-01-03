@@ -34,7 +34,7 @@
 #' analyse_rmst_diff()(condition, dat)
 analyse_rmst_diff <- function(max_time=NA){
   function(condition, dat, fixed_objects = NULL){
-    model <- nph::nphparams(dat$t, dat$evt, dat$trt, param_type="RMST", param_par=max_time)
+    model <- trycatch_nphparams(nph::nphparams(dat$t, dat$evt, dat$trt, param_type="RMST", param_par=max_time))
 
     list(
       p = model$tab$p_unadj,
