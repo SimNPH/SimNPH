@@ -79,7 +79,9 @@ analyse_piecewise_exponential <- function(cuts, testing_only=FALSE){
         summary <- summary(model)
 
         tmp_confint <- tryCatch(
-          confint(model),
+          suppressMessages(
+            confint(model)
+          ),
           error=function(e){
             matrix(NA_real_, 0, 2)
           })
@@ -108,7 +110,7 @@ analyse_piecewise_exponential <- function(cuts, testing_only=FALSE){
         summary <- summary(model)
 
         tmp_confint <- tryCatch(
-          confint(model),
+          suppressMessages(confint(model)),
           error=function(e){
             numeric(0)
           })
