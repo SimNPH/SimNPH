@@ -10,6 +10,10 @@ test_that("analyse milestone survival works", {
 
   dat <- generate_delayed_effect(condition)
 
+  # for this seed one group does not have events before t=2
+  # this lead to an error earlier
+  dat2 <- withr::with_seed(14, generate_delayed_effect(condition))
+
   expect_type(analyse_milestone_survival(), "closure")
   expect_error(analyse_milestone_survival(what="something else"))
   expect_error(analyse_milestone_survival(package="something else"))
@@ -20,6 +24,10 @@ test_that("analyse milestone survival works", {
   result2 <- analyse_milestone_survival(times=times, what="diff")(condition, dat)
   result3 <- analyse_milestone_survival(times=times, what="quot", package="survival")(condition, dat)
   result4 <- analyse_milestone_survival(times=times, what="diff", package="survival")(condition, dat)
+
+  expect_warning(result1a <- analyse_milestone_survival(times=times)(condition, dat2))
+  expect(length(result1a$p)==1, "p-value should be of length 1 if it cannot be computed i.e. NA_real_ not NULL")
+
 
   expect_type(result1, "list")
   expect_s3_class(result1, NA)

@@ -42,7 +42,7 @@ analyse_ahr <- function(max_time=NA, type="AHR"){
     type,
     AHR = {
       function(condition, dat, fixed_objects = NULL){
-        model <- nph::nphparams(dat$t, dat$evt, dat$trt, param_type="avgHR", param_par=max_time)
+        model <- trycatch_nphparams(nph::nphparams(dat$t, dat$evt, dat$trt, param_type="avgHR", param_par=max_time))
 
         list(
           p = model$tab$p_unadj,
@@ -56,7 +56,7 @@ analyse_ahr <- function(max_time=NA, type="AHR"){
     },
     gAHR = {
       function(condition, dat, fixed_objects = NULL){
-        model <- nph::nphparams(dat$t, dat$evt, dat$trt, param_type="HR", param_par=max_time)
+        model <- trycatch_nphparams(nph::nphparams(dat$t, dat$evt, dat$trt, param_type="HR", param_par=max_time))
 
         list(
           p = model$tab$p_unadj,

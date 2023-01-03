@@ -35,7 +35,7 @@
 #' analyse_diff_mean_survival()(condition, dat)
 analyse_diff_mean_survival <- function(quant=0.5){
   function(condition, dat, fixed_objects = NULL){
-    model <- nph::nphparams(dat$t, dat$evt, dat$trt, param_type="Q", param_par=quant)
+    model <- trycatch_nphparams(nph::nphparams(dat$t, dat$evt, dat$trt, param_type="Q", param_par=quant))
 
     list(
       p = model$tab$p_unadj,
