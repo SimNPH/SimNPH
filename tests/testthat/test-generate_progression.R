@@ -1,3 +1,77 @@
-test_that("multiplication works", {
-  expect_equal(2 * 2, 4)
+test_that("assumptions_progression outputs correct tibble", {
+  capture_output(
+    expect_invisible(
+      assumptions_progression(),
+      label = "assumptions_progression returns invisibly"
+    )
+  )
+
+  expect_output(
+    assumptions_progression(),
+    regexp = "^expand\\.grid.*",
+    label = "assumptions_progression prints something with expand.grid"
+  )
+
+  capture_output(
+    test_design <- assumptions_progression()
+  )
+
+  expect_true(
+    all(hasName(
+      test_design,
+      c("hazard_ctrl", "hazard_trt", "hazard_after_prog", "prog_rate_ctrl", "prog_rate_trt", "random_withdrawal")
+    )),
+    label = "output of assumptions_delayed_effect has the right columns"
+  )
+
+  expect_true(
+    test_design[, c("hazard_ctrl", "hazard_trt", "hazard_after_prog", "prog_rate_ctrl", "prog_rate_trt", "random_withdrawal")] |>
+      sapply(is.numeric) |>
+      all(),
+    label = "columns of output of assumptions_delayed_effect have the right datatype"
+  )
+
+})
+
+
+test_that("test that generate_progression outputs correct tibble", {
+  capture_output(
+    scenario <- merge(assumptions_progression(), design_fixed_followup(), by=NULL)[2, ]
+  )
+  one_simulation <- generate_progression(scenario)
+
+  expect_equal(
+    nrow(one_simulation),
+    scenario$n_trt + scenario$n_ctrl,
+    label = "nrow equals treatment + control"
+  )
+
+  expect_true(
+    all(hasName(
+      one_simulation,
+      c("t", "trt", "evt", "t_ice", "ice")
+    )),
+    label = "simulated dataset has the right columns"
+  )
+
+  expect_equal(
+    sapply(one_simulation[, c("t", "trt", "evt", "t_ice", "ice")], class),
+    c(t="numeric", trt="integer", evt="logical", t_ice="numeric", ice="logical"),
+    label = "columns of simulated dataset have the right datatypes"
+  )
+
+})
+
+
+test_that("true summary statistics progression works", {
+  capture_output(
+    design <- merge(assumptions_progression(), design_fixed_followup(), by=NULL)
+  )
+
+  summaries_os  <- true_summary_statistics_progression(design, what="os")
+  summaries_pfs <- true_summary_statistics_progression(design, what="pfs")
+
+  expect_named(summaries_pfs, c(names(design), "rmst_trt", "median_survival_trt", "rmst_ctrl", "median_survival_ctrl", "gAHR", "AHR", "cutoff_used"))
+  expect_named(summaries_os , c(names(design), "rmst_trt", "median_survival_trt", "rmst_ctrl", "median_survival_ctrl", "gAHR", "AHR", "cutoff_used"))
+
 })
