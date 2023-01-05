@@ -169,7 +169,7 @@ generate_progression <- function(condition, fixed_objects=NULL){
 #' my_design_pfs
 true_summary_statistics_progression <- function(Design, what="os", cutoff_stats=NA_real_, fixed_objects=NULL){
 
-  true_summary_statistics_progression_rowwise_pfs <- function(condition, cutoff_stats, fixed_objects=fixed_objects){
+  true_summary_statistics_progression_rowwise_pfs <- function(condition, cutoff_stats){
 
     # if t_max is not given in fixed_objects
     if(is.null(fixed_objects) || (!hasName(fixed_objects, "t_max"))){
@@ -210,7 +210,7 @@ true_summary_statistics_progression <- function(Design, what="os", cutoff_stats=
 
     res <- cbind(
       condition,
-      internal_real_statistics_pchaz(
+      internal_real_statistics_pchaz_discrete(
         data_generating_model_trt,
         data_generating_model_ctrl,
         N_trt=condition$n_trt,
@@ -224,52 +224,62 @@ true_summary_statistics_progression <- function(Design, what="os", cutoff_stats=
     res
   }
 
-  # true_summary_statistics_progression_rowwise_os <- function(condition, cutoff_stats){
-  #
-  #   # if t_max is not given in fixed_objects
-  #   if(is.null(fixed_objects) || (!hasName(fixed_objects, "t_max"))){
-  #     # set t_max to 1-1/10000 quantile of control or treatment survival function
-  #     # whichever is later
-  #     t_max <- max(
-  #       log(10000) / condition$hazard_ctrl,
-  #       log(10000) / condition$hazard_trt
-  #     )
-  #   } else {
-  #     t_max <- fixed_objects$t_max
-  #   }
-  #
-  #   data_generating_model_ctrl <- nph::subpop_pchaz(
-  #     c(0, t_max),
-  #     lambda1 = condition$hazard_ctrl,
-  #     lambda2 = condition$hazard_after_prog,
-  #     lambdaProg = condition$prog_rate_ctrl
-  #   )
-  #
-  #   data_generating_model_trt <- nph::subpop_pchaz(
-  #     c(0, t_max),
-  #     lambda1 = condition$hazard_trt,
-  #     lambda2 = condition$hazard_after_prog,
-  #     lambdaProg = condition$prog_rate_trt
-  #   )
-  #
-  #   res <- cbind(
-  #     condition,
-  #     internal_real_statistics_pchaz(
-  #       data_generating_model_trt,
-  #       data_generating_model_ctrl,
-  #       N_trt=condition$n_trt,
-  #       N_ctrl=condition$n_ctrl,
-  #       cutoff = cutoff_stats
-  #     )
-  #   )
-  #
-  #   row.names(res) <- NULL
-  #   res
-  # }
+  true_summary_statistics_progression_rowwise_os <- function(condition, cutoff_stats){
+
+    # if t_max is not given in fixed_objects
+    if(is.null(fixed_objects) || (!hasName(fixed_objects, "t_max"))){
+      # set t_max to 1-1/10000 quantile of control or treatment survival function
+      # whichever is later
+      t_max <- max(
+        log(10000) / condition$hazard_ctrl,
+        log(10000) / condition$hazard_trt
+      )
+    } else {
+      t_max <- fixed_objects$t_max
+    }
+
+    if(is.na(cutoff_stats)){
+      if(hasName(condition, "followup")){
+        cutoff_stats <- condition$followup
+      } else {
+        cutoff_stats <- t_max
+      }
+    }
+
+    data_generating_model_ctrl <- subpop_hazVfun_simnph(
+      c(0, t_max),
+      lambda1 = condition$hazard_ctrl,
+      lambda2 = condition$hazard_after_prog,
+      lambdaProg = condition$prog_rate_ctrl,
+      timezero = TRUE
+    )
+
+    data_generating_model_trt <- subpop_hazVfun_simnph(
+      c(0, t_max),
+      lambda1 = condition$hazard_trt,
+      lambda2 = condition$hazard_after_prog,
+      lambdaProg = condition$prog_rate_trt,
+      timezero = TRUE
+    )
+
+    res <- cbind(
+      condition,
+      internal_real_statistics_pchaz_discrete(
+        data_generating_model_trt,
+        data_generating_model_ctrl,
+        N_trt=condition$n_trt,
+        N_ctrl=condition$n_ctrl,
+        cutoff = cutoff_stats
+      ),
+      cutoff_used = cutoff_stats
+    )
+
+    row.names(res) <- NULL
+    res
+  }
 
   true_summary_statistics_progression_rowwise <- switch(what,
-                                                        # "os"  = true_summary_statistics_progression_rowwise_os,
-                                                        "os" = {stop(gettext("true summary statistics for overall survival with disease progression / treatment switching is not yet implemented."))},
+                                                        "os"  = true_summary_statistics_progression_rowwise_os,
                                                         "pfs" = true_summary_statistics_progression_rowwise_pfs,
                                                         {stop(paste0(gettext("Invalid value for"), " what: ", what, " ", gettext('use "os" for overall survival or "pfs" for progression free survival.')))}
   )
@@ -285,4 +295,45 @@ true_summary_statistics_progression <- function(Design, what="os", cutoff_stats=
 
 
 
-# TODO: function to callibrate progression rate to percentage who experience progression
+progression_rate_from_progression_prop <- function(design){
+
+  rowwise_fun <- function(condition){
+    t_max <- condition$followup * 10
+
+    cumhaz_trt <- fast_cumhaz_fun(
+      c(                   0),
+      c(condition$hazard_trt)
+    )
+
+    cumhaz_ctrl <- fast_cumhaz_fun(
+      c(                    0),
+      c(condition$hazard_ctrl)
+    )
+
+    target_fun_trt <- Vectorize(\(r){
+      cumhaz_prog_trt <- fast_cumhaz_fun(0, r)
+      prob_prog_trt  <- cumhaz_prog_trt(t_max)/(cumhaz_prog_trt(t_max) + cumhaz_trt(t_max))
+      prob_prog_trt-condition$prog_proportion_trt
+    })
+
+    target_fun_ctrl <- Vectorize(\(r){
+      cumhaz_prog_ctrl <- fast_cumhaz_fun(0, r)
+      prob_prog_ctrl  <- cumhaz_prog_ctrl(t_max)/(cumhaz_prog_ctrl(t_max) + cumhaz_ctrl(t_max))
+      prob_prog_ctrl-condition$prog_proportion_ctrl
+    })
+
+    condition$prog_rate_trt  <- uniroot(target_fun_trt,  interval=c(0, 1e-6), extendInt = "upX", tol=.Machine$double.eps)$root
+    condition$prog_rate_ctrl <- uniroot(target_fun_ctrl, interval=c(0, 1e-6), extendInt = "upX", tol=.Machine$double.eps)$root
+
+    condition
+  }
+
+  result <- design |>
+    split(1:nrow(design)) |>
+    lapply(rowwise_fun) |>
+    do.call(what=rbind)
+
+  result
+}
+
+
