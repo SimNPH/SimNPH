@@ -238,21 +238,27 @@ true_summary_statistics_progression <- function(Design, what="os", cutoff_stats=
       t_max <- fixed_objects$t_max
     }
 
-    data_generating_model_ctrl <- nph::subpop_pchaz(
+    if(is.na(cutoff_stats)){
+      if(hasName(condition, "followup")){
+        cutoff_stats <- condition$followup
+      } else {
+        cutoff_stats <- t_max
+      }
+    }
+
+    data_generating_model_ctrl <- subpop_hazVfun_simnph(
       c(0, t_max),
       lambda1 = condition$hazard_ctrl,
       lambda2 = condition$hazard_after_prog,
       lambdaProg = condition$prog_rate_ctrl,
-      discrete_approximation = TRUE,
       timezero = TRUE
     )
 
-    data_generating_model_trt <- nph::subpop_pchaz(
+    data_generating_model_trt <- subpop_hazVfun_simnph(
       c(0, t_max),
       lambda1 = condition$hazard_trt,
       lambda2 = condition$hazard_after_prog,
       lambdaProg = condition$prog_rate_trt,
-      discrete_approximation = TRUE,
       timezero = TRUE
     )
 
@@ -289,4 +295,45 @@ true_summary_statistics_progression <- function(Design, what="os", cutoff_stats=
 
 
 
-# TODO: function to callibrate progression rate to percentage who experience progression
+progression_rate_from_progression_prop <- function(design){
+
+  rowwise_fun <- function(condition){
+    t_max <- condition$followup * 10
+
+    cumhaz_trt <- fast_cumhaz_fun(
+      c(                   0),
+      c(condition$hazard_trt)
+    )
+
+    cumhaz_ctrl <- fast_cumhaz_fun(
+      c(                    0),
+      c(condition$hazard_ctrl)
+    )
+
+    target_fun_trt <- Vectorize(\(r){
+      cumhaz_prog_trt <- fast_cumhaz_fun(0, r)
+      prob_prog_trt  <- cumhaz_prog_trt(t_max)/(cumhaz_prog_trt(t_max) + cumhaz_trt(t_max))
+      prob_prog_trt-condition$prog_proportion_trt
+    })
+
+    target_fun_ctrl <- Vectorize(\(r){
+      cumhaz_prog_ctrl <- fast_cumhaz_fun(0, r)
+      prob_prog_ctrl  <- cumhaz_prog_ctrl(t_max)/(cumhaz_prog_ctrl(t_max) + cumhaz_ctrl(t_max))
+      prob_prog_ctrl-condition$prog_proportion_ctrl
+    })
+
+    condition$prog_rate_trt  <- uniroot(target_fun_trt,  interval=c(0, 1e-6), extendInt = "upX", tol=.Machine$double.eps)$root
+    condition$prog_rate_ctrl <- uniroot(target_fun_ctrl, interval=c(0, 1e-6), extendInt = "upX", tol=.Machine$double.eps)$root
+
+    condition
+  }
+
+  result <- design |>
+    split(1:nrow(design)) |>
+    lapply(rowwise_fun) |>
+    do.call(what=rbind)
+
+  result
+}
+
+

@@ -39,3 +39,23 @@ design <- merge(
   assumptions,
   by=NULL
 )
+
+
+# calculate progression rate from progression proportion  -----------------
+
+design <- design |>
+  within({
+    followup <- log(6) / hazard_ctrl
+  })
+
+design <- SimNPH:::progression_rate_from_progression_prop(design)
+
+
+# calculate random withdrawal ---------------------------------------------
+
+# design$random_withdrawal <- 0
+
+# calculate real statistics -----------------------------------------------
+
+design <- design |>
+  true_summary_statistics_progression()
