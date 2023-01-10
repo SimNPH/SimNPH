@@ -57,6 +57,7 @@ export(mixture_pdf_fun)
 export(mixture_surv_fun)
 export(mixture_quant_fun)
 export(mixture_rng_fun)
+export(wrap_all_in_trycatch)
 
 importFrom(Rcpp,evalCpp)
 useDynLib(SimNPH, .registration = TRUE)
