@@ -104,4 +104,14 @@ test_that("administrative censoring after fixed number of events", {
   expect_named(test_res2, c("t", "evt", "rec_time", "additional_column"))
   expect(!is.null(attr(test_res2, "followup")), "check followup attribute exists")
   expect(attr(test_res2, "followup") == 70, "check followup attribute has the correct value")
+
+  # with more events than are present in the dataset
+  test_res_3 <- admin_censoring_events(test_data, nrow(test_data)+1)
+  expect(all(test_res_3$evt), "If less events than targeted, no event should be excluded")
+
+  # with warning if there are not enough events
+  expect_warning(admin_censoring_events(test_data, nrow(test_data)+1, on_incomplete = "warn"))
+
+  # with error if there are not enough events
+  expect_error(admin_censoring_events(test_data, nrow(test_data)+1, on_incomplete = "stop"))
 })

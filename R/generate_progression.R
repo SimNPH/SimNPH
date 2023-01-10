@@ -295,6 +295,33 @@ true_summary_statistics_progression <- function(Design, what="os", cutoff_stats=
 
 
 
+#' Calculate progression rate from proportion of patients who progress
+#'
+#' @param design design data.frame
+#'
+#' @describeIn generate_progression Calculate progression rate from proportion of patients who progress
+#'
+#' @return For progression_rate_from_progression_prop: the design data.frame passed as
+#'   argument with the additional columns prog_rate_trt, prog_rate_ctrl
+#'
+#' @details For progression_rate_from_progression_prop, the design data.frame,
+#'   has to contain the columns `prog_prop_trt` and `prog_prop_ctrl` with the
+#'   proportions of patients, who progress in the respective arms.
+#'
+#' @export
+#'
+#' @examples
+#' my_design <- merge(
+#'     assumptions_progression(),
+#'     design_fixed_followup(),
+#'     by=NULL
+#'   )
+#' my_design$prog_rate_ctrl <- NA_real_
+#' my_design$prog_rate_trt <- NA_real_
+#' my_design$prog_prop_trt <- 0.2
+#' my_design$prog_prop_ctrl <- 0.3
+#' my_design <- progression_rate_from_progression_prop(my_design)
+#' my_design
 progression_rate_from_progression_prop <- function(design){
 
   rowwise_fun <- function(condition){
@@ -313,13 +340,13 @@ progression_rate_from_progression_prop <- function(design){
     target_fun_trt <- Vectorize(\(r){
       cumhaz_prog_trt <- fast_cumhaz_fun(0, r)
       prob_prog_trt  <- cumhaz_prog_trt(t_max)/(cumhaz_prog_trt(t_max) + cumhaz_trt(t_max))
-      prob_prog_trt-condition$prog_proportion_trt
+      prob_prog_trt-condition$prog_prop_trt
     })
 
     target_fun_ctrl <- Vectorize(\(r){
       cumhaz_prog_ctrl <- fast_cumhaz_fun(0, r)
       prob_prog_ctrl  <- cumhaz_prog_ctrl(t_max)/(cumhaz_prog_ctrl(t_max) + cumhaz_ctrl(t_max))
-      prob_prog_ctrl-condition$prog_proportion_ctrl
+      prob_prog_ctrl-condition$prog_prop_ctrl
     })
 
     condition$prog_rate_trt  <- uniroot(target_fun_trt,  interval=c(0, 1e-6), extendInt = "upX", tol=.Machine$double.eps)$root

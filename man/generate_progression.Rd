@@ -3,16 +3,21 @@
 \name{assumptions_progression}
 \alias{assumptions_progression}
 \alias{generate_progression}
+\alias{progression_rate_from_progression_prop}
 \title{Create an empty assumtions data.frame for generate_progression}
 \usage{
 assumptions_progression()
 
 generate_progression(condition, fixed_objects = NULL)
+
+progression_rate_from_progression_prop(design)
 }
 \arguments{
 \item{condition}{condition row of Design dataset}
 
 \item{fixed_objects}{fixed objects of Design dataset}
+
+\item{design}{design data.frame}
 }
 \value{
 For generate_progression: a design tibble with default values invisibly
@@ -20,11 +25,16 @@ For generate_progression: a design tibble with default values invisibly
 For generate_progression: A dataset with the columns t (time) and trt
 (1=treatment, 0=control), evt (event, currently TRUE for all observations),
 t_ice (time of intercurrent event), ice (intercurrent event)
+
+For progression_rate_from_progression_prop: the design data.frame passed as
+argument with the additional columns prog_rate_trt, prog_rate_ctrl
 }
 \description{
 Create an empty assumtions data.frame for generate_progression
 
 Generate Dataset with changing hazards after disease progression
+
+Calculate progression rate from proportion of patients who progress
 }
 \details{
 assumptions_progression prints the code to generate a default
@@ -42,12 +52,18 @@ Condidtion has to contain the following columns:
 \item prog_rate_ctrl hazard rate for disease progression unter control
 \item prog_rate_trt hazard rate for disease progression unter treatment
 }
+
+For progression_rate_from_progression_prop, the design data.frame,
+has to contain the columns \code{prog_prop_trt} and \code{prog_prop_ctrl} with the
+proportions of patients, who progress in the respective arms.
 }
 \section{Functions}{
 \itemize{
 \item \code{assumptions_progression}: generate default assumptions tibble
 
 \item \code{generate_progression}: simulates a dataset with changing hazards after disease progression
+
+\item \code{progression_rate_from_progression_prop}: Calculate progression rate from proportion of patients who progress
 }}
 
 \examples{
@@ -62,4 +78,15 @@ one_simulation <- merge(
   generate_progression()
 head(one_simulation)
 tail(one_simulation)
+my_design <- merge(
+    assumptions_progression(),
+    design_fixed_followup(),
+    by=NULL
+  )
+my_design$prog_rate_ctrl <- NA_real_
+my_design$prog_rate_trt <- NA_real_
+my_design$prog_prop_trt <- 0.2
+my_design$prog_prop_ctrl <- 0.3
+my_design <- progression_rate_from_progression_prop(my_design)
+my_design
 }
