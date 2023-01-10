@@ -23,8 +23,8 @@ options <- expand.grid(
 
 assumptions <- expand.grid(
   hazard_ctrl = nph::m2r(c(36, 12, 6)),
-  prog_proportion_trt  = c(0.1, 0.2),
-  prog_proportion_ctrl = c(0.1, 0.2),
+  prog_prop_trt  = c(0.1, 0.2),
+  prog_prop_ctrl = c(0.1, 0.2),
   hr_before_after = c(0.8, 0.5),
   censoring_prop = c(0, 0.1, 0.3)
 )
@@ -40,6 +40,10 @@ design <- merge(
   by=NULL
 )
 
+# calculate hazards from PH effect size -----------------------------------
+
+# calculate hazards (discuss options, which hazard in the treatment arm should
+# be callibrated? hazard had no progression occured, hazard for pfs, ...)
 
 # calculate progression rate from progression proportion  -----------------
 
