@@ -111,6 +111,7 @@ my_analyse <- list(
   )
 )
 
+my_analyse <- wrap_all_in_trycatch(my_analyse)
 
 # define summaries --------------------------------------------------------
 
