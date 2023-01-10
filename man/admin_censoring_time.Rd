@@ -10,7 +10,12 @@ recruitment_uniform(dat, recruitment_until, recruitment_from = 0)
 
 admin_censoring_time(dat, followup, keep_non_recruited = FALSE)
 
-admin_censoring_events(dat, events, keep_non_recruited = FALSE)
+admin_censoring_events(
+  dat,
+  events,
+  keep_non_recruited = FALSE,
+  on_incomplete = "ignore"
+)
 }
 \arguments{
 \item{dat}{a simulated dataset}
@@ -22,6 +27,8 @@ admin_censoring_events(dat, events, keep_non_recruited = FALSE)
 \item{followup}{followup time}
 
 \item{events}{number of events after which the dataset is analyzed}
+
+\item{on_incomplete=c("ignore", "warn", "stop")}{what should be done if there are fewer events than planned}
 }
 \value{
 Returns the dataset with added recruitment times.
@@ -53,6 +60,11 @@ event indicator \code{evt}.
 
 Times and event indicaotrs for patients recruited after followup are set to
 \code{NA}.
+
+If there are less events than planned for study end \code{on_incomplete} defines
+what should be done. "ignore" simply returns the dataset with the maximum of
+the observed times as followup. "warn" does the same but gives a warning.
+"stop" stopps with an error.
 }
 \section{Functions}{
 \itemize{

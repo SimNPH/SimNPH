@@ -87,6 +87,7 @@ admin_censoring_time <- function(dat, followup, keep_non_recruited = FALSE){
 #'
 #' @param dat a simulated dataset
 #' @param events number of events after which the dataset is analyzed
+#' @param on_incomplete=c("ignore","warn","stop") what should be done if there are fewer events than planned
 #'
 #' @return
 #' Returns the dataset with administrative censoring after `events` events, adds
@@ -101,6 +102,11 @@ admin_censoring_time <- function(dat, followup, keep_non_recruited = FALSE){
 #'
 #' Times and event indicaotrs for patients recruited after followup are set to
 #' `NA`.
+#'
+#' If there are less events than planned for study end `on_incomplete` defines
+#' what should be done. "ignore" simply returns the dataset with the maximum of
+#' the observed times as followup. "warn" does the same but gives a warning.
+#' "stop" stopps with an error.
 #'
 #' @describeIn admin_censoring_time apply administrative censoring after fixed number of events
 #'
@@ -118,16 +124,31 @@ admin_censoring_time <- function(dat, followup, keep_non_recruited = FALSE){
 #'
 #' dat_censored <- admin_censoring_events(dat, 4)
 #' attr(dat_censored, "followup")
-admin_censoring_events <- function(dat, events, keep_non_recruited = FALSE){
+admin_censoring_events <- function(dat, events, keep_non_recruited = FALSE, on_incomplete="ignore"){
 
-  # find time at which number of events is reached
-  tmp <- data.frame(
-    calendar_time = dat$t + dat$rec_time,
-    evt           = dat$evt
-  )
-  tmp <- tmp[order(tmp$calendar_time), ]
-  followup <- tmp$calendar_time[min(which(cumsum(tmp$evt %in% TRUE) >= events))]
+  if(sum(dat$evt) >= events){
+    # find time at which number of events is reached
+    tmp <- data.frame(
+      calendar_time = dat$t + dat$rec_time,
+      evt           = dat$evt
+    )
+    tmp <- tmp[order(tmp$calendar_time), ]
+    followup <- tmp$calendar_time[min(which(cumsum(tmp$evt %in% TRUE) >= events))]
+
+  } else {
+    switch (on_incomplete,
+      ignore = {},
+      warn = {
+        warning(gettext("Warning: in admin_censoring_events: Less events than targeted in dataset, using all present events."))
+      },
+      stop = {
+        stop(gettext("Error: in admin_censoring_events: Less events than targeted in dataset, using all present events."))
+      }
+    )
+    followup <- max(dat$t + dat$rec_time)
+  }
 
   admin_censoring_time(dat, followup, keep_non_recruited=keep_non_recruited)
+
 }
 
