@@ -86,6 +86,51 @@ test_that("summarising results from group sequential function works", {
   aggregate_results <- summarise_group_sequential()(condition, results)
 
   expect_s3_class(aggregate_results, "data.frame")
-  expect_named(aggregate_results, c("rejection", "n_pat", "n_evt", "followup", "sd_nevt", "sd_followup", "sd_npat"), ignore.order = TRUE)
+  expect_named(aggregate_results, c("rejection", "n_pat", "n_evt", "followup", "sd_nevt", "sd_followup", "sd_npat", "N_missing_rejection", "N_missing_npat", "N_missing_nevt", "N_missing_followup", "N"), ignore.order = TRUE)
   expect_equal(nrow(aggregate_results), 1)
 })
+
+test_that("summarise group sequential deals with missings correctly", {
+  tmp_results <- tibble::tribble(
+    ~rejected_at_stage,   ~N_pat,   ~N_evt, ~followup,
+                     1,       10,        5,        50,
+                     2,       20,       10,       100,
+              NA_real_, NA_real_, NA_real_,  NA_real_,
+                   Inf,       30,       15,       150,
+  )
+
+  my_summarise <- summarise_group_sequential()
+  results <- my_summarise(NA, tmp_results)
+
+  expect_equal(
+    results,
+    data.frame(
+      rejection = 2/3,
+      n_pat = 20,
+      n_evt = 10,
+      followup = 100,
+      sd_npat = 10,
+      sd_nevt = 5,
+      sd_followup = 50,
+      N = 4,
+      N_missing_rejection = 1,
+      N_missing_npat = 1,
+      N_missing_nevt = 1,
+      N_missing_followup = 1
+    )
+  )
+})
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -156,22 +156,26 @@ summarise_estimator <- function(est, real, lower=NULL, upper=NULL, name=NULL){
     upper  <- eval(upper, envir = results)
 
     results_tmp <- data.frame(
-      bias     = mean(est - real),
-      sd_bias  = sd(est-real),
-      var      = var(est),
-      mse      = mean((est-real)^2),
-      sd_mse   = sd((est-real)^2),
-      mae      = mean(abs(est-real)),
-      sd_mae   = sd(abs(est-real)),
-      coverage = NA_real_,
-      width    = NA_real_,
-      sd_width = NA_real_
+      bias         = mean(est-real, na.rm=TRUE),
+      sd_bias      = sd(est-real, na.rm=TRUE),
+      var          = var(est, na.rm=TRUE),
+      mse          = mean((est-real)^2, na.rm=TRUE),
+      sd_mse       = sd((est-real)^2, na.rm=TRUE),
+      mae          = mean(abs(est-real), na.rm=TRUE),
+      sd_mae       = sd(abs(est-real), na.rm=TRUE),
+      N_missing    = sum(is.na(est)),
+      N            = length(est),
+      coverage     = NA_real_,
+      width        = NA_real_,
+      sd_width     = NA_real_,
+      N_missing_CI = NA_real_
     )
 
     if(!is.null(lower) && !is.null(upper)){
-      results_tmp$coverage <- mean( (lower <= real) & (upper >= real) )
-      results_tmp$width    <- mean( abs(upper - lower) )
-      results_tmp$sd_width <- sd( abs(upper - lower) )
+      results_tmp$coverage     <- mean( (lower <= real) & (upper >= real), na.rm=TRUE)
+      results_tmp$width        <- mean( abs(upper - lower), na.rm=TRUE)
+      results_tmp$sd_width     <- sd( abs(upper - lower), na.rm=TRUE)
+      results_tmp$N_missing_CI <- sum( (is.na(lower) | is.na(upper)) )
     }
 
     results_tmp
@@ -226,12 +230,19 @@ summarise_estimator <- function(est, real, lower=NULL, upper=NULL, name=NULL){
 #' sim_results[, grepl("rejection", names(sim_results))]
 summarise_test <- function(alpha, name=NULL){
   res <- function(condition, results, fixed_objects){
-    results_tmp <- outer(results$p, 1-alpha, FUN=`<`) |>
-      colMeans() |>
+    rejection_tmp <- outer(results$p, 1-alpha, FUN=`<`) |>
+      colMeans(na.rm=TRUE) |>
       as.list() |>
       as.data.frame() |>
       setNames(paste0("rejection_", alpha))
 
+    missing_tmp <- outer(results$p, 1-alpha, FUN=\(p,a){is.na(p)}) |>
+      colSums() |>
+      as.list() |>
+      as.data.frame() |>
+      setNames(paste0("N_missing_", alpha))
+
+    results_tmp <- cbind(rejection_tmp, missing_tmp, N=nrow(results))
     results_tmp
   }
 

@@ -115,13 +115,18 @@ analyse_group_sequential <- function(followup, followup_type, alpha, analyse_fun
 summarise_group_sequential <- function(name=NULL){
   res <- function(condition, results, fixed_objects=NULL){
     data.frame(
-      "rejection" = mean(is.finite(results$rejected_at_stage)),
-      "n_pat" = mean(results$N_pat),
-      "n_evt" = mean(results$N_evt),
-      "followup" = mean(results$followup),
-      "sd_npat" = sd(results$N_pat),
-      "sd_nevt" = sd(results$N_evt),
-      "sd_followup" = sd(results$followup)
+      "rejection" = mean(is.finite(na.omit(results$rejected_at_stage))),
+      "n_pat" = mean(results$N_pat, na.rm=TRUE),
+      "n_evt" = mean(results$N_evt, na.rm=TRUE),
+      "followup" = mean(results$followup, na.rm=TRUE),
+      "sd_npat" = sd(results$N_pat, na.rm=TRUE),
+      "sd_nevt" = sd(results$N_evt, na.rm=TRUE),
+      "sd_followup" = sd(results$followup, na.rm=TRUE),
+      "N" = nrow(results),
+      "N_missing_rejection" = sum(is.na(results$rejected_at_stage)),
+      "N_missing_npat" = sum(is.na(results$N_pat)),
+      "N_missing_nevt" = sum(is.na(results$N_evt)),
+      "N_missing_followup" = sum(is.na(results$followup))
     )
   }
 
