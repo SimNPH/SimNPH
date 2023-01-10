@@ -91,7 +91,7 @@ test_that("creating a summarise function for an estimator works", {
     )
   )
 
-  expected_names <- expand.grid("coxph.", c("bias", "sd_bias", "var", "mse", "sd_mse", "mae", "sd_mae", "coverage", "width", "sd_width"), c("gAHR.", "hr.", "", "1.")) |>
+  expected_names <- expand.grid("coxph.", c("bias", "sd_bias", "var", "mse", "sd_mse", "N_missing", "N", "mae", "sd_mae", "coverage", "width", "sd_width", "N_missing_CI"), c("gAHR.", "hr.", "", "1.")) |>
     subset(select=c(1,3,2)) |>
     apply(1, paste, collapse="") |>
     unname()
@@ -136,7 +136,11 @@ test_that("generic summarise for tests works", {
   )
 
   expect(
-    all(hasName(sim_results, c("logrank.rejection_0.95", "logrank.rejection_0.99", "logrank.innovative.rejection_0.9"))),
+    all(hasName(sim_results, c(
+      "logrank.rejection_0.95", "logrank.rejection_0.99", "logrank.innovative.rejection_0.9",
+      "logrank.N_missing_0.95", "logrank.N_missing_0.99", "logrank.innovative.N_missing_0.9",
+      "logrank.N"
+      ))),
     "expected names not present in sim_results"
   )
 
@@ -146,4 +150,54 @@ test_that("generic summarise for tests works", {
   expect_lte(sim_results$logrank.rejection_0.95,           1)
   expect_lte(sim_results$logrank.rejection_0.99,           1)
   expect_lte(sim_results$logrank.innovative.rejection_0.9, 1)
+})
+
+test_that("missings are treated correctly for summarise estimator", {
+  my_summarise <- summarise_estimator(est, real, lower, upper)
+
+  condition_and_results <- tibble::tribble(
+    ~real,     ~est,    ~lower,  ~upper,
+        0,      0.1,       -1,        1,
+        0,        0,        2,        4,
+        0,     -0.1,       -1, NA_real_,
+        0, NA_real_, NA_real_,        1,
+  )
+
+  my_results <- my_summarise(condition_and_results, condition_and_results)
+
+  tmp <- c(0.1, 0, -0.1)
+
+  expect_equal(my_results$bias, 0)
+  expect_equal(my_results$sd_bias, sd(tmp))
+  expect_equal(my_results$var, var(tmp))
+  expect_equal(my_results$mse, mean(tmp^2))
+  expect_equal(my_results$sd_mse, sd(tmp^2))
+  expect_equal(my_results$mae, mean(abs(tmp)))
+  expect_equal(my_results$sd_mae, sd(abs(tmp)))
+  expect_equal(my_results$N_missing, 1)
+  expect_equal(my_results$N, 4)
+  expect_equal(my_results$coverage, 0.5)
+  expect_equal(my_results$width, 2)
+  expect_equal(my_results$sd_width, 0)
+  expect_equal(my_results$N_missing_CI, 2)
+})
+
+test_that("missings are treated correctly for summarise test", {
+  my_summarise <- summarise_test(alpha = c(0.95, 0.99))
+
+  condition_and_results <- tibble::tribble(
+    ~real,       ~p,
+        0,    0.001,
+        0,    0.04 ,
+        0,    0.1  ,
+        0, NA_real_,
+  )
+
+  my_results <- my_summarise(condition_and_results, condition_and_results)
+
+  expect_equal(my_results$rejection_0.95, 2/3)
+  expect_equal(my_results$rejection_0.99, 1/3)
+  expect_equal(my_results$N_missing_0.95, 1)
+  expect_equal(my_results$N_missing_0.99, 1)
+  expect_equal(my_results$N, 4)
 })
