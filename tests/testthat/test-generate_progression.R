@@ -68,10 +68,67 @@ test_that("true summary statistics progression works", {
     design <- merge(assumptions_progression(), design_fixed_followup(), by=NULL)
   )
 
-  summaries_os  <- true_summary_statistics_progression(design, what="os")
-  summaries_pfs <- true_summary_statistics_progression(design, what="pfs")
+  design_2 <- design
+  design_2$followup <- NULL
+
+  summaries_os     <- true_summary_statistics_progression(design, what="os")
+  summaries_pfs    <- true_summary_statistics_progression(design, what="pfs")
+  summaries_os_2   <- true_summary_statistics_progression(design, what="os", fixed_objects = list(t_max=10000))
+  summaries_pfs_2  <- true_summary_statistics_progression(design, what="pfs", fixed_objects = list(t_max=10000))
+  summaries_os_3   <- true_summary_statistics_progression(design_2, what="os")
+  summaries_pfs_3  <- true_summary_statistics_progression(design_2, what="pfs")
+
+  expect_error(true_summary_statistics_progression(design, what="something else"))
 
   expect_named(summaries_pfs, c(names(design), "rmst_trt", "median_survival_trt", "rmst_ctrl", "median_survival_ctrl", "gAHR", "AHR", "cutoff_used"))
   expect_named(summaries_os , c(names(design), "rmst_trt", "median_survival_trt", "rmst_ctrl", "median_survival_ctrl", "gAHR", "AHR", "cutoff_used"))
 
+  expect_named(summaries_pfs_2, c(names(design), "rmst_trt", "median_survival_trt", "rmst_ctrl", "median_survival_ctrl", "gAHR", "AHR", "cutoff_used"))
+  expect_named(summaries_os_2 , c(names(design), "rmst_trt", "median_survival_trt", "rmst_ctrl", "median_survival_ctrl", "gAHR", "AHR", "cutoff_used"))
+
+  expect_named(summaries_pfs_3, c(names(design_2), "rmst_trt", "median_survival_trt", "rmst_ctrl", "median_survival_ctrl", "gAHR", "AHR", "cutoff_used"))
+  expect_named(summaries_os_3 , c(names(design_2), "rmst_trt", "median_survival_trt", "rmst_ctrl", "median_survival_ctrl", "gAHR", "AHR", "cutoff_used"))
+})
+
+test_that("censoring rate from censoring proportion for disease progression works", {
+  design <- expand.grid(
+    hazard_ctrl         = 0.001518187, # hazard under control (med. survi. 15m)
+    hazard_trt          = 0.001265156, # hazard under treatment (med. surv. 18m)
+    hazard_after_prog   = 0.007590934, # hazard after progression (med. surv. 3m)
+    prog_rate_ctrl      = 0.001897734, # hazard rate for disease progression under control (med. time to progression 12m)
+    prog_rate_trt       = c(0.001897734, 0.001423300, 0.001265156), # hazard rate for disease progression unter treatment (med. time to progression 12m, 16m, 18m)
+    censoring_prop      = 0.1,         # rate of random withdrawal
+    followup            = 100,         # follow up time
+    n_trt               = 50,          # patients in treatment arm
+    n_ctrl              = 50           # patients in control arm
+  )
+
+  design_2 <- design
+  design_2$censoring_prop <- 0
+
+  res  <- cen_rate_from_cen_prop_progression(design)
+  res2 <- cen_rate_from_cen_prop_progression(design_2)
+
+  expect(all(!is.na(res$random_withdrawal)), "some values for random_withdrawal are missing")
+  expect_equal(res2$random_withdrawal, c(0,0,0))
+})
+
+test_that("progression rate from progression prop works", {
+  capture_output(
+    my_design <- merge(
+      assumptions_progression(),
+      design_fixed_followup(),
+      by=NULL
+    )
+  )
+  my_design$prog_rate_ctrl <- NULL
+  my_design$prog_rate_trt <- NULL
+  my_design$prog_prop_trt <- 0.2
+  my_design$prog_prop_ctrl <- 0.3
+
+  res  <- progression_rate_from_progression_prop(my_design)
+
+  expect_named(res, c(names(my_design), c("prog_rate_trt", "prog_rate_ctrl")))
+  expect_equal(order(res$prog_rate_trt), order(res$prog_prop_trt))
+  expect_equal(order(res$prog_rate_ctrl), order(res$prog_prop_ctrl))
 })

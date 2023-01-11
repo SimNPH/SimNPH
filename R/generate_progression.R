@@ -363,4 +363,80 @@ progression_rate_from_progression_prop <- function(design){
   result
 }
 
+#' @describeIn generate_progression calculate censoring rate from censoring proportion
+#'
+#' @return for cen_rate_from_cen_prop_progression: design data.frame with the
+#'   additional column random_withdrawal
+#' @export
+#'
+#' @details cen_rate_from_cen_prop_progression takes the proportion of
+#'   censored patients from the column `censoring_prop`. This column describes
+#'   the proportion of patients who are censored randomly before experiencing an
+#'   event, without regard to administrative censoring.
+#'
+#' @examples
+#' design <- expand.grid(
+#' hazard_ctrl         = 0.001518187, # hazard under control (med. survi. 15m)
+#' hazard_trt          = 0.001265156, # hazard under treatment (med. surv. 18m)
+#' hazard_after_prog   = 0.007590934, # hazard after progression (med. surv. 3m)
+#' prog_rate_ctrl      = 0.001897734, # hazard rate for disease progression under control (med. time to progression 12m)
+#' prog_rate_trt       = c(0.001897734, 0.001423300, 0.001265156), # hazard rate for disease progression unter treatment (med. time to progression 12m, 16m, 18m)
+#' censoring_prop      = 0.1,         # rate of random withdrawal
+#' followup            = 100,         # follow up time
+#' n_trt               = 50,          # patients in treatment arm
+#' n_ctrl              = 50           # patients in control arm
+#' )
+#' cen_rate_from_cen_prop_progression(design)
+cen_rate_from_cen_prop_progression <- function(design){
 
+  rowwise_fun <- function(condition){
+    if(condition$censoring_prop == 0){
+      condition$random_withdrawal <- 0.
+      return(condition)
+    }
+
+    t_max <- condition$followup * 10
+
+    a <- condition$n_trt / (condition$n_trt + condition$n_ctrl)
+    b <- 1-a
+
+    data_generating_model_ctrl <- subpop_hazVfun_simnph(
+      c(0, t_max),
+      lambda1 = condition$hazard_ctrl,
+      lambda2 = condition$hazard_after_prog,
+      lambdaProg = condition$prog_rate_ctrl,
+      timezero = TRUE
+    )
+
+    data_generating_model_trt <- subpop_hazVfun_simnph(
+      c(0, t_max),
+      lambda1 = condition$hazard_trt,
+      lambda2 = condition$hazard_after_prog,
+      lambdaProg = condition$prog_rate_trt,
+      timezero = TRUE
+    )
+
+    cumhaz_trt_tmax  <- tail(data_generating_model_trt$cumhaz, 1)
+    cumhaz_ctrl_tmax <- tail(data_generating_model_trt$cumhaz, 1)
+
+    target_fun <- Vectorize(\(r){
+      cumhaz_censoring <- fast_cumhaz_fun(0, r)
+      prob_cen_ctrl <- cumhaz_censoring(t_max)/(cumhaz_censoring(t_max) + cumhaz_ctrl_tmax)
+      prob_cen_trt  <- cumhaz_censoring(t_max)/(cumhaz_censoring(t_max) + cumhaz_trt_tmax)
+      prob_cen <- a*prob_cen_trt + b*prob_cen_ctrl
+      prob_cen-condition$censoring_prop
+    })
+
+    condition$random_withdrawal <- uniroot(target_fun, interval=c(0, 1e-6), extendInt = "upX", tol=.Machine$double.eps)$root
+
+    condition
+  }
+
+  result <- design |>
+    split(1:nrow(design)) |>
+    lapply(rowwise_fun) |>
+    do.call(what=rbind)
+
+  result
+
+}

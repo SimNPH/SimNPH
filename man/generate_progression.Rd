@@ -4,6 +4,7 @@
 \alias{assumptions_progression}
 \alias{generate_progression}
 \alias{progression_rate_from_progression_prop}
+\alias{cen_rate_from_cen_prop_progression}
 \title{Create an empty assumtions data.frame for generate_progression}
 \usage{
 assumptions_progression()
@@ -11,6 +12,8 @@ assumptions_progression()
 generate_progression(condition, fixed_objects = NULL)
 
 progression_rate_from_progression_prop(design)
+
+cen_rate_from_cen_prop_progression(design)
 }
 \arguments{
 \item{condition}{condition row of Design dataset}
@@ -28,6 +31,9 @@ t_ice (time of intercurrent event), ice (intercurrent event)
 
 For progression_rate_from_progression_prop: the design data.frame passed as
 argument with the additional columns prog_rate_trt, prog_rate_ctrl
+
+for cen_rate_from_cen_prop_progression: design data.frame with the
+additional column random_withdrawal
 }
 \description{
 Create an empty assumtions data.frame for generate_progression
@@ -56,6 +62,11 @@ Condidtion has to contain the following columns:
 For progression_rate_from_progression_prop, the design data.frame,
 has to contain the columns \code{prog_prop_trt} and \code{prog_prop_ctrl} with the
 proportions of patients, who progress in the respective arms.
+
+cen_rate_from_cen_prop_progression takes the proportion of
+censored patients from the column \code{censoring_prop}. This column describes
+the proportion of patients who are censored randomly before experiencing an
+event, without regard to administrative censoring.
 }
 \section{Functions}{
 \itemize{
@@ -64,6 +75,8 @@ proportions of patients, who progress in the respective arms.
 \item \code{generate_progression}: simulates a dataset with changing hazards after disease progression
 
 \item \code{progression_rate_from_progression_prop}: Calculate progression rate from proportion of patients who progress
+
+\item \code{cen_rate_from_cen_prop_progression}: calculate censoring rate from censoring proportion
 }}
 
 \examples{
@@ -89,4 +102,16 @@ my_design$prog_prop_trt <- 0.2
 my_design$prog_prop_ctrl <- 0.3
 my_design <- progression_rate_from_progression_prop(my_design)
 my_design
+design <- expand.grid(
+hazard_ctrl         = 0.001518187, # hazard under control (med. survi. 15m)
+hazard_trt          = 0.001265156, # hazard under treatment (med. surv. 18m)
+hazard_after_prog   = 0.007590934, # hazard after progression (med. surv. 3m)
+prog_rate_ctrl      = 0.001897734, # hazard rate for disease progression under control (med. time to progression 12m)
+prog_rate_trt       = c(0.001897734, 0.001423300, 0.001265156), # hazard rate for disease progression unter treatment (med. time to progression 12m, 16m, 18m)
+censoring_prop      = 0.1,         # rate of random withdrawal
+followup            = 100,         # follow up time
+n_trt               = 50,          # patients in treatment arm
+n_ctrl              = 50           # patients in control arm
+)
+cen_rate_from_cen_prop_progression(design)
 }
