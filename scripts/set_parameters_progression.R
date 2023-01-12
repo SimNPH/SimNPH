@@ -76,4 +76,4 @@ filename_os <- paste0("data/parameters/progression_os_", format(Sys.Date(), "%Y-
 write.table(design_os, file=filename_os, quote=FALSE, sep=", ", dec=".", row.names = FALSE, col.names = TRUE)
 
 filename_pfs <- paste0("data/parameters/progression_pfs_", format(Sys.Date(), "%Y-%m-%d"), ".csv")
-write.table(design_pfs, file=filename, quote=FALSE, sep=", ", dec=".", row.names = FALSE, col.names = TRUE)
+write.table(design_pfs, file=filename_pfs, quote=FALSE, sep=", ", dec=".", row.names = FALSE, col.names = TRUE)
