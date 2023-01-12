@@ -162,6 +162,10 @@ results <- runSimulation(
   cl = cl,
   save_details = list(
     out_rootdir = save_folder
+  ),
+  extra_options = list(
+    store_warning_seeds = TRUE,
+    allow_na = TRUE
   )
 )
 
