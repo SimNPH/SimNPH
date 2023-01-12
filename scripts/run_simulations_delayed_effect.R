@@ -1,9 +1,9 @@
 
-package_url <- "https://github.com/SimNPH/SimNPH/archive/refs/tags/sims_delayed_crossing.zip"
-download.file(package_url, destfile = "sims_delayed_crossing.zip")
-dir.create("sims_delayed_crossing")
-unzip("sims_delayed_crossing.zip", exdir = "sims_delayed_crossing")
-setwd("sims_delayed_crossing/SimNPH-sims_delayed_crossing/")
+package_url <- "https://github.com/SimNPH/SimNPH/archive/refs/tags/sims_delayed.zip"
+download.file(package_url, destfile = "sims_delayed.zip")
+dir.create("sims_delayed")
+unzip("sims_delayed.zip", exdir = "sims_delayed")
+setwd("sims_delayed/SimNPH-sims_delayed/")
 devtools::install(".", upgrade="never", build=TRUE, quick=TRUE, dependencies=TRUE)
 
 library(SimNPH)
