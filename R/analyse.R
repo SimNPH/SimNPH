@@ -1,7 +1,7 @@
 #' Wrap all functions in a list in tryCatch calls
 #'
 #' @param list_of_functions the list of functions to be wrapped
-#' @param error the error function in the tryCatch call
+#' @param error=\(e){warning(e$message);NA} the error function in the tryCatch call
 #'
 #' @return a list of functions
 #' @export
@@ -42,7 +42,7 @@
 #'
 #' Analyse2 <- wrap_all_in_trycatch(Analyse)
 #' Analyse2 <- wrap_all_in_trycatch(Analyse, error=\(e){NULL})
-wrap_all_in_trycatch <- function(list_of_functions, error=\(e){NA}){
+wrap_all_in_trycatch <- function(list_of_functions, error=\(e){warning(e$message); NA}){
   lapply(
     list_of_functions,
     \(f){

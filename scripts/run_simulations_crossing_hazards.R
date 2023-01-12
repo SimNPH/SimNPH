@@ -17,7 +17,7 @@ withr::with_libpaths("local_lib", library("SimNPH"))
 library(SimDesign)
 library(parallel)
 
-if(packageVersion("SimNPH") != "0.1.2"){
+if(packageVersion("SimNPH") != "0.1.3"){
   stop("Please run the simulations with the correct vesion of the SimNPH package for reproducability.")
 }
 
@@ -162,6 +162,10 @@ results <- runSimulation(
   cl = cl,
   save_details = list(
     out_rootdir = save_folder
+  ),
+  extra_options = list(
+    store_warning_seeds = TRUE,
+    allow_na = TRUE
   )
 )
 

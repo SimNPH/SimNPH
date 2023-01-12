@@ -58,6 +58,8 @@ export(mixture_surv_fun)
 export(mixture_quant_fun)
 export(mixture_rng_fun)
 export(wrap_all_in_trycatch)
+export(cen_rate_from_cen_prop_progression)
+export(hazard_before_progression_from_PH_effect_size)
 
 importFrom(Rcpp,evalCpp)
 useDynLib(SimNPH, .registration = TRUE)

@@ -26,9 +26,12 @@ assumptions <- expand.grid(
   prog_prop_trt  = c(0.1, 0.2),
   prog_prop_ctrl = c(0.1, 0.2),
   hr_before_after = c(0.8, 0.5),
-  censoring_prop = c(0, 0.1, 0.3)
-)
+  censoring_prop = c(0, 0.1, 0.3),
+  effect_size_ph = c(0, 0.5, 0.8, 0.9)
+) |>
+  subset(prog_prop_ctrl >= prog_prop_trt)
 
+# temporary used for progression rates, later updated to match effect size
 assumptions$hazard_trt <- assumptions$hazard_ctrl
 assumptions$hazard_after_prog <- assumptions$hazard_ctrl / assumptions$hr_before_after
 
@@ -40,11 +43,6 @@ design <- merge(
   by=NULL
 )
 
-# calculate hazards from PH effect size -----------------------------------
-
-# calculate hazards (discuss options, which hazard in the treatment arm should
-# be callibrated? hazard had no progression occured, hazard for pfs, ...)
-
 # calculate progression rate from progression proportion  -----------------
 
 design <- design |>
@@ -54,12 +52,28 @@ design <- design |>
 
 design <- SimNPH:::progression_rate_from_progression_prop(design)
 
+# calculate hazards from PH effect size -----------------------------------
+
+design <- hazard_before_progression_from_PH_effect_size(design)
+
 
 # calculate random withdrawal ---------------------------------------------
 
-# design$random_withdrawal <- 0
+design <- cen_rate_from_cen_prop_progression(design)
 
 # calculate real statistics -----------------------------------------------
 
-design <- design |>
-  true_summary_statistics_progression()
+design_os <- design |>
+  true_summary_statistics_progression(what="os")
+
+design_pfs <- design |>
+  true_summary_statistics_progression(what="pfs")
+
+
+# Saving ------------------------------------------------------------------
+
+filename_os <- paste0("data/parameters/progression_os_", format(Sys.Date(), "%Y-%m-%d"), ".csv")
+write.table(design_os, file=filename_os, quote=FALSE, sep=", ", dec=".", row.names = FALSE, col.names = TRUE)
+
+filename_pfs <- paste0("data/parameters/progression_pfs_", format(Sys.Date(), "%Y-%m-%d"), ".csv")
+write.table(design_pfs, file=filename_pfs, quote=FALSE, sep=", ", dec=".", row.names = FALSE, col.names = TRUE)

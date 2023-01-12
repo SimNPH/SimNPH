@@ -3,21 +3,55 @@
 \name{assumptions_progression}
 \alias{assumptions_progression}
 \alias{generate_progression}
+\alias{true_summary_statistics_progression}
 \alias{progression_rate_from_progression_prop}
+\alias{cen_rate_from_cen_prop_progression}
+\alias{hazard_before_progression_from_PH_effect_size}
 \title{Create an empty assumtions data.frame for generate_progression}
 \usage{
 assumptions_progression()
 
 generate_progression(condition, fixed_objects = NULL)
 
+true_summary_statistics_progression(
+  Design,
+  what = "os",
+  cutoff_stats = NA_real_,
+  fixed_objects = NULL,
+  milestones = NULL
+)
+
 progression_rate_from_progression_prop(design)
+
+cen_rate_from_cen_prop_progression(design)
+
+hazard_before_progression_from_PH_effect_size(
+  design,
+  target_power_ph = NA_real_,
+  followup = NA_real_,
+  target_alpha = 0.05
+)
 }
 \arguments{
 \item{condition}{condition row of Design dataset}
 
 \item{fixed_objects}{fixed objects of Design dataset}
 
+\item{Design}{Design data.frame for subgroup}
+
 \item{design}{design data.frame}
+
+\item{target_power_ph}{target power under proportional hazards}
+
+\item{what="os"}{True summary statistics for which estimand}
+
+\item{cutoff_stats=NA_real_}{cutoff time, see details}
+
+\item{fixed_objects=NULL}{additional settings, see details}
+
+\item{followup=NA_real_}{time until which the gAHR should be calculated, defaults to \code{condition$followup}}
+
+\item{target_alpha=0.05}{target alpha level for the power calculation}
 }
 \value{
 For generate_progression: a design tibble with default values invisibly
@@ -26,8 +60,25 @@ For generate_progression: A dataset with the columns t (time) and trt
 (1=treatment, 0=control), evt (event, currently TRUE for all observations),
 t_ice (time of intercurrent event), ice (intercurrent event)
 
+For true_summary_statistics_subgroup: the design data.frame
+passed as argument with the additional columns:
+\itemize{
+\item \code{rmst_trt} rmst in the treatment group
+\item \code{median_surv_trt} median survival in the treatment group
+\item \code{rmst_ctrl} rmst in the control group
+\item \code{median_surv_ctrl} median survial in the control group
+\item \code{gAHR} geometric average hazard ratio
+\item \code{AHR} average hazard ratio
+}
+
 For progression_rate_from_progression_prop: the design data.frame passed as
 argument with the additional columns prog_rate_trt, prog_rate_ctrl
+
+for cen_rate_from_cen_prop_progression: design data.frame with the
+additional column random_withdrawal
+
+For hazard_before_progression_from_PH_effect_size: the design
+data.frame passed as argument with the additional column hazard_trt.
 }
 \description{
 Create an empty assumtions data.frame for generate_progression
@@ -35,6 +86,8 @@ Create an empty assumtions data.frame for generate_progression
 Generate Dataset with changing hazards after disease progression
 
 Calculate progression rate from proportion of patients who progress
+
+Calculate hr after onset of treatment effect
 }
 \details{
 assumptions_progression prints the code to generate a default
@@ -53,9 +106,39 @@ Condidtion has to contain the following columns:
 \item prog_rate_trt hazard rate for disease progression unter treatment
 }
 
+\code{what} can be \code{"os"} for overall survival and \code{"pfs"} for progression free
+survival.
+
+The if \code{fixed_objects} contains \code{t_max} then this value is used as the
+maximum time to calculate function like survival, hazard, ... of the data
+generating models. If this is not given \code{t_max} is choosen as the minimum of
+the \code{1-(1/10000)} quantile of all survival distributions in the model.
+
+\code{cutoff_stats} is the time used to calculate the statistics like average
+hazard ratios and RMST, that are only calculated up to a certain point. It
+defaults to \code{NA_real_} in which case the variable \code{followup} from the Design
+dataset is used. If \code{followup} is also not set it uses \code{t_max}.
+
 For progression_rate_from_progression_prop, the design data.frame,
 has to contain the columns \code{prog_prop_trt} and \code{prog_prop_ctrl} with the
 proportions of patients, who progress in the respective arms.
+
+cen_rate_from_cen_prop_progression takes the proportion of
+censored patients from the column \code{censoring_prop}. This column describes
+the proportion of patients who are censored randomly before experiencing an
+event, without regard to administrative censoring.
+
+\code{hazard_before_progression_from_PH_effect_size} calculates the
+hazard ratio after onset of treatment effect as follows: First calculate
+the hazard in the control arm that would give the same median survival
+under an exponential model. Then calculate the median survival in the
+treatment arm that would give the desired power of the logrank test under
+exponential models in control and treatment arm. Then callibrate the hazard
+before progression in the treatment arm to give the same median survival
+time.
+
+This is a heuristic and to some extent arbitrary approach to calculate
+hazard ratios that correspond to reasonable and realistic scenarios.
 }
 \section{Functions}{
 \itemize{
@@ -63,7 +146,13 @@ proportions of patients, who progress in the respective arms.
 
 \item \code{generate_progression}: simulates a dataset with changing hazards after disease progression
 
+\item \code{true_summary_statistics_progression}: calculate true summary statistics for scenarios with disease progression
+
 \item \code{progression_rate_from_progression_prop}: Calculate progression rate from proportion of patients who progress
+
+\item \code{cen_rate_from_cen_prop_progression}: calculate censoring rate from censoring proportion
+
+\item \code{hazard_before_progression_from_PH_effect_size}: Calculate hazard in the treatment arm before progression from PH effect size
 }}
 
 \examples{
@@ -83,10 +172,35 @@ my_design <- merge(
     design_fixed_followup(),
     by=NULL
   )
+my_design$follwup <- 15
+my_design_os  <- true_summary_statistics_subgroup(my_design, "os")
+my_design_pfs <- true_summary_statistics_subgroup(my_design, "pfs")
+my_design_os
+my_design_pfs
+my_design <- merge(
+    assumptions_progression(),
+    design_fixed_followup(),
+    by=NULL
+  )
 my_design$prog_rate_ctrl <- NA_real_
 my_design$prog_rate_trt <- NA_real_
 my_design$prog_prop_trt <- 0.2
 my_design$prog_prop_ctrl <- 0.3
 my_design <- progression_rate_from_progression_prop(my_design)
 my_design
+design <- expand.grid(
+hazard_ctrl         = 0.001518187, # hazard under control (med. survi. 15m)
+hazard_trt          = 0.001265156, # hazard under treatment (med. surv. 18m)
+hazard_after_prog   = 0.007590934, # hazard after progression (med. surv. 3m)
+prog_rate_ctrl      = 0.001897734, # hazard rate for disease progression under control (med. time to progression 12m)
+prog_rate_trt       = c(0.001897734, 0.001423300, 0.001265156), # hazard rate for disease progression unter treatment (med. time to progression 12m, 16m, 18m)
+censoring_prop      = 0.1,         # rate of random withdrawal
+followup            = 100,         # follow up time
+n_trt               = 50,          # patients in treatment arm
+n_ctrl              = 50           # patients in control arm
+)
+cen_rate_from_cen_prop_progression(design)
+\dontrun{
+my_design <- hazard_before_progression_from_PH_effect_size(my_design, target_power_ph=0.9)
+}
 }

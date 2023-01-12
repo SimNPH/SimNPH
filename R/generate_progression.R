@@ -121,8 +121,6 @@ generate_progression <- function(condition, fixed_objects=NULL){
   rbind(data_trt, data_ctrl)
 }
 
-#' Calculate true summary statistics for scenarios with differential treatment effect in subgroup
-#'
 #' @param Design Design data.frame for subgroup
 #' @param what="os" True summary statistics for which estimand
 #' @param cutoff_stats=NA_real_ cutoff time, see details
@@ -154,7 +152,7 @@ generate_progression <- function(condition, fixed_objects=NULL){
 #'
 #' @export
 #'
-#' @describeIn generate_subgroup  calculate true summary statistics for subgroup
+#' @describeIn generate_progression calculate true summary statistics for scenarios with disease progression
 #'
 #' @examples
 #' my_design <- merge(
@@ -167,7 +165,7 @@ generate_progression <- function(condition, fixed_objects=NULL){
 #' my_design_pfs <- true_summary_statistics_subgroup(my_design, "pfs")
 #' my_design_os
 #' my_design_pfs
-true_summary_statistics_progression <- function(Design, what="os", cutoff_stats=NA_real_, fixed_objects=NULL){
+true_summary_statistics_progression <- function(Design, what="os", cutoff_stats=NA_real_, fixed_objects=NULL, milestones=NULL){
 
   true_summary_statistics_progression_rowwise_pfs <- function(condition, cutoff_stats){
 
@@ -191,32 +189,15 @@ true_summary_statistics_progression <- function(Design, what="os", cutoff_stats=
       }
     }
 
-
-    # create functions for control group with constant hazard from 0 to t_max
-    # minimum of two exponential (constant hazards) distributions is again
-    # exponential with sum of the rates
-    data_generating_model_ctrl <- nph::pchaz(
-      c(0, t_max),
-      c(condition$hazard_ctrl + condition$prog_rate_ctrl)
-    )
-
-    # minimum of two exponential (constant hazards) distributions is again
-    # exponential with sum of the rates
-    # create functions for control group with constant hazard from 0 to t_max
-    data_generating_model_trt <- nph::pchaz(
-      c(0, t_max),
-      c(condition$hazard_trt + condition$prog_rate_trt)
+    real_stats <- fast_real_statistics_pchaz(
+      Tint_trt =  0, lambda_trt  = condition$hazard_trt  + condition$prog_rate_trt,
+      Tint_ctrl = 0, lambda_ctrl = condition$hazard_ctrl + condition$prog_rate_ctrl,
+      cutoff = cutoff_stats, N_trt = condition$n_trt, N_ctrl = condition$n_ctrl, milestones=milestones
     )
 
     res <- cbind(
       condition,
-      internal_real_statistics_pchaz_discrete(
-        data_generating_model_trt,
-        data_generating_model_ctrl,
-        N_trt=condition$n_trt,
-        N_ctrl=condition$n_ctrl,
-        cutoff = cutoff_stats
-      ),
+      real_stats,
       cutoff_used=cutoff_stats
     )
 
@@ -231,8 +212,7 @@ true_summary_statistics_progression <- function(Design, what="os", cutoff_stats=
       # set t_max to 1-1/10000 quantile of control or treatment survival function
       # whichever is later
       t_max <- max(
-        log(10000) / condition$hazard_ctrl,
-        log(10000) / condition$hazard_trt
+        log(10000) / condition$hazard_ctrl
       )
     } else {
       t_max <- fixed_objects$t_max
@@ -269,7 +249,8 @@ true_summary_statistics_progression <- function(Design, what="os", cutoff_stats=
         data_generating_model_ctrl,
         N_trt=condition$n_trt,
         N_ctrl=condition$n_ctrl,
-        cutoff = cutoff_stats
+        cutoff = cutoff_stats,
+        milestones = milestones
       ),
       cutoff_used = cutoff_stats
     )
@@ -277,6 +258,7 @@ true_summary_statistics_progression <- function(Design, what="os", cutoff_stats=
     row.names(res) <- NULL
     res
   }
+
 
   true_summary_statistics_progression_rowwise <- switch(what,
                                                         "os"  = true_summary_statistics_progression_rowwise_os,
@@ -363,4 +345,205 @@ progression_rate_from_progression_prop <- function(design){
   result
 }
 
+#' @describeIn generate_progression calculate censoring rate from censoring proportion
+#'
+#' @return for cen_rate_from_cen_prop_progression: design data.frame with the
+#'   additional column random_withdrawal
+#' @export
+#'
+#' @details cen_rate_from_cen_prop_progression takes the proportion of
+#'   censored patients from the column `censoring_prop`. This column describes
+#'   the proportion of patients who are censored randomly before experiencing an
+#'   event, without regard to administrative censoring.
+#'
+#' @examples
+#' design <- expand.grid(
+#' hazard_ctrl         = 0.001518187, # hazard under control (med. survi. 15m)
+#' hazard_trt          = 0.001265156, # hazard under treatment (med. surv. 18m)
+#' hazard_after_prog   = 0.007590934, # hazard after progression (med. surv. 3m)
+#' prog_rate_ctrl      = 0.001897734, # hazard rate for disease progression under control (med. time to progression 12m)
+#' prog_rate_trt       = c(0.001897734, 0.001423300, 0.001265156), # hazard rate for disease progression unter treatment (med. time to progression 12m, 16m, 18m)
+#' censoring_prop      = 0.1,         # rate of random withdrawal
+#' followup            = 100,         # follow up time
+#' n_trt               = 50,          # patients in treatment arm
+#' n_ctrl              = 50           # patients in control arm
+#' )
+#' cen_rate_from_cen_prop_progression(design)
+cen_rate_from_cen_prop_progression <- function(design){
 
+  rowwise_fun <- function(condition){
+    if(condition$censoring_prop == 0){
+      condition$random_withdrawal <- 0.
+      return(condition)
+    }
+
+    t_max <- condition$followup * 10
+
+    a <- condition$n_trt / (condition$n_trt + condition$n_ctrl)
+    b <- 1-a
+
+    data_generating_model_ctrl <- subpop_hazVfun_simnph(
+      c(0, t_max),
+      lambda1 = condition$hazard_ctrl,
+      lambda2 = condition$hazard_after_prog,
+      lambdaProg = condition$prog_rate_ctrl,
+      timezero = TRUE
+    )
+
+    data_generating_model_trt <- subpop_hazVfun_simnph(
+      c(0, t_max),
+      lambda1 = condition$hazard_trt,
+      lambda2 = condition$hazard_after_prog,
+      lambdaProg = condition$prog_rate_trt,
+      timezero = TRUE
+    )
+
+    cumhaz_trt_tmax  <- tail(data_generating_model_trt$cumhaz, 1)
+    cumhaz_ctrl_tmax <- tail(data_generating_model_trt$cumhaz, 1)
+
+    target_fun <- Vectorize(\(r){
+      cumhaz_censoring <- fast_cumhaz_fun(0, r)
+      prob_cen_ctrl <- cumhaz_censoring(t_max)/(cumhaz_censoring(t_max) + cumhaz_ctrl_tmax)
+      prob_cen_trt  <- cumhaz_censoring(t_max)/(cumhaz_censoring(t_max) + cumhaz_trt_tmax)
+      prob_cen <- a*prob_cen_trt + b*prob_cen_ctrl
+      prob_cen-condition$censoring_prop
+    })
+
+    condition$random_withdrawal <- uniroot(target_fun, interval=c(0, 1e-6), extendInt = "upX", tol=.Machine$double.eps)$root
+
+    condition
+  }
+
+  result <- design |>
+    split(1:nrow(design)) |>
+    lapply(rowwise_fun) |>
+    do.call(what=rbind)
+
+  result
+
+}
+
+
+
+
+#' Calculate hr after onset of treatment effect
+#'
+#' @param design design data.frame
+#' @param target_power_ph target power under proportional hazards
+#' @param followup=NA_real_ time until which the gAHR should be calculated, defaults to `condition$followup`
+#' @param target_alpha=0.05 target alpha level for the power calculation
+#'
+#' @return For hazard_before_progression_from_PH_effect_size: the design
+#'   data.frame passed as argument with the additional column hazard_trt.
+#' @export
+#'
+#' @describeIn generate_progression Calculate hazard in the treatment arm before progression from PH effect size
+#'
+#' @details `hazard_before_progression_from_PH_effect_size` calculates the
+#'   hazard ratio after onset of treatment effect as follows: First calculate
+#'   the hazard in the control arm that would give the same median survival
+#'   under an exponential model. Then calculate the median survival in the
+#'   treatment arm that would give the desired power of the logrank test under
+#'   exponential models in control and treatment arm. Then callibrate the hazard
+#'   before progression in the treatment arm to give the same median survival
+#'   time.
+#'
+#'   This is a heuristic and to some extent arbitrary approach to calculate
+#'   hazard ratios that correspond to reasonable and realistic scenarios.
+#'
+#' @examples
+#' \dontrun{
+#' my_design <- hazard_before_progression_from_PH_effect_size(my_design, target_power_ph=0.9)
+#' }
+hazard_before_progression_from_PH_effect_size <- function(design, target_power_ph=NA_real_, followup=NA_real_, target_alpha=0.05){
+  # hazard ratio required, inverted Schönfeld sample size formula
+  hr_required_schoenfeld <- function(Nevt, alpha=0.05, beta=0.2, p=0.5){
+    exp( (qnorm(beta) + qnorm(alpha)) / sqrt(p*(1-p)*Nevt) )
+  }
+
+  get_hr_after <- function(condition, target_power_ph=NA_real_, followup=followup){
+
+    if(condition$effect_size_ph == 0){
+      condition$hazard_trt <- condition$hazard_ctrl
+      return(condition)
+    }
+
+    t_max <- log(100) / condition$hazard_ctrl
+
+    if(is.na(followup)){
+      if(hasName(condition, "followup")){
+        followup <- condition$followup
+      } else {
+        stop(gettext("followup not given and followup not present in design"))
+      }
+    }
+
+    if(is.na(target_power_ph)){
+      if(hasName(condition, "effect_size_ph")){
+        target_power_ph <- condition$effect_size_ph
+      } else {
+        stop(gettext("target_ph_power not given and effect_size_ph not present in design"))
+      }
+    }
+
+    model_control <- SimNPH:::subpop_hazVfun_simnph(
+      c(0, followup),
+      lambda1 = condition$hazard_ctrl,
+      lambda2 = condition$hazard_after_prog,
+      lambdaProg = condition$prog_rate_ctrl,
+      timezero = TRUE
+    )
+
+    F_ctrl_followup <- model_control$F |>
+      tail(1)
+
+    # setting median to max(t) if less than half die
+    # only for uniroot later, not for general use!
+    median_progression <- function(mod){
+      med <- mod$t[mod$S <= 0.5][1] + 1
+      if(is.na(med)){
+        med <- max(mod$t)
+      }
+      med
+    }
+
+    Nevt <- F_ctrl_followup * (condition$n_ctrl + condition$n_trt)
+    ph_hr <- hr_required_schoenfeld(Nevt, alpha=target_alpha, beta=(1-target_power_ph), p=(condition$n_ctrl/(condition$n_ctrl + condition$n_trt)))
+    median_ctrl <- model_control$t[model_control$S <= 0.5][1]
+
+    hazard_ctrl_ph <- uniroot(
+      \(h){
+        fast_quant_fun(0, h)(0.5) - median_ctrl
+      },
+      interval=c(1e-8, 0.0001),
+      extendInt="downX"
+    )$root
+
+    median_trt_ph  <- fast_quant_fun(0, hazard_ctrl_ph * ph_hr)(0.5)
+
+    target_fun_hazard_trt <- function(hazard_after){
+      sapply(hazard_after, \(h){
+        mod_trt <- SimNPH:::subpop_hazVfun_simnph(
+          c(0, followup),
+          lambda1 = h,
+          lambda2 = condition$hazard_after_prog,
+          lambdaProg = condition$prog_rate_trt,
+          timezero = TRUE
+        )
+        median_trt <- median_progression(mod_trt)
+        median_trt_ph - median_trt
+      })
+    }
+
+    condition$hazard_trt <- uniroot(target_fun_hazard_trt, interval=c(1e-8, 0.0001), extendInt = "upX")$root
+    condition
+  }
+
+  result <- design |>
+    split(1:nrow(design)) |>
+    lapply(get_hr_after, target_power_ph=target_power_ph, followup=followup) |>
+    do.call(what=rbind)
+
+  result
+
+}
