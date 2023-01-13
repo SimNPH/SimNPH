@@ -307,7 +307,12 @@ true_summary_statistics_progression <- function(Design, what="os", cutoff_stats=
 progression_rate_from_progression_prop <- function(design){
 
   rowwise_fun <- function(condition){
-    t_max <- condition$followup * 10
+    # set t_max to 1-1/1000 quantile of control or treatment survival function
+    # whichever is later
+    t_max <- max(
+      log(1000) / condition$hazard_ctrl,
+      log(1000) / condition$hazard_trt
+    )
 
     cumhaz_trt <- fast_cumhaz_fun(
       c(                   0),
@@ -339,7 +344,7 @@ progression_rate_from_progression_prop <- function(design){
 
   result <- design |>
     split(1:nrow(design)) |>
-    lapply(rowwise_fun) |>
+    purrr::map(rowwise_fun, .progress = TRUE) |>
     do.call(what=rbind)
 
   result
@@ -421,7 +426,7 @@ cen_rate_from_cen_prop_progression <- function(design){
 
   result <- design |>
     split(1:nrow(design)) |>
-    lapply(rowwise_fun) |>
+    purrr::map(rowwise_fun, .progress = TRUE) |>
     do.call(what=rbind)
 
   result
@@ -489,8 +494,8 @@ hazard_before_progression_from_PH_effect_size <- function(design, target_power_p
       }
     }
 
-    # set t_max to 1/1000 quantile of control arm
-    t_max <- log(1000) / condition$hazard_ctrl
+    # set t_max to 1/5000 quantile of control arm
+    t_max <- log(500) / condition$hazard_ctrl
 
     model_control <- SimNPH:::subpop_hazVfun_simnph(
       c(0, t_max),
@@ -543,7 +548,7 @@ hazard_before_progression_from_PH_effect_size <- function(design, target_power_p
 
   result <- design |>
     split(1:nrow(design)) |>
-    lapply(get_hr_after, target_power_ph=target_power_ph, final_events=final_events) |>
+    purrr::map(get_hr_after, target_power_ph=target_power_ph, final_events=final_events, .progress=TRUE) |>
     do.call(what=rbind)
 
   result

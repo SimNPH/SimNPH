@@ -46,12 +46,11 @@ design <- merge(
 
 # calculate progression rate from progression proportion  -----------------
 
-design <- SimNPH:::progression_rate_from_progression_prop(design)
+design <- progression_rate_from_progression_prop(design)
 
 # calculate hazards from PH effect size -----------------------------------
 
 design <- hazard_before_progression_from_PH_effect_size(design)
-
 
 # calculate random withdrawal ---------------------------------------------
 

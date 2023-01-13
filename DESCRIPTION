@@ -21,7 +21,7 @@ Suggests:
     withr,
     ldbounds
 Imports:
-    purrr,
+    purrr (>= 1.0.0),
     rlang,
     tibble,
     nph,
