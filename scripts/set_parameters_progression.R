@@ -14,8 +14,8 @@ options <- expand.grid(
   within({
     n_trt <- n_pat / 2
     n_ctrl <- n_pat / 2
-    interim_events <- n_pat / 4
-    final_events <- n_pat / 2
+    final_events <- ceiling(n_pat * 0.75)
+    interim_events <- ceiling(final_events * 0.5)
   })
 
 
@@ -31,9 +31,10 @@ assumptions <- expand.grid(
 ) |>
   subset(prog_prop_ctrl >= prog_prop_trt)
 
+assumptions$hazard_after_prog <- assumptions$hazard_ctrl / assumptions$hr_before_after
+
 # temporary used for progression rates, later updated to match effect size
 assumptions$hazard_trt <- assumptions$hazard_ctrl
-assumptions$hazard_after_prog <- assumptions$hazard_ctrl / assumptions$hr_before_after
 
 # Merging Options and Assumptions -----------------------------------------
 
@@ -44,11 +45,6 @@ design <- merge(
 )
 
 # calculate progression rate from progression proportion  -----------------
-
-design <- design |>
-  within({
-    followup <- log(6) / hazard_ctrl
-  })
 
 design <- SimNPH:::progression_rate_from_progression_prop(design)
 

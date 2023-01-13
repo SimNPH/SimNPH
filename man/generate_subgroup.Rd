@@ -22,7 +22,7 @@ true_summary_statistics_subgroup(
 hazard_subgroup_from_PH_effect_size(
   design,
   target_power_ph = NA_real_,
-  followup = NA_real_,
+  final_events = NA_real_,
   target_alpha = 0.05
 )
 
@@ -45,7 +45,7 @@ cen_rate_from_cen_prop_subgroup(design)
 
 \item{fixed_objects=NULL}{additional settings, see details}
 
-\item{followup=NA_real_}{time until which the gAHR should be calculated, defaults to \code{condition$followup}}
+\item{final_events=NA_real_}{target events for inversion of Schönfeld Formula, defaults to \code{condition$final_events}}
 
 \item{target_alpha=0.05}{target alpha level for the power calculation}
 }

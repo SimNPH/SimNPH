@@ -430,7 +430,7 @@ cen_rate_from_cen_prop_progression <- function(design){
 #'
 #' @param design design data.frame
 #' @param target_power_ph target power under proportional hazards
-#' @param followup=NA_real_ time until which the gAHR should be calculated, defaults to `condition$followup`
+#' @param final_events=NA_real_ target events for inversion of Schönfeld Formula, defaults to `condition$final_events`
 #' @param target_alpha=0.05 target alpha level for the power calculation
 #'
 #' @return For hazard_before_progression_from_PH_effect_size: the design
@@ -455,26 +455,24 @@ cen_rate_from_cen_prop_progression <- function(design){
 #' \dontrun{
 #' my_design <- hazard_before_progression_from_PH_effect_size(my_design, target_power_ph=0.9)
 #' }
-hazard_before_progression_from_PH_effect_size <- function(design, target_power_ph=NA_real_, followup=NA_real_, target_alpha=0.05){
+hazard_before_progression_from_PH_effect_size <- function(design, target_power_ph=NA_real_, final_events=NA_real_, target_alpha=0.05){
   # hazard ratio required, inverted Schönfeld sample size formula
   hr_required_schoenfeld <- function(Nevt, alpha=0.05, beta=0.2, p=0.5){
     exp( (qnorm(beta) + qnorm(alpha)) / sqrt(p*(1-p)*Nevt) )
   }
 
-  get_hr_after <- function(condition, target_power_ph=NA_real_, followup=followup){
+  get_hr_after <- function(condition, target_power_ph=NA_real_, final_events=NA_real_){
 
     if(condition$effect_size_ph == 0){
       condition$hazard_trt <- condition$hazard_ctrl
       return(condition)
     }
 
-    t_max <- log(100) / condition$hazard_ctrl
-
-    if(is.na(followup)){
-      if(hasName(condition, "followup")){
-        followup <- condition$followup
+    if(is.na(final_events)){
+      if(hasName(condition, "final_events")){
+        final_events <- condition$final_events
       } else {
-        stop(gettext("followup not given and followup not present in design"))
+        stop("final_events not given and not present in condition")
       }
     }
 
@@ -486,16 +484,16 @@ hazard_before_progression_from_PH_effect_size <- function(design, target_power_p
       }
     }
 
+    # set t_max to 1/1000 quantile of control arm
+    t_max <- log(1000) / condition$hazard_ctrl
+
     model_control <- SimNPH:::subpop_hazVfun_simnph(
-      c(0, followup),
+      c(0, t_max),
       lambda1 = condition$hazard_ctrl,
       lambda2 = condition$hazard_after_prog,
       lambdaProg = condition$prog_rate_ctrl,
       timezero = TRUE
     )
-
-    F_ctrl_followup <- model_control$F |>
-      tail(1)
 
     # setting median to max(t) if less than half die
     # only for uniroot later, not for general use!
@@ -507,9 +505,8 @@ hazard_before_progression_from_PH_effect_size <- function(design, target_power_p
       med
     }
 
-    Nevt <- F_ctrl_followup * (condition$n_ctrl + condition$n_trt)
-    ph_hr <- hr_required_schoenfeld(Nevt, alpha=target_alpha, beta=(1-target_power_ph), p=(condition$n_ctrl/(condition$n_ctrl + condition$n_trt)))
-    median_ctrl <- model_control$t[model_control$S <= 0.5][1]
+    ph_hr <- hr_required_schoenfeld(final_events, alpha=target_alpha, beta=(1-target_power_ph), p=(condition$n_ctrl/(condition$n_ctrl + condition$n_trt)))
+    median_ctrl <- median_progression(model_control)
 
     hazard_ctrl_ph <- uniroot(
       \(h){
@@ -524,7 +521,7 @@ hazard_before_progression_from_PH_effect_size <- function(design, target_power_p
     target_fun_hazard_trt <- function(hazard_after){
       sapply(hazard_after, \(h){
         mod_trt <- SimNPH:::subpop_hazVfun_simnph(
-          c(0, followup),
+          c(0, t_max),
           lambda1 = h,
           lambda2 = condition$hazard_after_prog,
           lambdaProg = condition$prog_rate_trt,
@@ -541,7 +538,7 @@ hazard_before_progression_from_PH_effect_size <- function(design, target_power_p
 
   result <- design |>
     split(1:nrow(design)) |>
-    lapply(get_hr_after, target_power_ph=target_power_ph, followup=followup) |>
+    lapply(get_hr_after, target_power_ph=target_power_ph, final_events=final_events) |>
     do.call(what=rbind)
 
   result

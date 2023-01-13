@@ -18,7 +18,7 @@ hr_after_onset_from_gAHR(design, target_gAHR, cutoff = NA_real_)
 hr_after_onset_from_PH_effect_size(
   design,
   target_power_ph = NA_real_,
-  followup = NA_real_,
+  final_events = NA_real_,
   target_alpha = 0.05
 )
 
@@ -46,7 +46,7 @@ true_summary_statistics_delayed_effect(
 
 \item{Design}{Design data.frame for delayed effect}
 
-\item{followup=NA_real_}{time until which the gAHR should be calculated, defaults to \code{condition$followup}}
+\item{final_events=NA_real_}{target events for inversion of Schönfeld Formula, defaults to \code{condition$final_events}}
 
 \item{target_alpha=0.05}{target alpha level for the power calculation}
 
@@ -182,6 +182,8 @@ my_design <- merge(
     design_fixed_followup(),
     by=NULL
   )
+
+my_design$final_events <- ceiling((my_design$n_trt + my_design$n_ctrl)*0.75)
 my_design$hazard_trt <- NA
 my_design <- hr_after_onset_from_PH_effect_size(my_design, target_power_ph=0.9)
 my_design

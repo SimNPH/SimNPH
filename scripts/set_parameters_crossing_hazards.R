@@ -14,8 +14,8 @@ options <- expand.grid(
   within({
     n_trt <- n_pat / 2
     n_ctrl <- n_pat / 2
-    interim_events <- n_pat / 4
-    final_events <- n_pat / 2
+    final_events <- ceiling(n_pat * 0.75)
+    interim_events <- ceiling(final_events * 0.5)
   })
 
 
@@ -49,9 +49,6 @@ design <- merge(
 # hazards with the given effect size. Fails if onset of treatment effect is
 # after the median survival time
 design <- design |>
-  within({
-    followup <- log(6) / hazard_ctrl
-  }) |>
   hr_after_crossing_from_PH_effect_size()
 
 # rate of random censoring
