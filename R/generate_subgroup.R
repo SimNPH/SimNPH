@@ -365,7 +365,12 @@ cen_rate_from_cen_prop_subgroup <- function(design){
       return(condition)
     }
 
-    t_max <- condition$followup * 10
+    # set t_max to 1-1/10000 quantile of control or treatment survival function
+    # whichever is later
+    t_max <- max(
+      log(10000) / condition$hazard_ctrl,
+      log(10000) / condition$hazard_trt
+    )
 
     a <- condition$n_trt / (condition$n_trt + condition$n_ctrl)
     b <- 1-a
