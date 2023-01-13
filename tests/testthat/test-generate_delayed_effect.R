@@ -196,6 +196,9 @@ test_that("test that hr_after_onset_from_PH_effect_size works", {
   my_design$hazard_trt <- NA
   my_design$hazard_ctrl <- 0.1
 
+  my_design$followup <- NULL
+  my_design$final_events <- (my_design$n_trt + my_design$n_ctrl) * 0.75
+
   suppressWarnings(
     expect_warning(
       my_design_B <- hr_after_onset_from_PH_effect_size(my_design, 0.9)
@@ -205,20 +208,6 @@ test_that("test that hr_after_onset_from_PH_effect_size works", {
 
   my_design_E <- hr_after_onset_from_PH_effect_size(my_design, 0)
   expect_equal(my_design_E$hazard_trt, my_design$hazard_ctrl)
-
-  expect_error(
-    my_design_C <- hr_after_onset_from_PH_effect_size(my_design, followup = 200)
-  )
-
-  my_design$effect_size_ph <- 0.9
-  suppressWarnings(
-    expect_warning(
-      my_design_D <- hr_after_onset_from_PH_effect_size(my_design, followup=200)
-    )
-  )
-
-  my_design$followup <- NULL
-  expect_error(hr_after_onset_from_PH_effect_size(my_design, 0.9))
 
   expect_equal(is.na(my_design_B$hazard_trt), c(F, F, F, F, T, T))
 })

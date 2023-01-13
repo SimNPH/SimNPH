@@ -235,7 +235,7 @@ true_summary_statistics_subgroup <- function(Design, cutoff_stats=NA_real_, mile
 #'
 #' @param design design data.frame
 #' @param target_power_ph target power under proportional hazards
-#' @param followup=NA_real_ time until which the gAHR should be calculated, defaults to `condition$followup`
+#' @param final_events=NA_real_ target events for inversion of Schönfeld Formula, defaults to `condition$final_events`
 #' @param target_alpha=0.05 target alpha level for the power calculation
 #'
 #' @return For hazard_subgroup_from_PH_effect_size: the design data.frame passed as
@@ -268,20 +268,19 @@ true_summary_statistics_subgroup <- function(Design, cutoff_stats=NA_real_, mile
 #' my_design$hr_subgroup_relative <- 0.9
 #' my_design <- hazard_subgroup_from_PH_effect_size(my_design, target_power_ph=0.9)
 #' my_design
-hazard_subgroup_from_PH_effect_size <- function(design, target_power_ph=NA_real_, followup=NA_real_, target_alpha=0.05){
+hazard_subgroup_from_PH_effect_size <- function(design, target_power_ph=NA_real_, final_events=NA_real_, target_alpha=0.05){
   # hazard ratio required, inverted Schönfeld sample size formula
   hr_required_schoenfeld <- function(Nevt, alpha=0.05, beta=0.2, p=0.5){
     exp( (qnorm(beta) + qnorm(alpha)) / sqrt(p*(1-p)*Nevt) )
   }
 
-  get_hr_after <- function(condition, target_power_ph=NA_real_, followup=followup){
-    t_max <- log(100) / condition$hazard_ctrl
+  get_hr_after <- function(condition, target_power_ph=NA_real_, final_events=NA_real_){
 
-    if(is.na(followup)){
-      if(hasName(condition, "followup")){
-        followup <- condition$followup
+    if(is.na(final_events)){
+      if(hasName(condition, "final_events")){
+        final_events <- condition$final_events
       } else {
-        stop(gettext("followup not given and followup not present in design"))
+        stop("final_events not given and not present in condition")
       }
     }
 
@@ -297,9 +296,7 @@ hazard_subgroup_from_PH_effect_size <- function(design, target_power_ph=NA_real_
       condition$hazard_trt <- condition$hazard_ctrl
     }
 
-    F_ctrl_followup <- fast_cdf_fun(0, condition$hazard_ctrl)(followup) # enter paramters for control arm
-    Nevt <- F_ctrl_followup * (condition$n_ctrl + condition$n_trt)
-    ph_hr <- hr_required_schoenfeld(Nevt, alpha=target_alpha, beta=(1-target_power_ph), p=(condition$n_ctrl/(condition$n_ctrl + condition$n_trt)))
+    ph_hr <- hr_required_schoenfeld(final_events, alpha=target_alpha, beta=(1-target_power_ph), p=(condition$n_ctrl/(condition$n_ctrl + condition$n_trt)))
 
     median_trt  <- fast_quant_fun(0, condition$hazard_ctrl * ph_hr)(0.5)
     median_ctrl <- fast_quant_fun(0, condition$hazard_ctrl        )(0.5)
@@ -327,7 +324,7 @@ hazard_subgroup_from_PH_effect_size <- function(design, target_power_ph=NA_real_
 
   result <- design |>
     split(1:nrow(design)) |>
-    lapply(get_hr_after, target_power_ph=target_power_ph, followup=followup) |>
+    lapply(get_hr_after, target_power_ph=target_power_ph, final_events=final_events) |>
     do.call(what=rbind)
 
   result
@@ -368,7 +365,12 @@ cen_rate_from_cen_prop_subgroup <- function(design){
       return(condition)
     }
 
-    t_max <- condition$followup * 10
+    # set t_max to 1-1/10000 quantile of control or treatment survival function
+    # whichever is later
+    t_max <- max(
+      log(10000) / condition$hazard_ctrl,
+      log(10000) / condition$hazard_trt
+    )
 
     a <- condition$n_trt / (condition$n_trt + condition$n_ctrl)
     b <- 1-a
