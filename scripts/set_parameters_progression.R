@@ -15,7 +15,7 @@ options <- expand.grid(
     n_trt <- n_pat / 2
     n_ctrl <- n_pat / 2
     final_events <- ceiling(n_pat * 0.75)
-    interim_events <- ceiling(final_events * 0.5)
+    interim_events <- ceiling(final_events * 0.5) # 75% estimated from reconstructed KM curves
   })
 
 

@@ -66,15 +66,32 @@ internal_real_statistics_pchaz_discrete <- function(data_gen_model_trt, data_gen
 
 
 
+# function to calculate the real summary statistics for piecewise constant hazards
+#
+# arguments:
+#  * haz_trt     hazard function of the treatment arm
+#  * pdf_trt     probability density function of the treatment arm
+#  * surv_trt    survival function of the treatment arm
+#  * quant_trt   quantile function of the treatment arm
+#  * haz_ctrl    hazard function of the control arm
+#  * pdf_ctrl    probability density function of the control arm
+#  * surv_ctrl   survival function of the control arm
+#  * quant_ctrl  quantile function of the control arm
+#  * N_trt       number of patients in the treatment arm
+#  * N_ctrl      number of patients in the control arm
+#  * cutoff      cutoff used to calculate rmst and average hazard ratios
+#  * milestones  milestones at which to compute the milestone survival
 fast_real_statistics <- function(
     haz_trt,  pdf_trt,  surv_trt, quant_trt,
     haz_ctrl, pdf_ctrl, surv_ctrl, quant_ctrl,
     N_trt=1, N_ctrl=1, cutoff=1000, milestones=NULL
 ){
 
+  # define helper functions for the calculation of the average hazard ratios
   h  <- \(t){haz_trt(t)+haz_ctrl(t)}
   f  <- \(t){(1/(N_trt+N_ctrl))*(N_trt*pdf_trt(t) + N_ctrl*pdf_ctrl(t))}
 
+  # calculate all the summary statistics
   res <- data.frame(
     rmst_trt            = integrate(surv_trt, 0, cutoff)$value,
     median_survival_trt = quant_trt(0.5),
@@ -85,6 +102,7 @@ fast_real_statistics <- function(
       integrate(\(t){(haz_ctrl(t)/h(t)) * f(t)}, 0, cutoff)$value
   )
 
+  # if times for milestone survival are given calculate milestone survival at given times
   if(!is.null(milestones)){
     if(is.null(names(milestones))){
       my_colnames <- paste0("milestone_surv_", milestones)
