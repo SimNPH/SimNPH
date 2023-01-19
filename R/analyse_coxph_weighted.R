@@ -1,6 +1,7 @@
 #' Analyse Dataset with weighted Cox regression
 #'
 #' @param type="SG" type of weights, see Details
+#' @param max_time=NA_real_ cutoff time for estimation, defaults to last event time
 #'
 #' @return an analyse function that returns a data.frame with the columns
 #' * `p` p value of the score test
@@ -29,12 +30,18 @@
 #'   head(1)
 #' dat <- generate_delayed_effect(condition)
 #' analyse_coxph_weighted()(condition, dat)
-analyse_coxph_weighted <- function(type="SG"){
+analyse_coxph_weighted <- function(type="SG", max_time=NA_real_){
   if(!(type %in% c("SG", "S", "G"))){
     stop('in analyse_coxph_weighted: invalid "type", currently implemented: "SG" and "G".')
   }
 
   function(condition, dat, fixed_objects = NULL){
+    # TODO: check this
+    # censor at cutoff time
+    if(!is.na(max_time)){
+      dat$evt[dat$t > max_time] <- FALSE
+      dat$t <- pmin(dat$t, max_time)
+    }
 
     # set t_max to last non-censored observation to avoid infinite weights
     t_max <- max(dat$t[dat$evt])
