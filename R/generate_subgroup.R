@@ -100,32 +100,19 @@ invisible(
 #' Calculate true summary statistics for scenarios with differential treatment effect in subgroup
 #'
 #' @param Design Design data.frame for subgroup
-#' @param cutoff_stats=NA_real_ cutoff time, see details
+#' @param cutoff_stats=NULL (optionally named) cutoff times, see details
 #' @param milestones=NULL (optionally named) vector of times at which milestone survival should be calculated
 #' @param fixed_objects=NULL additional settings, see details
 #'
 #' @return For true_summary_statistics_subgroup: the design data.frame
-#'   passed as argument with the additional columns:
-#' * `rmst_trt` rmst in the treatment group
-#' * `median_surv_trt` median survival in the treatment group
-#' * `rmst_ctrl` rmst in the control group
-#' * `median_surv_ctrl` median survial in the control group
-#' * `gAHR` geometric average hazard ratio
-#' * `AHR` average hazard ratio
+#'   passed as argument with the additional columns
 #'
 #' @export
 #'
 #' @details
 #'
-#' The if `fixed_objects` contains `t_max` then this value is used as the
-#' maximum time to calculate function like survival, hazard, ... of the data
-#' generating models. If this is not given `t_max` is choosen as the minimum of
-#' the `1-(1/10000)` quantile of all survival distributions in the model.
-#'
-#' `cutoff_stats` is the time used to calculate the statistics like average
-#' hazard ratios and RMST, that are only calculated up to a certain point. It
-#' defaults to `NA_real_` in which case the variable `followup` from the Design
-#' dataset is used. If `followup` is also not set it uses `t_max`.
+#' `cutoff_stats` are the times used to calculate the statistics like average
+#' hazard ratios and RMST, that are only calculated up to a certain point.
 #'
 #' @describeIn generate_subgroup  calculate true summary statistics for subgroup
 #'
@@ -137,28 +124,9 @@ invisible(
 #'   )
 #' my_design <- true_summary_statistics_subgroup(my_design)
 #' my_design
-true_summary_statistics_subgroup <- function(Design, cutoff_stats=NA_real_, milestones=NULL, fixed_objects=NULL){
+true_summary_statistics_subgroup <- function(Design, cutoff_stats=NULL, milestones=NULL, fixed_objects=NULL){
 
   true_summary_statistics_subgroup_rowwise <- function(condition, cutoff_stats, milestones){
-
-    if(is.null(fixed_objects) || (!hasName(fixed_objects, "t_max"))){
-      # set t_max to 1-1/10000 quantile of control or treatment survival function
-      # whichever is later
-      t_max <- max(
-        log(10000) / condition$hazard_ctrl,
-        log(10000) / condition$hazard_trt
-      )
-    } else {
-      t_max <- fixed_objects$t_max
-    }
-
-    if(is.na(cutoff_stats)){
-      if(hasName(condition, "followup")){
-        cutoff_stats <- condition$followup
-      } else {
-        cutoff_stats <- t_max
-      }
-    }
 
     if (condition$prevalence < 0 || condition$prevalence > 1) {
       stop(gettext("Subgroup prevalence has to be between 0 and 1"))
@@ -208,13 +176,12 @@ true_summary_statistics_subgroup <- function(Design, cutoff_stats=NA_real_, mile
     real_stats <- fast_real_statistics(
       haz_trt,  pdf_trt,  surv_trt, quant_trt,
       haz_ctrl, pdf_ctrl, surv_ctrl, quant_ctrl,
-      N_trt=condition$n_trt, N_ctrl=condition$n_ctrl, cutoff=cutoff_stats, milestones=NULL
+      N_trt=condition$n_trt, N_ctrl=condition$n_ctrl, cutoff=cutoff_stats, milestones=milestones
     )
 
     res <- cbind(
       condition,
-      real_stats,
-      cutoff_used=cutoff_stats
+      real_stats
     )
 
     row.names(res) <- NULL
@@ -223,7 +190,7 @@ true_summary_statistics_subgroup <- function(Design, cutoff_stats=NA_real_, mile
 
   Design <- Design |>
     split(1:nrow(Design)) |>
-    mapply(FUN=true_summary_statistics_subgroup_rowwise, cutoff_stats = cutoff_stats, MoreArgs = list(milestones=milestones), SIMPLIFY = FALSE)
+    lapply(true_summary_statistics_subgroup_rowwise, cutoff_stats = cutoff_stats, milestones=milestones)
 
   Design <- do.call(rbind, Design)
 

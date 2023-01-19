@@ -109,33 +109,37 @@ test_that("test that true_summary_statistics_crossing_hazards works", {
     crossing=c(0,7),
     hazard_ctrl=0.2,
     hazard_trt_before=c(0.5, 0.2),
-    hazard_trt_after =c(0.2, 0.02),
-    cutoff_stats=c(7, 15),
-    followup = 18
+    hazard_trt_after =c(0.2, 0.02)
   )
 
   test_design1 <- test_design |>
-    true_summary_statistics_crossing_hazards(cutoff_stats = test_design$cutoff_stats)
+    true_summary_statistics_crossing_hazards(cutoff_stats = c(7, 15))
 
   test_design2 <- test_design |>
     true_summary_statistics_crossing_hazards()
 
-  test_design3  <- test_design |>
-    subset(select=c(-followup)) |>
-    true_summary_statistics_crossing_hazards()
-
   test_design4 <- test_design |>
-    true_summary_statistics_crossing_hazards(cutoff_stats = test_design$cutoff_stats, milestones=c("milestone1"=10))
+    true_summary_statistics_crossing_hazards(cutoff_stats = c(7,15), milestones=c("milestone1"=10))
 
-  expect_named(test_design1, c("n_trt", "n_ctrl", "crossing", "hazard_ctrl", "hazard_trt_before", "hazard_trt_after", "cutoff_stats", "followup", "rmst_trt", "median_survival_trt", "rmst_ctrl", "median_survival_ctrl", "gAHR", "AHR", "cutoff_used"))
+  expect_named(test_design1, c("n_trt", "n_ctrl", "crossing", "hazard_ctrl", "hazard_trt_before",
+                               "hazard_trt_after", "median_survival_trt", "median_survival_ctrl",
+                               "rmst_trt_7", "rmst_ctrl_7", "gAHR_7", "AHR_7", "rmst_trt_15",
+                               "rmst_ctrl_15", "gAHR_15", "AHR_15"))
 
-  expect_named(test_design4, c("n_trt", "n_ctrl", "crossing", "hazard_ctrl", "hazard_trt_before", "hazard_trt_after", "cutoff_stats", "followup", "rmst_trt", "median_survival_trt", "rmst_ctrl", "median_survival_ctrl", "gAHR", "AHR", "milestone1_trt", "milestone1_ctrl", "cutoff_used"))
+  expect_named(test_design2, c("n_trt", "n_ctrl", "crossing", "hazard_ctrl", "hazard_trt_before",
+                               "hazard_trt_after", "median_survival_trt", "median_survival_ctrl"))
+
+  expect_named(test_design4, c("n_trt", "n_ctrl", "crossing", "hazard_ctrl", "hazard_trt_before",
+                               "hazard_trt_after", "median_survival_trt", "median_survival_ctrl",
+                               "rmst_trt_7", "rmst_ctrl_7", "gAHR_7", "AHR_7", "rmst_trt_15",
+                               "rmst_ctrl_15", "gAHR_15", "AHR_15",
+                               "milestone_survival_trt_milestone1", "milestone_survival_ctrl_milestone1"))
 
   expect(
     with(
       test_design1,
       all(
-        AHR[(hazard_ctrl == hazard_trt_before) & (hazard_ctrl == hazard_trt_after)] == 1
+        AHR_7[(hazard_ctrl == hazard_trt_before) & (hazard_ctrl == hazard_trt_after)] == 1
       )
     ),
     "all average hazard ratios should be 1 for equal hazards"
@@ -145,7 +149,7 @@ test_that("test that true_summary_statistics_crossing_hazards works", {
     with(
       test_design1,
       all(
-        AHR[(crossing >= cutoff_stats) & (hazard_trt_before == hazard_ctrl)] == 1
+        AHR_7[(crossing >= 7) & (hazard_trt_before == hazard_ctrl)] == 1
       )
     ),
     "all average hazard ratios should be 1 if hazards are only differnt after cutoff"
@@ -155,7 +159,7 @@ test_that("test that true_summary_statistics_crossing_hazards works", {
     with(
       test_design1,
       all(
-        gAHR[(hazard_ctrl == hazard_trt_before) & (hazard_ctrl == hazard_trt_after)] == 1
+        gAHR_7[(hazard_ctrl == hazard_trt_before) & (hazard_ctrl == hazard_trt_after)] == 1
       )
     ),
     "all geometric average hazard ratios should be 1 for equal hazards"
@@ -165,15 +169,12 @@ test_that("test that true_summary_statistics_crossing_hazards works", {
     with(
       test_design1,
       all(
-        gAHR[(crossing >= cutoff_stats) & (hazard_trt_before == hazard_ctrl)] == 1
+        gAHR_7[(crossing >= 7) & (hazard_trt_before == hazard_ctrl)] == 1
       )
     ),
     "all geometric average hazard ratios should be 1 if hazards are only differnt after cutoff"
   )
 
-  expect(all(test_design2$cutoff_used == test_design2$followup), "cutoff used defaults to followup")
-
-  expect(all(!is.na(test_design3$cutoff_used)), "cutoff is calculated if cutoff_stats and followup are missing")
 })
 
 test_that("test that true_summary_statistics_crossing_hazards fails on crossing < 0", {
@@ -185,16 +186,6 @@ test_that("test that true_summary_statistics_crossing_hazards fails on crossing 
 
   expect_error(
     true_summary_statistics_crossing_hazards(scenario)
-  )
-})
-
-test_that("test that true_summary_statistics_crossing_hazards works, if t_max is given", {
-  capture_output(
-    scenario <- merge(assumptions_crossing_hazards(), design_fixed_followup(), by=NULL)[1, ]
-  )
-
-  expect_s3_class(
-    true_summary_statistics_crossing_hazards(scenario, fixed_objects=list(t_max=10)), "data.frame"
   )
 })
 
