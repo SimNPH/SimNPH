@@ -65,7 +65,7 @@ my_analyse <- list(
   # estimation
   ahr  = analyse_ahr(type="AHR"),
   gahr = analyse_ahr(type="gAHR"),
-  mean_surv = analyse_diff_mean_survival(),
+  median_surv = analyse_diff_median_survival(),
   milestone = analyse_milestone_survival(times=m2d(c(8, 12))),
   rmst = analyse_rmst_diff(),
   cox = analyse_coxph(),
@@ -125,7 +125,7 @@ my_analyse <- wrap_all_in_trycatch(my_analyse)
 my_summarise <- create_summarise_function(
   ahr = summarise_estimator(est=AHR, real=AHR),
   gahr = summarise_estimator(est=gAHR, real=gAHR),
-  mean_surv = summarise_estimator(est=diff_Q, real=median_survival_trt/median_survival_ctrl),
+  median_surv = summarise_estimator(est=diff_Q, real=median_survival_trt/median_survival_ctrl),
   milestone = summarise_estimator(est=milestone_surv_ratio[1], real= ms_surv_8_ctrl/ ms_surv_8_trt, name="milestone_8" ),
   milestone = summarise_estimator(est=milestone_surv_ratio[2], real=ms_surv_12_ctrl/ms_surv_12_trt, name="milestone_12"),
   rmst = summarise_estimator(est=rmst_diff, real=rmst_trt-rmst_ctrl),

@@ -12,8 +12,8 @@ test_that("analyse diff means survival works", {
 
   expect_type(analyse_rmst_diff(), "closure")
 
-  results <- analyse_diff_mean_survival()(condition, dat)
-  results2 <- analyse_diff_mean_survival(0.7)(condition, dat)
+  results <- analyse_diff_median_survival()(condition, dat)
+  results2 <- analyse_diff_median_survival(0.7)(condition, dat)
 
   expect_type(results, "list")
   expect_s3_class(results, NA)
