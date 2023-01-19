@@ -1,4 +1,4 @@
-#' Analyse the dataset using differnce in mena survival
+#' Analyse the dataset using differnce in median survival
 #'
 #' @param quant=0.5 quantile for which the difference should be calculated, defaults to the median
 #'
@@ -32,8 +32,8 @@
 #'   ) |>
 #'   head(1)
 #' dat <- generate_delayed_effect(condition)
-#' analyse_diff_mean_survival()(condition, dat)
-analyse_diff_mean_survival <- function(quant=0.5){
+#' analyse_diff_median_survival()(condition, dat)
+analyse_diff_median_survival <- function(quant=0.5){
   function(condition, dat, fixed_objects = NULL){
     model <- trycatch_nphparams(nph::nphparams(dat$t, dat$evt, dat$trt, param_type="Q", param_par=quant))
 

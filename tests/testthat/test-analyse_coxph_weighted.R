@@ -21,9 +21,17 @@ test_that("weighted cox regression works", {
   analyse_sg <- analyse_coxph_weighted(type="SG")
   analyse_g  <- analyse_coxph_weighted(type="G")
 
+  analyse_s_50  <- analyse_coxph_weighted(type="S", max_time=50)
+  analyse_sg_50 <- analyse_coxph_weighted(type="SG", max_time=50)
+  analyse_g_50  <- analyse_coxph_weighted(type="G", max_time=50)
+
   res_s  <- analyse_s (condition, dat)
   res_sg <- analyse_sg(condition, dat)
   res_g  <- analyse_g (condition, dat)
+
+  res_s_50  <- analyse_s_50 (condition, dat)
+  res_sg_50 <- analyse_sg_50(condition, dat)
+  res_g_50  <- analyse_g_50 (condition, dat)
 
   expect_error(analyse_coxph_weighted(type="something else"))
 
@@ -35,11 +43,20 @@ test_that("weighted cox regression works", {
   expect_s3_class(res_sg, NA)
   expect_named(res_sg, c("p", "coef", "hr", "hr_lower", "hr_upper", "N_pat", "N_evt", "followup"))
 
-  expect_type(res_s, "list")
-  expect_s3_class(res_s, NA)
-  expect_named(res_s, c("p", "coef", "hr", "hr_lower", "hr_upper", "N_pat", "N_evt", "followup"))
-
   expect_type(res_g, "list")
   expect_s3_class(res_g, NA)
   expect_named(res_g, c("p", "coef", "hr", "hr_lower", "hr_upper", "N_pat", "N_evt", "followup"))
+
+  expect_type(res_s_50, "list")
+  expect_s3_class(res_s_50, NA)
+  expect_named(res_s_50, c("p", "coef", "hr", "hr_lower", "hr_upper", "N_pat", "N_evt", "followup"))
+
+  expect_type(res_sg_50, "list")
+  expect_s3_class(res_sg_50, NA)
+  expect_named(res_sg_50, c("p", "coef", "hr", "hr_lower", "hr_upper", "N_pat", "N_evt", "followup"))
+
+  expect_type(res_g_50, "list")
+  expect_s3_class(res_g_50, NA)
+  expect_named(res_g_50, c("p", "coef", "hr", "hr_lower", "hr_upper", "N_pat", "N_evt", "followup"))
+
 })

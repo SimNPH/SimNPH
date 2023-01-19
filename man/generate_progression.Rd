@@ -16,7 +16,7 @@ generate_progression(condition, fixed_objects = NULL)
 true_summary_statistics_progression(
   Design,
   what = "os",
-  cutoff_stats = NA_real_,
+  cutoff_stats = NULL,
   fixed_objects = NULL,
   milestones = NULL
 )
@@ -45,7 +45,9 @@ hazard_before_progression_from_PH_effect_size(
 
 \item{what="os"}{True summary statistics for which estimand}
 
-\item{cutoff_stats=NA_real_}{cutoff time, see details}
+\item{cutoff_stats=NULL}{(optionally named) cutoff time, see details}
+
+\item{milestones=NULL}{(optionally named) vector of times at which milestone survival should be calculated}
 
 \item{fixed_objects=NULL}{additional settings, see details}
 
@@ -61,15 +63,7 @@ For generate_progression: A dataset with the columns t (time) and trt
 t_ice (time of intercurrent event), ice (intercurrent event)
 
 For true_summary_statistics_subgroup: the design data.frame
-passed as argument with the additional columns:
-\itemize{
-\item \code{rmst_trt} rmst in the treatment group
-\item \code{median_surv_trt} median survival in the treatment group
-\item \code{rmst_ctrl} rmst in the control group
-\item \code{median_surv_ctrl} median survial in the control group
-\item \code{gAHR} geometric average hazard ratio
-\item \code{AHR} average hazard ratio
-}
+passed as argument with the additional columns
 
 For progression_rate_from_progression_prop: the design data.frame passed as
 argument with the additional columns prog_rate_trt, prog_rate_ctrl
@@ -114,10 +108,8 @@ maximum time to calculate function like survival, hazard, ... of the data
 generating models. If this is not given \code{t_max} is choosen as the minimum of
 the \code{1-(1/10000)} quantile of all survival distributions in the model.
 
-\code{cutoff_stats} is the time used to calculate the statistics like average
-hazard ratios and RMST, that are only calculated up to a certain point. It
-defaults to \code{NA_real_} in which case the variable \code{followup} from the Design
-dataset is used. If \code{followup} is also not set it uses \code{t_max}.
+\code{cutoff_stats} are the times used to calculate the statistics like average
+hazard ratios and RMST, that are only calculated up to a certain point.
 
 For progression_rate_from_progression_prop, the design data.frame,
 has to contain the columns \code{prog_prop_trt} and \code{prog_prop_ctrl} with the
@@ -172,7 +164,6 @@ my_design <- merge(
     design_fixed_followup(),
     by=NULL
   )
-my_design$follwup <- 15
 my_design_os  <- true_summary_statistics_subgroup(my_design, "os")
 my_design_pfs <- true_summary_statistics_subgroup(my_design, "pfs")
 my_design_os

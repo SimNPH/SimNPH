@@ -71,23 +71,33 @@ test_that("true summary statistics progression works", {
   design_2 <- design
   design_2$followup <- NULL
 
-  summaries_os     <- true_summary_statistics_progression(design, what="os")
-  summaries_pfs    <- true_summary_statistics_progression(design, what="pfs")
+  summaries_os     <- true_summary_statistics_progression(design, what="os", cutoff=c(75), milestones=c(50, 100))
+  summaries_pfs    <- true_summary_statistics_progression(design, what="pfs", cutoff=c(75), milestones=c(50, 100))
   summaries_os_2   <- true_summary_statistics_progression(design, what="os", fixed_objects = list(t_max=10000))
   summaries_pfs_2  <- true_summary_statistics_progression(design, what="pfs", fixed_objects = list(t_max=10000))
-  summaries_os_3   <- true_summary_statistics_progression(design_2, what="os")
-  summaries_pfs_3  <- true_summary_statistics_progression(design_2, what="pfs")
+  summaries_os_3   <- true_summary_statistics_progression(design_2, what="os", cutoff=c("a"=75), milestones=c("first"=50, "second"=100))
+  summaries_pfs_3  <- true_summary_statistics_progression(design_2, what="pfs", cutoff=c("a"=75), milestones=c("first"=50, "second"=100))
 
   expect_error(true_summary_statistics_progression(design, what="something else"))
 
-  expect_named(summaries_pfs, c(names(design), "rmst_trt", "median_survival_trt", "rmst_ctrl", "median_survival_ctrl", "gAHR", "AHR", "cutoff_used"))
-  expect_named(summaries_os , c(names(design), "rmst_trt", "median_survival_trt", "rmst_ctrl", "median_survival_ctrl", "gAHR", "AHR", "cutoff_used"))
 
-  expect_named(summaries_pfs_2, c(names(design), "rmst_trt", "median_survival_trt", "rmst_ctrl", "median_survival_ctrl", "gAHR", "AHR", "cutoff_used"))
-  expect_named(summaries_os_2 , c(names(design), "rmst_trt", "median_survival_trt", "rmst_ctrl", "median_survival_ctrl", "gAHR", "AHR", "cutoff_used"))
 
-  expect_named(summaries_pfs_3, c(names(design_2), "rmst_trt", "median_survival_trt", "rmst_ctrl", "median_survival_ctrl", "gAHR", "AHR", "cutoff_used"))
-  expect_named(summaries_os_3 , c(names(design_2), "rmst_trt", "median_survival_trt", "rmst_ctrl", "median_survival_ctrl", "gAHR", "AHR", "cutoff_used"))
+  expect_named(summaries_pfs, c(names(design), "median_survival_trt", "median_survival_ctrl",
+                                "rmst_trt_75", "rmst_ctrl_75", "gAHR_75", "AHR_75", "milestone_survival_trt_50",
+                                "milestone_survival_ctrl_50", "milestone_survival_trt_100", "milestone_survival_ctrl_100"))
+  expect_named(summaries_os , c(names(design), "median_survival_trt", "median_survival_ctrl",
+                                "rmst_trt_75", "rmst_ctrl_75", "gAHR_75", "AHR_75", "milestone_survival_trt_50",
+                                "milestone_survival_ctrl_50", "milestone_survival_trt_100", "milestone_survival_ctrl_100"))
+
+  expect_named(summaries_pfs_2, c(names(design), "median_survival_trt", "median_survival_ctrl"))
+  expect_named(summaries_os_2 , c(names(design), "median_survival_trt", "median_survival_ctrl"))
+
+  expect_named(summaries_pfs_3, c(names(design_2), "median_survival_trt", "median_survival_ctrl",
+                                  "rmst_trt_a", "rmst_ctrl_a", "gAHR_a", "AHR_a", "milestone_survival_trt_first",
+                                  "milestone_survival_ctrl_first", "milestone_survival_trt_second", "milestone_survival_ctrl_second"))
+  expect_named(summaries_os_3 , c(names(design_2), "median_survival_trt", "median_survival_ctrl",
+                                  "rmst_trt_a", "rmst_ctrl_a", "gAHR_a", "AHR_a", "milestone_survival_trt_first",
+                                  "milestone_survival_ctrl_first", "milestone_survival_trt_second", "milestone_survival_ctrl_second"))
 })
 
 test_that("censoring rate from censoring proportion for disease progression works", {

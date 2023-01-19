@@ -230,7 +230,7 @@ summarise_estimator <- function(est, real, lower=NULL, upper=NULL, name=NULL){
 #' sim_results[, grepl("rejection", names(sim_results))]
 summarise_test <- function(alpha, name=NULL){
   res <- function(condition, results, fixed_objects){
-    rejection_tmp <- outer(results$p, 1-alpha, FUN=`<`) |>
+    rejection_tmp <- outer(results$p, alpha, FUN=`<`) |>
       colMeans(na.rm=TRUE) |>
       as.list() |>
       as.data.frame() |>

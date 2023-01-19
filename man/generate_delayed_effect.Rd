@@ -26,7 +26,7 @@ cen_rate_from_cen_prop_delayed_effect(design)
 
 true_summary_statistics_delayed_effect(
   Design,
-  cutoff_stats = NA_real_,
+  cutoff_stats = NULL,
   milestones = NULL,
   fixed_objects = NULL
 )
@@ -50,7 +50,7 @@ true_summary_statistics_delayed_effect(
 
 \item{target_alpha=0.05}{target alpha level for the power calculation}
 
-\item{cutoff_stats=NA_real_}{cutoff time, see details}
+\item{cutoff_stats=NULL}{(optionally named) cutoff times, see details}
 
 \item{milestones=NULL}{(optionally named) vector of times at which milestone survival should be calculated}
 
@@ -72,15 +72,7 @@ for cen_rate_from_cen_prop_delayed_effect: design data.frame with the
 additional column random_withdrawal
 
 For true_summary_statistics_delayed_effect: the design data.frame
-passed as argument with the additional columns:
-\itemize{
-\item \code{rmst_trt} rmst in the treatment group
-\item \code{median_surv_trt} median survival in the treatment group
-\item \code{rmst_ctrl} rmst in the control group
-\item \code{median_surv_ctrl} median survial in the control group
-\item \code{gAHR} geometric average hazard ratio
-\item \code{AHR} average hazard ratio
-}
+passed as argument with additional columns
 }
 \description{
 Generate Dataset with delayed effect
@@ -131,15 +123,8 @@ censored patients from the column \code{censoring_prop}. This column describes
 the proportion of patients who are censored randomly before experiencing an
 event, without regard to administrative censoring.
 
-The if \code{fixed_objects} contains \code{t_max} then this value is used as the
-maximum time to calculate function like survival, hazard, ... of the data
-generating models. If this is not given \code{t_max} is choosen as the minimum of
-the \code{1-(1/10000)} quantile of all survival distributions in the model.
-
-\code{cutoff_stats} is the time used to calculate the statistics like average
-hazard ratios and RMST, that are only calculated up to a certain point. It
-defaults to \code{NA_real_} in which case the variable \code{followup} from the Design
-dataset is used. If \code{followup} is also not set it uses \code{t_max}.
+\code{cutoff_stats} are the times used to calculate the statistics like average
+hazard ratios and RMST, that are only calculated up to a certain point.
 }
 \section{Functions}{
 \itemize{
@@ -202,7 +187,6 @@ my_design <- merge(
     design_fixed_followup(),
     by=NULL
   )
-my_design$followup <- 15
 my_design <- true_summary_statistics_delayed_effect(my_design)
 my_design
 }

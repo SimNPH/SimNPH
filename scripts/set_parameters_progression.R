@@ -15,7 +15,7 @@ options <- expand.grid(
     n_trt <- n_pat / 2
     n_ctrl <- n_pat / 2
     final_events <- ceiling(n_pat * 0.75)
-    interim_events <- ceiling(final_events * 0.5)
+    interim_events <- ceiling(final_events * 0.5) # 75% estimated from reconstructed KM curves
   })
 
 
@@ -59,10 +59,18 @@ design <- cen_rate_from_cen_prop_progression(design)
 # calculate real statistics -----------------------------------------------
 
 design_os <- design |>
-  true_summary_statistics_progression(what="os")
+  true_summary_statistics_progression(
+    what="os",
+    milestones   = m2d(c("6m"=6, "12m"=12)),
+    cutoff_stats = m2d(c("6m"=6, "12m"=12))
+  )
 
 design_pfs <- design |>
-  true_summary_statistics_progression(what="pfs")
+  true_summary_statistics_progression(
+    what="pfs",
+    milestones   = m2d(c("6m"=6, "12m"=12)),
+    cutoff_stats = m2d(c("6m"=6, "12m"=12))
+  )
 
 
 # Saving ------------------------------------------------------------------

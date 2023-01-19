@@ -349,32 +349,19 @@ cen_rate_from_cen_prop_crossing_hazards <- function(design){
 #' Calculate true summary statistics for scenarios with crossing hazards
 #'
 #' @param Design Design data.frame for crossing hazards
-#' @param cutoff_stats=NA_real_ cutoff time, see details
+#' @param cutoff_stats=NULL (optionally named) cutoff time, see details
 #' @param milestones=NULL (optionally named) vector of times at which milestone survival should be calculated
 #' @param fixed_objects=NULL additional settings, see details
 #'
 #' @return For true_summary_statistics_crossing_hazards: the design data.frame
-#'   passed as argument with the additional columns:
-#' * `rmst_trt` rmst in the treatment group
-#' * `median_surv_trt` median survival in the treatment group
-#' * `rmst_ctrl` rmst in the control group
-#' * `median_surv_ctrl` median survial in the control group
-#' * `gAHR` geometric average hazard ratio
-#' * `AHR` average hazard ratio
+#'   passed as argument with additional columns,
 #'
 #' @export
 #'
 #' @details
 #'
-#' The if `fixed_objects` contains `t_max` then this value is used as the
-#' maximum time to calculate function like survival, hazard, ... of the data
-#' generating models. If this is not given `t_max` is choosen as the minimum of
-#' the `1-(1/10000)` quantile of all survival distributions in the model.
-#'
-#' `cutoff_stats` is the time used to calculate the statistics like average
-#' hazard ratios and RMST, that are only calculated up to a certain point. It
-#' defaults to `NA_real_` in which case the variable `followup` from the Design
-#' dataset is used. If `followup` is also not set it uses `t_max`.
+#' `cutoff_stats` are the times used to calculate the statistics like average
+#' hazard ratios and RMST, that are only calculated up to a certain point.
 #'
 #' @describeIn generate_crossing_hazards  calculate true summary statistics for crossing hazards
 #'
@@ -387,32 +374,9 @@ cen_rate_from_cen_prop_crossing_hazards <- function(design){
 #' my_design$follwup <- 15
 #' my_design <- true_summary_statistics_crossing_hazards(my_design)
 #' my_design
-true_summary_statistics_crossing_hazards <- function(Design, cutoff_stats=NA_real_, milestones=NULL, fixed_objects=NULL){
+true_summary_statistics_crossing_hazards <- function(Design, cutoff_stats=NULL, milestones=NULL, fixed_objects=NULL){
 
   true_summary_statistics_crossing_hazards_rowwise <- function(condition, cutoff_stats, milestones){
-
-    # if t_max is not given in fixed_objects
-    if(is.null(fixed_objects) || (!hasName(fixed_objects, "t_max"))){
-      # set t_max to 1-1/10000 quantile of control or treatment survival function
-      # whichever is later
-      t_max <- max(
-        log(10000) / condition$hazard_ctrl,
-        log(10000) / condition$hazard_trt_after,
-        log(10000) / condition$hazard_trt_before
-      )
-    } else {
-      t_max <- fixed_objects$t_max
-    }
-
-    if(is.na(cutoff_stats)){
-      if(hasName(condition, "followup")){
-        cutoff_stats <- condition$followup
-      } else {
-        cutoff_stats <- t_max
-      }
-    }
-
-
     # create functions for treatment group
     if (condition$crossing < 0){
       # if crossing is smaller than 0 stop with error
@@ -438,8 +402,7 @@ true_summary_statistics_crossing_hazards <- function(Design, cutoff_stats=NA_rea
 
     res <- cbind(
       condition,
-      real_stats,
-      cutoff_used=cutoff_stats
+      real_stats
     )
 
     row.names(res) <- NULL
@@ -448,7 +411,7 @@ true_summary_statistics_crossing_hazards <- function(Design, cutoff_stats=NA_rea
 
   Design <- Design |>
     split(1:nrow(Design)) |>
-    mapply(FUN=true_summary_statistics_crossing_hazards_rowwise, cutoff_stats = cutoff_stats, MoreArgs = list(milestones=milestones), SIMPLIFY = FALSE)
+    lapply(true_summary_statistics_crossing_hazards_rowwise, cutoff_stats = cutoff_stats, milestones=milestones)
 
   Design <- do.call(rbind, Design)
 

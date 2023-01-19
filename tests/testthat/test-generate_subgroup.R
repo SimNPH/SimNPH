@@ -97,30 +97,25 @@ test_that("test that true_summary_statistics_subgroup works", {
     hazard_ctrl=0.2,
     hazard_trt=c(0.2, 0.02),
     hazard_subgroup=1e-4,
-    random_withdrawal=0.01,
-    cutoff_stats=c(7, 15),
-    followup=18
+    random_withdrawal=0.01
   )
 
   test_design1 <- test_design |>
-    true_summary_statistics_subgroup(cutoff_stats = test_design$cutoff_stats)
+    true_summary_statistics_subgroup(cutoff_stats = c(7, 15), milestones = c(10))
 
-  test_design2 <- test_design |>
-    true_summary_statistics_subgroup()
+  expect_named(test_design1, c("n_trt", "n_ctrl", "prevalence", "hazard_ctrl", "hazard_trt",
+                               "hazard_subgroup", "random_withdrawal",
+                               "median_survival_trt", "median_survival_ctrl", "rmst_trt_7",
+                               "rmst_ctrl_7", "gAHR_7", "AHR_7", "rmst_trt_15", "rmst_ctrl_15",
+                               "gAHR_15", "AHR_15", "milestone_survival_trt_10", "milestone_survival_ctrl_10"
+  ))
 
-  test_design3  <- test_design |>
-    subset(select=c(-followup)) |>
-    true_summary_statistics_subgroup()
+  expect(all(test_design1$gAHR_7[(test_design1$prevalence == 0) & (test_design1$hazard_ctrl == test_design1$hazard_trt)] == 1), "all gAHR should be 1 for equal hazards and prevalence == 0")
+  expect(all(test_design1$ AHR_15[(test_design1$prevalence == 0) & (test_design1$hazard_ctrl == test_design1$hazard_trt)] == 1), "all AHR should be 1 for equal hazards and prevalence == 0")
 
-  expect_named(test_design1, c("n_trt", "n_ctrl", "prevalence", "hazard_ctrl", "hazard_trt", "hazard_subgroup", "random_withdrawal", "cutoff_stats", "followup", "rmst_trt", "median_survival_trt", "rmst_ctrl", "median_survival_ctrl", "gAHR", "AHR", "cutoff_used"))
+  expect(all(test_design1$gAHR_7[(test_design1$prevalence == 0) & (test_design1$hazard_ctrl == test_design1$hazard_trt)] == 1), "all gAHR should be 1 for equal hazards and prevalence == 0")
+  expect(all(test_design1$ AHR_15[(test_design1$prevalence == 0) & (test_design1$hazard_ctrl == test_design1$hazard_trt)] == 1), "all AHR should be 1 for equal hazards and prevalence == 0")
 
-  expect(all(test_design1$gAHR[(test_design1$prevalence == 0) & (test_design1$hazard_ctrl == test_design1$hazard_trt)] == 1), "all gAHR should be 1 for equal hazards and prevalence == 0")
-
-  expect(all(test_design1$ AHR[(test_design1$prevalence == 0) & (test_design1$hazard_ctrl == test_design1$hazard_trt)] == 1), "all AHR should be 1 for equal hazards and prevalence == 0")
-
-  expect(all(test_design2$cutoff_used == test_design2$followup), "cutoff used defaults to followup")
-
-  expect(all(!is.na(test_design3$cutoff_used)), "cutoff is calculated if cutoff_stats and followup are missing")
 })
 
 test_that("test that true_summary_statistics_subgroup fails prevalence not in [0,1]", {
@@ -141,13 +136,5 @@ test_that("test that true_summary_statistics_subgroup fails prevalence not in [0
   )
 })
 
-test_that("test that true_summary_statistics_subgroup works, if t_max is given", {
-  capture_output(
-    scenario <- merge(assumptions_subgroup(), design_fixed_followup(), by=NULL)[1, ]
-  )
 
-  expect_s3_class(
-    true_summary_statistics_subgroup(scenario, fixed_objects=list(t_max=10)), "data.frame"
-  )
-})
 
