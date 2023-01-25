@@ -4,10 +4,12 @@
 \alias{random_censoring_exp}
 \title{Apply Random Exponentially Distributed Censoring}
 \usage{
-random_censoring_exp(dat, rate)
+random_censoring_exp(dat, rate, discrete = TRUE)
 }
 \arguments{
 \item{rate}{time of end of enrollment}
+
+\item{discrete}{should the censoring times be rounded to whole days?}
 }
 \value{
 Returns a Function with one argument \code{dat} that modifies a dataset generated
