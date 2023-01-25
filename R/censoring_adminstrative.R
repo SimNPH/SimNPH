@@ -3,6 +3,7 @@
 #' @param dat a simulated dataset
 #' @param recruitment_until time of end of recruitment
 #' @param recruitment_from time of start of recruitment (defaults to 0)
+#' @param discrete=TRUE should the recruitment time be rounded to full days?
 #'
 #' @return
 #' Returns the dataset with added recruitment times.
@@ -13,8 +14,12 @@
 #' @examples
 #' dat <- data.frame(t=c(0, 1, 2), trt=c(FALSE, FALSE, TRUE))
 #' recruitment_uniform(dat, 7, 0)
-recruitment_uniform <- function(dat, recruitment_until, recruitment_from=0){
-  dat$rec_time <- runif(nrow(dat), recruitment_from, recruitment_until)
+recruitment_uniform <- function(dat, recruitment_until, recruitment_from=0, discrete=TRUE){
+  if(discrete){
+    dat$rec_time <- floor(runif(nrow(dat), recruitment_from, recruitment_until)) + 1
+  } else {
+    dat$rec_time <- runif(nrow(dat), recruitment_from, recruitment_until)
+  }
   dat
 }
 

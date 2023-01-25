@@ -6,7 +6,12 @@
 \alias{admin_censoring_events}
 \title{Add recruitment time to Dataset}
 \usage{
-recruitment_uniform(dat, recruitment_until, recruitment_from = 0)
+recruitment_uniform(
+  dat,
+  recruitment_until,
+  recruitment_from = 0,
+  discrete = TRUE
+)
 
 admin_censoring_time(dat, followup, keep_non_recruited = FALSE)
 
@@ -27,6 +32,8 @@ admin_censoring_events(
 \item{followup}{followup time}
 
 \item{events}{number of events after which the dataset is analyzed}
+
+\item{discrete=TRUE}{should the recruitment time be rounded to full days?}
 
 \item{on_incomplete=c("ignore", "warn", "stop")}{what should be done if there are fewer events than planned}
 }

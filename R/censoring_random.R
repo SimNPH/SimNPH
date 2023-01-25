@@ -1,6 +1,7 @@
 #' Apply Random Exponentially Distributed Censoring
 #'
 #' @param rate time of end of enrollment
+#' @param discrete should the censoring times be rounded to whole days?
 #'
 #' @return
 #' Returns a Function with one argument `dat` that modifies a dataset generated
@@ -33,7 +34,7 @@
 #'   ylab = "censored times"
 #' )
 #' abline(0,1)
-random_censoring_exp <- function(dat, rate){
+random_censoring_exp <- function(dat, rate, discrete=TRUE){
   censor_fixed_time_internal <- function(dat, time_var, evt_var, cen_time){
     if(all(c(time_var, evt_var) %in% names(dat))){
       dat[[evt_var]][ dat[[time_var]] > cen_time ] <- FALSE
@@ -43,7 +44,11 @@ random_censoring_exp <- function(dat, rate){
   }
 
   if(rate > 0){
-    censoring_time <- rexp(nrow(dat), rate = rate)
+    if(discrete){
+      censoring_time <- floor(rexp(nrow(dat), rate = rate)) + 1
+    } else {
+      censoring_time <- rexp(nrow(dat), rate = rate)
+    }
     dat <- dat |>
       censor_fixed_time_internal("t", "evt", censoring_time) |>
       censor_fixed_time_internal("t_ice", "ice", censoring_time)
