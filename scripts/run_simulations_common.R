@@ -17,7 +17,9 @@ my_analyse <- list(
   pw_exp_3  = analyse_piecewise_exponential(cuts=m2d(seq(0, 240, by= 3)), testing_only=TRUE),
   pw_exp_12 = analyse_piecewise_exponential(cuts=m2d(seq(0, 240, by=12)), testing_only=TRUE),
   peto_peto = analyse_gehan_wilcoxon(),
-  fh = analyse_logrank_fh_weights(rho=0, gamma=1),
+  fh_0_0 = analyse_logrank_fh_weights(rho=0, gamma=0),
+  fh_0_1 = analyse_logrank_fh_weights(rho=0, gamma=1),
+  fh_1_0 = analyse_logrank_fh_weights(rho=1, gamma=0),
   logrank = analyse_logrank(),
   max_combo = analyse_maxcombo(),
   modest_6 = analyse_modelstly_weighted(t_star=m2d(6)),
@@ -29,11 +31,23 @@ my_analyse <- list(
     alpha = nominal_alpha,
     analyse_functions = analyse_gehan_wilcoxon()
   ),
-  fh_gs = analyse_group_sequential(
+  fh_gs_0_0 = analyse_group_sequential(
+    followup = c(condition$interim_events, condition$final_events),
+    followup_type = c("event", "event"),
+    alpha = nominal_alpha,
+    analyse_functions = analyse_logrank_fh_weights(rho=0, gamma=0)
+  ),
+  fh_gs_0_1 = analyse_group_sequential(
     followup = c(condition$interim_events, condition$final_events),
     followup_type = c("event", "event"),
     alpha = nominal_alpha,
     analyse_functions = analyse_logrank_fh_weights(rho=0, gamma=1)
+  ),
+  fh_gs_1_0 = analyse_group_sequential(
+    followup = c(condition$interim_events, condition$final_events),
+    followup_type = c("event", "event"),
+    alpha = nominal_alpha,
+    analyse_functions = analyse_logrank_fh_weights(rho=1, gamma=0)
   ),
   logrank_gs = analyse_group_sequential(
     followup = c(condition$interim_events, condition$final_events),
@@ -83,14 +97,18 @@ my_summarise <- create_summarise_function(
   pw_exp_3 = summarise_test(alpha),
   pw_exp_12 = summarise_test(alpha),
   peto_peto = summarise_test(alpha),
-  fh = summarise_test(alpha),
+  fh_0_0 = summarise_test(alpha),
+  fh_0_1 = summarise_test(alpha),
+  fh_1_0 = summarise_test(alpha),
   logrank = summarise_test(alpha),
   max_combo = summarise_test(alpha),
   modest_6 = summarise_test(alpha),
   modest_8 = summarise_test(alpha),
   # tests group sequential
   peto_peto_gs = summarise_group_sequential(),
-  fh_gs = summarise_group_sequential(),
+  fh_gs_0_0 = summarise_group_sequential(),
+  fh_gs_0_1 = summarise_group_sequential(),
+  fh_gs_1_0 = summarise_group_sequential(),
   logrank_gs = summarise_group_sequential(),
   max_combo_gs = summarise_group_sequential(),
   modest_gs_6 = summarise_group_sequential(),
