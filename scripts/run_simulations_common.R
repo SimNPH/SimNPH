@@ -72,7 +72,8 @@ my_analyse <- list(
     followup_type = c("event", "event"),
     alpha = nominal_alpha,
     analyse_functions = analyse_modelstly_weighted(t_star=m2d(8))
-  )
+  ),
+  descriptive = analyse_describe()
 )
 
 my_analyse <- wrap_all_in_trycatch(my_analyse)
@@ -112,6 +113,7 @@ my_summarise <- create_summarise_function(
   logrank_gs = summarise_group_sequential(),
   max_combo_gs = summarise_group_sequential(),
   modest_gs_6 = summarise_group_sequential(),
-  modest_gs_8 = summarise_group_sequential()
+  modest_gs_8 = summarise_group_sequential(),
+  descriptive = summarise_describe()
 )
 

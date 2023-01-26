@@ -62,6 +62,8 @@ export(hazard_before_progression_from_PH_effect_size)
 export(results_pivot_longer)
 export(nested_loop_plot)
 export(trellis_plot)
+export(analyse_describe)
+export(summarise_describe)
 
 importFrom(Rcpp,evalCpp)
 useDynLib(SimNPH, .registration = TRUE)
