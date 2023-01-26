@@ -20,6 +20,7 @@ my_analyse <- list(
   fh_0_0 = analyse_logrank_fh_weights(rho=0, gamma=0),
   fh_0_1 = analyse_logrank_fh_weights(rho=0, gamma=1),
   fh_1_0 = analyse_logrank_fh_weights(rho=1, gamma=0),
+  fh_1_1 = analyse_logrank_fh_weights(rho=1, gamma=1),
   logrank = analyse_logrank(),
   max_combo = analyse_maxcombo(),
   modest_6 = analyse_modelstly_weighted(t_star=m2d(6)),
@@ -48,6 +49,12 @@ my_analyse <- list(
     followup_type = c("event", "event"),
     alpha = nominal_alpha,
     analyse_functions = analyse_logrank_fh_weights(rho=1, gamma=0)
+  ),
+  fh_gs_1_1 = analyse_group_sequential(
+    followup = c(condition$interim_events, condition$final_events),
+    followup_type = c("event", "event"),
+    alpha = nominal_alpha,
+    analyse_functions = analyse_logrank_fh_weights(rho=1, gamma=1)
   ),
   logrank_gs = analyse_group_sequential(
     followup = c(condition$interim_events, condition$final_events),
@@ -101,6 +108,7 @@ my_summarise <- create_summarise_function(
   fh_0_0 = summarise_test(alpha),
   fh_0_1 = summarise_test(alpha),
   fh_1_0 = summarise_test(alpha),
+  fh_1_1 = summarise_test(alpha),
   logrank = summarise_test(alpha),
   max_combo = summarise_test(alpha),
   modest_6 = summarise_test(alpha),
@@ -110,6 +118,7 @@ my_summarise <- create_summarise_function(
   fh_gs_0_0 = summarise_group_sequential(),
   fh_gs_0_1 = summarise_group_sequential(),
   fh_gs_1_0 = summarise_group_sequential(),
+  fh_gs_1_1 = summarise_group_sequential(),
   logrank_gs = summarise_group_sequential(),
   max_combo_gs = summarise_group_sequential(),
   modest_gs_6 = summarise_group_sequential(),

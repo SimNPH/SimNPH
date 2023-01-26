@@ -1,16 +1,9 @@
 
-package_url <- "https://github.com/SimNPH/SimNPH/archive/refs/tags/sims_delayed.zip"
-download.file(package_url, destfile = "sims_delayed.zip")
-dir.create("sims_delayed")
-unzip("sims_delayed.zip", exdir = "sims_delayed")
-setwd("sims_delayed/SimNPH-sims_delayed/")
-devtools::install(".", upgrade="never", build=TRUE, quick=TRUE, dependencies=TRUE)
-
 library(SimNPH)
 library(SimDesign)
 library(parallel)
 
-if(packageVersion("SimNPH") != "0.1.4"){
+if(packageVersion("SimNPH") != "0.2.0"){
   stop("Please run the simulations with the correct vesion of the SimNPH package for reproducability.")
 }
 
@@ -36,7 +29,7 @@ clusterEvalQ(cl, {
 # setup data generation ---------------------------------------------------
 
 # load parameters
-design <- read.table("data/parameters/delayed_effect_2023-01-17.csv", sep=",", dec=".", header=TRUE)
+design <- read.table("data/parameters/delayed_effect_2023-01-26.csv", sep=",", dec=".", header=TRUE)
 
 # define generator
 my_generator <- function(condition, fixed_objects=NULL){

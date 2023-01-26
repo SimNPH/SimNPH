@@ -1,23 +1,9 @@
-package_url <- "https://github.com/SimNPH/SimNPH/archive/refs/tags/sims_crossing.zip"
-download.file(package_url, destfile = "sims_crossing.zip")
-dir.create("sims_crossing")
-unzip("sims_crossing.zip", exdir = "sims_crossing")
-setwd("sims_crossing/SimNPH-sims_crossing/")
 
-# installing package to local library to not interfere with other versions
-# running in the same filesystem
-dir.create("local_lib")
-withr::with_libpaths(
-  "local_lib",
-  devtools::install(".", build=TRUE, quick=TRUE, dependencies=TRUE),
-  action="prefix"
-)
-
-withr::with_libpaths("local_lib", library("SimNPH"))
+library(SimNPH)
 library(SimDesign)
 library(parallel)
 
-if(packageVersion("SimNPH") != "0.1.4"){
+if(packageVersion("SimNPH") != "0.2.0"){
   stop("Please run the simulations with the correct vesion of the SimNPH package for reproducability.")
 }
 
@@ -35,7 +21,7 @@ cl <- makeCluster(n_cores)
 
 clusterEvalQ(cl, {
   library(SimDesign)
-  withr::with_libpaths("local_lib", library("SimNPH"))
+  library(SimNPH)
   library(parallel)
 })
 
@@ -43,7 +29,7 @@ clusterEvalQ(cl, {
 # setup data generation ---------------------------------------------------
 
 # load parameters
-design <- read.table("data/parameters/crossing_hazards_2023-01-17.csv", sep=",", dec=".", header=TRUE)
+design <- read.table("data/parameters/crossing_hazards_2023-01-26.csv", sep=",", dec=".", header=TRUE)
 
 # define generator
 my_generator <- function(condition, fixed_objects=NULL){
