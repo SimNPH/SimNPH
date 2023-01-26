@@ -1,6 +1,6 @@
 #' Analyse Dataset with the Cox Protportional Hazards Model
 #'
-#' @return an analyse function that returns a data.frame with the columns
+#' @return an analyse function that returns a list with the elements
 #' * `p` p value of the score test
 #' * `coef` coefficient for `trt`
 #' * `hr` hazard ratio for `trt`

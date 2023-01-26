@@ -231,9 +231,8 @@ true_summary_statistics_progression <- function(Design, what="os", cutoff_stats=
 
   Design <- Design |>
     split(1:nrow(Design)) |>
-    lapply(true_summary_statistics_progression_rowwise, cutoff_stats = cutoff_stats, milestones=milestones)
-
-  Design <- do.call(rbind, Design)
+    purrr::map(true_summary_statistics_progression_rowwise, cutoff_stats = cutoff_stats, milestones=milestones, .progress = TRUE) |>
+    do.call(what=rbind)
 
   Design
 }
