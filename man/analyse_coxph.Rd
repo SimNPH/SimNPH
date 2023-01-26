@@ -7,7 +7,7 @@
 analyse_coxph()
 }
 \value{
-an analyse function that returns a data.frame with the columns
+an analyse function that returns a list with the elements
 \itemize{
 \item \code{p} p value of the score test
 \item \code{coef} coefficient for \code{trt}
