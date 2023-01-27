@@ -1,5 +1,5 @@
 
-folder_name <- "sims_delayed_2"
+folder_name <- "sims_2"
 git_tag <- "sims_2"
 
 zip_name <- paste0(folder_name, ".zip")
