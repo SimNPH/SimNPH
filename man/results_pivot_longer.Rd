@@ -6,7 +6,7 @@
 \alias{trellis_plot}
 \title{functions for plotting results}
 \usage{
-results_pivot_longer(data)
+results_pivot_longer(data, exclude_from_methods = c("descriptive"))
 
 nested_loop_plot(data, xvars, yvar, yvar_sd = NULL)
 
@@ -28,6 +28,8 @@ trellis_plot(
 
 \item{trellis_var}{variable for faccets}
 
+\item{exclude_from_methods=c("descriptive")}{"methods" that should not be pivoted into long format}
+
 \item{yvar_sd=NULL}{variables that contain the standard deviations of the y-variables}
 
 \item{trellis_var_y=NULL}{optional additional variable for faccets}
@@ -44,6 +46,10 @@ a ggplot object
 functions for plotting results
 }
 \details{
+With \code{exclude_from_methods} descriptive statistics or results of
+reference methods can be kept as own columns and used like the columns of
+the simulation parameters.
+
 A nested loop plot is a plot in which all variables on the x-axis
 are displayed together by sorting by the first, the second, ... variable
 and then creating a factor containing all variable levels.In this way a

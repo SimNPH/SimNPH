@@ -13,3 +13,4 @@ notes_drafts_etc
 /src/*.dll
 /src/*.o
 testdata
+%LOCALAPPDATA%
