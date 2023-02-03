@@ -3,9 +3,14 @@
 #' @describeIn results_pivot_longer pivot simulation results into long format
 #'
 #' @param data for results_pivot_longer: simulation result as retured by SimDesign
+#' @param exclude_from_methods=c("descriptive") "methods" that should not be pivoted into long format
 #'
 #' @return dataset in long format with one row per method and scenario and one
 #'   column per metric
+#'
+#' @details With `exclude_from_methods` descriptive statistics or results of
+#'   reference methods can be kept as own columns and used like the columns of
+#'   the simulation parameters.
 #'
 #' @export
 #'
@@ -14,7 +19,7 @@
 #'   plot_data <- simulation_results |>
 #'   results_pivot_longer
 #' }
-results_pivot_longer <- function(data){
+results_pivot_longer <- function(data, exclude_from_methods=c("descriptive")){
   # delete potentially huge attributes that are not needed for plots
   attr(data, "ERROR_msg")    <- NULL
   attr(data, "WARNING_msg")  <- NULL
@@ -22,15 +27,21 @@ results_pivot_longer <- function(data){
 
   methods <- attr(data, "design_names") |>
     getElement("sim") |>
-    str_extract("^[^\\.]*")
+    str_extract(".*(?=\\.[^\\d])")
 
   summaries <- attr(data, "design_names") |>
     getElement("sim") |>
-    str_extract("(?<=\\.).*")
+    str_remove(str_c(methods, "."))
 
-  pivot_spec <- tibble(.name=attr(data, "design_names")$sim, .value=summaries, method=methods)
+  include <- !(methods %in% exclude_from_methods)
 
-  data |>
+  pivot_spec <- tibble(
+    .name=attr(data, "design_names")$sim[include],
+    .value=summaries[include],
+    method=methods[include]
+    )
+
+  result <- data |>
     rename(
       n_pat_design = n_pat
     ) |>
@@ -39,7 +50,7 @@ results_pivot_longer <- function(data){
 
 order_combine_xvars <- function(data, xvars){
   data |>
-    arrange(!!!xvars) |>
+    arrange(across(all_of(xvars))) |>
     unite(x, !!!xvars) |>
     mutate(
       x = fct_inorder(x)
@@ -87,19 +98,20 @@ nested_loop_plot <- function(data, xvars, yvar, yvar_sd=NULL){
 
 
   if(is.null(yvar_sd)){
-    data$sd <- NA_real_
+    data <- data |>
+      mutate(
+        lower=NA_real_,
+        upper=NA_real_
+      )
   } else {
     yvar_sd <- sym(yvar_sd)
     data <- data |>
       mutate(
-        sd = !!yvar_sd
+        sd = !!yvar_sd,
+        lower = !!yvar - 2*sd/sqrt(REPLICATIONS),
+        upper = !!yvar + 2*sd/sqrt(REPLICATIONS)
       )
   }
-
-  data <- data |> mutate(
-    lower = !!yvar - 2*sd/sqrt(REPLICATIONS),
-    upper = !!yvar + 2*sd/sqrt(REPLICATIONS)
-  )
 
   ggplot(data, aes(x=x, y=!!yvar, group=method, colour=method, ymin=lower, ymax=upper, fill=method)) +
     geom_line() +
@@ -151,28 +163,27 @@ nested_loop_plot <- function(data, xvars, yvar, yvar_sd=NULL){
 #'    trellis_var_y="prog_prop_ctrl"
 #'  )
 #' }
-trellis_plot <- function(data, xvars, yvar, trellis_var, yvar_sd=NULL, trellis_var_y=NULL){
+trellis_plot <- function(data, xvar, yvar, trellis_var, yvar_sd=NULL, trellis_var_y=NULL){
   yvar <- sym(yvar)
-
-  data <- data |>
-    order_combine_xvars(xvars)
+  xvar <- sym(xvar)
 
   if(is.null(yvar_sd)){
-    data$sd <- NA_real_
+    data <- data |>
+      mutate(
+        lower=NA_real_,
+        upper=NA_real_
+      )
   } else {
     yvar_sd <- sym(yvar_sd)
     data <- data |>
       mutate(
-        sd = !!yvar_sd
+        sd = !!yvar_sd,
+        lower = !!yvar - 2*sd/sqrt(REPLICATIONS),
+        upper = !!yvar + 2*sd/sqrt(REPLICATIONS)
       )
   }
 
-  data <- data |> mutate(
-    lower = !!yvar - 2*sd/sqrt(REPLICATIONS),
-    upper = !!yvar + 2*sd/sqrt(REPLICATIONS)
-  )
-
-  gg <- ggplot(data, aes(x=x, y=!!yvar, group=method, colour=method, ymin=lower, ymax=upper, fill=method)) +
+  gg <- ggplot(data, aes(x=!!xvar, y=!!yvar, colour=method, ymin=lower, ymax=upper, fill=method)) +
     geom_line() +
     geom_ribbon(alpha=0.3)
 
