@@ -163,28 +163,27 @@ nested_loop_plot <- function(data, xvars, yvar, yvar_sd=NULL){
 #'    trellis_var_y="prog_prop_ctrl"
 #'  )
 #' }
-trellis_plot <- function(data, xvars, yvar, trellis_var, yvar_sd=NULL, trellis_var_y=NULL){
+trellis_plot <- function(data, xvar, yvar, trellis_var, yvar_sd=NULL, trellis_var_y=NULL){
   yvar <- sym(yvar)
-
-  data <- data |>
-    order_combine_xvars(xvars)
+  xvar <- sym(xvar)
 
   if(is.null(yvar_sd)){
-    data$sd <- NA_real_
+    data <- data |>
+      mutate(
+        lower=NA_real_,
+        upper=NA_real_
+      )
   } else {
     yvar_sd <- sym(yvar_sd)
     data <- data |>
       mutate(
-        sd = !!yvar_sd
+        sd = !!yvar_sd,
+        lower = !!yvar - 2*sd/sqrt(REPLICATIONS),
+        upper = !!yvar + 2*sd/sqrt(REPLICATIONS)
       )
   }
 
-  data <- data |> mutate(
-    lower = !!yvar - 2*sd/sqrt(REPLICATIONS),
-    upper = !!yvar + 2*sd/sqrt(REPLICATIONS)
-  )
-
-  gg <- ggplot(data, aes(x=x, y=!!yvar, group=method, colour=method, ymin=lower, ymax=upper, fill=method)) +
+  gg <- ggplot(data, aes(x=!!xvar, y=!!yvar, colour=method, ymin=lower, ymax=upper, fill=method)) +
     geom_line() +
     geom_ribbon(alpha=0.3)
 
