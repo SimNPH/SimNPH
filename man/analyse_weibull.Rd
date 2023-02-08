@@ -7,16 +7,19 @@
 analyse_weibull()
 }
 \value{
-an analysis function that returns a data.frame with the columns
-\itemize{
-\item \code{est_med_trt} estimated median survival in the treatment arm
-\item \code{est_med_ctrl} estimated median survival in the control arm
-\item \code{N_pat} number of patients
-\item \code{N_evt} number of events
-}
+an analysis function that returns a data.frame
 }
 \description{
 Analyse Dataset with Weibull Regression
+}
+\details{
+the columns in the return are the two-sided p-value for the test of
+equal medians. The estimated medians in the treatment and control group and
+the estimated difference in median survival with confidence intervals.
+
+The estimates and tests are comstructed by fitting seperate Weibull
+regression models in the treatment and control groups and then estimating
+the medians and respective variances with the delta-method.
 }
 \examples{
 condition <- merge(
