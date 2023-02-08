@@ -12,7 +12,7 @@ nested_loop_plot(data, xvars, yvar, yvar_sd = NULL)
 
 trellis_plot(
   data,
-  xvars,
+  xvar,
   yvar,
   trellis_var,
   yvar_sd = NULL,

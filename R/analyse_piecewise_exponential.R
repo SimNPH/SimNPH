@@ -40,7 +40,10 @@ analyse_piecewise_exponential <- function(cuts, testing_only=FALSE){
         names()
 
       dat3 <- dat2 |>
-        subset(interval %in% intervals_with_events)
+        subset(interval %in% intervals_with_events) |>
+        within(
+          interval <- factor(interval)
+        )
 
       if( length(unique(dat3$interval)) > 1 ) {
         model <- glm(evt ~ trt*interval-trt-1+offset(log(t_interval)), data=dat3, family=poisson())
