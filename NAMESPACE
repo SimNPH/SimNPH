@@ -64,6 +64,7 @@ export(nested_loop_plot)
 export(trellis_plot)
 export(analyse_describe)
 export(summarise_describe)
+export(analyse_weibull)
 
 importFrom(Rcpp,evalCpp)
 useDynLib(SimNPH, .registration = TRUE)
