@@ -46,5 +46,5 @@ analyse_ahr(max_time=50, type="AHR")(condition, dat)
 analyse_ahr(max_time=50, type="gAHR")(condition, dat)
 }
 \seealso{
-\link{nph:nphparams}
+\link[nph:nphparams]{nph::nphparams}
 }

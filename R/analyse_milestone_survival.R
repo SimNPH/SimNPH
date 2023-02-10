@@ -27,7 +27,7 @@
 #'
 #'
 #' @seealso
-#' [nph:nphparams]
+#' [nph::nphparams]
 #'
 #' @examples
 #' condition <- merge(

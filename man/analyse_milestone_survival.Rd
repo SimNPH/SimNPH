@@ -53,5 +53,5 @@ analyse_milestone_survival(3:5, what="quot", package="survival")(condition, dat)
 analyse_milestone_survival(3:5, what="diff", package="survival")(condition, dat)
 }
 \seealso{
-\link{nph:nphparams}
+\link[nph:nphparams]{nph::nphparams}
 }

@@ -22,7 +22,7 @@
 #' * `N_evt` number of events
 #'
 #' @seealso
-#' [nph:nphparams]
+#' [nph::nphparams]
 #'
 #' @examples
 #' condition <- merge(

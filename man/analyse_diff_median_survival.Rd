@@ -42,5 +42,5 @@ dat <- generate_delayed_effect(condition)
 analyse_diff_median_survival()(condition, dat)
 }
 \seealso{
-\link{nph:nphparams}
+\link[nph:nphparams]{nph::nphparams}
 }
