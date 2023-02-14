@@ -34,27 +34,25 @@ true_summary_statistics_crossing_hazards(
 \arguments{
 \item{condition}{condition row of Design dataset}
 
-\item{fixed_objects}{fixed objects of Design dataset}
+\item{fixed_objects}{additional settings, see details}
 
 \item{design}{design data.frame}
 
 \item{target_gAHR}{target geometric average hazard ratio}
 
+\item{cutoff}{time until which the gAHR should be calculated, defaults to \code{condition$followup}}
+
 \item{target_power_ph}{target power under proportional hazards}
+
+\item{final_events}{target events for inversion of Schönfeld Formula, defaults to \code{condition$final_events}}
+
+\item{target_alpha}{target alpha level for the power calculation}
 
 \item{Design}{Design data.frame for crossing hazards}
 
-\item{cutoff=NA_real_}{time until which the gAHR should be calculated, defaults to \code{condition$followup}}
+\item{cutoff_stats}{(optionally named) cutoff time, see details}
 
-\item{final_events=NA_real_}{target events for inversion of Schönfeld Formula, defaults to \code{condition$final_events}}
-
-\item{target_alpha=0.05}{target alpha level for the power calculation}
-
-\item{cutoff_stats=NULL}{(optionally named) cutoff time, see details}
-
-\item{milestones=NULL}{(optionally named) vector of times at which milestone survival should be calculated}
-
-\item{fixed_objects=NULL}{additional settings, see details}
+\item{milestones}{(optionally named) vector of times at which milestone survival should be calculated}
 }
 \value{
 For generate_crossing_hazards: A dataset with the columns t (time) and trt

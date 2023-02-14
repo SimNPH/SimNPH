@@ -1,7 +1,7 @@
 #' Analyse Dataset with weighted Cox regression
 #'
-#' @param type="SG" type of weights, see Details
-#' @param max_time=NA_real_ cutoff time for estimation, defaults to last event time
+#' @param type type of weights, see Details
+#' @param max_time cutoff time for estimation, defaults to last event time
 #'
 #' @return an analyse function that returns a data.frame with the columns
 #' * `p` p value of the score test

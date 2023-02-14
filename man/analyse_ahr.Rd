@@ -9,7 +9,7 @@ analyse_ahr(max_time = NA, type = "AHR")
 \arguments{
 \item{max_time}{time for which the RMST is calculated}
 
-\item{type=c("AHR", "gAHR")}{AHR for average hazard ratio gAHR for geometric average hazard ratio}
+\item{type}{"AHR" for average hazard ratio "gAHR" for geometric average hazard ratio}
 }
 \value{
 Returns an analysis function, that can be used in runSimulations

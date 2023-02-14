@@ -116,7 +116,7 @@ invisible(
 #'
 #' @param design design data.frame
 #' @param target_gAHR target geometric average hazard ratio
-#' @param cutoff=NA_real_ time until which the gAHR should be calculated, defaults to `condition$followup`
+#' @param cutoff time until which the gAHR should be calculated, defaults to `condition$followup`
 #'
 #' @return For hr_after_crossing_from_gAHR: the design data.frame passed as
 #'   argument with the additional column hazard_trt.
@@ -176,8 +176,8 @@ hr_after_crossing_from_gAHR <- function(design, target_gAHR, cutoff=NA_real_){
 #'
 #' @param design design data.frame
 #' @param target_power_ph target power under proportional hazards
-#' @param final_events=NA_real_ target events for inversion of Schönfeld Formula, defaults to `condition$final_events`
-#' @param target_alpha=0.05 target alpha level for the power calculation
+#' @param final_events target events for inversion of Schönfeld Formula, defaults to `condition$final_events`
+#' @param target_alpha target alpha level for the power calculation
 #'
 #' @return For hr_after_crossing_from_PH_effect_size: the design data.frame passed as
 #'   argument with the additional column hazard_trt.
@@ -349,9 +349,9 @@ cen_rate_from_cen_prop_crossing_hazards <- function(design){
 #' Calculate true summary statistics for scenarios with crossing hazards
 #'
 #' @param Design Design data.frame for crossing hazards
-#' @param cutoff_stats=NULL (optionally named) cutoff time, see details
-#' @param milestones=NULL (optionally named) vector of times at which milestone survival should be calculated
-#' @param fixed_objects=NULL additional settings, see details
+#' @param cutoff_stats (optionally named) cutoff time, see details
+#' @param milestones (optionally named) vector of times at which milestone survival should be calculated
+#' @param fixed_objects additional settings, see details
 #'
 #' @return For true_summary_statistics_crossing_hazards: the design data.frame
 #'   passed as argument with additional columns,

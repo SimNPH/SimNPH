@@ -15,7 +15,7 @@ wrap_all_in_trycatch(
 \arguments{
 \item{list_of_functions}{the list of functions to be wrapped}
 
-\item{error=\(e){warning(e$message);NA}}{the error function in the tryCatch call}
+\item{error}{the error function in the tryCatch call}
 }
 \value{
 a list of functions

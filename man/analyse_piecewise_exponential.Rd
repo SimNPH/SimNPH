@@ -9,7 +9,7 @@ analyse_piecewise_exponential(cuts, testing_only = FALSE)
 \arguments{
 \item{cuts}{interval boundaries for the piecewise exponential model}
 
-\item{testing_only=FALSE}{if set to true omits all statistics in the
+\item{testing_only}{if set to \code{TRUE} omits all statistics in the
 intervals and just returns the p value of the global test.}
 }
 \value{

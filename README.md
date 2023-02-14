@@ -137,7 +137,7 @@ invisible(
 #'
 #' @param Design Design data.frame for x
 #' @param cutoff_stats Cutoff time for rmst and average hazard ratios
-#' @param fixed_objects=NULL fixed objects not used for now
+#' @param fixed_objects fixed objects not used for now
 #'
 #' @return For true_summary_statistics_x: the design data.frame
 #'   passed as argument with the additional columns:

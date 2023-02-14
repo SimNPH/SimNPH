@@ -3,42 +3,26 @@
 \name{results_pivot_longer}
 \alias{results_pivot_longer}
 \alias{nested_loop_plot}
-\alias{trellis_plot}
 \title{functions for plotting results}
 \usage{
 results_pivot_longer(data, exclude_from_methods = c("descriptive"))
 
 nested_loop_plot(data, xvars, yvar, yvar_sd = NULL)
-
-trellis_plot(
-  data,
-  xvar,
-  yvar,
-  trellis_var,
-  yvar_sd = NULL,
-  trellis_var_y = NULL
-)
 }
 \arguments{
 \item{data}{for plot functions: simulation results in long format}
+
+\item{exclude_from_methods}{"methods" that should not be pivoted into long format}
 
 \item{xvars}{variables to be displayed on the x axis}
 
 \item{yvar}{variables to be displayed on the y axis}
 
-\item{trellis_var}{variable for faccets}
-
-\item{exclude_from_methods=c("descriptive")}{"methods" that should not be pivoted into long format}
-
-\item{yvar_sd=NULL}{variables that contain the standard deviations of the y-variables}
-
-\item{trellis_var_y=NULL}{optional additional variable for faccets}
+\item{yvar_sd}{variables that contain the standard deviations of the y-variables}
 }
 \value{
 dataset in long format with one row per method and scenario and one
 column per metric
-
-a ggplot object
 
 a ggplot object
 }
@@ -57,25 +41,12 @@ metric can be plotted for all simulation parameters in one plot.
 
 \code{xvars} is typically a vector of all simulation parameters. \code{yvars} is
 typically one metric, for example bias, mse, ...
-
-A trellis plot is a series of plot in which one simulation parameter
-is plotted against one metric. The plot is split into the levels of one or
-two additional simulation parameters. This function also allows more then
-one x variable to give a hybrid trellis nested loop plot. (TODO: add
-reference)
-
-If \code{trellis_var_y} is omitted, a plot using \code{facet_wrap} facceted by
-\code{trellis_var} is created. If \code{trellis_var_y} is given, then the facets use
-\code{trellis_var} for the columns and \code{trellis_var_y} for the rows of the plot
-matrix.
 }
 \section{Functions}{
 \itemize{
 \item \code{results_pivot_longer}: pivot simulation results into long format
 
 \item \code{nested_loop_plot}: nested loop plot of simulation results
-
-\item \code{trellis_plot}: nested loop plot of simulation results
 }}
 
 \examples{
@@ -96,29 +67,5 @@ plotdata |>
    yvar_sd="sd_bias"
  ) +
  geom_hline(yintercept=0)
-}
-\dontrun{
-plotdata |>
- filter(
-   method \%in\% c("ahr", "gahr", "cox", "weighted_cox")
- ) |>
- trellis_plot(
-   xvars="effect_size_ph",
-   yvar="bias",
-   yvar_sd="sd_bias",
-   trellis_var="prog_prop_trt"
- )
-
-plotdata |>
- filter(
-   method \%in\% c("ahr", "gahr", "cox", "weighted_cox")
- ) |>
- trellis_plot(
-   xvars="effect_size_ph",
-   yvar="bias",
-   yvar_sd="sd_bias",
-   trellis_var="prog_prop_trt",
-   trellis_var_y="prog_prop_ctrl"
- )
 }
 }

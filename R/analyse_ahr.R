@@ -1,7 +1,7 @@
 #' Analyse the dataset using extimators for the the average hazard ratio
 #'
 #' @param max_time time for which the RMST is calculated
-#' @param type=c("AHR","gAHR") AHR for average hazard ratio gAHR for geometric average hazard ratio
+#' @param type "AHR" for average hazard ratio "gAHR" for geometric average hazard ratio
 #'
 #' @return Returns an analysis function, that can be used in runSimulations
 #'

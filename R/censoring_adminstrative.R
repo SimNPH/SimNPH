@@ -3,7 +3,7 @@
 #' @param dat a simulated dataset
 #' @param recruitment_until time of end of recruitment
 #' @param recruitment_from time of start of recruitment (defaults to 0)
-#' @param discrete=TRUE should the recruitment time be rounded to full days?
+#' @param discrete should the recruitment time be rounded to full days?
 #'
 #' @return
 #' Returns the dataset with added recruitment times.
@@ -92,7 +92,8 @@ admin_censoring_time <- function(dat, followup, keep_non_recruited = FALSE){
 #'
 #' @param dat a simulated dataset
 #' @param events number of events after which the dataset is analyzed
-#' @param on_incomplete=c("ignore","warn","stop") what should be done if there are fewer events than planned
+#' @param keep_non_recruited should patients recruited after end of study be kept
+#' @param on_incomplete what to do if there are fewer events than planned "ignore","warn","stop"
 #'
 #' @return
 #' Returns the dataset with administrative censoring after `events` events, adds

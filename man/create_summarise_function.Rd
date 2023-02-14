@@ -7,7 +7,7 @@
 create_summarise_function(...)
 }
 \arguments{
-\item{summarise_functions}{named list of functions}
+\item{...}{summarise function}
 }
 \value{
 a function with arguments condition, results, fixed objects

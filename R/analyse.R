@@ -1,7 +1,7 @@
 #' Wrap all functions in a list in tryCatch calls
 #'
 #' @param list_of_functions the list of functions to be wrapped
-#' @param error=\(e){warning(e$message);NA} the error function in the tryCatch call
+#' @param error the error function in the tryCatch call
 #'
 #' @return a list of functions
 #' @export

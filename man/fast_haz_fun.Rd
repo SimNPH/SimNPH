@@ -29,7 +29,7 @@ fast_rng_fun(Tint, lambda, discrete = TRUE)
 
 \item{lambda}{hazards in the time intervals}
 
-\item{discrete=TRUE}{should surivial times be rounded down to the next whole day}
+\item{discrete}{should surivial times be rounded down to the next whole day}
 }
 \value{
 A function with one parameter, a vector of times where the function should be evaluated.

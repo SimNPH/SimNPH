@@ -166,8 +166,9 @@ hr_after_onset_from_gAHR <- function(design, target_gAHR, cutoff=NA_real_){
 #'
 #' @param design design data.frame
 #' @param target_power_ph target power under proportional hazards
-#' @param final_events=NA_real_ target events for inversion of Schönfeld Formula, defaults to `condition$final_events`
-#' @param target_alpha=0.05 target alpha level for the power calculation
+#' @param final_events target events for inversion of Schönfeld Formula
+#' defaults to `condition$final_events`
+#' @param target_alpha target alpha level for the power calculation
 #'
 #' @return For hr_after_onset_from_PH_effect_size: the design data.frame passed as
 #'   argument with the additional column hazard_trt.
@@ -337,9 +338,9 @@ cen_rate_from_cen_prop_delayed_effect <- function(design){
 #' Calculate true summary statistics for scenarios with delayed treatment effect
 #'
 #' @param Design Design data.frame for delayed effect
-#' @param cutoff_stats=NULL (optionally named) cutoff times, see details
-#' @param milestones=NULL (optionally named) vector of times at which milestone survival should be calculated
-#' @param fixed_objects=NULL additional settings, see details
+#' @param cutoff_stats (optionally named) cutoff times, see details
+#' @param milestones (optionally named) vector of times at which milestone survival should be calculated
+#' @param fixed_objects additional settings, see details
 #'
 #' @return For true_summary_statistics_delayed_effect: the design data.frame
 #'   passed as argument with additional columns

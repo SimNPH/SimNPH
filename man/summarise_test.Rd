@@ -9,7 +9,8 @@ summarise_test(alpha, name = NULL)
 \arguments{
 \item{alpha}{the significance level(s)}
 
-\item{name}{= NULL name for the summarise function, appended to the name of the analysis method in the final results}
+\item{name}{name for the summarise function,
+appended to the name of the analysis method in the final results}
 }
 \value{
 A function that can be used in Summarise that returns a data frame with the columns

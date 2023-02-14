@@ -7,7 +7,7 @@
 analyse_diff_median_survival(quant = 0.5)
 }
 \arguments{
-\item{quant=0.5}{quantile for which the difference should be calculated, defaults to the median}
+\item{quant}{quantile for which the difference should be calculated, defaults to the median}
 }
 \value{
 Returns an analysis function, that can be used in runSimulations

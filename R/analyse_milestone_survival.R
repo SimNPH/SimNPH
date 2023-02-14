@@ -1,8 +1,8 @@
 #' Analyse the Dataset using difference or quotient of milestone survival
 #'
 #' @param times followup times at which the the survival should be compared
-#' @param what="quot" "quot" for quotient and "diff" for differnce of surival probabilities
-#' @param package="nph" package to be used for computations: "nph" or "survival"
+#' @param what "quot" for quotient and "diff" for differnce of surival probabilities
+#' @param package package to be used for computations: "nph" or "survival"
 #'
 #' @return Returns an analysis function, that can be used in runSimulations
 #'

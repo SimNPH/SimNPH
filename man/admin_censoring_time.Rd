@@ -29,13 +29,15 @@ admin_censoring_events(
 
 \item{recruitment_from}{time of start of recruitment (defaults to 0)}
 
+\item{discrete}{should the recruitment time be rounded to full days?}
+
 \item{followup}{followup time}
+
+\item{keep_non_recruited}{should patients recruited after end of study be kept}
 
 \item{events}{number of events after which the dataset is analyzed}
 
-\item{discrete=TRUE}{should the recruitment time be rounded to full days?}
-
-\item{on_incomplete=c("ignore", "warn", "stop")}{what should be done if there are fewer events than planned}
+\item{on_incomplete}{what to do if there are fewer events than planned "ignore","warn","stop"}
 }
 \value{
 Returns the dataset with added recruitment times.

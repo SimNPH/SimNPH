@@ -15,12 +15,12 @@
 #' Design
 assumptions_progression <- function(){
   skel <- "expand.grid(
-  hazard_ctrl         = 0.001518187, # hazard under control (med. survi. 15m)
-  hazard_trt          = 0.001265156, # hazard under treatment (med. surv. 18m)
-  hazard_after_prog   = 0.007590934, # hazard after progression (med. surv. 3m)
-  prog_rate_ctrl      = 0.001897734, # hazard rate for disease progression under control (med. time to progression 12m)
-  prog_rate_trt       = c(0.001897734, 0.001423300, 0.001265156), # hazard rate for disease progression unter treatment (med. time to progression 12m, 16m, 18m)
-  random_withdrawal   = 0.01         # rate of random withdrawal
+  hazard_ctrl       = 0.001518187, # hazard under control (med. survi. 15m)
+  hazard_trt        = 0.001265156, # hazard under treatment (med. surv. 18m)
+  hazard_after_prog = 0.007590934, # hazard after progression (med. surv. 3m)
+  prog_rate_ctrl    = 0.001897734, # hazard rate for disease progression under control
+  prog_rate_trt     = c(0.001897734, 0.001423300, 0.001265156), # haz. rate for progression, trt.
+  random_withdrawal = 0.01         # rate of random withdrawal
 )
 "
 
@@ -122,10 +122,10 @@ generate_progression <- function(condition, fixed_objects=NULL){
 }
 
 #' @param Design Design data.frame for subgroup
-#' @param what="os" True summary statistics for which estimand
-#' @param cutoff_stats=NULL (optionally named) cutoff time, see details
-#' @param milestones=NULL (optionally named) vector of times at which milestone survival should be calculated
-#' @param fixed_objects=NULL additional settings, see details
+#' @param what True summary statistics for which estimand
+#' @param cutoff_stats (optionally named) cutoff time, see details
+#' @param milestones (optionally named) vector of times at which milestone survival should be calculated
+#' @param fixed_objects additional settings, see details
 #'
 #' @return For true_summary_statistics_subgroup: the design data.frame
 #'   passed as argument with the additional columns
@@ -402,8 +402,8 @@ cen_rate_from_cen_prop_progression <- function(design){
 #'
 #' @param design design data.frame
 #' @param target_power_ph target power under proportional hazards
-#' @param final_events=NA_real_ target events for inversion of Schönfeld Formula, defaults to `condition$final_events`
-#' @param target_alpha=0.05 target alpha level for the power calculation
+#' @param final_events target events for inversion of Schönfeld Formula, defaults to `condition$final_events`
+#' @param target_alpha target alpha level for the power calculation
 #'
 #' @return For hazard_before_progression_from_PH_effect_size: the design
 #'   data.frame passed as argument with the additional column hazard_trt.

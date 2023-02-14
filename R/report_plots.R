@@ -3,7 +3,7 @@
 #' @describeIn results_pivot_longer pivot simulation results into long format
 #'
 #' @param data for results_pivot_longer: simulation result as retured by SimDesign
-#' @param exclude_from_methods=c("descriptive") "methods" that should not be pivoted into long format
+#' @param exclude_from_methods "methods" that should not be pivoted into long format
 #'
 #' @return dataset in long format with one row per method and scenario and one
 #'   column per metric
@@ -48,19 +48,44 @@ results_pivot_longer <- function(data, exclude_from_methods=c("descriptive")){
     pivot_longer_spec(pivot_spec)
 }
 
-order_combine_xvars <- function(data, xvars){
-  data |>
+order_combine_xvars <- function(data, xvars, facet_vars=c(), size_x_axis=0.8){
+  result <- data |>
     arrange(across(all_of(xvars))) |>
-    unite(x, !!!xvars) |>
+    unite(x, !!!xvars, remove=FALSE) |>
     mutate(
       x = fct_inorder(x)
     )
+
+  x_axis <- result |>
+    select(x, !!!xvars, !!!facet_vars) |>
+    unique() |>
+    pivot_longer(cols=c(-x, -any_of(facet_vars))) |>
+    group_by(name) |>
+    mutate(
+      y=(as.integer(as.factor(value))-1) / (length(unique(value))-1)
+    ) |>
+    ungroup() |>
+    mutate(
+      level = match(name, xvars),
+      y = y*size_x_axis + (1-size_x_axis)/2 + level
+    )
+
+  x_axis_labels <- x_axis |>
+    group_by(name) |>
+    summarise(
+      level=first(level),
+      label=str_c(first(name), ": ", str_c(unique(value), collapse=", "))
+    )
+
+  attr(result, "x_axis") <- x_axis
+  attr(result, "x_labels") <- x_axis_labels
+  result
 }
 
 #' @param data for plot functions: simulation results in long format
 #' @param xvars variables to be displayed on the x axis
 #' @param yvar variables to be displayed on the y axis
-#' @param yvar_sd=NULL variables that contain the standard deviations of the y-variables
+#' @param yvar_sd variables that contain the standard deviations of the y-variables
 #'
 #' @describeIn results_pivot_longer nested loop plot of simulation results
 #'
@@ -116,96 +141,6 @@ nested_loop_plot <- function(data, xvars, yvar, yvar_sd=NULL){
   ggplot(data, aes(x=x, y=!!yvar, group=method, colour=method, ymin=lower, ymax=upper, fill=method)) +
     geom_line() +
     geom_ribbon(alpha=0.3)
-}
-
-
-#' @describeIn results_pivot_longer nested loop plot of simulation results
-#'
-#' @param trellis_var variable for faccets
-#' @param trellis_var_y=NULL optional additional variable for faccets
-#'
-#' @details A trellis plot is a series of plot in which one simulation parameter
-#'   is plotted against one metric. The plot is split into the levels of one or
-#'   two additional simulation parameters. This function also allows more then
-#'   one x variable to give a hybrid trellis nested loop plot. (TODO: add
-#'   reference)
-#'
-#'   If `trellis_var_y` is omitted, a plot using `facet_wrap` facceted by
-#'   `trellis_var` is created. If `trellis_var_y` is given, then the facets use
-#'   `trellis_var` for the columns and `trellis_var_y` for the rows of the plot
-#'   matrix.
-#'
-#' @return a ggplot object
-#' @export
-#'
-#' @examples
-#' \dontrun{
-#' plotdata |>
-#'  filter(
-#'    method %in% c("ahr", "gahr", "cox", "weighted_cox")
-#'  ) |>
-#'  trellis_plot(
-#'    xvars="effect_size_ph",
-#'    yvar="bias",
-#'    yvar_sd="sd_bias",
-#'    trellis_var="prog_prop_trt"
-#'  )
-#'
-#'plotdata |>
-#'  filter(
-#'    method %in% c("ahr", "gahr", "cox", "weighted_cox")
-#'  ) |>
-#'  trellis_plot(
-#'    xvars="effect_size_ph",
-#'    yvar="bias",
-#'    yvar_sd="sd_bias",
-#'    trellis_var="prog_prop_trt",
-#'    trellis_var_y="prog_prop_ctrl"
-#'  )
-#' }
-trellis_plot <- function(data, xvar, yvar, trellis_var, yvar_sd=NULL, trellis_var_y=NULL){
-  yvar <- sym(yvar)
-  xvar <- sym(xvar)
-
-  if(is.null(yvar_sd)){
-    data <- data |>
-      mutate(
-        lower=NA_real_,
-        upper=NA_real_
-      )
-  } else {
-    yvar_sd <- sym(yvar_sd)
-    data <- data |>
-      mutate(
-        sd = !!yvar_sd,
-        lower = !!yvar - 2*sd/sqrt(REPLICATIONS),
-        upper = !!yvar + 2*sd/sqrt(REPLICATIONS)
-      )
-  }
-
-  gg <- ggplot(data, aes(x=!!xvar, y=!!yvar, colour=method, ymin=lower, ymax=upper, fill=method)) +
-    geom_line() +
-    geom_ribbon(alpha=0.3)
-
-  if(is.null(trellis_var_y)){
-    gg <- gg +
-      facet_wrap(
-        trellis_var,
-        labeller = label_both
-      )
-  } else {
-    trellis_var <- sym(trellis_var)
-    trellis_var_y <- sym(trellis_var_y)
-
-    gg <- gg +
-      facet_grid(
-        rows=vars(!!trellis_var_y),
-        cols=vars(!!trellis_var),
-        labeller = label_both
-      )
-  }
-
-  gg
 }
 
 
