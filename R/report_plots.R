@@ -1,4 +1,4 @@
-#' functions for plotting results
+#' Functions for Plotting and Reporting Results
 #'
 #' @describeIn results_pivot_longer pivot simulation results into long format
 #'
@@ -48,9 +48,10 @@ results_pivot_longer <- function(data, exclude_from_methods=c("descriptive")){
     pivot_longer_spec(pivot_spec)
 }
 
-order_combine_xvars <- function(data, xvars, facet_vars=c(), size_x_axis=0.8){
+order_combine_xvars <- function(data, xvars, facet_vars=c(), height_x_axis=0.8, grid_level=2){
   result <- data |>
-    arrange(across(all_of(xvars))) |>
+    complete(!!!xvars, method) |>
+    arrange(!!!xvars) |>
     unite(x, !!!xvars, remove=FALSE) |>
     mutate(
       x = fct_inorder(x)
@@ -67,7 +68,7 @@ order_combine_xvars <- function(data, xvars, facet_vars=c(), size_x_axis=0.8){
     ungroup() |>
     mutate(
       level = match(name, xvars),
-      y = y*size_x_axis + (1-size_x_axis)/2 + level
+      y = level - (y*height_x_axis) - (height_x_axis / 2)
     )
 
   x_axis_labels <- x_axis |>
@@ -77,70 +78,108 @@ order_combine_xvars <- function(data, xvars, facet_vars=c(), size_x_axis=0.8){
       label=str_c(first(name), ": ", str_c(unique(value), collapse=", "))
     )
 
+  x_axis_breaks <- result |>
+    select(!!!xvars[1:grid_level], x) |>
+    group_by(!!!xvars[1:grid_level]) |>
+    filter(1:n() == 1) |>
+    pull(x)
+
   attr(result, "x_axis") <- x_axis
   attr(result, "x_labels") <- x_axis_labels
+  attr(result, "x_axis_breaks") <- x_axis_breaks
   result
 }
 
-#' @param data for plot functions: simulation results in long format
-#' @param xvars variables to be displayed on the x axis
-#' @param yvar variables to be displayed on the y axis
-#' @param yvar_sd variables that contain the standard deviations of the y-variables
+#' @describeIn results_pivot_longer Nested Loop Plot with optional Facets
 #'
-#' @describeIn results_pivot_longer nested loop plot of simulation results
+#' @param data for combined_plto simulation results in long format, as returned by `results_pivot_longer`.
+#' @param methods methods to include in the plot
+#' @param xvars orderd vector of variable names to display on the x axis
+#' @param yvar variable name of the variable to be displayed on the y axis (metric)
+#' @param facet_x_vars vector of variable names to create columns of facets
+#' @param facet_y_vars vector of variable names to create rows of facets
+#' @param heights_plots relative heights of the main plot and the stairs on the bottom
+#' @param scale_stairs height of the stairs for each variable between 0 and 1
+#' @param grid_level depht of loops for which the grid-lines are drawn
 #'
-#' @return a ggplot object
+#' @return a ggplot/patchwork object conatining the plots
 #' @export
-#'
-#' @details A nested loop plot is a plot in which all variables on the x-axis
-#'   are displayed together by sorting by the first, the second, ... variable
-#'   and then creating a factor containing all variable levels.In this way a
-#'   metric can be plotted for all simulation parameters in one plot.
-#'
-#'   `xvars` is typically a vector of all simulation parameters. `yvars` is
-#'   typically one metric, for example bias, mse, ...
 #'
 #' @examples
 #' \dontrun{
-#' plotdata |>
-#'  filter(
-#'    method %in% c("ahr", "gahr", "cox", "weighted_cox")
-#'  ) |>
-#'  nested_loop_plot(
-#'    xvars=c("recruitment", "n_pat_design", "interim_events", "final_events", "n_ctrl",
-#'            "n_trt", "hazard_ctrl", "prog_prop_trt", "prog_prop_ctrl", "hr_before_after",
-#'            "censoring_prop", "effect_size_ph"),
-#'    yvar="bias",
-#'    yvar_sd="sd_bias"
-#'  ) +
-#'  geom_hline(yintercept=0)
+#'   results_long <- results_wide |>
+#'     results_pivot_longer()
+#'   combined_plot(results_long, c("logrank", "max_combo"), c("effect_size_ph", "delay", "hazard_ctrl", "n_pat_design", "recruitment", "censoring_prop"), "rejection_0.05", grid_level=2)
 #' }
-nested_loop_plot <- function(data, xvars, yvar, yvar_sd=NULL){
-  yvar <- sym(yvar)
+combined_plot <- function(
+    data,
+    methods,
+    xvars,
+    yvar,
+    facet_x_vars=c(),
+    facet_y_vars=c(),
+    heights_plots = c(3,1),
+    scale_stairs = 0.75,
+    grid_level = 2
+    ){
 
-  data <- data |>
-    order_combine_xvars(xvars)
-
-
-  if(is.null(yvar_sd)){
-    data <- data |>
-      mutate(
-        lower=NA_real_,
-        upper=NA_real_
-      )
-  } else {
-    yvar_sd <- sym(yvar_sd)
-    data <- data |>
-      mutate(
-        sd = !!yvar_sd,
-        lower = !!yvar - 2*sd/sqrt(REPLICATIONS),
-        upper = !!yvar + 2*sd/sqrt(REPLICATIONS)
-      )
+  if(!all(c("ggplot2", "patchwork") %in% .packages())){
+    stop(gettext("Packages ggplot2 and patchwork need to be loaded for the functionality provided in the plot functions."))
   }
 
-  ggplot(data, aes(x=x, y=!!yvar, group=method, colour=method, ymin=lower, ymax=upper, fill=method)) +
+  facet_vars_y_sym <- syms(facet_y_vars)
+  facet_vars_x_sym <- syms(facet_x_vars)
+  xvars <- syms(xvars)
+  yvar  <- sym(yvar)
+
+  data <- data |>
+    filter(method %in% methods) |>
+    order_combine_xvars(xvars, facet_vars=facet_x_vars, height_x_axis=scale_stairs, grid_level=grid_level)
+
+  plot_2 <- ggplot(NULL) +
+    geom_step(
+      data=attr(data, "x_axis"),
+      mapping=aes(y=y, group=name, x=x)
+    ) +
+    geom_text(
+      data=attr(data, "x_labels"),
+      mapping=aes(y=level-1, label=str_c("  ", label)),
+      x = 0,
+      hjust = 0,
+      vjust = 1,
+      size = 2.84527559055118 # ggplot:::.pt
+    ) +
+    theme_void() +
+    scale_y_reverse(
+      breaks=1:100
+    ) +
+    theme(
+      panel.grid.major.y = element_line(
+        colour="darkgray"
+      ),
+      axis.text.x = element_blank(),
+      axis.ticks.x = element_blank(),
+      axis.title.x = element_blank(),
+      strip.text = element_blank()
+    )  +
+    facet_grid(
+      cols = vars(!!!facet_vars_x_sym)
+    )
+
+  plot_1 <- ggplot(data, aes(x=x, y=!!yvar, group=method, colour=method)) +
     geom_line() +
-    geom_ribbon(alpha=0.3)
+    scale_x_discrete(breaks = attr(data, "x_axis_breaks")) +
+    theme(
+      axis.text.x = element_blank(),
+      axis.ticks.x = element_blank(),
+      axis.title.x = element_blank()
+    )  +
+    facet_grid(
+      cols = vars(!!!facet_vars_x_sym),
+      rows = vars(!!!facet_vars_y_sym),
+      labeller = label_both
+    )
+
+  (plot_1 / plot_2) + plot_layout(heights=heights_plots)
+
 }
-
-
