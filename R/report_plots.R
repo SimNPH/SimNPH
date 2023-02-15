@@ -68,7 +68,7 @@ order_combine_xvars <- function(data, xvars, facet_vars=c(), height_x_axis=0.8, 
     ungroup() |>
     mutate(
       level = match(name, xvars),
-      y = level - (y*height_x_axis) - (height_x_axis / 2)
+      y = level - (y*height_x_axis) - (0.5 * (1-height_x_axis))
     )
 
   x_axis_labels <- x_axis |>
