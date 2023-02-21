@@ -2,7 +2,8 @@
 % Please edit documentation in R/analyse.R
 \name{wrap_all_in_trycatch}
 \alias{wrap_all_in_trycatch}
-\title{Wrap all functions in a list in tryCatch calls}
+\alias{wrap_all_in_preserve_seed}
+\title{Wrappers around Analyse Functions}
 \usage{
 wrap_all_in_trycatch(
   list_of_functions,
@@ -11,6 +12,8 @@ wrap_all_in_trycatch(
      NA
  }
 )
+
+wrap_all_in_preserve_seed(list_of_functions)
 }
 \arguments{
 \item{list_of_functions}{the list of functions to be wrapped}
@@ -21,7 +24,7 @@ wrap_all_in_trycatch(
 a list of functions
 }
 \description{
-Wrap all functions in a list in tryCatch calls
+Wrappers around Analyse Functions
 }
 \details{
 SimDesign redraws data if one analysis function fails. This is not
@@ -40,24 +43,37 @@ add another \code{error} argument. For example \verb{\\(e)\{NULL\}} could work i
 cases, in other cases you'll have to give a function that returns a
 data.frame with the same columns as the analyse functions and only NA
 values.
-}
-\examples{
-Analyse <- list(
-A = \(condition, dat, fixed_objects=NULL){
-  if( runif(1) >= 0.5){
-    counter_11(1)
-    list(x=1, y=1)
-  } else {
-    counter_12(1)
-    stop("asdf")
-  }
-},
-B = \(condition, dat, fixed_objects=NULL){
-  counter_13(1)
-  list(z=1)
-}
-)
 
-Analyse2 <- wrap_all_in_trycatch(Analyse)
-Analyse2 <- wrap_all_in_trycatch(Analyse, error=\(e){NULL})
+Analysis functions might use random numbers. If simulations should
+be replicated this can interfere with the RNG state of other analysis
+functions. To avoid this you can wrap all analysis function in a
+\code{withr::with_preserve_seed} call, so that the RNG state is reset after each
+analysis function is called. This way adding, removing or changing one
+analysis function has no effect on the other analysis functions, even if
+the analysis functions use random numbers.
+}
+\section{Functions}{
+\itemize{
+\item \code{wrap_all_in_trycatch}: Wrap all functions in a list in tryCatch calls
+
+\item \code{wrap_all_in_preserve_seed}: wrap all functions in \code{withr::with_preserve_seed}
+}}
+
+\examples{
+funs1 <- list(\(){stop("test")}, \(){1})
+funs2 <- wrap_all_in_trycatch(funs1)
+\dontrun{
+lapply(funs1, \(f){f()})
+}
+lapply(funs2, \(f){f()})
+
+funs1 <- list(\(){rnorm(1)})
+funs2 <- list(\(){runif(1)}, \(){rnorm(1)})
+funs3 <- funs2 |> wrap_all_in_preserve_seed()
+set.seed(1)
+lapply(funs1, \(f){f()})
+set.seed(1)
+lapply(funs2, \(f){f()})
+set.seed(1)
+lapply(funs3, \(f){f()})
 }

@@ -1,9 +1,12 @@
-#' Wrap all functions in a list in tryCatch calls
+#' Wrappers around Analyse Functions
 #'
 #' @param list_of_functions the list of functions to be wrapped
 #' @param error the error function in the tryCatch call
 #'
 #' @return a list of functions
+#'
+#' @describeIn wrap_all_in_trycatch Wrap all functions in a list in tryCatch calls
+#'
 #' @export
 #'
 #' @details SimDesign redraws data if one analysis function fails. This is not
@@ -24,24 +27,13 @@
 #'   values.
 #'
 #' @examples
-#' Analyse <- list(
-#' A = \(condition, dat, fixed_objects=NULL){
-#'   if( runif(1) >= 0.5){
-#'     counter_11(1)
-#'     list(x=1, y=1)
-#'   } else {
-#'     counter_12(1)
-#'     stop("asdf")
-#'   }
-#' },
-#' B = \(condition, dat, fixed_objects=NULL){
-#'   counter_13(1)
-#'   list(z=1)
+#' funs1 <- list(\(){stop("test")}, \(){1})
+#' funs2 <- wrap_all_in_trycatch(funs1)
+#' \dontrun{
+#' lapply(funs1, \(f){f()})
 #' }
-#' )
+#' lapply(funs2, \(f){f()})
 #'
-#' Analyse2 <- wrap_all_in_trycatch(Analyse)
-#' Analyse2 <- wrap_all_in_trycatch(Analyse, error=\(e){NULL})
 wrap_all_in_trycatch <- function(list_of_functions, error=\(e){warning(e$message); NA}){
   lapply(
     list_of_functions,
@@ -54,4 +46,35 @@ wrap_all_in_trycatch <- function(list_of_functions, error=\(e){warning(e$message
       }
     }
   )
+}
+
+#' @describeIn wrap_all_in_trycatch wrap all functions in `withr::with_preserve_seed`
+#'
+#' @export
+#'
+#' @details Analysis functions might use random numbers. If simulations should
+#'   be replicated this can interfere with the RNG state of other analysis
+#'   functions. To avoid this you can wrap all analysis function in a
+#'   `withr::with_preserve_seed` call, so that the RNG state is reset after each
+#'   analysis function is called. This way adding, removing or changing one
+#'   analysis function has no effect on the other analysis functions, even if
+#'   the analysis functions use random numbers.
+#'
+#' @examples
+#' funs1 <- list(\(){rnorm(1)})
+#' funs2 <- list(\(){runif(1)}, \(){rnorm(1)})
+#' funs3 <- funs2 |> wrap_all_in_preserve_seed()
+#' set.seed(1)
+#' lapply(funs1, \(f){f()})
+#' set.seed(1)
+#' lapply(funs2, \(f){f()})
+#' set.seed(1)
+#' lapply(funs3, \(f){f()})
+wrap_all_in_preserve_seed <- function(list_of_functions){
+  lapply(list_of_functions,
+  \(f){
+    function(...){
+      withr::with_preserve_seed(f(...))
+    }
+  })
 }
