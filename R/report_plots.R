@@ -27,11 +27,11 @@ results_pivot_longer <- function(data, exclude_from_methods=c("descriptive")){
 
   methods <- attr(data, "design_names") |>
     getElement("sim") |>
-    str_extract(".*(?=\\.[^\\d])")
+    stringr::str_extract(".*(?=\\.[^\\d])")
 
   summaries <- attr(data, "design_names") |>
     getElement("sim") |>
-    str_remove(str_c(methods, "."))
+    stringr::str_remove(str_c(methods, "."))
 
   include <- !(methods %in% exclude_from_methods)
 
@@ -45,7 +45,7 @@ results_pivot_longer <- function(data, exclude_from_methods=c("descriptive")){
     rename(
       n_pat_design = n_pat
     ) |>
-    pivot_longer_spec(pivot_spec)
+    tidyr::pivot_longer_spec(pivot_spec)
 }
 
 order_combine_xvars <- function(data, xvars, facet_vars=c(), height_x_axis=0.8, grid_level=2){
