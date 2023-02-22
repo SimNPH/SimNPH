@@ -7,9 +7,9 @@
 analyse_coxph_weighted(type = "SG", max_time = NA_real_)
 }
 \arguments{
-\item{type="SG"}{type of weights, see Details}
+\item{type}{type of weights, see Details}
 
-\item{max_time=NA_real_}{cutoff time for estimation, defaults to last event time}
+\item{max_time}{cutoff time for estimation, defaults to last event time}
 }
 \value{
 an analyse function that returns a data.frame with the columns

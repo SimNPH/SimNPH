@@ -19,7 +19,9 @@ Suggests:
     covr,
     survRM2,
     withr,
-    ldbounds
+    ldbounds,
+    ggplot2,
+    patchwork
 Imports:
     purrr (>= 1.0.0),
     rlang,
@@ -27,7 +29,8 @@ Imports:
     nph,
     nphRCT,
     Rcpp (>= 1.0.8),
-    car
+    car,
+    withr
 LinkingTo: Rcpp
 Config/testthat/edition: 3
 VignetteBuilder: knitr

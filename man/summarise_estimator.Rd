@@ -15,7 +15,8 @@ summarise_estimator(est, real, lower = NULL, upper = NULL, name = NULL)
 
 \item{upper}{upper CI, expression evaluated in results}
 
-\item{name}{= NULL name for the summarise function, appended to the name of the analysis method in the final results}
+\item{name}{name for the summarise function,
+appended to the name of the analysis method in the final results}
 }
 \value{
 A function that can be used in Summarise that returns a data frame with the columns

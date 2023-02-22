@@ -10,7 +10,7 @@ analyse_describe()
 summarise_describe(name = NULL)
 }
 \arguments{
-\item{name}{= NULL name for the summarise function, appended to the name of the analysis method in the final results}
+\item{name}{name for the summarise function, appended to the name of the analysis method in the final results}
 }
 \value{
 an analyse function that returns a list with the elements

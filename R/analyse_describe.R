@@ -58,7 +58,7 @@ analyse_describe <- function(){
 
 
 #' @describeIn analyse_describe Summarise Descriptive Statistics
-#' @param name = NULL name for the summarise function, appended to the name of the analysis method in the final results
+#' @param name name for the summarise function, appended to the name of the analysis method in the final results
 #'
 #' @return
 #'

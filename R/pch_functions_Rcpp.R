@@ -102,7 +102,7 @@ fast_quant_fun   <- function(Tint, lambda){
 
 #' @export
 #'
-#' @param discrete=TRUE should surivial times be rounded down to the next whole day
+#' @param discrete should surivial times be rounded down to the next whole day
 #'
 #' @return for fast_rng_fun: a function with the argument that draws `n` samples
 #'   from the survival distribution

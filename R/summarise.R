@@ -1,6 +1,6 @@
 #' Create a summarise function from a named list of functions
 #'
-#' @param summarise_functions named list of functions
+#' @param ... summarise function
 #'
 #' @return a function with arguments condition, results, fixed objects
 #' @export
@@ -91,7 +91,8 @@ create_summarise_function <- function(...){
 #' @param real real summary statistic, expression evaluated in condition
 #' @param lower lower CI, expression evaluated in results
 #' @param upper upper CI, expression evaluated in results
-#' @param name = NULL name for the summarise function, appended to the name of the analysis method in the final results
+#' @param name name for the summarise function,
+#' appended to the name of the analysis method in the final results
 #'
 #' @return
 #'
@@ -189,7 +190,8 @@ summarise_estimator <- function(est, real, lower=NULL, upper=NULL, name=NULL){
 #' Generic summarise function for tests
 #'
 #' @param alpha the significance level(s)
-#' @param name = NULL name for the summarise function, appended to the name of the analysis method in the final results
+#' @param name name for the summarise function,
+#' appended to the name of the analysis method in the final results
 #'
 #' @return
 #'

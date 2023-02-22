@@ -1,7 +1,7 @@
 #' Create Analyse function for piecewise exponential model
 #'
 #' @param cuts interval boundaries for the piecewise exponential model
-#' @param testing_only=FALSE if set to true omits all statistics in the
+#' @param testing_only if set to `TRUE` omits all statistics in the
 #'   intervals and just returns the p value of the global test.
 #'
 #' @return an analyse function that can be used in runSimulation

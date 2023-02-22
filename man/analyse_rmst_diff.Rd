@@ -41,5 +41,5 @@ dat <- generate_delayed_effect(condition)
 analyse_rmst_diff()(condition, dat)
 }
 \seealso{
-\link{nph:nphparams}
+\link[nph:nphparams]{nph::nphparams}
 }

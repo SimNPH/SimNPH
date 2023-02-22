@@ -2,80 +2,63 @@
 % Please edit documentation in R/report_plots.R
 \name{results_pivot_longer}
 \alias{results_pivot_longer}
-\alias{nested_loop_plot}
-\alias{trellis_plot}
-\title{functions for plotting results}
+\alias{combined_plot}
+\title{Functions for Plotting and Reporting Results}
 \usage{
 results_pivot_longer(data, exclude_from_methods = c("descriptive"))
 
-nested_loop_plot(data, xvars, yvar, yvar_sd = NULL)
-
-trellis_plot(
+combined_plot(
   data,
-  xvar,
+  methods,
+  xvars,
   yvar,
-  trellis_var,
-  yvar_sd = NULL,
-  trellis_var_y = NULL
+  facet_x_vars = c(),
+  facet_y_vars = c(),
+  heights_plots = c(3, 1),
+  scale_stairs = 0.75,
+  grid_level = 2
 )
 }
 \arguments{
-\item{data}{for plot functions: simulation results in long format}
+\item{data}{for combined_plto simulation results in long format, as returned by \code{results_pivot_longer}.}
 
-\item{xvars}{variables to be displayed on the x axis}
+\item{exclude_from_methods}{"methods" that should not be pivoted into long format}
 
-\item{yvar}{variables to be displayed on the y axis}
+\item{methods}{methods to include in the plot}
 
-\item{trellis_var}{variable for faccets}
+\item{xvars}{orderd vector of variable names to display on the x axis}
 
-\item{exclude_from_methods=c("descriptive")}{"methods" that should not be pivoted into long format}
+\item{yvar}{variable name of the variable to be displayed on the y axis (metric)}
 
-\item{yvar_sd=NULL}{variables that contain the standard deviations of the y-variables}
+\item{facet_x_vars}{vector of variable names to create columns of facets}
 
-\item{trellis_var_y=NULL}{optional additional variable for faccets}
+\item{facet_y_vars}{vector of variable names to create rows of facets}
+
+\item{heights_plots}{relative heights of the main plot and the stairs on the bottom}
+
+\item{scale_stairs}{height of the stairs for each variable between 0 and 1}
+
+\item{grid_level}{depht of loops for which the grid-lines are drawn}
 }
 \value{
 dataset in long format with one row per method and scenario and one
 column per metric
 
-a ggplot object
-
-a ggplot object
+a ggplot/patchwork object conatining the plots
 }
 \description{
-functions for plotting results
+Functions for Plotting and Reporting Results
 }
 \details{
 With \code{exclude_from_methods} descriptive statistics or results of
 reference methods can be kept as own columns and used like the columns of
 the simulation parameters.
-
-A nested loop plot is a plot in which all variables on the x-axis
-are displayed together by sorting by the first, the second, ... variable
-and then creating a factor containing all variable levels.In this way a
-metric can be plotted for all simulation parameters in one plot.
-
-\code{xvars} is typically a vector of all simulation parameters. \code{yvars} is
-typically one metric, for example bias, mse, ...
-
-A trellis plot is a series of plot in which one simulation parameter
-is plotted against one metric. The plot is split into the levels of one or
-two additional simulation parameters. This function also allows more then
-one x variable to give a hybrid trellis nested loop plot. (TODO: add
-reference)
-
-If \code{trellis_var_y} is omitted, a plot using \code{facet_wrap} facceted by
-\code{trellis_var} is created. If \code{trellis_var_y} is given, then the facets use
-\code{trellis_var} for the columns and \code{trellis_var_y} for the rows of the plot
-matrix.
 }
 \section{Functions}{
 \itemize{
 \item \code{results_pivot_longer}: pivot simulation results into long format
 
-\item \code{nested_loop_plot}: nested loop plot of simulation results
-
-\item \code{trellis_plot}: nested loop plot of simulation results
+\item \code{combined_plot}: Nested Loop Plot with optional Facets
 }}
 
 \examples{
@@ -84,41 +67,8 @@ matrix.
   results_pivot_longer
 }
 \dontrun{
-plotdata |>
- filter(
-   method \%in\% c("ahr", "gahr", "cox", "weighted_cox")
- ) |>
- nested_loop_plot(
-   xvars=c("recruitment", "n_pat_design", "interim_events", "final_events", "n_ctrl",
-           "n_trt", "hazard_ctrl", "prog_prop_trt", "prog_prop_ctrl", "hr_before_after",
-           "censoring_prop", "effect_size_ph"),
-   yvar="bias",
-   yvar_sd="sd_bias"
- ) +
- geom_hline(yintercept=0)
-}
-\dontrun{
-plotdata |>
- filter(
-   method \%in\% c("ahr", "gahr", "cox", "weighted_cox")
- ) |>
- trellis_plot(
-   xvars="effect_size_ph",
-   yvar="bias",
-   yvar_sd="sd_bias",
-   trellis_var="prog_prop_trt"
- )
-
-plotdata |>
- filter(
-   method \%in\% c("ahr", "gahr", "cox", "weighted_cox")
- ) |>
- trellis_plot(
-   xvars="effect_size_ph",
-   yvar="bias",
-   yvar_sd="sd_bias",
-   trellis_var="prog_prop_trt",
-   trellis_var_y="prog_prop_ctrl"
- )
+  results_long <- results_wide |>
+    results_pivot_longer()
+  combined_plot(results_long, c("logrank", "max_combo"), c("effect_size_ph", "delay", "hazard_ctrl", "n_pat_design", "recruitment", "censoring_prop"), "rejection_0.05", grid_level=2)
 }
 }

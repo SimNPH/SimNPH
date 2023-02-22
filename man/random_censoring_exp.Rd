@@ -7,6 +7,8 @@
 random_censoring_exp(dat, rate, discrete = TRUE)
 }
 \arguments{
+\item{dat}{the dataset to apply the random censoring to}
+
 \item{rate}{time of end of enrollment}
 
 \item{discrete}{should the censoring times be rounded to whole days?}

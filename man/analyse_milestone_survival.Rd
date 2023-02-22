@@ -9,9 +9,9 @@ analyse_milestone_survival(times, what = "quot", package = "nph")
 \arguments{
 \item{times}{followup times at which the the survival should be compared}
 
-\item{what="quot"}{"quot" for quotient and "diff" for differnce of surival probabilities}
+\item{what}{"quot" for quotient and "diff" for differnce of surival probabilities}
 
-\item{package="nph"}{package to be used for computations: "nph" or "survival"}
+\item{package}{package to be used for computations: "nph" or "survival"}
 }
 \value{
 Returns an analysis function, that can be used in runSimulations
@@ -53,5 +53,5 @@ analyse_milestone_survival(3:5, what="quot", package="survival")(condition, dat)
 analyse_milestone_survival(3:5, what="diff", package="survival")(condition, dat)
 }
 \seealso{
-\link{nph:nphparams}
+\link[nph:nphparams]{nph::nphparams}
 }

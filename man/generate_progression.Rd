@@ -35,25 +35,23 @@ hazard_before_progression_from_PH_effect_size(
 \arguments{
 \item{condition}{condition row of Design dataset}
 
-\item{fixed_objects}{fixed objects of Design dataset}
+\item{fixed_objects}{additional settings, see details}
 
 \item{Design}{Design data.frame for subgroup}
+
+\item{what}{True summary statistics for which estimand}
+
+\item{cutoff_stats}{(optionally named) cutoff time, see details}
+
+\item{milestones}{(optionally named) vector of times at which milestone survival should be calculated}
 
 \item{design}{design data.frame}
 
 \item{target_power_ph}{target power under proportional hazards}
 
-\item{what="os"}{True summary statistics for which estimand}
+\item{final_events}{target events for inversion of Schönfeld Formula, defaults to \code{condition$final_events}}
 
-\item{cutoff_stats=NULL}{(optionally named) cutoff time, see details}
-
-\item{milestones=NULL}{(optionally named) vector of times at which milestone survival should be calculated}
-
-\item{fixed_objects=NULL}{additional settings, see details}
-
-\item{final_events=NA_real_}{target events for inversion of Schönfeld Formula, defaults to \code{condition$final_events}}
-
-\item{target_alpha=0.05}{target alpha level for the power calculation}
+\item{target_alpha}{target alpha level for the power calculation}
 }
 \value{
 For generate_progression: a design tibble with default values invisibly

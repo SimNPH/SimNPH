@@ -1,6 +1,6 @@
 #' Analyse the dataset using differnce in median survival
 #'
-#' @param quant=0.5 quantile for which the difference should be calculated, defaults to the median
+#' @param quant quantile for which the difference should be calculated, defaults to the median
 #'
 #' @return Returns an analysis function, that can be used in runSimulations
 #'
@@ -22,7 +22,7 @@
 #' * `N_evt` number of events
 #'
 #' @seealso
-#' [nph:nphparams]
+#' [nph::nphparams]
 #'
 #' @examples
 #' condition <- merge(

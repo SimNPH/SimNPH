@@ -1,5 +1,6 @@
 #' Apply Random Exponentially Distributed Censoring
 #'
+#' @param dat the dataset to apply the random censoring to
 #' @param rate time of end of enrollment
 #' @param discrete should the censoring times be rounded to whole days?
 #'
