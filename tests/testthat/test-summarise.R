@@ -65,29 +65,31 @@ test_that("creating a summarise function for an estimator works", {
 
   # create some summarise functions
   summarise_all <- create_summarise_function(
-    coxph=summarise_estimator(hr, gAHR, hr_lower, hr_upper, name="gAHR"),
+    coxph=summarise_estimator(hr, gAHR_15, hr_lower, hr_upper, name="gAHR"),
     coxph=summarise_estimator(hr, hazard_trt/hazard_ctrl, hr_lower, hr_upper, name="hr"),
-    coxph=summarise_estimator(exp(coef), gAHR),
+    coxph=summarise_estimator(exp(coef), gAHR_15),
     coxph=summarise_estimator(hr, NA_real_)
   )
 
   # runs simulations
-  capture.output(
-    type="output",
+  capture_warnings(
     capture.output(
-      type="message",
-      withr::with_seed(1, {
-        sim_results <- runSimulation(
-          design=condition,
-          replications=10,
-          generate=generate_delayed_effect,
-          analyse=list(
-            coxph=analyse_coxph()
-          ),
-          summarise = summarise_all,
-          save = FALSE
-        )
-      })
+      type="output",
+      capture.output(
+        type="message",
+        withr::with_seed(1, {
+          sim_results <- runSimulation(
+            design=condition,
+            replications=10,
+            generate=generate_delayed_effect,
+            analyse=list(
+              coxph=analyse_coxph()
+            ),
+            summarise = summarise_all,
+            save = FALSE
+          )
+        })
+      )
     )
   )
 
@@ -183,7 +185,7 @@ test_that("missings are treated correctly for summarise estimator", {
 })
 
 test_that("missings are treated correctly for summarise test", {
-  my_summarise <- summarise_test(alpha = c(0.95, 0.99))
+  my_summarise <- summarise_test(alpha = c(0.05, 0.01))
 
   condition_and_results <- tibble::tribble(
     ~real,       ~p,
@@ -195,9 +197,9 @@ test_that("missings are treated correctly for summarise test", {
 
   my_results <- my_summarise(condition_and_results, condition_and_results)
 
-  expect_equal(my_results$rejection_0.95, 2/3)
-  expect_equal(my_results$rejection_0.99, 1/3)
-  expect_equal(my_results$N_missing_0.95, 1)
-  expect_equal(my_results$N_missing_0.99, 1)
+  expect_equal(my_results$rejection_0.05, 2/3)
+  expect_equal(my_results$rejection_0.01, 1/3)
+  expect_equal(my_results$N_missing_0.05, 1)
+  expect_equal(my_results$N_missing_0.01, 1)
   expect_equal(my_results$N, 4)
 })
