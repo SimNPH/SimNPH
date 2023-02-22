@@ -22,7 +22,7 @@ analyse_modelstly_weighted <- function(t_star){
 
   function(condition, dat, fixed_objects = NULL){
     z_score <- nphRCT::wlrt(Surv(t, evt)~trt, dat, t_star=t_star, method="mw")$z
-    p_value <- (1-pnorm(z_score))
+    p_value <- (pnorm(-z_score, lower.tail = FALSE))
 
     result_tmp <- list(
       p = p_value,
