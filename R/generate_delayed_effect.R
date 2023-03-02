@@ -101,67 +101,6 @@ invisible(
 )
 }
 
-#' Calculate hr after onset of treatment effect from gAHR
-#'
-#' @param design design data.frame
-#' @param target_gAHR target geometric average hazard ratio
-#' @param cutoff time until which the gAHR should be calculated
-#'
-#' @return For hr_after_onset_from_gAHR: the design data.frame passed as
-#'   argument with the additional column hazard_trt.
-#' @export
-#'
-#' @describeIn generate_delayed_effect  Calculate hr after onset of treatment effect from gAHR
-#'
-#' @examples
-#' my_design <- merge(
-#'     assumptions_delayed_effect(),
-#'     design_fixed_followup(),
-#'     by=NULL
-#'   )
-#' my_design$hazard_trt <- NA
-#' my_design <- hr_after_onset_from_gAHR(my_design, 0.8, 200)
-#' my_design
-hr_after_onset_from_gAHR <- function(design, target_gAHR, cutoff=NA_real_){
-
-  fast_gAHR <- function(hazard_trt, condition, cutoff, target_gAHR=1, N_trt=1, N_ctrl=1){
-    h1 <- fast_haz_fun(c(0, condition$delay), c(condition$hazard_ctrl, hazard_trt))
-    h0 <- fast_haz_fun(c(0), c(condition$hazard_ctrl))
-
-    f1 <- fast_pdf_fun(c(0, condition$delay), c(condition$hazard_ctrl, hazard_trt))
-    f0 <- fast_pdf_fun(c(0), c(condition$hazard_ctrl))
-
-    f  <- \(t){(1/(N_trt+N_ctrl))*(N_trt*f1(t) + N_ctrl*f0(t))}
-    w  <- \(t){1} # Cox
-
-    gAHR <- exp(integrate(\(t){log(h1(t) / h0(t)) * f(t) * w(t)}, 0, cutoff)$value)
-
-    gAHR-target_gAHR
-  }
-
-  get_hr_after <- function(condition, cutoff=cutoff){
-    if(is.na(cutoff)){
-      if(hasName(condition, "followup")){
-        cutoff <- condition$followup
-      } else {
-        stop(gettext("cutoff not given and followup not present in design"))
-      }
-    }
-
-    condition$hazard_trt <- uniroot(fast_gAHR, interval = c(1e-8, 1), condition=condition, cutoff=cutoff, target_gAHR=target_gAHR)$root
-    condition
-  }
-
-  result <- design |>
-    split(1:nrow(design)) |>
-    lapply(get_hr_after, cutoff=cutoff) |>
-    do.call(what=rbind)
-
-  result
-
-
-}
-
 #' Calculate hr after onset of treatment effect
 #'
 #' @param design design data.frame
@@ -202,7 +141,7 @@ hr_after_onset_from_gAHR <- function(design, target_gAHR, cutoff=NA_real_){
 hr_after_onset_from_PH_effect_size <- function(design, target_power_ph=NA_real_, final_events=NA_real_, target_alpha=0.05){
   # hazard ratio required, inverted Schönfeld sample size formula
   hr_required_schoenfeld <- function(Nevt, alpha=0.05, beta=0.2, p=0.5){
-    exp( (qnorm(beta) + qnorm(alpha)) / sqrt(p*(1-p)*Nevt) )
+    exp( (qnorm(beta) + qnorm(alpha) ) / sqrt(p*(1-p)*Nevt) )
   }
 
   get_hr_after <- function(condition, target_power_ph=NA_real_, final_events=NA_real_){

@@ -112,65 +112,6 @@ invisible(
 )
 }
 
-#' Calculate hr after crossing of hazards from gAHT
-#'
-#' @param design design data.frame
-#' @param target_gAHR target geometric average hazard ratio
-#' @param cutoff time until which the gAHR should be calculated, defaults to `condition$followup`
-#'
-#' @return For hr_after_crossing_from_gAHR: the design data.frame passed as
-#'   argument with the additional column hazard_trt.
-#' @export
-#'
-#' @describeIn generate_crossing_hazards  Calculate hr after crossing of hazards from gAHR
-#'
-#' @examples
-#' my_design <- merge(
-#'     assumptions_crossing_hazards(),
-#'     design_fixed_followup(),
-#'     by=NULL
-#'   )
-#' my_design$hazard_trt <- NA
-#' my_design <- hr_after_crossing_from_gAHR(my_design, 0.8, 200)
-#' my_design
-hr_after_crossing_from_gAHR <- function(design, target_gAHR, cutoff=NA_real_){
-
-  fast_gAHR <- function(hazard_trt_after, condition, cutoff, target_gAHR=1, N_trt=1, N_ctrl=1){
-    h1 <- fast_haz_fun(c(0, condition$crossing), c(condition$hazard_trt_before, hazard_trt_after))
-    h0 <- fast_haz_fun(c(0), c(condition$hazard_ctrl))
-
-    f1 <- fast_pdf_fun(c(0, condition$crossing), c(condition$hazard_trt_before, hazard_trt_after))
-    f0 <- fast_pdf_fun(c(0), c(condition$hazard_ctrl))
-
-    f  <- \(t){(1/(N_trt+N_ctrl))*(N_trt*f1(t) + N_ctrl*f0(t))}
-    w  <- \(t){1} # Cox
-
-    gAHR <- exp(integrate(\(t){log(h1(t) / h0(t)) * f(t) * w(t)}, 0, cutoff)$value)
-
-    gAHR-target_gAHR
-  }
-
-  get_hr_after <- function(condition, cutoff=cutoff){
-    if(is.na(cutoff)){
-      if(hasName(condition, "followup")){
-        cutoff <- condition$followup
-      } else {
-        stop(gettext("cutoff not given and followup not present in design"))
-      }
-    }
-
-    condition$hazard_trt_after <- uniroot(fast_gAHR, interval = c(1e-8, 1), condition=condition, cutoff=cutoff, target_gAHR=target_gAHR)$root
-    condition
-  }
-
-  result <- design |>
-    split(1:nrow(design)) |>
-    lapply(get_hr_after, cutoff=cutoff) |>
-    do.call(what=rbind)
-
-  result
-}
-
 
 #' Calculate hr after crossing the hazard functions
 #'
@@ -242,7 +183,7 @@ hr_after_crossing_from_PH_effect_size <- function(design, target_power_ph=NA_rea
       median_trt <- median_ctrl
     }
 
-    if(median_trt <= condition$crossing ||
+    if(median_trt <= condition$crossing || # TODO: check
        median_ctrl <= condition$crossing ||
        median_trt_before <= condition$crossing
        ){
