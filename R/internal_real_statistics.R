@@ -121,9 +121,6 @@ fast_real_statistics <- function(
     h  <- \(t){haz_trt(t)+haz_ctrl(t)}
     f  <- \(t){(1/(N_trt+N_ctrl))*(N_trt*pdf_trt(t) + N_ctrl*pdf_ctrl(t))}
 
-    # stop on error=FALSE:
-    # this is somewhat risky, but I know, that the functions I use are well-behaved
-    # TODO: improve safety while still having fault tolerance
     rmst_ahr <- purrr::imap(cutoff, function(cutoff, label){
       tmp <- data.frame(
         rmst_trt            = integrate(surv_trt, 0, cutoff)$value,
