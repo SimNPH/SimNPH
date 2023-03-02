@@ -29,14 +29,6 @@ design <- merge(
   by=NULL
 )
 
-# Schoenfeld Formula ------------------------------------------------------
-
-# hazard ratio required, inverted Schönfeld sample size formula
-hr_required_schoenfeld <- function(Nevt, alpha=0.05, beta=0.2, p=0.5){
-  exp( (qnorm(beta) + qnorm(alpha)) / sqrt(p*(1-p)*Nevt) )
-}
-
-
 # calculate hr and medians ------------------------------------------------
 
 target_alpha <- 0.05
@@ -46,7 +38,7 @@ get_medians <- function(condition){
   if(condition$effect_size_ph == 0){
     ph_hr <- 1
   } else {
-    ph_hr <- hr_required_schoenfeld(
+    ph_hr <- SimNPH:::hr_required_schoenfeld(
       condition$final_events,
       alpha=target_alpha,
       beta=(1-condition$effect_size_ph),

@@ -236,10 +236,6 @@ true_summary_statistics_subgroup <- function(Design, cutoff_stats=NULL, mileston
 #' my_design <- hazard_subgroup_from_PH_effect_size(my_design, target_power_ph=0.9)
 #' my_design
 hazard_subgroup_from_PH_effect_size <- function(design, target_power_ph=NA_real_, final_events=NA_real_, target_alpha=0.05){
-  # hazard ratio required, inverted Schönfeld sample size formula
-  hr_required_schoenfeld <- function(Nevt, alpha=0.05, beta=0.2, p=0.5){
-    exp( (qnorm(beta) + qnorm(alpha)) / sqrt(p*(1-p)*Nevt) )
-  }
 
   get_hr_after <- function(condition, target_power_ph=NA_real_, final_events=NA_real_){
 

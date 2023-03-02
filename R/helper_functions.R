@@ -14,3 +14,8 @@ trycatch_nphparams <- function(call){
       )
     })
 }
+
+# hazard ratio required, inverted Schönfeld sample size formula
+hr_required_schoenfeld <- function(Nevt, alpha=0.05, beta=0.2, p=0.5){
+  exp( (qnorm(beta) + qnorm(alpha) ) / sqrt(p*(1-p)*Nevt) )
+}
