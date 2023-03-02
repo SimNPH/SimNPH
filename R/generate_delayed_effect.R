@@ -165,6 +165,7 @@ hr_after_onset_from_PH_effect_size <- function(design, target_power_ph=NA_real_,
     if(target_power_ph == 0){
       condition$hazard_trt <- condition$hazard_ctrl
       condition$target_median_trt <- median_ctrl * scale
+      condition$target_hr <- 1
       return(condition)
     }
 
@@ -175,6 +176,7 @@ hr_after_onset_from_PH_effect_size <- function(design, target_power_ph=NA_real_,
       warning("Median survival is shorter than delay of treatment effect, calculation not possible")
       condition$hazard_trt <- NA_real_
       condition$target_median_trt <- median_trt * scale
+      condition$target_hr <- ph_hr
       return(condition)
     }
 
@@ -193,6 +195,7 @@ hr_after_onset_from_PH_effect_size <- function(design, target_power_ph=NA_real_,
 
     condition$target_median_trt <- median_trt * scale
     condition$hazard_trt <- my_root$root / scale
+    condition$target_hr <- ph_hr
     condition
   }
 
