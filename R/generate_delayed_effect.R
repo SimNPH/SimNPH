@@ -223,30 +223,41 @@ hr_after_onset_from_PH_effect_size <- function(design, target_power_ph=NA_real_,
       }
     }
 
+    # scaling the hazards and medians to give better accuracy for the optimizer
+    scale <- 1/condition$hazard_ctrl
+    median_ctrl <- fast_quant_fun(0, scale*condition$hazard_ctrl        )(0.5)
+
     if(target_power_ph == 0){
       condition$hazard_trt <- condition$hazard_ctrl
+      condition$target_median_trt <- median_ctrl * scale
       return(condition)
     }
 
-
     ph_hr <- hr_required_schoenfeld(final_events, alpha=target_alpha, beta=(1-target_power_ph), p=(condition$n_ctrl/(condition$n_ctrl + condition$n_trt)))
-
-    median_trt  <- fast_quant_fun(0, condition$hazard_ctrl * ph_hr)(0.5)
-    median_ctrl <- fast_quant_fun(0, condition$hazard_ctrl        )(0.5)
+    median_trt  <- fast_quant_fun(0, scale*condition$hazard_ctrl * ph_hr)(0.5)
 
     if(median_trt <= condition$delay || median_ctrl <= condition$delay){
       warning("Median survival is shorter than delay of treatment effect, calculation not possible")
       condition$hazard_trt <- NA_real_
+      condition$target_median_trt <- median_trt * scale
       return(condition)
     }
 
     target_fun_hazard_after <- function(hazard_after){
       sapply(hazard_after, \(h){
-        median_trt - fast_quant_fun(c(0, condition$delay), c(condition$hazard_ctrl, h))(0.5)
+        median_trt - fast_quant_fun(c(0, condition$delay/scale), c(condition$hazard_ctrl*scale, h))(0.5)
       })
     }
 
-    condition$hazard_trt <- uniroot(target_fun_hazard_after, interval=c(1e-8, condition$hazard_ctrl))$root
+    my_root <- uniroot(
+      target_fun_hazard_after,
+      interval=c(0.5, 2),
+      extendInt = "upX",
+      tol=2*.Machine$double.eps
+    )
+
+    condition$target_median_trt <- median_trt * scale
+    condition$hazard_trt <- my_root$root / scale
     condition
   }
 
