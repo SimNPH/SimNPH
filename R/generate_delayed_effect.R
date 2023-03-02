@@ -236,7 +236,7 @@ hr_after_onset_from_PH_effect_size <- function(design, target_power_ph=NA_real_,
     ph_hr <- hr_required_schoenfeld(final_events, alpha=target_alpha, beta=(1-target_power_ph), p=(condition$n_ctrl/(condition$n_ctrl + condition$n_trt)))
     median_trt  <- fast_quant_fun(0, scale*condition$hazard_ctrl * ph_hr)(0.5)
 
-    if(median_trt <= condition$delay || median_ctrl <= condition$delay){
+    if(median_trt*scale <= condition$delay || median_ctrl*scale <= condition$delay){
       warning("Median survival is shorter than delay of treatment effect, calculation not possible")
       condition$hazard_trt <- NA_real_
       condition$target_median_trt <- median_trt * scale
