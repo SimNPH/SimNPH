@@ -263,28 +263,24 @@ cen_rate_from_cen_prop_delayed_effect <- function(design){
       log(10000) / condition$hazard_trt
     )
 
-    a <- condition$n_trt / (condition$n_trt + condition$n_ctrl)
-    b <- 1-a
-
     cumhaz_trt <- fast_cumhaz_fun(
       c(                    0,      condition$delay),
       c(condition$hazard_ctrl, condition$hazard_trt)
-    )
+    )(t_max)
 
     cumhaz_ctrl <- fast_cumhaz_fun(
       c(                    0),
       c(condition$hazard_ctrl)
+    )(t_max)
+
+    condition$random_withdrawal <- censoring_prop_from_cumhaz(
+      n_trt          = condition$n_trt,
+      n_ctrl         = condition$n_ctrl,
+      censoring_prop = condition$censoring_prop,
+      cumhaz_ctrl    = cumhaz_ctrl,
+      cumhaz_trt     = cumhaz_trt,
+      t_max          = t_max
     )
-
-    target_fun <- Vectorize(\(r){
-      cumhaz_censoring <- fast_cumhaz_fun(0, r)
-      prob_cen_ctrl <- cumhaz_censoring(t_max)/(cumhaz_censoring(t_max) + cumhaz_ctrl(t_max))
-      prob_cen_trt  <- cumhaz_censoring(t_max)/(cumhaz_censoring(t_max) + cumhaz_trt(t_max))
-      prob_cen <- a*prob_cen_trt + b*prob_cen_ctrl
-      prob_cen-condition$censoring_prop
-    })
-
-    condition$random_withdrawal <- uniroot(target_fun, interval=c(0, 1e-6), extendInt = "upX", tol=.Machine$double.eps)$root
 
     condition
   }

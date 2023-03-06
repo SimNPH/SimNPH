@@ -455,7 +455,7 @@ hazard_before_progression_from_PH_effect_size <- function(design, target_power_p
     # set t_max to 1/5000 quantile of control arm
     t_max <- log(500) / condition$hazard_ctrl
 
-    model_control <- SimNPH:::subpop_hazVfun_simnph(
+    model_control <- subpop_hazVfun_simnph(
       c(0, t_max),
       lambda1 = condition$hazard_ctrl,
       lambda2 = condition$hazard_after_prog,
@@ -473,7 +473,12 @@ hazard_before_progression_from_PH_effect_size <- function(design, target_power_p
       med
     }
 
-    ph_hr <- hr_required_schoenfeld(final_events, alpha=target_alpha, beta=(1-target_power_ph), p=(condition$n_ctrl/(condition$n_ctrl + condition$n_trt)))
+    ph_hr <- hr_required_schoenfeld(
+      final_events,
+      alpha=target_alpha,
+      beta=(1-target_power_ph),
+      p=(condition$n_ctrl/(condition$n_ctrl + condition$n_trt))
+    )
     median_ctrl <- median_progression(model_control)
 
     hazard_ctrl_ph <- uniroot(
