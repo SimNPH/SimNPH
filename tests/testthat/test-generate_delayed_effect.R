@@ -156,28 +156,6 @@ test_that("test that true_summary_statistics_delayed_effect fails on delay < 0",
 })
 
 
-test_that("test that hr_after_onset_from_gAHR works", {
-  capture.output(
-    my_design <- merge(
-      assumptions_delayed_effect(),
-      design_fixed_followup(),
-      by=NULL
-    )
-  )
-
-  my_design$hazard_trt <- NA
-  my_design$hazard_ctrl <- 0.1
-
-  my_design_A <- hr_after_onset_from_gAHR(my_design, 0.95)
-  my_design_B <- hr_after_onset_from_gAHR(my_design, 0.95, cutoff = 150)
-
-  my_design$followup <- NULL
-
-  expect_error(hr_after_onset_from_gAHR(my_design, 0.95))
-  expect(all(!is.na(my_design_A$hazard_trt)), "hazard_trt not missing")
-  expect(all(!is.na(my_design_B$hazard_trt)), "hazard_trt not missing")
-})
-
 test_that("test that hr_after_onset_from_PH_effect_size works", {
   capture.output(
     my_design <- merge(

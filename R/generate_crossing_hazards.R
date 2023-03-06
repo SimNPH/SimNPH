@@ -149,7 +149,7 @@ invisible(
 #' my_design$hazard_trt <- NA
 #' my_design <- hr_after_crossing_from_PH_effect_size(my_design, target_power_ph=0.9)
 #' my_design
-hr_after_crossing_from_PH_effect_size <- function(design, target_power_ph=NA_real_, final_events=NA_real_, target_alpha=0.05){
+hr_after_crossing_from_PH_effect_size <- function(design, target_power_ph=NA_real_, final_events=NA_real_, target_alpha=0.025){
 
   get_hr_after <- function(condition, target_power_ph=NA_real_, final_events=NA_real_){
 
@@ -169,32 +169,59 @@ hr_after_crossing_from_PH_effect_size <- function(design, target_power_ph=NA_rea
       }
     }
 
-    ph_hr <- hr_required_schoenfeld(final_events, alpha=target_alpha, beta=(1-target_power_ph), p=(condition$n_ctrl/(condition$n_ctrl + condition$n_trt)))
-
-    median_trt <- fast_quant_fun(0, condition$hazard_ctrl * ph_hr)(0.5)
-    median_ctrl <- fast_quant_fun(0, condition$hazard_ctrl        )(0.5)
-    median_trt_before <- fast_quant_fun(0, condition$hazard_trt_before)(0.5)
+    scale <- 1/condition$hazard_ctrl
+    median_ctrl <- fast_quant_fun(0, scale*condition$hazard_ctrl)(0.5)
 
     if(target_power_ph == 0){
       median_trt <- median_ctrl
+      ph_hr <- 1
+    } else {
+      ph_hr <- hr_required_schoenfeld(
+        final_events,
+        alpha=target_alpha,
+        beta=(1-target_power_ph),
+        p=(condition$n_ctrl/(condition$n_ctrl + condition$n_trt))
+      )
+
+      median_trt <- fast_quant_fun(0, scale*condition$hazard_ctrl*ph_hr)(0.5)
     }
 
-    if(median_trt <= condition$crossing || # TODO: check
-       median_ctrl <= condition$crossing ||
-       median_trt_before <= condition$crossing
+    median_trt_before <- fast_quant_fun(0, scale*condition$hazard_trt_before)(0.5)
+
+    if(scale*median_ctrl <= condition$crossing ||
+       scale*median_trt_before <= condition$crossing
        ){
       warning("Median survival reached before crossing of the hazards curves, calculation not possible")
-      condition$hazard_trt_after <- NA_real_
+      condition$hazard_trt_after  <- NA_real_
+      condition$target_median_trt <- median_trt * scale
+      condition$target_hr         <- ph_hr
       return(condition)
     }
 
     target_fun_hazard_after <- function(hazard_after){
       sapply(hazard_after, \(h){
-        median_trt - fast_quant_fun(c(0, condition$crossing), c(condition$hazard_trt_before, h))(0.5)
+        median_trt -
+          fast_quant_fun(
+            c(0, condition$crossing/scale),
+            c(condition$hazard_trt_before*scale, h)
+          )(0.5)
       })
     }
 
-    condition$hazard_trt_after  <- uniroot(target_fun_hazard_after, interval=c(1e-8, condition$hazard_ctrl))$root
+    # setting the lower interval bound to 0 and f.lower to -Inf
+    # and extendInt="upX" guarantees, that the root is searched on all positives
+    # but also that the target function is never evaluated at non-positive values
+    my_root <- uniroot(
+      target_fun_hazard_after,
+      interval=c(0, 2),
+      f.lower = -Inf,
+      extendInt = "upX",
+      tol=2*.Machine$double.eps
+    )
+
+    condition$target_median_trt <- median_trt * scale
+    condition$hazard_trt_after  <- my_root$root / scale
+    condition$target_hr         <- ph_hr
     condition
   }
 
