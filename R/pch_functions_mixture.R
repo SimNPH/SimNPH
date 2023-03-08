@@ -147,8 +147,10 @@ mixture_surv_fun   <- function(p, survs){
 #'   )
 #' )
 #' plot(surv(seq(0, 30, by=0.15)), type="l")
-mixture_quant_fun   <- function(p, cdfs){
+mixture_quant_fun   <- function(p, cdfs, quants){
   p <- prepare_p(p)
+  check_lists(p, cdfs, quants)
+
   mix_cdf <- mixture_cdf_fun(p, cdfs)
 
   target_fun <- function(x, v){
@@ -156,7 +158,16 @@ mixture_quant_fun   <- function(p, cdfs){
   }
 
   function(v){
-    sapply(v, \(y) uniroot(target_fun, v=y, interval=c(0,1), extendInt="upX")$root)
+    sapply(v, \(y){
+      lims <- range(sapply(quants, \(q){q(y)}))
+      uniroot(
+        target_fun,
+        v=y,
+        interval=lims,
+        extendInt="upX",
+        tol=2*.Machine$double.eps
+      )$root
+    })
   }
 }
 
