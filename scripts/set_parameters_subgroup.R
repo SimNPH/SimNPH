@@ -25,7 +25,7 @@ assumptions <- expand.grid(
   hazard_ctrl = nph::m2r(c(36, 12, 6)),
   censoring_prop = c(0, 0.1, 0.3),
   effect_size_ph = c(0, 0.5, 0.8, 0.9),
-  prevalence = seq(0.1, 0.5, by=0.2),
+  prevalence = seq(0.1, 0.9, by=0.2),
   hr_subgroup_relative = seq(0.7, 0.9, by=0.1)
 )
 

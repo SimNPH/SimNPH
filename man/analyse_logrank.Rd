@@ -4,12 +4,16 @@
 \alias{analyse_logrank}
 \title{Analyse Dataset with the Logrank Test}
 \usage{
-analyse_logrank()
+analyse_logrank(alternative = "two.sided")
+}
+\arguments{
+\item{alternative}{alternative hypothesis for the tests "two.sided" or "one.sieded"}
 }
 \value{
 an analysis function that returns a data.frame with the columns
 \itemize{
 \item \code{p} p-value of the logrank test
+\item \code{alternative} the alternative used
 \item \code{N_pat} number of patients
 \item \code{N_evt} number of events
 }
@@ -17,12 +21,18 @@ an analysis function that returns a data.frame with the columns
 \description{
 Analyse Dataset with the Logrank Test
 }
+\details{
+\code{alternative} can be "two.sided" for a two sided test of equality of the
+summary statistic or "one.sided" for a one sided test testing H0: treatment
+has equal or shorter survival than control vs. H1 treatment has longer
+survival than control.
+}
 \examples{
 condition <- merge(
-    assumptions_delayed_effect(),
-    design_fixed_followup(),
-    by=NULL
-  ) |>
+  assumptions_delayed_effect(),
+  design_fixed_followup(),
+  by = NULL
+) |>
   head(1)
 dat <- generate_delayed_effect(condition)
 analyse_logrank()(condition, dat)

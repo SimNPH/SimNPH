@@ -4,21 +4,32 @@
 \alias{analyse_coxph_weighted}
 \title{Analyse Dataset with weighted Cox regression}
 \usage{
-analyse_coxph_weighted(type = "SG", max_time = NA_real_)
+analyse_coxph_weighted(
+  type = "SG",
+  max_time = NA_real_,
+  level = 0.95,
+  alternative = "two.sided"
+)
 }
 \arguments{
 \item{type}{type of weights, see Details}
 
 \item{max_time}{cutoff time for estimation, defaults to last event time}
+
+\item{level}{confidence level for CI computation}
+
+\item{alternative}{alternative hypothesis for the tests "two.sided" or "one.sieded"}
 }
 \value{
 an analyse function that returns a data.frame with the columns
 \itemize{
-\item \code{p} p value of the score test
+\item \code{p} p value of the score test (two.sided) or the Wald test (one.sided)
+\item \code{alternative} the alternative used
 \item \code{coef} coefficient for \code{trt}
 \item \code{hr} hazard ratio for \code{trt}
 \item \code{hr_lower} lower 95\% confidence intervall boundary for the hazard ratio for \code{trt}
 \item \code{hr_upper}lower 95\% confidence intervall boundary for the hazard ratio for \code{trt}
+\item \code{CI_level} the CI level used
 \item \code{N_pat} number of patients
 \item \code{N_evt} number of events
 }
@@ -31,13 +42,18 @@ Type can be "SG", "S" or "G". For "SG" the weights are set to
 \code{S(t)*G(t)^(-1)}, for "S" \code{S(t)} is used, for "G", \code{G(t)^(-1)} is used. Here
 \code{S(t)} denotes the Kaplan Meier estimator for the event Times and \code{G(t)}
 denotes the Kaplan Meier estimator for the censoring times.
+
+\code{alternative} can be "two.sided" for a two sided test of equality of the
+summary statistic or "one.sided" for a one sided test testing H0: treatment
+has equal or shorter survival than control vs. H1 treatment has longer
+survival than control.
 }
 \examples{
 condition <- merge(
-    assumptions_delayed_effect(),
-    design_fixed_followup(),
-    by=NULL
-  ) |>
+  assumptions_delayed_effect(),
+  design_fixed_followup(),
+  by = NULL
+) |>
   head(1)
 dat <- generate_delayed_effect(condition)
 analyse_coxph_weighted()(condition, dat)

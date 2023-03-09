@@ -22,8 +22,6 @@ test_that("analyse milestone survival works", {
 
   result1 <- analyse_milestone_survival(times=times)(condition, dat)
   result2 <- analyse_milestone_survival(times=times, what="diff")(condition, dat)
-  result3 <- analyse_milestone_survival(times=times, what="quot", package="survival")(condition, dat)
-  result4 <- analyse_milestone_survival(times=times, what="diff", package="survival")(condition, dat)
 
   expect_warning(result1a <- analyse_milestone_survival(times=times)(condition, dat2))
   expect(length(result1a$p)==1, "p-value should be of length 1 if it cannot be computed i.e. NA_real_ not NULL")
@@ -31,17 +29,10 @@ test_that("analyse milestone survival works", {
 
   expect_type(result1, "list")
   expect_s3_class(result1, NA)
-  expect_named(result1, c("p", "milestone_surv_ratio", "milestone_surv_ratio_lower", "milestone_surv_ratio_upper", "times", "N_pat", "N_evt"))
+  expect_named(result1, c("p", "alternative", "milestone_surv_ratio", "milestone_surv_ratio_lower", "milestone_surv_ratio_upper", "CI_level", "times", "N_pat", "N_evt"))
 
   expect_type(result2, "list")
   expect_s3_class(result1, NA)
-  expect_named(result2, c("p", "milestone_surv_diff", "milestone_surv_diff_lower", "milestone_surv_diff_upper", "times", "N_pat", "N_evt"))
+  expect_named(result2, c("p", "alternative", "milestone_surv_diff", "milestone_surv_diff_lower", "milestone_surv_diff_upper", "CI_level", "times", "N_pat", "N_evt"))
 
-  expect_type(result3, "list")
-  expect_s3_class(result3, NA)
-  expect_named(result3, c("milestone_surv_ratio", "times", "N_pat", "N_evt"))
-
-  expect_type(result4, "list")
-  expect_s3_class(result4, NA)
-  expect_named(result4, c("milestone_surv_diff", "times", "N_pat", "N_evt"))
 })

@@ -4,7 +4,10 @@
 \alias{analyse_maxcombo}
 \title{Analyse Dataset with the Maxcombo Test}
 \usage{
-analyse_maxcombo()
+analyse_maxcombo(alternative = "two.sided")
+}
+\arguments{
+\item{alternative}{alternative hypothesis for the tests "two.sided" or "one.sieded"}
 }
 \value{
 an analyse function that returns a data.frame with the combined
@@ -13,12 +16,18 @@ p-value of the max combo test in the column p
 \description{
 Analyse Dataset with the Maxcombo Test
 }
+\details{
+\code{alternative} can be "two.sided" for a two sided test of equality of the
+summary statistic or "one.sided" for a one sided test testing H0: treatment
+has equal or shorter survival than control vs. H1 treatment has longer
+survival than control.
+}
 \examples{
 condition <- merge(
-    assumptions_delayed_effect(),
-    design_fixed_followup(),
-    by=NULL
-  ) |>
+  assumptions_delayed_effect(),
+  design_fixed_followup(),
+  by = NULL
+) |>
   head(1)
 dat <- generate_delayed_effect(condition)
 analyse_maxcombo()(condition, dat)

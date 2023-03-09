@@ -37,26 +37,26 @@ test_that("weighted cox regression works", {
 
   expect_type(res_s, "list")
   expect_s3_class(res_s, NA)
-  expect_named(res_s, c("p", "coef", "hr", "hr_lower", "hr_upper", "N_pat", "N_evt", "followup"))
+  expect_named(res_s, c("p", "alternative", "coef", "hr", "hr_lower", "hr_upper", "CI_level", "N_pat", "N_evt", "followup"))
 
   expect_type(res_sg, "list")
   expect_s3_class(res_sg, NA)
-  expect_named(res_sg, c("p", "coef", "hr", "hr_lower", "hr_upper", "N_pat", "N_evt", "followup"))
+  expect_named(res_sg, c("p", "alternative", "coef", "hr", "hr_lower", "hr_upper", "CI_level", "N_pat", "N_evt", "followup"))
 
   expect_type(res_g, "list")
   expect_s3_class(res_g, NA)
-  expect_named(res_g, c("p", "coef", "hr", "hr_lower", "hr_upper", "N_pat", "N_evt", "followup"))
+  expect_named(res_g, c("p", "alternative", "coef", "hr", "hr_lower", "hr_upper", "CI_level", "N_pat", "N_evt", "followup"))
 
   expect_type(res_s_50, "list")
   expect_s3_class(res_s_50, NA)
-  expect_named(res_s_50, c("p", "coef", "hr", "hr_lower", "hr_upper", "N_pat", "N_evt", "followup"))
+  expect_named(res_s_50, c("p", "alternative", "coef", "hr", "hr_lower", "hr_upper", "CI_level", "N_pat", "N_evt", "followup"))
 
   expect_type(res_sg_50, "list")
   expect_s3_class(res_sg_50, NA)
-  expect_named(res_sg_50, c("p", "coef", "hr", "hr_lower", "hr_upper", "N_pat", "N_evt", "followup"))
+  expect_named(res_sg_50, c("p", "alternative", "coef", "hr", "hr_lower", "hr_upper", "CI_level", "N_pat", "N_evt", "followup"))
 
   expect_type(res_g_50, "list")
   expect_s3_class(res_g_50, NA)
-  expect_named(res_g_50, c("p", "coef", "hr", "hr_lower", "hr_upper", "N_pat", "N_evt", "followup"))
+  expect_named(res_g_50, c("p", "alternative", "coef", "hr", "hr_lower", "hr_upper", "CI_level", "N_pat", "N_evt", "followup"))
 
 })

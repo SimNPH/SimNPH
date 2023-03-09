@@ -4,7 +4,10 @@
 \alias{analyse_gehan_wilcoxon}
 \title{Create Analyse function for Gehan Wilcoxon test}
 \usage{
-analyse_gehan_wilcoxon()
+analyse_gehan_wilcoxon(alternative = "two.sided")
+}
+\arguments{
+\item{alternative}{alternative hypothesis for the tests "two.sided" or "one.sieded"}
 }
 \value{
 an analyse function that can be used in runSimulation
@@ -12,13 +15,19 @@ an analyse function that can be used in runSimulation
 \description{
 Create Analyse function for Gehan Wilcoxon test
 }
+\details{
+\code{alternative} can be "two.sided" for a two sided test of equality of the
+summary statistic or "one.sided" for a one sided test testing H0: treatment
+has equal or shorter survival than control vs. H1 treatment has longer
+survival than control.
+}
 \examples{
 condition <- merge(
-   assumptions_delayed_effect(),
-   design_fixed_followup(),
-   by=NULL
- ) |>
- head(1)
+  assumptions_delayed_effect(),
+  design_fixed_followup(),
+  by = NULL
+) |>
+  head(1)
 dat <- generate_delayed_effect(condition)
 analyse_gehan_wilcoxon()(condition, dat)
 }

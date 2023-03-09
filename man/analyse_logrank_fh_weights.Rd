@@ -4,12 +4,14 @@
 \alias{analyse_logrank_fh_weights}
 \title{Analyse Dataset with the Fleming Harrington weighted Logrank Test}
 \usage{
-analyse_logrank_fh_weights(rho, gamma)
+analyse_logrank_fh_weights(rho, gamma, alternative = "two.sided")
 }
 \arguments{
 \item{rho}{rho for the rho-gamma family of weights}
 
 \item{gamma}{gamma for the rho-gamma family of weights}
+
+\item{alternative}{alternative hypothesis for the tests "two.sided" or "one.sieded"}
 }
 \value{
 a function with the arguments condition, dat and fixed_objects that
@@ -20,17 +22,23 @@ dat, fixed_arguments.
 \description{
 Analyse Dataset with the Fleming Harrington weighted Logrank Test
 }
+\details{
+\code{alternative} can be "two.sided" for a two sided test of equality of the
+summary statistic or "one.sided" for a one sided test testing H0: treatment
+has equal or shorter survival than control vs. H1 treatment has longer
+survival than control.
+}
 \examples{
 condition <- merge(
-    assumptions_delayed_effect(),
-    design_fixed_followup(),
-    by=NULL
-  ) |>
+  assumptions_delayed_effect(),
+  design_fixed_followup(),
+  by = NULL
+) |>
   head(1)
 dat <- generate_delayed_effect(condition)
 # create two functions with different weights
-analyse_01 <- analyse_logrank_fh_weights(rho=0, gamma=1)
-analyse_10 <- analyse_logrank_fh_weights(rho=1, gamma=0)
+analyse_01 <- analyse_logrank_fh_weights(rho = 0, gamma = 1)
+analyse_10 <- analyse_logrank_fh_weights(rho = 1, gamma = 0)
 # run the tests created before
 analyse_01(condition, dat)
 analyse_10(condition, dat)

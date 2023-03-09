@@ -4,16 +4,23 @@
 \alias{analyse_coxph}
 \title{Analyse Dataset with the Cox Protportional Hazards Model}
 \usage{
-analyse_coxph()
+analyse_coxph(level = 0.95, alternative = "two.sided")
+}
+\arguments{
+\item{level}{confidence level for CI computation}
+
+\item{alternative}{alternative hypothesis for the tests "two.sided" or "one.sieded"}
 }
 \value{
 an analyse function that returns a list with the elements
 \itemize{
-\item \code{p} p value of the score test
+\item \code{p} p value of the score test (two.sided) or the Wald test (one.sided)
+\item \code{alternative} the alternative used
 \item \code{coef} coefficient for \code{trt}
 \item \code{hr} hazard ratio for \code{trt}
 \item \code{hr_lower} lower 95\% confidence intervall boundary for the hazard ratio for \code{trt}
 \item \code{hr_upper}lower 95\% confidence intervall boundary for the hazard ratio for \code{trt}
+\item \code{CI_level} the CI level used
 \item \code{N_pat} number of patients
 \item \code{N_evt} number of events
 }
@@ -21,12 +28,18 @@ an analyse function that returns a list with the elements
 \description{
 Analyse Dataset with the Cox Protportional Hazards Model
 }
+\details{
+\code{alternative} can be "two.sided" for a two sided test of equality of the
+summary statistic or "one.sided" for a one sided test testing H0: treatment
+has equal or shorter survival than control vs. H1 treatment has longer
+survival than control.
+}
 \examples{
 condition <- merge(
-    assumptions_delayed_effect(),
-    design_fixed_followup(),
-    by=NULL
-  ) |>
+  assumptions_delayed_effect(),
+  design_fixed_followup(),
+  by = NULL
+) |>
   head(1)
 dat <- generate_delayed_effect(condition)
 analyse_coxph()(condition, dat)
