@@ -1,6 +1,7 @@
 #' Analyse the Dataset using the difference in RMST
 #'
 #' @param max_time time for which the RMST is calculated
+#' @param level confidence level for CI computation
 #'
 #' @return Returns an analysis function, that can be used in runSimulations
 #'
@@ -32,15 +33,21 @@
 #'   head(1)
 #' dat <- generate_delayed_effect(condition)
 #' analyse_rmst_diff()(condition, dat)
-analyse_rmst_diff <- function(max_time=NA){
+analyse_rmst_diff <- function(max_time=NA, level=0.95){
   function(condition, dat, fixed_objects = NULL){
-    model <- trycatch_nphparams(nph::nphparams(dat$t, dat$evt, dat$trt, param_type="RMST", param_par=max_time))
+    model <- trycatch_nphparams(nph::nphparams(
+      dat$t, dat$evt, dat$trt,
+      param_type="RMST",
+      param_par=max_time,
+      lvl=level
+      ))
 
     list(
       p = model$tab$p_unadj,
       rmst_diff = model$tab$Estimate,
       rmst_diff_lower = model$tab$lwr_unadj,
       rmst_diff_upper = model$tab$upr_unadj,
+      CI_level = level,
       N_pat=nrow(dat),
       N_evt=sum(dat$evt)
     )

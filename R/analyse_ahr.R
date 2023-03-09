@@ -2,6 +2,8 @@
 #'
 #' @param max_time time for which the RMST is calculated
 #' @param type "AHR" for average hazard ratio "gAHR" for geometric average hazard ratio
+#' @param level confidence level for CI computation
+#' @param alternative alternative hypothesis for the tests "two.sided" or "one.sieded"
 #'
 #' @return Returns an analysis function, that can be used in runSimulations
 #'
@@ -10,6 +12,11 @@
 #' @details
 #' The implementation from the nph package is used, see the documentation there
 #' for details.
+#'
+#' `alternative` can be "two.sided" for a two sided test of equality of the
+#' summary statistic or "one.sided" for a one sided test testing H0: treatment
+#' has equal or shorter survival than control vs. H1 treatment has longer
+#' survival than control.
 #'
 #' The data.frame returned by the created function includes the follwing
 #' columns:
@@ -36,19 +43,33 @@
 #' analyse_ahr(type="gAHR")(condition, dat)
 #' analyse_ahr(max_time=50, type="AHR")(condition, dat)
 #' analyse_ahr(max_time=50, type="gAHR")(condition, dat)
-analyse_ahr <- function(max_time=NA, type="AHR"){
+analyse_ahr <- function(max_time=NA, type="AHR", level=0.95, alternative="two.sided"){
+
+  alt_ <- switch (alternative,
+                  two.sided = "two.sided",
+                  one.sided = "less",
+                  stop(gettext("'alternative' has to be either 'two.sided' or 'one.sided'."))
+  )
 
   switch(
     type,
     AHR = {
       function(condition, dat, fixed_objects = NULL){
-        model <- trycatch_nphparams(nph::nphparams(dat$t, dat$evt, dat$trt, param_type="avgHR", param_par=max_time))
+        model <- trycatch_nphparams(nph::nphparams(
+            dat$t, dat$evt, dat$trt,
+            param_type="avgHR",
+            param_par=max_time,
+            lvl=level,
+            alternative_test=alt_
+          ))
 
         list(
           p = model$tab$p_unadj,
+          alternative = alternative,
           AHR = model$tab$Estimate,
           AHR_lower = model$tab$lwr_unadj,
           AHR_upper = model$tab$upr_unadj,
+          CI_level = level,
           N_pat=nrow(dat),
           N_evt=sum(dat$evt)
         )
@@ -56,13 +77,21 @@ analyse_ahr <- function(max_time=NA, type="AHR"){
     },
     gAHR = {
       function(condition, dat, fixed_objects = NULL){
-        model <- trycatch_nphparams(nph::nphparams(dat$t, dat$evt, dat$trt, param_type="HR", param_par=max_time))
+        model <- trycatch_nphparams(nph::nphparams(
+          dat$t, dat$evt, dat$trt,
+          param_type="HR",
+          param_par=max_time,
+          lvl=level,
+          alternative_test=alt_
+        ))
 
         list(
           p = model$tab$p_unadj,
+          alternative = alternative,
           gAHR = model$tab$Estimate,
           gAHR_lower = model$tab$lwr_unadj,
           gAHR_upper = model$tab$upr_unadj,
+          CI_level = level,
           N_pat=nrow(dat),
           N_evt=sum(dat$evt)
         )

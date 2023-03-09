@@ -16,9 +16,9 @@ test_that("analyse rmst diff works", {
 
   expect_type(results, "list")
   expect_s3_class(results, NA)
-  expect_named(results, c("p", "rmst_diff", "rmst_diff_lower", "rmst_diff_upper", "N_pat", "N_evt"))
+  expect_named(results, c("p", "rmst_diff", "rmst_diff_lower", "rmst_diff_upper", "CI_level", "N_pat", "N_evt"))
 
   expect_type(results2, "list")
   expect_s3_class(results2, NA)
-  expect_named(results2, c("p", "rmst_diff", "rmst_diff_lower", "rmst_diff_upper", "N_pat", "N_evt"))
+  expect_named(results2, c("p", "rmst_diff", "rmst_diff_lower", "rmst_diff_upper", "CI_level", "N_pat", "N_evt"))
 })

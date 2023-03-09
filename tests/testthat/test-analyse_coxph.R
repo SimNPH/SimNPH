@@ -13,5 +13,5 @@ test_that("analyse coxph works", {
   expect_type(results, "list")
   expect_s3_class(results, NA)
 
-  expect_named(results, c("p", "coef", "hr", "hr_lower", "hr_upper", "N_pat", "N_evt"))
+  expect_named(results, c("p", "alternative", "coef", "hr", "hr_lower", "hr_upper", "CI_level", "N_pat", "N_evt"))
 })
