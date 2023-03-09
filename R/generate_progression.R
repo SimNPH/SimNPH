@@ -279,27 +279,15 @@ progression_rate_from_progression_prop <- function(design){
     cumhaz_trt <- fast_cumhaz_fun(
       c(                   0),
       c(condition$hazard_trt)
-    )
+    )(t_max)
 
     cumhaz_ctrl <- fast_cumhaz_fun(
       c(                    0),
       c(condition$hazard_ctrl)
-    )
+    )(t_max)
 
-    target_fun_trt <- Vectorize(\(r){
-      cumhaz_prog_trt <- fast_cumhaz_fun(0, r)
-      prob_prog_trt  <- cumhaz_prog_trt(t_max)/(cumhaz_prog_trt(t_max) + cumhaz_trt(t_max))
-      prob_prog_trt-condition$prog_prop_trt
-    })
-
-    target_fun_ctrl <- Vectorize(\(r){
-      cumhaz_prog_ctrl <- fast_cumhaz_fun(0, r)
-      prob_prog_ctrl  <- cumhaz_prog_ctrl(t_max)/(cumhaz_prog_ctrl(t_max) + cumhaz_ctrl(t_max))
-      prob_prog_ctrl-condition$prog_prop_ctrl
-    })
-
-    condition$prog_rate_trt  <- uniroot(target_fun_trt,  interval=c(0, 1e-6), extendInt = "upX", tol=.Machine$double.eps)$root
-    condition$prog_rate_ctrl <- uniroot(target_fun_ctrl, interval=c(0, 1e-6), extendInt = "upX", tol=.Machine$double.eps)$root
+    condition$prog_rate_trt  <- cumhaz_trt  / ((1/condition$prog_prop_trt  - 1)*t_max)
+    condition$prog_rate_ctrl <- cumhaz_ctrl / ((1/condition$prog_prop_ctrl - 1)*t_max)
 
     condition
   }
@@ -452,7 +440,7 @@ hazard_before_progression_from_PH_effect_size <- function(design, target_power_p
       }
     }
 
-    # set t_max to 1/5000 quantile of control arm
+    # set t_max to 1/500 quantile of control arm
     t_max <- log(500) / condition$hazard_ctrl
 
     model_control <- subpop_hazVfun_simnph(
@@ -479,6 +467,7 @@ hazard_before_progression_from_PH_effect_size <- function(design, target_power_p
       beta=(1-target_power_ph),
       p=(condition$n_ctrl/(condition$n_ctrl + condition$n_trt))
     )
+
     median_ctrl <- median_progression(model_control)
 
     hazard_ctrl_ph <- uniroot(
@@ -486,14 +475,15 @@ hazard_before_progression_from_PH_effect_size <- function(design, target_power_p
         fast_quant_fun(0, h)(0.5) - median_ctrl
       },
       interval=c(1e-8, 0.0001),
-      extendInt="downX"
+      extendInt="downX",
+      tol = 2*.Machine$double.eps
     )$root
 
     median_trt_ph  <- fast_quant_fun(0, hazard_ctrl_ph * ph_hr)(0.5)
 
     target_fun_hazard_trt <- function(hazard_after){
       sapply(hazard_after, \(h){
-        mod_trt <- SimNPH:::subpop_hazVfun_simnph(
+        mod_trt <- subpop_hazVfun_simnph(
           c(0, t_max),
           lambda1 = h,
           lambda2 = condition$hazard_after_prog,
@@ -504,8 +494,8 @@ hazard_before_progression_from_PH_effect_size <- function(design, target_power_p
         median_trt_ph - median_trt
       })
     }
-
-    condition$hazard_trt <- uniroot(target_fun_hazard_trt, interval=c(1e-8, 0.0001), extendInt = "upX")$root
+    browser()
+    condition$hazard_trt <- uniroot(target_fun_hazard_trt, interval=c(1e-8, 0.0001), extendInt = "upX", tol=.Machine$double.eps*2)$root
     condition
   }
 
