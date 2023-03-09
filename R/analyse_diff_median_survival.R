@@ -17,9 +17,11 @@
 #' columns:
 #'
 #' * `p` p value of the test, see Details
+#' * `alternative` the alternative used
 #' * `diff_Q` estimated differnce in quantile of the suvivla functions
 #' * `diff_Q_lower` unadjusted lower bound of the confidence interval for the differnce in quantile of the suvivla functions
 #' * `diff_Q_upper` unadjusted upper bound of the confidence interval for the differnce in quantile of the suvivla functions
+#' * `CI_level` the CI level used
 #' * `quantile` quantile used for extimation
 #' * `N_pat` number of patients
 #' * `N_evt` number of events
@@ -51,7 +53,8 @@ analyse_diff_median_survival <- function(quant = 0.5, level = 0.95, alternative 
       param_type = "Q",
       param_par = quant,
       lvl = level,
-      alternative_test = alt_
+      alternative_test = alternative,
+      param_alternative = alt_
     ))
 
     list(

@@ -20,7 +20,7 @@ mixture_pdf_fun(p, pdfs)
 
 mixture_surv_fun(p, survs)
 
-mixture_quant_fun(p, cdfs)
+mixture_quant_fun(p, cdfs, quants)
 
 mixture_rng_fun(p, rngs)
 }

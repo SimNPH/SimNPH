@@ -4,7 +4,10 @@
 \alias{analyse_weibull}
 \title{Analyse Dataset with Weibull Regression}
 \usage{
-analyse_weibull()
+analyse_weibull(level = 0.95)
+}
+\arguments{
+\item{level}{confidence level for CI computation}
 }
 \value{
 an analysis function that returns a data.frame

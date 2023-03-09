@@ -7,10 +7,12 @@
 #'
 #' @return an analyse function that returns a data.frame with the columns
 #' * `p` p value of the score test (two.sided) or the Wald test (one.sided)
+#' * `alternative` the alternative used
 #' * `coef` coefficient for `trt`
 #' * `hr` hazard ratio for `trt`
 #' * `hr_lower` lower 95% confidence intervall boundary for the hazard ratio for `trt`
 #' * `hr_upper`lower 95% confidence intervall boundary for the hazard ratio for `trt`
+#' * `CI_level` the CI level used
 #' * `N_pat` number of patients
 #' * `N_evt` number of events
 #'

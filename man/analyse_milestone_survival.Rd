@@ -4,14 +4,21 @@
 \alias{analyse_milestone_survival}
 \title{Analyse the Dataset using difference or quotient of milestone survival}
 \usage{
-analyse_milestone_survival(times, what = "quot", package = "nph")
+analyse_milestone_survival(
+  times,
+  what = "quot",
+  level = 0.95,
+  alternative = "two.sided"
+)
 }
 \arguments{
 \item{times}{followup times at which the the survival should be compared}
 
 \item{what}{"quot" for quotient and "diff" for differnce of surival probabilities}
 
-\item{package}{package to be used for computations: "nph" or "survival"}
+\item{level}{confidence level for CI computation}
+
+\item{alternative}{alternative hypothesis for the tests "two.sided" or "one.sieded"}
 }
 \value{
 Returns an analysis function, that can be used in runSimulations
@@ -23,6 +30,11 @@ Analyse the Dataset using difference or quotient of milestone survival
 The implementation from the nph package is used, see the documentation there
 for details.
 
+\code{alternative} can be "two.sided" for a two sided test of equality of the
+summary statistic or "one.sided" for a one sided test testing H0: treatment
+has equal or shorter survival than control vs. H1 treatment has longer
+survival than control.
+
 The data.frame returned by the created function includes the follwing
 columns:
 \itemize{
@@ -30,13 +42,11 @@ columns:
 \item \code{times} followup times at which the the survival are compared
 \item \code{N_pat} number of patients
 \item \code{N_evt} number of events
-}
-
-If the package nph is used the following columns are also returned:
-\itemize{
 \item \code{p} p value for the H0 that the ratios are 1 or the differnce is 0 respectively
+\item \code{alternative} the alternative used
 \item \code{milestone_surv_ratio_lower} / \code{milestone_surv_diff_lower} upper/lower CI for the estimate
 \item \code{milestone_surv_ratio_upper} / \code{milestone_surv_diff_upper} upper/lower CI for the estimate
+\item \code{CI_level} the CI level used
 }
 }
 \examples{
@@ -49,8 +59,6 @@ condition <- merge(
 dat <- generate_delayed_effect(condition)
 analyse_milestone_survival(3:5)(condition, dat)
 analyse_milestone_survival(3:5, what="diff")(condition, dat)
-analyse_milestone_survival(3:5, what="quot", package="survival")(condition, dat)
-analyse_milestone_survival(3:5, what="diff", package="survival")(condition, dat)
 }
 \seealso{
 \link[nph:nphparams]{nph::nphparams}

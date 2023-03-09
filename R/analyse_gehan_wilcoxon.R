@@ -3,6 +3,14 @@
 #' @param alternative alternative hypothesis for the tests "two.sided" or "one.sieded"
 #'
 #' @return an analyse function that can be used in runSimulation
+#'
+#' @details
+#'
+#' `alternative` can be "two.sided" for a two sided test of equality of the
+#' summary statistic or "one.sided" for a one sided test testing H0: treatment
+#' has equal or shorter survival than control vs. H1 treatment has longer
+#' survival than control.
+#'
 #' @export
 #'
 #' @examples
@@ -14,7 +22,7 @@
 #'   head(1)
 #' dat <- generate_delayed_effect(condition)
 #' analyse_gehan_wilcoxon()(condition, dat)
-analyse_gehan_wilcoxon <- function(alternative) {
+analyse_gehan_wilcoxon <- function(alternative="two.sided") {
   stopifnot(alternative %in% c("two.sided", "one.sided"))
 
   function(condition, dat, fixed_objects = NULL) {
@@ -24,15 +32,20 @@ analyse_gehan_wilcoxon <- function(alternative) {
 
     p_value <- switch(alternative,
                       two.sided = {
-                        1 - pchisq(model$score, 1)
+                        pchisq(model$chisq, df, lower.tail = FALSE)
                       },
                       one.sided = {
-                        1 - pnorm(model$wald.test)
+                        ifelse(
+                          (model$obs - model$exp)[2] < 0,
+                          pchisq(model$chisq, df, lower.tail = FALSE),
+                          1 - pchisq(model$chisq, df, lower.tail = FALSE)
+                        )
                       }
     )
 
     result_tmp <- list(
-      p = pchisq(model$chisq, df, lower.tail = FALSE),
+      p = p_value,
+      alternative=alternative,
       N_pat = nrow(dat),
       N_evt = sum(dat$evt)
     )

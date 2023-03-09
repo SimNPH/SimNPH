@@ -29,10 +29,10 @@ test_that("analyse milestone survival works", {
 
   expect_type(result1, "list")
   expect_s3_class(result1, NA)
-  expect_named(result1, c("p", "milestone_surv_ratio", "milestone_surv_ratio_lower", "milestone_surv_ratio_upper", "times", "N_pat", "N_evt"))
+  expect_named(result1, c("p", "alternative", "milestone_surv_ratio", "milestone_surv_ratio_lower", "milestone_surv_ratio_upper", "CI_level", "times", "N_pat", "N_evt"))
 
   expect_type(result2, "list")
   expect_s3_class(result1, NA)
-  expect_named(result2, c("p", "milestone_surv_diff", "milestone_surv_diff_lower", "milestone_surv_diff_upper", "times", "N_pat", "N_evt"))
+  expect_named(result2, c("p", "alternative", "milestone_surv_diff", "milestone_surv_diff_lower", "milestone_surv_diff_upper", "CI_level", "times", "N_pat", "N_evt"))
 
 })
