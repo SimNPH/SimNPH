@@ -162,9 +162,13 @@ true_summary_statistics_subgroup <- function(Design, cutoff_stats=NULL, mileston
 
     quant_trt <- mixture_quant_fun(
       c(1-condition$prevalence, condition$prevalence),
-      list(
+      cdfs=list(
         fast_cdf_fun(0, condition$hazard_trt),
         fast_cdf_fun(0, condition$hazard_subgroup)
+      ),
+      quants=list(
+        fast_quant_fun(0, condition$hazard_trt),
+        fast_quant_fun(0, condition$hazard_subgroup)
       )
     )
 
@@ -236,10 +240,6 @@ true_summary_statistics_subgroup <- function(Design, cutoff_stats=NULL, mileston
 #' my_design <- hazard_subgroup_from_PH_effect_size(my_design, target_power_ph=0.9)
 #' my_design
 hazard_subgroup_from_PH_effect_size <- function(design, target_power_ph=NA_real_, final_events=NA_real_, target_alpha=0.05){
-  # hazard ratio required, inverted Schönfeld sample size formula
-  hr_required_schoenfeld <- function(Nevt, alpha=0.05, beta=0.2, p=0.5){
-    exp( (qnorm(beta) + qnorm(alpha)) / sqrt(p*(1-p)*Nevt) )
-  }
 
   get_hr_after <- function(condition, target_power_ph=NA_real_, final_events=NA_real_){
 
@@ -263,10 +263,17 @@ hazard_subgroup_from_PH_effect_size <- function(design, target_power_ph=NA_real_
       condition$hazard_trt <- condition$hazard_ctrl
     }
 
-    ph_hr <- hr_required_schoenfeld(final_events, alpha=target_alpha, beta=(1-target_power_ph), p=(condition$n_ctrl/(condition$n_ctrl + condition$n_trt)))
+    ph_hr <- hr_required_schoenfeld(
+      final_events,
+      alpha=target_alpha,
+      beta=(1-target_power_ph),
+      p=(condition$n_ctrl/(condition$n_ctrl + condition$n_trt))
+    )
 
-    median_trt  <- fast_quant_fun(0, condition$hazard_ctrl * ph_hr)(0.5)
-    median_ctrl <- fast_quant_fun(0, condition$hazard_ctrl        )(0.5)
+    scale <- 1/condition$hazard_ctrl
+
+    median_trt  <- fast_quant_fun(0, scale * condition$hazard_ctrl * ph_hr)(0.5)
+    median_ctrl <- fast_quant_fun(0, scale * condition$hazard_ctrl        )(0.5)
 
     if(target_power_ph == 0){
       median_trt <- median_ctrl
@@ -279,19 +286,33 @@ hazard_subgroup_from_PH_effect_size <- function(design, target_power_ph=NA_real_
           cdfs = list(
             fast_cdf_fun(0, h*condition$hr_subgroup_relative),
             fast_cdf_fun(0, h)
-          ))
+          ),
+          quants = list(
+            fast_quant_fun(0, h*condition$hr_subgroup_relative),
+            fast_quant_fun(0, h)
+          )
+          )
         median_trt - my_quant_fun(0.5)
       })
     }
 
-    condition$hazard_trt <- uniroot(target_fun_hazards_subgroups, interval=c(1e-8, condition$hazard_ctrl*100))$root
+    my_root <- uniroot(
+      target_fun_hazards_subgroups,
+      interval=c(0, 2),
+      f.lower = -Inf,
+      extendInt = "upX",
+      tol=2*.Machine$double.eps
+    )
+
+    condition$hazard_trt <- my_root$root / scale
+    condition$target_median_trt <- median_trt * scale
     condition$hazard_subgroup <- condition$hazard_trt * condition$hr_subgroup_relative
     condition
   }
 
   result <- design |>
     split(1:nrow(design)) |>
-    lapply(get_hr_after, target_power_ph=target_power_ph, final_events=final_events) |>
+    purrr::map(get_hr_after, target_power_ph=target_power_ph, final_events=final_events, .progress=TRUE) |>
     do.call(what=rbind)
 
   result
@@ -339,38 +360,34 @@ cen_rate_from_cen_prop_subgroup <- function(design){
       log(10000) / condition$hazard_trt
     )
 
-    a <- condition$n_trt / (condition$n_trt + condition$n_ctrl)
-    b <- 1-a
-
     cumhaz_trt <- mixture_cumhaz_fun(
       c(condition$prevalence, 1-condition$prevalence),
       survs = list(
         fast_surv_fun(0, condition$hazard_subgroup),
         fast_surv_fun(0, condition$hazard_trt)
       )
-    )
+    )(t_max)
 
     cumhaz_ctrl <- fast_cumhaz_fun(
       c(                    0),
       c(condition$hazard_ctrl)
+    )(t_max)
+
+    condition$random_withdrawal <- censoring_prop_from_cumhaz(
+      n_trt          = condition$n_trt,
+      n_ctrl         = condition$n_ctrl,
+      censoring_prop = condition$censoring_prop,
+      cumhaz_ctrl    = cumhaz_ctrl,
+      cumhaz_trt     = cumhaz_trt,
+      t_max          = t_max
     )
-
-    target_fun <- Vectorize(\(r){
-      cumhaz_censoring <- fast_cumhaz_fun(0, r)
-      prob_cen_ctrl <- cumhaz_censoring(t_max)/(cumhaz_censoring(t_max) + cumhaz_ctrl(t_max))
-      prob_cen_trt  <- cumhaz_censoring(t_max)/(cumhaz_censoring(t_max) + cumhaz_trt(t_max))
-      prob_cen <- a*prob_cen_trt + b*prob_cen_ctrl
-      prob_cen-condition$censoring_prop
-    })
-
-    condition$random_withdrawal <- uniroot(target_fun, interval=c(0, 1e-6), extendInt = "upX", tol=.Machine$double.eps)$root
 
     condition
   }
 
   result <- design |>
     split(1:nrow(design)) |>
-    lapply(rowwise_fun) |>
+    purrr::map(rowwise_fun, .progress = TRUE) |>
     do.call(what=rbind)
 
   result

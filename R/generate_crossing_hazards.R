@@ -112,65 +112,6 @@ invisible(
 )
 }
 
-#' Calculate hr after crossing of hazards from gAHT
-#'
-#' @param design design data.frame
-#' @param target_gAHR target geometric average hazard ratio
-#' @param cutoff time until which the gAHR should be calculated, defaults to `condition$followup`
-#'
-#' @return For hr_after_crossing_from_gAHR: the design data.frame passed as
-#'   argument with the additional column hazard_trt.
-#' @export
-#'
-#' @describeIn generate_crossing_hazards  Calculate hr after crossing of hazards from gAHR
-#'
-#' @examples
-#' my_design <- merge(
-#'     assumptions_crossing_hazards(),
-#'     design_fixed_followup(),
-#'     by=NULL
-#'   )
-#' my_design$hazard_trt <- NA
-#' my_design <- hr_after_crossing_from_gAHR(my_design, 0.8, 200)
-#' my_design
-hr_after_crossing_from_gAHR <- function(design, target_gAHR, cutoff=NA_real_){
-
-  fast_gAHR <- function(hazard_trt_after, condition, cutoff, target_gAHR=1, N_trt=1, N_ctrl=1){
-    h1 <- fast_haz_fun(c(0, condition$crossing), c(condition$hazard_trt_before, hazard_trt_after))
-    h0 <- fast_haz_fun(c(0), c(condition$hazard_ctrl))
-
-    f1 <- fast_pdf_fun(c(0, condition$crossing), c(condition$hazard_trt_before, hazard_trt_after))
-    f0 <- fast_pdf_fun(c(0), c(condition$hazard_ctrl))
-
-    f  <- \(t){(1/(N_trt+N_ctrl))*(N_trt*f1(t) + N_ctrl*f0(t))}
-    w  <- \(t){1} # Cox
-
-    gAHR <- exp(integrate(\(t){log(h1(t) / h0(t)) * f(t) * w(t)}, 0, cutoff)$value)
-
-    gAHR-target_gAHR
-  }
-
-  get_hr_after <- function(condition, cutoff=cutoff){
-    if(is.na(cutoff)){
-      if(hasName(condition, "followup")){
-        cutoff <- condition$followup
-      } else {
-        stop(gettext("cutoff not given and followup not present in design"))
-      }
-    }
-
-    condition$hazard_trt_after <- uniroot(fast_gAHR, interval = c(1e-8, 1), condition=condition, cutoff=cutoff, target_gAHR=target_gAHR)$root
-    condition
-  }
-
-  result <- design |>
-    split(1:nrow(design)) |>
-    lapply(get_hr_after, cutoff=cutoff) |>
-    do.call(what=rbind)
-
-  result
-}
-
 
 #' Calculate hr after crossing the hazard functions
 #'
@@ -208,11 +149,7 @@ hr_after_crossing_from_gAHR <- function(design, target_gAHR, cutoff=NA_real_){
 #' my_design$hazard_trt <- NA
 #' my_design <- hr_after_crossing_from_PH_effect_size(my_design, target_power_ph=0.9)
 #' my_design
-hr_after_crossing_from_PH_effect_size <- function(design, target_power_ph=NA_real_, final_events=NA_real_, target_alpha=0.05){
-  # hazard ratio required, inverted Schönfeld sample size formula
-  hr_required_schoenfeld <- function(Nevt, alpha=0.05, beta=0.2, p=0.5){
-    exp( (qnorm(beta) + qnorm(alpha)) / sqrt(p*(1-p)*Nevt) )
-  }
+hr_after_crossing_from_PH_effect_size <- function(design, target_power_ph=NA_real_, final_events=NA_real_, target_alpha=0.025){
 
   get_hr_after <- function(condition, target_power_ph=NA_real_, final_events=NA_real_){
 
@@ -232,32 +169,59 @@ hr_after_crossing_from_PH_effect_size <- function(design, target_power_ph=NA_rea
       }
     }
 
-    ph_hr <- hr_required_schoenfeld(final_events, alpha=target_alpha, beta=(1-target_power_ph), p=(condition$n_ctrl/(condition$n_ctrl + condition$n_trt)))
-
-    median_trt <- fast_quant_fun(0, condition$hazard_ctrl * ph_hr)(0.5)
-    median_ctrl <- fast_quant_fun(0, condition$hazard_ctrl        )(0.5)
-    median_trt_before <- fast_quant_fun(0, condition$hazard_trt_before)(0.5)
+    scale <- 1/condition$hazard_ctrl
+    median_ctrl <- fast_quant_fun(0, scale*condition$hazard_ctrl)(0.5)
 
     if(target_power_ph == 0){
       median_trt <- median_ctrl
+      ph_hr <- 1
+    } else {
+      ph_hr <- hr_required_schoenfeld(
+        final_events,
+        alpha=target_alpha,
+        beta=(1-target_power_ph),
+        p=(condition$n_ctrl/(condition$n_ctrl + condition$n_trt))
+      )
+
+      median_trt <- fast_quant_fun(0, scale*condition$hazard_ctrl*ph_hr)(0.5)
     }
 
-    if(median_trt <= condition$crossing ||
-       median_ctrl <= condition$crossing ||
-       median_trt_before <= condition$crossing
+    median_trt_before <- fast_quant_fun(0, scale*condition$hazard_trt_before)(0.5)
+
+    if(scale*median_ctrl <= condition$crossing ||
+       scale*median_trt_before <= condition$crossing
        ){
       warning("Median survival reached before crossing of the hazards curves, calculation not possible")
-      condition$hazard_trt_after <- NA_real_
+      condition$hazard_trt_after  <- NA_real_
+      condition$target_median_trt <- median_trt * scale
+      condition$target_hr         <- ph_hr
       return(condition)
     }
 
     target_fun_hazard_after <- function(hazard_after){
       sapply(hazard_after, \(h){
-        median_trt - fast_quant_fun(c(0, condition$crossing), c(condition$hazard_trt_before, h))(0.5)
+        median_trt -
+          fast_quant_fun(
+            c(0, condition$crossing/scale),
+            c(condition$hazard_trt_before*scale, h)
+          )(0.5)
       })
     }
 
-    condition$hazard_trt_after  <- uniroot(target_fun_hazard_after, interval=c(1e-8, condition$hazard_ctrl))$root
+    # setting the lower interval bound to 0 and f.lower to -Inf
+    # and extendInt="upX" guarantees, that the root is searched on all positives
+    # but also that the target function is never evaluated at non-positive values
+    my_root <- uniroot(
+      target_fun_hazard_after,
+      interval=c(0, 2),
+      f.lower = -Inf,
+      extendInt = "upX",
+      tol=2*.Machine$double.eps
+    )
+
+    condition$target_median_trt <- median_trt * scale
+    condition$hazard_trt_after  <- my_root$root / scale
+    condition$target_hr         <- ph_hr
     condition
   }
 
@@ -311,28 +275,24 @@ cen_rate_from_cen_prop_crossing_hazards <- function(design){
       log(10000) / condition$hazard_trt
     )
 
-    a <- condition$n_trt / (condition$n_trt + condition$n_ctrl)
-    b <- 1-a
-
     cumhaz_trt <- fast_cumhaz_fun(
       c(                          0,         condition$crossing),
       c(condition$hazard_trt_before, condition$hazard_trt_after)
-    )
+    )(t_max)
 
     cumhaz_ctrl <- fast_cumhaz_fun(
       c(                    0),
       c(condition$hazard_ctrl)
+    )(t_max)
+
+    condition$random_withdrawal <- censoring_prop_from_cumhaz(
+      n_trt          = condition$n_trt,
+      n_ctrl         = condition$n_ctrl,
+      censoring_prop = condition$censoring_prop,
+      cumhaz_ctrl    = cumhaz_ctrl,
+      cumhaz_trt     = cumhaz_trt,
+      t_max          = t_max
     )
-
-    target_fun <- Vectorize(\(r){
-      cumhaz_censoring <- fast_cumhaz_fun(0, r)
-      prob_cen_ctrl <- cumhaz_censoring(t_max)/(cumhaz_censoring(t_max) + cumhaz_ctrl(t_max))
-      prob_cen_trt  <- cumhaz_censoring(t_max)/(cumhaz_censoring(t_max) + cumhaz_trt(t_max))
-      prob_cen <- a*prob_cen_trt + b*prob_cen_ctrl
-      prob_cen-condition$censoring_prop
-    })
-
-    condition$random_withdrawal <- uniroot(target_fun, interval=c(0, 1e-6), extendInt = "upX", tol=.Machine$double.eps)$root
 
     condition
   }

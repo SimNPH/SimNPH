@@ -3,7 +3,6 @@
 \name{generate_delayed_effect}
 \alias{generate_delayed_effect}
 \alias{assumptions_delayed_effect}
-\alias{hr_after_onset_from_gAHR}
 \alias{hr_after_onset_from_PH_effect_size}
 \alias{cen_rate_from_cen_prop_delayed_effect}
 \alias{true_summary_statistics_delayed_effect}
@@ -12,8 +11,6 @@
 generate_delayed_effect(condition, fixed_objects = NULL)
 
 assumptions_delayed_effect()
-
-hr_after_onset_from_gAHR(design, target_gAHR, cutoff = NA_real_)
 
 hr_after_onset_from_PH_effect_size(
   design,
@@ -38,10 +35,6 @@ true_summary_statistics_delayed_effect(
 
 \item{design}{design data.frame}
 
-\item{target_gAHR}{target geometric average hazard ratio}
-
-\item{cutoff}{time until which the gAHR should be calculated}
-
 \item{target_power_ph}{target power under proportional hazards}
 
 \item{final_events}{target events for inversion of Schönfeld Formula
@@ -61,9 +54,6 @@ For generate_delayed_effect: A dataset with the columns t (time) and trt
 
 For assumptions_delayed_effect: a design tibble with default values invisibly
 
-For hr_after_onset_from_gAHR: the design data.frame passed as
-argument with the additional column hazard_trt.
-
 For hr_after_onset_from_PH_effect_size: the design data.frame passed as
 argument with the additional column hazard_trt.
 
@@ -77,8 +67,6 @@ passed as argument with additional columns
 Generate Dataset with delayed effect
 
 Create an empty assumtions data.frame for generate_delayed_effect
-
-Calculate hr after onset of treatment effect from gAHR
 
 Calculate hr after onset of treatment effect
 
@@ -132,8 +120,6 @@ treatment effect
 
 \item \code{assumptions_delayed_effect}: generate default design tibble
 
-\item \code{hr_after_onset_from_gAHR}: Calculate hr after onset of treatment effect from gAHR
-
 \item \code{hr_after_onset_from_PH_effect_size}: Calculate hr after onset of treatment effect of the hazards from PH effect size
 
 \item \code{cen_rate_from_cen_prop_delayed_effect}: calculate censoring rate from censoring proportion
@@ -153,14 +139,6 @@ head(one_simulation)
 tail(one_simulation)
 Design <- assumptions_delayed_effect()
 Design
-my_design <- merge(
-    assumptions_delayed_effect(),
-    design_fixed_followup(),
-    by=NULL
-  )
-my_design$hazard_trt <- NA
-my_design <- hr_after_onset_from_gAHR(my_design, 0.8, 200)
-my_design
 my_design <- merge(
     assumptions_crossing_hazards(),
     design_fixed_followup(),

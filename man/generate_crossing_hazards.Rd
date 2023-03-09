@@ -3,7 +3,6 @@
 \name{generate_crossing_hazards}
 \alias{generate_crossing_hazards}
 \alias{assumptions_crossing_hazards}
-\alias{hr_after_crossing_from_gAHR}
 \alias{hr_after_crossing_from_PH_effect_size}
 \alias{cen_rate_from_cen_prop_crossing_hazards}
 \alias{true_summary_statistics_crossing_hazards}
@@ -12,8 +11,6 @@
 generate_crossing_hazards(condition, fixed_objects = NULL)
 
 assumptions_crossing_hazards()
-
-hr_after_crossing_from_gAHR(design, target_gAHR, cutoff = NA_real_)
 
 hr_after_crossing_from_PH_effect_size(
   design,
@@ -38,10 +35,6 @@ true_summary_statistics_crossing_hazards(
 
 \item{design}{design data.frame}
 
-\item{target_gAHR}{target geometric average hazard ratio}
-
-\item{cutoff}{time until which the gAHR should be calculated, defaults to \code{condition$followup}}
-
 \item{target_power_ph}{target power under proportional hazards}
 
 \item{final_events}{target events for inversion of Schönfeld Formula, defaults to \code{condition$final_events}}
@@ -60,9 +53,6 @@ For generate_crossing_hazards: A dataset with the columns t (time) and trt
 
 For assumptions_crossing_hazards: a design tibble with default values invisibly
 
-For hr_after_crossing_from_gAHR: the design data.frame passed as
-argument with the additional column hazard_trt.
-
 For hr_after_crossing_from_PH_effect_size: the design data.frame passed as
 argument with the additional column hazard_trt.
 
@@ -76,8 +66,6 @@ passed as argument with additional columns,
 Generate Dataset with crossing hazards
 
 Create an empty assumtions data.frame for generate_crossing_hazards
-
-Calculate hr after crossing of hazards from gAHT
 
 Calculate hr after crossing the hazard functions
 
@@ -132,8 +120,6 @@ hazards
 
 \item \code{assumptions_crossing_hazards}: generate default design tibble
 
-\item \code{hr_after_crossing_from_gAHR}: Calculate hr after crossing of hazards from gAHR
-
 \item \code{hr_after_crossing_from_PH_effect_size}: Calculate hr after crossing of the hazards from PH effect size
 
 \item \code{cen_rate_from_cen_prop_crossing_hazards}: calculate censoring rate from censoring proportion
@@ -153,14 +139,6 @@ head(one_simulation)
 tail(one_simulation)
 Design <- assumptions_crossing_hazards()
 Design
-my_design <- merge(
-    assumptions_crossing_hazards(),
-    design_fixed_followup(),
-    by=NULL
-  )
-my_design$hazard_trt <- NA
-my_design <- hr_after_crossing_from_gAHR(my_design, 0.8, 200)
-my_design
 my_design <- merge(
     assumptions_crossing_hazards(),
     design_fixed_followup(),

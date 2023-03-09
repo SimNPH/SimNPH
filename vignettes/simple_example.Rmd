@@ -104,12 +104,8 @@ of both tests for each scenario.
 alpha <- 0.05
 
 Summarise <- create_summarise_function(
-  maxcombo = function(condition, results, fixed_objects=NULL){
-    data.frame("rejection"=mean(results$p < alpha))
-  },
-  logrank = function(condition, results, fixed_objects=NULL){
-    data.frame("rejection"=mean(results$p < alpha))
-  }
+  maxcombo = summarise_test(alpha),
+  logrank  = summarise_test(alpha)
 )
 ```
 
@@ -145,7 +141,7 @@ res <- runSimulation(
 
 ```{r}
 res |> 
-  subset(select=c("delay", "maxcombo.rejection", "logrank.rejection")) |>
+  subset(select=c("delay", "maxcombo.rejection_0.05", "logrank.rejection_0.05")) |>
   knitr::kable()
 ```
 
@@ -262,7 +258,7 @@ Options <- design_fixed_followup()
 Design <- merge(Assumptions, Options, by=NULL)
 
 Design <- Design |> 
-  true_summary_statistics_delayed_effect()
+  true_summary_statistics_delayed_effect(cutoff_stats = 20)
 
 knitr::kable(Design)
 ```
@@ -291,7 +287,7 @@ statistics.
 
 ```{r}
 Summarise <- create_summarise_function(
-    coxph=summarise_estimator(hr, gAHR, hr_lower, hr_upper, name="gAHR"),
+    coxph=summarise_estimator(hr, gAHR_20, hr_lower, hr_upper, name="gAHR"),
     coxph=summarise_estimator(hr, hazard_trt/hazard_ctrl, hr_lower, hr_upper, name="HR")
   )
 ```
