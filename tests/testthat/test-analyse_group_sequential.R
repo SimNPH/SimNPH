@@ -45,8 +45,8 @@ test_that("group sequential tests work", {
   expect_gte(result$followup, 0)
 
   expect_length(result$results_stages[[1]][[1]], 2)
-  expect_named(result$results_stages[[1]][[1]][[1]], c("p", "N_pat", "N_evt"))
-  expect_named(result$results_stages[[1]][[1]][[2]], c("p", "N_pat", "N_evt"))
+  expect_named(result$results_stages[[1]][[1]][[1]], c("p", "alternative", "N_pat", "N_evt"))
+  expect_named(result$results_stages[[1]][[1]][[2]], c("p", "alternative", "N_pat", "N_evt"))
 })
 
 test_that("summarising results from group sequential function works", {
