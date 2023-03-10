@@ -29,7 +29,7 @@ clusterEvalQ(cl, {
 # setup data generation ---------------------------------------------------
 
 # load parameters
-design <- read.table("data/parameters/delayed_effect_2023-03-10.csv", sep=",", dec=".", header=TRUE)
+design <- read.table("data/parameters/delayed_effect_sub_2023-03-10.csv", sep=",", dec=".", header=TRUE)
 
 design <- design |>
   subset(effect_size_ph==0) |>
