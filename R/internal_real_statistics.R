@@ -125,7 +125,8 @@ fast_real_statistics <- function(
       tmp <- data.frame(
         rmst_trt            = integrate(surv_trt, 0, cutoff)$value,
         rmst_ctrl           = integrate(surv_ctrl, 0, cutoff)$value,
-        gAHR                = exp(integrate(\(t){log(haz_trt(t) / haz_ctrl(t)) * f(t) }, 0, cutoff, stop.on.error = FALSE)$value),
+        gAHR                = exp(integrate(\(t){log(haz_trt(t) / haz_ctrl(t)) * f(t) }, 0, cutoff, stop.on.error = FALSE)$value /
+                                    integrate(\(t){f(t) }, 0, cutoff, stop.on.error = FALSE)$value),
         AHR                 = integrate(\(t){(haz_trt(t)/h(t)) * f(t) }, 0, cutoff, stop.on.error = FALSE)$value /
           integrate(\(t){(haz_ctrl(t)/h(t)) * f(t)}, 0, cutoff, stop.on.error = FALSE)$value
       )
