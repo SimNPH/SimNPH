@@ -92,3 +92,33 @@ test_that("internal function for real summary statistics outputs correct values"
 
   expect(all(abs((result_1_c / result_1_b) - 1) < 0.15), "relative error between discrete approximation with 1/10 interval and exact calculation is less than 15%")
 })
+
+test_that("average hazard ratios work", {
+
+  res <- fast_real_statistics_pchaz(
+    Tint_trt=0,  lambda_trt=0.5,
+    Tint_ctrl=0, lambda_ctrl=1,
+    N_trt=1, N_ctrl=1, cutoff=c(1, 5, 10, 100), milestones=c(1, 5, 10, 100)
+  )
+
+  max_abs_err_gahr <- max(abs(res[, c("gAHR_1", "gAHR_5", "gAHR_10", "gAHR_100")] - 0.5))
+  max_abs_err_ahr  <- max(abs(res[, c("AHR_1", "AHR_5", "AHR_10", "AHR_100")] - 0.5))
+
+  # tolerance for absolute error from integrate funciton
+  expect_lt(max_abs_err_gahr, .Machine$double.eps^0.25)
+  expect_lt(max_abs_err_ahr, .Machine$double.eps^0.25)
+
+  res <- fast_real_statistics_pchaz(
+    Tint_trt=0,  lambda_trt=1,
+    Tint_ctrl=0, lambda_ctrl=1,
+    N_trt=1, N_ctrl=1, cutoff=c(1, 5, 10, 100), milestones=c(1, 5, 10, 100)
+  )
+
+  max_abs_err_gahr <- max(abs(res[, c("gAHR_1", "gAHR_5", "gAHR_10", "gAHR_100")] - 1))
+  max_abs_err_ahr  <- max(abs(res[, c("AHR_1", "AHR_5", "AHR_10", "AHR_100")] - 1))
+
+  # tolerance for absolute error from integrate funciton
+  expect_lt(max_abs_err_gahr, .Machine$double.eps^0.25)
+  expect_lt(max_abs_err_ahr, .Machine$double.eps^0.25)
+
+})
