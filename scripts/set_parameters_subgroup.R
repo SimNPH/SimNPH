@@ -8,8 +8,8 @@ m2d <- \(t) 365.25*t/12
 # Options -----------------------------------------------------------------
 
 options <- expand.grid(
-  recruitment = m2d(c(18, 30)),
-  n_pat = c(300, 500, 1000, 1500)
+  recruitment = m2d(c(18)),
+  n_pat = c(300, 1000)
 ) |>
   within({
     n_trt <- n_pat / 2
@@ -22,9 +22,9 @@ options <- expand.grid(
 # Assumptions -------------------------------------------------------------
 
 assumptions <- expand.grid(
-  hazard_ctrl = nph::m2r(c(36, 12, 6)),
-  censoring_prop = c(0, 0.1, 0.3),
-  effect_size_ph = c(0, 0.5, 0.8, 0.9),
+  hazard_ctrl = nph::m2r(c(12, 6)),
+  censoring_prop = c(0, 0.3),
+  effect_size_ph = c(0, 0.5, 0.8),
   prevalence = seq(0.1, 0.9, by=0.2),
   hr_subgroup_relative = seq(0.7, 0.9, by=0.1)
 )
@@ -62,6 +62,6 @@ design <- design |>
 
 # Saving ------------------------------------------------------------------
 
-filename <- paste0("data/parameters/subgroup_", format(Sys.Date(), "%Y-%m-%d"), ".csv")
+filename <- paste0("data/parameters/subgroup_sub_", format(Sys.Date(), "%Y-%m-%d"), ".csv")
 write.table(design, file=filename, quote=FALSE, sep=", ", dec=".", row.names = FALSE, col.names = TRUE)
 
