@@ -31,14 +31,6 @@ clusterEvalQ(cl, {
 # load parameters
 design <- read.table("data/parameters/delayed_effect_sub_2023-03-10.csv", sep=",", dec=".", header=TRUE)
 
-design <- design |>
-  subset(effect_size_ph==0) |>
-  subset(delay==0) |>
-  subset(n_pat==300) |>
-  subset(random_withdrawal==0) |>
-  head(1)
-
-
 # define generator
 my_generator <- function(condition, fixed_objects=NULL){
   generate_delayed_effect(condition, fixed_objects) |>
