@@ -79,10 +79,10 @@ analyse_coxph_weighted <- function(type = "SG", max_time = NA_real_, level = 0.9
     model_summary <- summary(model, conf.int = level)
 
     p_value <- switch(alternative,
-      two.sided = function(model) {
+      two.sided = {
         1 - pchisq(model$score, 1)
       },
-      one.sided = function(model) {
+      one.sided = {
         1 - pnorm(model$wald.test)
       }
     )
