@@ -5,7 +5,7 @@ library(SimNPH)
 
 # number of simulations
 # TODO: set this to the number of datasets of replications
-N_sim <- 2
+N_sim <- 1
 
 # to convert from months to days
 m2d <- \(t) 365.25*t/12
@@ -33,12 +33,11 @@ Design <- expand.grid(
 # contains the number of the replication.
 generate_read <- function(condition, fixed_objects=NULL){
   # TODO: edit to fit your folder structure and filename pattern
-
   filename <- paste0(
     # folder name relative to the folder the simulation is started
     "testdata/scenario_",
     # format the scenario number, add leading 0 to a width of 4 digits
-    formatC(condition$scenario, width=1, flag="0"),
+    formatC(condition$scenario, width=4, flag="0"),
     # start of filename
     "/Dataset",
     # format number of replication, add leading 0 to a width of 4 digits
@@ -108,3 +107,4 @@ res <- runSimulation(
 )
 
 res
+names(res)
