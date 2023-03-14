@@ -12,5 +12,6 @@ notes_drafts_etc
 /doc/
 /src/*.dll
 /src/*.o
+/src/*.so
 testdata
 %LOCALAPPDATA%
