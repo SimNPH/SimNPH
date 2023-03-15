@@ -494,7 +494,6 @@ hazard_before_progression_from_PH_effect_size <- function(design, target_power_p
         median_trt_ph - median_trt
       })
     }
-    browser()
     condition$hazard_trt <- uniroot(target_fun_hazard_trt, interval=c(1e-8, 0.0001), extendInt = "upX", tol=.Machine$double.eps*2)$root
     condition
   }
