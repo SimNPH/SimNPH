@@ -46,7 +46,7 @@ generate_subgroup <- function(condition, fixed_objects=NULL){
   )
 
   data_trt <- data.frame(
-    t = fast_rng_fun(0, condition$hazard_subgroup)(counts[2]),
+    t = fast_rng_fun(0, condition$hazard_trt)(counts[2]),
     trt = 1,
     evt = TRUE,
     subgroup = 0
