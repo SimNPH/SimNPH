@@ -167,8 +167,8 @@ if(run_parallel) stopCluster(cl)
 
 saveRDS(results, paste0(save_folder, "/results.Rds"))
 
-results
-names(results)
-results$SEED
-results$logrank.rejection_0.025
+# results
+# names(results)
+# results$SEED
+# results$logrank.rejection_0.025
 
