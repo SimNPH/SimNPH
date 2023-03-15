@@ -23,7 +23,7 @@ save_folder <- here::here(
 sim_data_dir <- here::here("..","..","parametric_simulations","sim_data")
 
 alpha <- 0.025
-nominal_alpha <- ldbounds::ldBounds(c(0.5,1))$nom.alpha
+nominal_alpha <- ldbounds::ldBounds(c(0.5,1), sides=1, alpha=0.025)$nom.alpha
 
 # Helper functions --------------------------------------------------------
 
