@@ -93,7 +93,7 @@ my_summarise <- create_summarise_function(
   ahr_12m = summarise_estimator(est=AHR, real=AHR_12m),
   gahr_6m  = summarise_estimator(est=gAHR, real=gAHR_6m),
   gahr_12m = summarise_estimator(est=gAHR, real=gAHR_12m),
-  median_surv = summarise_estimator(est=diff_Q, real=median_survival_trt/median_survival_ctrl),
+  median_surv = summarise_estimator(est=diff_Q, real=median_survival_trt-median_survival_ctrl),
   milestone = summarise_estimator(est=milestone_surv_ratio[1], real= milestone_survival_ctrl_6m/ milestone_survival_trt_6m, name="milestone_6" ),
   milestone = summarise_estimator(est=milestone_surv_ratio[2], real=milestone_survival_ctrl_12m/milestone_survival_trt_12m, name="milestone_12"),
   rmst_diff_6m  = summarise_estimator(est=rmst_diff, real=rmst_trt_6m -rmst_ctrl_6m),
