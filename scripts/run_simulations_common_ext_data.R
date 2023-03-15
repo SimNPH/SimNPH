@@ -10,8 +10,11 @@ if(packageVersion("SimNPH") != "0.2.0"){
 
 # Script options/settings --------------------------------------------------------
 
-N_sim <- 25 # number of simulations per scenario
-run_parallel <- FALSE # should we parallelize?
+N_sim <- 2500 # number of simulations per scenario
+
+run_parallel <- TRUE # should we parallelize?
+n_cores <- parallel::detectCores() - 4
+
 save_folder <- here::here(
   "data",
   paste0("simulation_common_ext_data_",
@@ -20,6 +23,7 @@ save_folder <- here::here(
 sim_data_dir <- here::here("..","..","parametric_simulations","sim_data")
 
 alpha <- 0.025
+nominal_alpha <- ldbounds::ldBounds(c(0.5,1))$nom.alpha
 
 # Helper functions --------------------------------------------------------
 
@@ -30,7 +34,6 @@ m2d <- \(t) 365.25*t/12
 
 cl <- NULL
 if(run_parallel){
-  n_cores <- parallel::detectCores() - 4
   cl <- makeCluster(n_cores)
 
   clusterEvalQ(cl, {
@@ -38,6 +41,9 @@ if(run_parallel){
     library(SimNPH)
     library(parallel)
   })
+
+  clusterExport(cl, c("sim_data_dir","save_folder","alpha","nominal_alpha"))
+
 }
 
 # Design data.frame -------------------------------------------------------
@@ -55,7 +61,7 @@ if(run_parallel){
 # Design <- design_1
 # # |> dplyr::arrange(scenario)
 Design <- read.table("data/parameters/ext_data_2023-03-14.csv", sep=",", dec=".", header=TRUE)
-Design <- Design[1:2,]
+# Design <- Design[1:2,]
 
 # Function to read in dataset ---------------------------------------------
 
@@ -163,6 +169,6 @@ saveRDS(results, paste0(save_folder, "/results.Rds"))
 
 results
 names(results)
-
+results$SEED
 results$logrank.rejection_0.025
 
