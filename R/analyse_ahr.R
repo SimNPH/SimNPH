@@ -61,7 +61,7 @@ analyse_ahr <- function(max_time = NA, type = "AHR", level = 0.95, alternative =
           param_par = max_time,
           lvl = level,
           param_alternative = alt_,
-          alternative_test = alternative
+          alternative_test = alt_
         ))
 
         list(
@@ -84,7 +84,7 @@ analyse_ahr <- function(max_time = NA, type = "AHR", level = 0.95, alternative =
           param_par = max_time,
           lvl = level,
           param_alternative = alt_,
-          alternative_test = alternative
+          alternative_test = alt_
         ))
 
         list(
