@@ -13,7 +13,7 @@ if(packageVersion("SimNPH") != "0.2.0"){
 N_sim <- 2500 # number of simulations per scenario
 
 run_parallel <- TRUE # should we parallelize?
-n_cores <- parallel::detectCores() - 4
+n_cores <- parallel::detectCores() - 2
 
 save_folder <- here::here(
   "data",
@@ -61,7 +61,7 @@ if(run_parallel){
 # Design <- design_1
 # # |> dplyr::arrange(scenario)
 Design <- read.table("data/parameters/ext_data_2023-03-14.csv", sep=",", dec=".", header=TRUE)
-# Design <- Design[1:2,]
+Design <- Design[1,]
 
 # Function to read in dataset ---------------------------------------------
 
@@ -122,22 +122,22 @@ my_generator <- function(condition, fixed_objects=NULL){
 # analyse
 # example with just logrank test and cox regression
 # will later be replaced by sourcing scripts/run_simulations_common.R
-# my_analyse <- list(
-#   logrank     = analyse_logrank(),
-#   coxph       = analyse_coxph(),
-#   descriptive = analyse_describe()
-# )
+my_analyse <- list(
+  logrank     = analyse_logrank(alternative = "one.sided"),
+  coxph       = analyse_coxph(alternative = "one.sided"),
+  descriptive = analyse_describe()
+)
 
 # summarise
 # example with just logrank test, cox regression and descriptive statistics
 # will later be replaced by sourcing scripts/run_simulations_common.R
-# my_summarise <- create_summarise_function(
-#   logrank     = summarise_test(alpha),
-#   coxph       = summarise_estimator(coef, 0),
-#   descriptive = summarise_describe()
-# )
+my_summarise <- create_summarise_function(
+  logrank     = summarise_test(alpha),
+  coxph       = summarise_estimator(est=hr, real=0, lower=hr_lower, upper=hr_upper),#summarise_estimator(coef, 0),
+  descriptive = summarise_describe()
+)
 
-source("scripts/run_simulations_common.R")
+# source("scripts/run_simulations_common.R")
 
 
 # run simulations ---------------------------------------------------------
@@ -170,5 +170,11 @@ saveRDS(results, paste0(save_folder, "/results.Rds"))
 # results
 # names(results)
 # results$SEED
-# results$logrank.rejection_0.025
+results$logrank.rejection_0.025
+results$coxph
+results$descriptive.evt_ctrl
+
+results$logrank.sd_width
+
+
 
