@@ -1,6 +1,7 @@
 #' Analyse Dataset with Weibull Regression
 #'
 #' @param level confidence level for CI computation
+#' @param alternative alternative hypothesis for the tests "two.sided" or "one.sieded"
 #'
 #' @return an analysis function that returns a data.frame
 #'
@@ -24,7 +25,9 @@
 #'   tail(1)
 #' dat <- generate_delayed_effect(condition)
 #' analyse_weibull()(condition, dat)
-analyse_weibull <- function(level=0.95) {
+analyse_weibull <- function(level=0.95, alternative = "two.sided") {
+  stopifnot(alternative %in% c("two.sided", "one.sided"))
+
   function(condition, dat, fixed_objects = NULL){
     # Calculations provided by Andrew Hooker
 
@@ -79,11 +82,19 @@ analyse_weibull <- function(level=0.95) {
     )
 
     z_val <- (diff_med_tte$Estimate)/diff_med_tte$SE
-    p_val_1sided <- 1-pnorm(z_val)
-    p_val_2sided <- 1-pchisq(z_val^2, 1)
+
+    p_value <- switch(alternative,
+                      two.sided = {
+                        1-pchisq(z_val^2, 1)
+                      },
+                      one.sided = {
+                        1-pnorm(z_val)
+                      }
+    )
 
     list(
-      p = p_val_2sided,
+      p = p_value,
+      alternative = alternative,
       med_trt_est = med_tte_0[, "Estimate"],
       med_trt_lower = med_tte_0[, 3],
       med_trt_upper = med_tte_0[, 4],

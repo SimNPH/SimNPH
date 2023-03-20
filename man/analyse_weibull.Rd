@@ -4,10 +4,12 @@
 \alias{analyse_weibull}
 \title{Analyse Dataset with Weibull Regression}
 \usage{
-analyse_weibull(level = 0.95)
+analyse_weibull(level = 0.95, alternative = "two.sided")
 }
 \arguments{
 \item{level}{confidence level for CI computation}
+
+\item{alternative}{alternative hypothesis for the tests "two.sided" or "one.sieded"}
 }
 \value{
 an analysis function that returns a data.frame
