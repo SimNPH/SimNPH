@@ -22,6 +22,7 @@ trycatch_nphparams <- function(call){
 # beta: target beta
 # p: allocation ratio
 hr_required_schoenfeld <- function(Nevt, alpha=0.05, beta=0.2, p=0.5){
+  if(beta == 1) return(1)
   exp( (qnorm(beta) + qnorm(alpha) ) / sqrt(p*(1-p)*Nevt) )
 }
 
