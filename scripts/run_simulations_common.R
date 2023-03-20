@@ -13,6 +13,9 @@ my_analyse <- list(
   cox = analyse_coxph(alternative = "one.sided"),
   weighted_cox_6m  = analyse_coxph_weighted(type="G", max_time=m2d(6), alternative = "one.sided"),
   weighted_cox_12m = analyse_coxph_weighted(type="G", max_time=m2d(12), alternative = "one.sided"),
+  aft_weibull = analyse_aft(dist="weibull", alternative = "one.sided"),
+  aft_lognormal = analyse_aft(dist="lognormal", alternative = "one.sided"),
+  diff_med_weibull = analyse_weibull(alternative = "two.sided"),
   # tests
   pw_exp_3  = analyse_piecewise_exponential(cuts=m2d(seq(0, 240, by= 3)), testing_only=TRUE),
   pw_exp_12 = analyse_piecewise_exponential(cuts=m2d(seq(0, 240, by=12)), testing_only=TRUE),
@@ -101,6 +104,9 @@ my_summarise <- create_summarise_function(
   cox = summarise_estimator(est=hr, real=gAHR_12m, lower=hr_lower, upper=hr_upper, null=1),
   weighted_cox_6m  = summarise_estimator(est=hr, real=gAHR_6m, lower=hr_lower, upper=hr_upper, null=1),
   weighted_cox_12m = summarise_estimator(est=hr, real=gahr_6m, lower=hr_lower, upper=hr_upper, null=1),
+  aft_weibull = summarise_estimator(est=coef, lower=lower, upper=upper, null=0),
+  aft_lognormal = summarise_estimator(est=coef, lower=lower, upper=upper, null=0),
+  diff_med_weibull = summarise_estimator(est=diff_med_est, real=median_survival_trt-median_survival_ctrl,lower=diff_med_lower, upper=diff_med_upper, null=0),
   # tests
   pw_exp_3 = summarise_test(alpha),
   pw_exp_12 = summarise_test(alpha),

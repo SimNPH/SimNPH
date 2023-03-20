@@ -10,6 +10,8 @@ test_that("analyse coxph works", {
   dat <- generate_delayed_effect(condition)
   results <- analyse_coxph()(condition, dat)
 
+
+
   expect_type(results, "list")
   expect_s3_class(results, NA)
 

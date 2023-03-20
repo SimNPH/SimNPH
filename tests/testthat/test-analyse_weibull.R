@@ -13,9 +13,10 @@ test_that("analyse weibull works", {
   dat <- generate_delayed_effect(condition)
 
   res <- analyse_weibull()(NA, dat)
+  res2 <- analyse_weibull(alternative="one.sided")(NA, dat)
 
   expect_named(res, c(
-    "p",
+    "p", "alternative",
     "med_trt_est", "med_trt_lower", "med_trt_upper",
     "med_ctrl_est", "med_ctrl_lower", "med_ctrl_upper",
     "diff_med_est", "diff_med_lower", "diff_med_upper",
