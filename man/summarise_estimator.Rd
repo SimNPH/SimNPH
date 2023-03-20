@@ -4,7 +4,15 @@
 \alias{summarise_estimator}
 \title{Generic Summarise function for esitmators}
 \usage{
-summarise_estimator(est, real, lower = NULL, upper = NULL, name = NULL)
+summarise_estimator(
+  est,
+  real,
+  lower = NULL,
+  upper = NULL,
+  null = NULL,
+  est_sd = NULL,
+  name = NULL
+)
 }
 \arguments{
 \item{est}{estimator, expression evaluated in results}
@@ -15,24 +23,29 @@ summarise_estimator(est, real, lower = NULL, upper = NULL, name = NULL)
 
 \item{upper}{upper CI, expression evaluated in results}
 
+\item{null}{parameter value under the null hypothesis}
+
+\item{est_sd}{standard deviation estimated by the method, evaluated in results}
+
 \item{name}{name for the summarise function,
 appended to the name of the analysis method in the final results}
 }
 \value{
-A function that can be used in Summarise that returns a data frame with the columns
-\itemize{
-\item bias the bias with respect to the true value
-\item var the variance
-\item mse the mean squared error with respect to the true value
-\item mae the mean absolute error with respect to the true value
-\item coverage the coverage of the confidence interval
-\item width the mean width of the confidence interval
-\item columns starting with sd_ with the standard deviations of the corresponding
-statistics
-}
+A function that can be used in Summarise that returns a data frame with
+summary statistics of the performance measures in the columns.
 }
 \description{
 Generic Summarise function for esitmators
+}
+\details{
+The different parameters are evaluated in different envionments, \code{est},
+\code{lower}, \code{upper}, \code{est_sd} refer to output of the method and are evaluated in
+the results dataset. \code{real} refers to a real value of a summary statistic in
+this scenario and is therefore evaluated in the condition dataset. \code{null} and
+\code{name} are constants and directly evaluated when the function is defined.
+The argument \code{null}, the parameter value under the null hypothesis is used to
+output the rejection rate based on the confidence intervall. Which is output
+in the column \code{null_cover}
 }
 \examples{
 # generate the design matrix and append the true summary statistics

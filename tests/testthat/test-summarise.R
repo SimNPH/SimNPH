@@ -93,7 +93,31 @@ test_that("creating a summarise function for an estimator works", {
     )
   )
 
-  expected_names <- expand.grid("coxph.", c("bias", "sd_bias", "var", "mse", "sd_mse", "N_missing", "N", "mae", "sd_mae", "coverage", "width", "sd_width", "N_missing_CI"), c("gAHR.", "hr.", "", "1.")) |>
+  expected_names <- expand.grid(
+    "coxph.",
+    c(
+      "mean_est"    ,
+      "median_est"  ,
+      "sd_est"      ,
+      "bias"        ,
+      "sd_bias"     ,
+      "mse"         ,
+      "sd_mse"      ,
+      "mae"         ,
+      "sd_mae"      ,
+      "coverage"    ,
+      "null_cover"  ,
+      "width"       ,
+      "sd_width"    ,
+      "mean_sd"     ,
+      "sd_sd"       ,
+      "N_missing"   ,
+      "N"           ,
+      "N_missing_CI",
+      "N_missing_sd"
+      ),
+    c("gAHR.", "hr.", "", "1.")
+    ) |>
     subset(select=c(1,3,2)) |>
     apply(1, paste, collapse="") |>
     unname()
