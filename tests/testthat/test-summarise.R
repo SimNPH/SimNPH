@@ -106,6 +106,8 @@ test_that("creating a summarise function for an estimator works", {
       "mae"            ,
       "sd_mae"         ,
       "coverage"       ,
+      "cover_lower"    ,
+      "cover_upper"    ,
       "null_cover"     ,
       "width"          ,
       "sd_width"       ,
@@ -118,6 +120,8 @@ test_that("creating a summarise function for an estimator works", {
       "N_missing"      ,
       "N"              ,
       "N_missing_CI"   ,
+      "N_missing_upper",
+      "N_missing_lower",
       "N_missing_sd"   ,
       "N_missing_n_pat",
       "N_missing_n_evt"
