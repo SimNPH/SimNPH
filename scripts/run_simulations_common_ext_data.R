@@ -2,14 +2,14 @@
 # install first by running:
 # remotes::install_git("https://github.com/SimNPH/SimNPH.git")
 library(SimNPH)
+library(SimDesign)
 library(parallel)
 
-if(packageVersion("SimNPH") != "0.2.0"){
+if(packageVersion("SimNPH") != "0.3.0"){
   stop("Please run the simulations with the correct vesion of the SimNPH package for reproducability.")
 }
 
 # Script options/settings --------------------------------------------------------
-
 N_sim <- 2500 # number of simulations per scenario
 
 run_parallel <- TRUE # should we parallelize?
@@ -20,7 +20,7 @@ save_folder <- here::here(
   paste0("simulation_common_ext_data_",
          Sys.info()["nodename"], "_",
          strftime(Sys.time(), "%Y-%m-%d_%H%M%S")))
-sim_data_dir <- here::here("..","..","parametric_simulations","sim_data")
+sim_data_dir <- here::here("..","..","parametric_simulations","sim_data","new_sim")
 
 alpha <- 0.025
 nominal_alpha <- ldbounds::ldBounds(c(0.5,1), sides=1, alpha=0.025)$nom.alpha
@@ -61,7 +61,7 @@ if(run_parallel){
 # Design <- design_1
 # # |> dplyr::arrange(scenario)
 Design <- read.table("data/parameters/ext_data_2023-03-14.csv", sep=",", dec=".", header=TRUE)
-# Design <- Design[1,]
+Design <- Design[1,]
 
 # Function to read in dataset ---------------------------------------------
 
@@ -91,16 +91,17 @@ generate_read <- function(condition, fixed_objects=NULL){
   dat <- readr::read_table(filename,show_col_types=FALSE)
 
   dat <- dat |> dplyr::filter(FLAG!=1) |>
-    dplyr::select("id"=ID,"t"=TIME,"evt"=DV,"trt"=TRT)
+    dplyr::select("id"=ID,"t"=TIME,"evt"=DV,"trt"=TRT) |>
+    dplyr::mutate(trt=1-trt,evt=as.logical(evt))
 
   # rename the columns
   # names(dat) <- c("ID"="id", "TIME"="t", "DV"="evt", "TRT"="trt")[names(dat)]
 
-  # convert the columns to the format used by SimNPH
-  dat <- within(dat, {
-    trt = 1-trt
-    evt = as.logical(evt)
-  })
+  # # convert the columns to the format used by SimNPH
+  # dat <- within(dat, {
+  #   trt = 1-trt
+  #   evt = as.logical(evt)
+  # })
 
   # return the data
   dat
@@ -124,16 +125,20 @@ my_generator <- function(condition, fixed_objects=NULL){
 # will later be replaced by sourcing scripts/run_simulations_common.R
 my_analyse <- list(
   logrank     = analyse_logrank(alternative = "one.sided"),
-  # coxph       = analyse_coxph(alternative = "one.sided"),
+  cox = analyse_coxph(alternative = "one.sided"),
+  aft_weibull = analyse_aft(dist="weibull", alternative = "one.sided"),
   descriptive = analyse_describe()
 )
+my_analyse <- wrap_all_in_trycatch(my_analyse)
 
 # summarise
 # example with just logrank test, cox regression and descriptive statistics
 # will later be replaced by sourcing scripts/run_simulations_common.R
 my_summarise <- create_summarise_function(
   logrank     = summarise_test(alpha),
-  # coxph       = summarise_estimator(est=hr, real=0, lower=hr_lower, upper=hr_upper),#summarise_estimator(coef, 0),
+  cox = summarise_estimator(est=hr,real=NA_real_,lower=hr_lower, upper=hr_upper, null=1),
+  # cox = summarise_estimator(est=hr, real=gAHR_12m, lower=hr_lower, upper=hr_upper, null=1),
+  aft_weibull = summarise_estimator(est=coef, lower=lower, upper=upper, null=0),
   descriptive = summarise_describe()
 )
 
@@ -171,11 +176,19 @@ saveRDS(results, paste0(save_folder, "/results.Rds"))
 # names(results)
 # results$SEED
 results$logrank.rejection_0.025
-results$coxph
-results$descriptive.evt_ctrl
+results$logrank.mean_n_evt
+results$logrank.sd_n_evt
 
-results$logrank.sd_width
+results |> select_at(vars(contains("cox")))
+results$cox.cover_upper
+
+results |> select_at(vars(contains("aft")))
 
 
-library(dplyr)
-results |> filter(effect_size_ph==0) |> select(logrank.rejection_0.025)
+
+results |>
+  dplyr::filter(effect_size_ph==0) |>
+  dplyr::select(logrank.rejection_0.025)
+
+binom::binom.confint(results$logrank.rejection_0.025[1]*results$logrank.N[1],
+                     results$logrank.N[1],methods="wilson")
