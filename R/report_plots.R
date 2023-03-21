@@ -101,6 +101,9 @@ order_combine_xvars <- function(data, xvars, facet_vars=c(), height_x_axis=0.8, 
 #' @param heights_plots relative heights of the main plot and the stairs on the bottom
 #' @param scale_stairs height of the stairs for each variable between 0 and 1
 #' @param grid_level depht of loops for which the grid-lines are drawn
+#' @param scales passed on to facet_grid
+#' @param hlines position of horizontal lines, passed as `yintercept` to
+#'   `geom_hline`
 #'
 #' @return a ggplot/patchwork object conatining the plots
 #' @export
@@ -120,7 +123,9 @@ combined_plot <- function(
     facet_y_vars=c(),
     heights_plots = c(3,1),
     scale_stairs = 0.75,
-    grid_level = 2
+    grid_level = 2,
+    scales = "fixed",
+    hlines = numeric(0)
     ){
 
   if(!all(c("ggplot2", "patchwork") %in% .packages())){
@@ -177,8 +182,10 @@ combined_plot <- function(
     facet_grid(
       cols = vars(!!!facet_vars_x_sym),
       rows = vars(!!!facet_vars_y_sym),
-      labeller = label_both
-    )
+      labeller = label_both,
+      scales = scales
+    ) +
+    geom_hline(yintercept=hlines)
 
   (plot_1 / plot_2) + plot_layout(heights=heights_plots)
 

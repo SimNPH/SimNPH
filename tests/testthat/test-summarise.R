@@ -93,7 +93,41 @@ test_that("creating a summarise function for an estimator works", {
     )
   )
 
-  expected_names <- expand.grid("coxph.", c("bias", "sd_bias", "var", "mse", "sd_mse", "N_missing", "N", "mae", "sd_mae", "coverage", "width", "sd_width", "N_missing_CI"), c("gAHR.", "hr.", "", "1.")) |>
+  expected_names <- expand.grid(
+    "coxph.",
+    c(
+      "mean_est"       ,
+      "median_est"     ,
+      "sd_est"         ,
+      "bias"           ,
+      "sd_bias"        ,
+      "mse"            ,
+      "sd_mse"         ,
+      "mae"            ,
+      "sd_mae"         ,
+      "coverage"       ,
+      "cover_lower"    ,
+      "cover_upper"    ,
+      "null_cover"     ,
+      "width"          ,
+      "sd_width"       ,
+      "mean_sd"        ,
+      "sd_sd"          ,
+      "mean_n_pat"     ,
+      "sd_n_pat"       ,
+      "mean_n_evt"     ,
+      "sd_n_evt"       ,
+      "N_missing"      ,
+      "N"              ,
+      "N_missing_CI"   ,
+      "N_missing_upper",
+      "N_missing_lower",
+      "N_missing_sd"   ,
+      "N_missing_n_pat",
+      "N_missing_n_evt"
+      ),
+    c("gAHR.", "hr.", "", "1.")
+    ) |>
     subset(select=c(1,3,2)) |>
     apply(1, paste, collapse="") |>
     unname()
@@ -141,10 +175,13 @@ test_that("generic summarise for tests works", {
     all(hasName(sim_results, c(
       "logrank.rejection_0.95", "logrank.rejection_0.99", "logrank.innovative.rejection_0.9",
       "logrank.N_missing_0.95", "logrank.N_missing_0.99", "logrank.innovative.N_missing_0.9",
+      "logrank.mean_n_pat", "logrank.sd_n_pat", "logrank.mean_n_evt", "logrank.sd_n_evt",
       "logrank.N"
       ))),
     "expected names not present in sim_results"
   )
+
+
 
   expect_gte(sim_results$logrank.rejection_0.95,           0)
   expect_gte(sim_results$logrank.rejection_0.99,           0)
@@ -152,6 +189,8 @@ test_that("generic summarise for tests works", {
   expect_lte(sim_results$logrank.rejection_0.95,           1)
   expect_lte(sim_results$logrank.rejection_0.99,           1)
   expect_lte(sim_results$logrank.innovative.rejection_0.9, 1)
+  expect_equal(sim_results$logrank.innovative.sd_n_pat, 0)
+  expect_equal(sim_results$logrank.innovative.mean_n_evt, 100)
 })
 
 test_that("missings are treated correctly for summarise estimator", {
@@ -171,7 +210,7 @@ test_that("missings are treated correctly for summarise estimator", {
 
   expect_equal(my_results$bias, 0)
   expect_equal(my_results$sd_bias, sd(tmp))
-  expect_equal(my_results$var, var(tmp))
+  expect_equal(my_results$sd_est, sd(tmp))
   expect_equal(my_results$mse, mean(tmp^2))
   expect_equal(my_results$sd_mse, sd(tmp^2))
   expect_equal(my_results$mae, mean(abs(tmp)))

@@ -63,6 +63,7 @@ export(analyse_describe)
 export(summarise_describe)
 export(analyse_weibull)
 export(combined_plot)
+export(analyse_aft)
 
 importFrom(Rcpp,evalCpp)
 useDynLib(SimNPH, .registration = TRUE)
