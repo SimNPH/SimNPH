@@ -61,7 +61,7 @@ if(run_parallel){
 # Design <- design_1
 # # |> dplyr::arrange(scenario)
 Design <- read.table("data/parameters/ext_data_2023-03-14.csv", sep=",", dec=".", header=TRUE)
-Design <- Design[1,]
+# Design <- Design[1,]
 
 # Function to read in dataset ---------------------------------------------
 
@@ -124,7 +124,7 @@ my_generator <- function(condition, fixed_objects=NULL){
 # will later be replaced by sourcing scripts/run_simulations_common.R
 my_analyse <- list(
   logrank     = analyse_logrank(alternative = "one.sided"),
-  coxph       = analyse_coxph(alternative = "one.sided"),
+  # coxph       = analyse_coxph(alternative = "one.sided"),
   descriptive = analyse_describe()
 )
 
@@ -133,7 +133,7 @@ my_analyse <- list(
 # will later be replaced by sourcing scripts/run_simulations_common.R
 my_summarise <- create_summarise_function(
   logrank     = summarise_test(alpha),
-  coxph       = summarise_estimator(est=hr, real=0, lower=hr_lower, upper=hr_upper),#summarise_estimator(coef, 0),
+  # coxph       = summarise_estimator(est=hr, real=0, lower=hr_lower, upper=hr_upper),#summarise_estimator(coef, 0),
   descriptive = summarise_describe()
 )
 
@@ -177,4 +177,5 @@ results$descriptive.evt_ctrl
 results$logrank.sd_width
 
 
-
+library(dplyr)
+results |> filter(effect_size_ph==0) |> select(logrank.rejection_0.025)
