@@ -242,3 +242,97 @@ test_that("missings are treated correctly for summarise test", {
   expect_equal(my_results$N_missing_0.01, 1)
   expect_equal(my_results$N, 4)
 })
+
+test_that("calculations in summarise estimator work", {
+  condition <- tibble::tribble(
+    ~real, ~null,
+        1,     0,
+  )
+
+  results <- tibble::tribble(
+      ~est,   ~lower,   ~upper,  ~est_sd,      ~N_pat,      ~N_evt,
+       1.0,     0.49,      1.5,     0.25,         50L,         25L,
+       1.5,      1.1,        2,     0.23,         50L,         25L,
+       0.5,     -0.2,      0.9,     0.27,         49L,         48L,
+       1.1, NA_real_, NA_real_, NA_real_,         35L,         35L,
+  NA_real_, NA_real_, NA_real_, NA_real_, NA_integer_, NA_integer_
+  )
+
+  output <- summarise_estimator(est, real, lower=lower, upper=upper, null=null, est_sd=est_sd)(condition, results)
+
+  expected_output <- data.frame(
+    mean_est = (1.0+1.5+0.5+1.1)/4,
+    median_est = (1.0+1.1)/2,
+    sd_est = sd(c(1.0, 1.5, 0.5, 1.1)),
+    bias = (1.0+1.5+0.5+1.1-4)/4,
+    sd_bias = sd(c(1.0, 1.5, 0.5, 1.1)-1),
+    mse = mean((c(1.0, 1.5, 0.5, 1.1)-1)^2),
+    sd_mse = sd((c(1.0, 1.5, 0.5, 1.1)-1)^2),
+    mae = mean(abs(c(1.0, 1.5, 0.5, 1.1)-1)),
+    sd_mae = sd(abs(c(1.0, 1.5, 0.5, 1.1)-1)),
+    coverage = 1/3,
+    null_cover = 1/3,
+    cover_lower = 2/3,
+    cover_upper = 2/3,
+    width = (1.5-0.49+2-1.1+0.9+0.2)/3,
+    sd_width = sd(c(1.5-0.49, 2-1.1, 0.9+0.2)),
+    mean_sd = (0.25+0.23+0.27)/3,
+    sd_sd = sd(c(0.25, 0.23, 0.27)),
+    mean_n_pat = (50+50+49+35)/4,
+    sd_n_pat = sd(c(50, 50, 49, 35)),
+    mean_n_evt = (25+25+48+35)/4,
+    sd_n_evt = sd(c(25, 25, 48, 35)),
+    N_missing = 1L,
+    N = 5L,
+    N_missing_CI = 2L,
+    N_missing_upper = 2L,
+    N_missing_lower = 2L,
+    N_missing_sd = 2L,
+    N_missing_n_pat = 1L,
+    N_missing_n_evt = 1L
+  )
+
+  expect_equal(output, expected_output)
+})
+
+test_that("calculations in summarise test work", {
+
+  results <- tibble::tribble(
+          ~p,      ~N_pat,      ~N_evt,
+       0.040,         50L,         25L,
+       0.030,         50L,         25L,
+       0.001,         49L,         48L,
+       0.510,         35L,         35L,
+    NA_real_, NA_integer_, NA_integer_
+  )
+
+  output_1 <- summarise_test(alpha=0.050)(NA, results)
+  output_2 <- summarise_test(alpha=0.025)(NA, results)
+
+  expected_output_1 <- data.frame(
+    rejection_0.05 = 3/4,
+    N_missing_0.05 = 1,
+    N = 5,
+    mean_n_pat = (50+50+49+35)/4,
+    sd_n_pat = sd(c(50, 50, 49, 35)),
+    mean_n_evt = (25+25+48+35)/4,
+    sd_n_evt = sd(c(25, 25, 48, 35)),
+    N_missing_n_pat = 1L,
+    N_missing_n_evt = 1L
+  )
+
+  expected_output_2 <- data.frame(
+    rejection_0.025 = 1/4,
+    N_missing_0.025 = 1,
+    N = 5,
+    mean_n_pat = (50+50+49+35)/4,
+    sd_n_pat = sd(c(50, 50, 49, 35)),
+    mean_n_evt = (25+25+48+35)/4,
+    sd_n_evt = sd(c(25, 25, 48, 35)),
+    N_missing_n_pat = 1L,
+    N_missing_n_evt = 1L
+  )
+
+  expect_equal(output_1, expected_output_1)
+  expect_equal(output_2, expected_output_2)
+})
