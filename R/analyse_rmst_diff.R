@@ -58,7 +58,7 @@ analyse_rmst_diff <- function(max_time = NA, level = 0.95, alternative = "two.si
       param_par = max_time,
       lvl = level,
       param_alternative = alt_,
-      alternative_test = alternative
+      alternative_test = alt_
     ))
 
     list(

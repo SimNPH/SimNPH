@@ -419,11 +419,6 @@ hazard_before_progression_from_PH_effect_size <- function(design, target_power_p
 
   get_hr_after <- function(condition, target_power_ph=NA_real_, final_events=NA_real_){
 
-    if(condition$effect_size_ph == 0){
-      condition$hazard_trt <- condition$hazard_ctrl
-      return(condition)
-    }
-
     if(is.na(final_events)){
       if(hasName(condition, "final_events")){
         final_events <- condition$final_events
@@ -440,9 +435,15 @@ hazard_before_progression_from_PH_effect_size <- function(design, target_power_p
       }
     }
 
+    if(target_power_ph == 0 & condition$prog_rate_ctrl == condition$prog_rate_trt){
+      condition$hazard_trt <- condition$hazard_ctrl
+      return(condition)
+    }
+
     # set t_max to 1/500 quantile of control arm
     t_max <- log(500) / condition$hazard_ctrl
 
+    ## This is an internal function that is not exported
     model_control <- subpop_hazVfun_simnph(
       c(0, t_max),
       lambda1 = condition$hazard_ctrl,
@@ -467,6 +468,7 @@ hazard_before_progression_from_PH_effect_size <- function(design, target_power_p
       beta=(1-target_power_ph),
       p=(condition$n_ctrl/(condition$n_ctrl + condition$n_trt))
     )
+
 
     median_ctrl <- median_progression(model_control)
 
@@ -494,7 +496,7 @@ hazard_before_progression_from_PH_effect_size <- function(design, target_power_p
         median_trt_ph - median_trt
       })
     }
-    browser()
+
     condition$hazard_trt <- uniroot(target_fun_hazard_trt, interval=c(1e-8, 0.0001), extendInt = "upX", tol=.Machine$double.eps*2)$root
     condition
   }

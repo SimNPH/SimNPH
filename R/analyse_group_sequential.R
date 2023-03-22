@@ -75,7 +75,8 @@ analyse_group_sequential <- function(followup, followup_type, alpha, analyse_fun
       rejected_at_stage = rejected_at_stage,
       N_pat = results_stages[[max_stage]][["N_pat"]],
       N_evt = results_stages[[max_stage]][["N_evt"]],
-      followup = attr(datasets_stages[[max_stage]], "followup"),
+      study_time = attr(datasets_stages[[max_stage]], "followup"),
+      max_followup = max(datasets_stages[[max_stage]]$t, na.rm=TRUE),
       results_stages = list(list(results_stages))
     )
 
@@ -97,13 +98,7 @@ analyse_group_sequential <- function(followup, followup_type, alpha, analyse_fun
 #'  * fixed objects
 #'
 #' that can be passed to create_summarise_function or to
-#' SimDesign::runSimulation and that returns a `data.frame` with the columns
-#'  * `rejection` the empirical rejection rate
-#'  * `n_pat` the mean number of patients recruited
-#'  * `n_evt` the mean number of observed events
-#'  * `followup` the mean followup time
-#'  * columns starting with sd_ with the standard deviations of the
-#'    corresponding statistics
+#' SimDesign::runSimulation and that returns a `data.frame`.
 #'
 #' @export
 #'
@@ -118,15 +113,18 @@ summarise_group_sequential <- function(name=NULL){
       "rejection" = mean(is.finite(na.omit(results$rejected_at_stage))),
       "n_pat" = mean(results$N_pat, na.rm=TRUE),
       "n_evt" = mean(results$N_evt, na.rm=TRUE),
-      "followup" = mean(results$followup, na.rm=TRUE),
+      "study_time" = mean(results$study_time, na.rm=TRUE),
+      "followup" = mean(results$max_followup, na.rm=TRUE),
       "sd_npat" = sd(results$N_pat, na.rm=TRUE),
       "sd_nevt" = sd(results$N_evt, na.rm=TRUE),
-      "sd_followup" = sd(results$followup, na.rm=TRUE),
+      "sd_study_time" = sd(results$study_time, na.rm=TRUE),
+      "sd_followup" = sd(results$max_followup, na.rm=TRUE),
       "N" = nrow(results),
       "N_missing_rejection" = sum(is.na(results$rejected_at_stage)),
       "N_missing_npat" = sum(is.na(results$N_pat)),
       "N_missing_nevt" = sum(is.na(results$N_evt)),
-      "N_missing_followup" = sum(is.na(results$followup))
+      "N_missing_study_time" = sum(is.na(results$study_time)),
+      "N_missing_followup" = sum(is.na(results$max_followup))
     )
   }
 

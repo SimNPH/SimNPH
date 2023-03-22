@@ -16,7 +16,9 @@ combined_plot(
   facet_y_vars = c(),
   heights_plots = c(3, 1),
   scale_stairs = 0.75,
-  grid_level = 2
+  grid_level = 2,
+  scales = "fixed",
+  hlines = numeric(0)
 )
 }
 \arguments{
@@ -39,6 +41,11 @@ combined_plot(
 \item{scale_stairs}{height of the stairs for each variable between 0 and 1}
 
 \item{grid_level}{depht of loops for which the grid-lines are drawn}
+
+\item{scales}{passed on to facet_grid}
+
+\item{hlines}{position of horizontal lines, passed as \code{yintercept} to
+\code{geom_hline}}
 }
 \value{
 dataset in long format with one row per method and scenario and one

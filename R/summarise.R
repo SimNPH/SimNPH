@@ -91,21 +91,28 @@ create_summarise_function <- function(...){
 #' @param real real summary statistic, expression evaluated in condition
 #' @param lower lower CI, expression evaluated in results
 #' @param upper upper CI, expression evaluated in results
+#' @param null parameter value under the null hypothesis
+#' @param est_sd standard deviation estimated by the method, evaluated in results
 #' @param name name for the summarise function,
 #' appended to the name of the analysis method in the final results
 #'
 #' @return
 #'
-#' A function that can be used in Summarise that returns a data frame with the columns
+#' A function that can be used in Summarise that returns a data frame with
+#' summary statistics of the performance measures in the columns.
 #'
-#' * bias the bias with respect to the true value
-#' * var the variance
-#' * mse the mean squared error with respect to the true value
-#' * mae the mean absolute error with respect to the true value
-#' * coverage the coverage of the confidence interval
-#' * width the mean width of the confidence interval
-#' * columns starting with sd_ with the standard deviations of the corresponding
-#'   statistics
+#' @details
+#'
+#' The different parameters are evaluated in different envionments, `est`,
+#' `lower`, `upper`, `est_sd` refer to output of the method and are evaluated in
+#' the results dataset. `real` refers to a real value of a summary statistic in
+#' this scenario and is therefore evaluated in the condition dataset. `null` and
+#' `name` are constants and directly evaluated when the function is defined.
+#
+#' The argument `null`, the parameter value under the null hypothesis is used to
+#' output the rejection rate based on the confidence intervall. Which is output
+#' in the column `null_cover`
+#'
 #'
 #' @export
 #'
@@ -143,33 +150,55 @@ create_summarise_function <- function(...){
 #' sim_results[, names(sim_results) |> grepl(pattern="mse")]
 #' # but the variance can be estimated in all cases
 #' sim_results[, names(sim_results) |> grepl(pattern="var")]
-summarise_estimator <- function(est, real, lower=NULL, upper=NULL, name=NULL){
+summarise_estimator <- function(est, real, lower=NULL, upper=NULL, null=NULL, est_sd=NULL, name=NULL){
 
   est <- substitute(est)
   real <- substitute(real)
   lower <- substitute(lower)
   upper <- substitute(upper)
+  est_sd <- substitute(est_sd)
+  null <- substitute(null)
 
   res <- function(condition, results, fixed_objects){
-    est    <- eval(est,   envir = results)
-    real   <- eval(real,  envir = condition)
-    lower  <- eval(lower, envir = results)
-    upper  <- eval(upper, envir = results)
+    est    <- eval(est,    envir = results)
+    real   <- eval(real,   envir = condition)
+    lower  <- eval(lower,  envir = results)
+    upper  <- eval(upper,  envir = results)
+    est_sd <- eval(est_sd, envir = results)
+    null   <- eval(null,   envir = condition)
 
     results_tmp <- data.frame(
-      bias         = mean(est-real, na.rm=TRUE),
-      sd_bias      = sd(est-real, na.rm=TRUE),
-      var          = var(est, na.rm=TRUE),
-      mse          = mean((est-real)^2, na.rm=TRUE),
-      sd_mse       = sd((est-real)^2, na.rm=TRUE),
-      mae          = mean(abs(est-real), na.rm=TRUE),
-      sd_mae       = sd(abs(est-real), na.rm=TRUE),
-      N_missing    = sum(is.na(est)),
-      N            = length(est),
-      coverage     = NA_real_,
-      width        = NA_real_,
-      sd_width     = NA_real_,
-      N_missing_CI = NA_real_
+      mean_est        = mean(est, na.rm=TRUE),
+      median_est      = median(est, na.rm = TRUE),
+      sd_est          = sd(est, na.rm=TRUE),
+      bias            = mean(est-real, na.rm=TRUE),
+      sd_bias         = sd(est-real, na.rm=TRUE),
+      mse             = mean((est-real)^2, na.rm=TRUE),
+      sd_mse          = sd((est-real)^2, na.rm=TRUE),
+      mae             = mean(abs(est-real), na.rm=TRUE),
+      sd_mae          = sd(abs(est-real), na.rm=TRUE),
+      coverage        = NA_real_,
+      null_cover      = NA_real_,
+      cover_lower     = NA_real_,
+      cover_upper     = NA_real_,
+      null_lower      = NA_real_,
+      null_upper      = NA_real_,
+      width           = NA_real_,
+      sd_width        = NA_real_,
+      mean_sd         = NA_real_,
+      sd_sd           = NA_real_,
+      mean_n_pat      = NA_real_,
+      sd_n_pat        = NA_real_,
+      mean_n_evt      = NA_real_,
+      sd_n_evt        = NA_real_,
+      N_missing       = sum(is.na(est)),
+      N               = length(est),
+      N_missing_CI    = NA_real_,
+      N_missing_upper = NA_real_,
+      N_missing_lower = NA_real_,
+      N_missing_sd    = NA_real_,
+      N_missing_n_pat = NA_real_,
+      N_missing_n_evt = NA_real_
     )
 
     if(!is.null(lower) && !is.null(upper)){
@@ -177,6 +206,46 @@ summarise_estimator <- function(est, real, lower=NULL, upper=NULL, name=NULL){
       results_tmp$width        <- mean( abs(upper - lower), na.rm=TRUE)
       results_tmp$sd_width     <- sd( abs(upper - lower), na.rm=TRUE)
       results_tmp$N_missing_CI <- sum( (is.na(lower) | is.na(upper)) )
+    }
+
+    if(!is.null(lower) && !is.null(upper) && !is.null(null)){
+      results_tmp$null_cover   <- mean( (lower <= null) & (upper >= null), na.rm=TRUE)
+    }
+
+    if(!is.null(lower)){
+      results_tmp$cover_lower <- mean( (lower <= real) , na.rm=TRUE)
+      results_tmp$N_missing_lower <- sum( is.na(lower) )
+    }
+
+    if(!is.null(upper)){
+      results_tmp$cover_upper <- mean( (upper >= real) , na.rm=TRUE)
+      results_tmp$N_missing_upper <- sum( is.na(upper) )
+    }
+
+    if(!is.null(lower) && !is.null(null)){
+      results_tmp$null_lower <- mean( (lower <= null) , na.rm=TRUE)
+    }
+
+    if(!is.null(upper) && !is.null(null)){
+      results_tmp$null_upper <- mean( (upper >= null) , na.rm=TRUE)
+    }
+
+    if(!is.null(est_sd)){
+      results_tmp$mean_sd <- mean(est_sd, na.rm=TRUE)
+      results_tmp$sd_sd <- sd(est_sd, na.rm=TRUE)
+      results_tmp$N_missing_sd <- sum( is.na(est_sd) )
+    }
+
+    if(hasName(results, "N_pat")){
+      results_tmp$mean_n_pat   <- mean(results$N_pat, na.rm=TRUE)
+      results_tmp$sd_n_pat     <- sd(results$N_pat, na.rm=TRUE)
+      results_tmp$N_missing_n_pat <- sum( is.na(results$N_pat) )
+    }
+
+    if(hasName(results, "N_evt")){
+      results_tmp$mean_n_evt  <- mean(results$N_evt, na.rm=TRUE)
+      results_tmp$sd_n_evt    <- sd(results$N_evt, na.rm=TRUE)
+      results_tmp$N_missing_n_evt <- sum( is.na(results$N_evt) )
     }
 
     results_tmp
@@ -245,6 +314,28 @@ summarise_test <- function(alpha, name=NULL){
       setNames(paste0("N_missing_", alpha))
 
     results_tmp <- cbind(rejection_tmp, missing_tmp, N=nrow(results))
+
+
+    results_tmp$mean_n_pat <-  NA_real_
+    results_tmp$sd_n_pat   <-  NA_real_
+    results_tmp$mean_n_evt <-  NA_real_
+    results_tmp$sd_n_evt   <-  NA_real_
+    results_tmp$N_missing_n_pat <- NA_real_
+    results_tmp$N_missing_n_evt <- NA_real_
+
+
+    if(hasName(results, "N_pat")){
+      results_tmp$mean_n_pat   <- mean(results$N_pat, na.rm=TRUE)
+      results_tmp$sd_n_pat     <- sd(results$N_pat, na.rm=TRUE)
+      results_tmp$N_missing_n_pat <- sum( is.na(results$N_pat) )
+    }
+
+    if(hasName(results, "N_evt")){
+      results_tmp$mean_n_evt  <- mean(results$N_evt, na.rm=TRUE)
+      results_tmp$sd_n_evt    <- sd(results$N_evt, na.rm=TRUE)
+      results_tmp$N_missing_n_evt <- sum( is.na(results$N_evt) )
+    }
+
     results_tmp
   }
 
