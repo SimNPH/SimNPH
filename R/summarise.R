@@ -181,6 +181,8 @@ summarise_estimator <- function(est, real, lower=NULL, upper=NULL, null=NULL, es
       null_cover      = NA_real_,
       cover_lower     = NA_real_,
       cover_upper     = NA_real_,
+      null_lower      = NA_real_,
+      null_upper      = NA_real_,
       width           = NA_real_,
       sd_width        = NA_real_,
       mean_sd         = NA_real_,
@@ -218,6 +220,14 @@ summarise_estimator <- function(est, real, lower=NULL, upper=NULL, null=NULL, es
     if(!is.null(upper)){
       results_tmp$cover_upper <- mean( (upper >= real) , na.rm=TRUE)
       results_tmp$N_missing_upper <- sum( is.na(upper) )
+    }
+
+    if(!is.null(lower) && !is.null(null)){
+      results_tmp$null_lower <- mean( (lower <= null) , na.rm=TRUE)
+    }
+
+    if(!is.null(upper) && !is.null(null)){
+      results_tmp$null_upper <- mean( (upper >= null) , na.rm=TRUE)
     }
 
     if(!is.null(est_sd)){
