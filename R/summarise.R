@@ -157,13 +157,15 @@ summarise_estimator <- function(est, real, lower=NULL, upper=NULL, null=NULL, es
   lower <- substitute(lower)
   upper <- substitute(upper)
   est_sd <- substitute(est_sd)
+  null <- substitute(null)
 
   res <- function(condition, results, fixed_objects){
-    est    <- eval(est,   envir = results)
-    real   <- eval(real,  envir = condition)
-    lower  <- eval(lower, envir = results)
-    upper  <- eval(upper, envir = results)
+    est    <- eval(est,    envir = results)
+    real   <- eval(real,   envir = condition)
+    lower  <- eval(lower,  envir = results)
+    upper  <- eval(upper,  envir = results)
     est_sd <- eval(est_sd, envir = results)
+    null   <- eval(null,   envir = condition)
 
     results_tmp <- data.frame(
       mean_est        = mean(est, na.rm=TRUE),
@@ -219,21 +221,21 @@ summarise_estimator <- function(est, real, lower=NULL, upper=NULL, null=NULL, es
     }
 
     if(!is.null(est_sd)){
-      results$mean_sd <- mean(est_sd, na.rm=TRUE)
-      results$sd_sd <- sd(est_sd, na.rm=TRUE)
-      results$N_missing_sd <- sum( is.na(est_sd) )
+      results_tmp$mean_sd <- mean(est_sd, na.rm=TRUE)
+      results_tmp$sd_sd <- sd(est_sd, na.rm=TRUE)
+      results_tmp$N_missing_sd <- sum( is.na(est_sd) )
     }
 
     if(hasName(results, "N_pat")){
       results_tmp$mean_n_pat   <- mean(results$N_pat, na.rm=TRUE)
       results_tmp$sd_n_pat     <- sd(results$N_pat, na.rm=TRUE)
-      results$N_missing_n_pat <- sum( is.na(results$N_pat) )
+      results_tmp$N_missing_n_pat <- sum( is.na(results$N_pat) )
     }
 
     if(hasName(results, "N_evt")){
       results_tmp$mean_n_evt  <- mean(results$N_evt, na.rm=TRUE)
       results_tmp$sd_n_evt    <- sd(results$N_evt, na.rm=TRUE)
-      results$N_missing_n_evt <- sum( is.na(results$N_evt) )
+      results_tmp$N_missing_n_evt <- sum( is.na(results$N_evt) )
     }
 
     results_tmp
@@ -315,13 +317,13 @@ summarise_test <- function(alpha, name=NULL){
     if(hasName(results, "N_pat")){
       results_tmp$mean_n_pat   <- mean(results$N_pat, na.rm=TRUE)
       results_tmp$sd_n_pat     <- sd(results$N_pat, na.rm=TRUE)
-      results$N_missing_n_pat <- sum( is.na(results$N_pat) )
+      results_tmp$N_missing_n_pat <- sum( is.na(results$N_pat) )
     }
 
     if(hasName(results, "N_evt")){
       results_tmp$mean_n_evt  <- mean(results$N_evt, na.rm=TRUE)
       results_tmp$sd_n_evt    <- sd(results$N_evt, na.rm=TRUE)
-      results$N_missing_n_evt <- sum( is.na(results$N_evt) )
+      results_tmp$N_missing_n_evt <- sum( is.na(results$N_evt) )
     }
 
     results_tmp
