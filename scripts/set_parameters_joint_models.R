@@ -31,7 +31,7 @@ design <- merge(
 
 # calculate hr and medians ------------------------------------------------
 
-target_alpha <- 0.05
+target_alpha <- 0.025
 
 get_medians <- function(condition){
 
