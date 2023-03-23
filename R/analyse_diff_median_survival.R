@@ -53,7 +53,7 @@ analyse_diff_median_survival <- function(quant = 0.5, level = 0.95, alternative 
       param_type = "Q",
       param_par = quant,
       lvl = level,
-      alternative_test = alt_,
+      alternative_test = alternative,
       param_alternative = alt_
     ))
 
