@@ -103,9 +103,9 @@ my_summarise <- create_summarise_function(
   rmst_diff_12m = summarise_estimator(est=rmst_diff, real=rmst_trt_12m-rmst_ctrl_12m, lower=rmst_diff_lower, upper=rmst_diff_upper, null=0),
   cox = summarise_estimator(est=hr, real=gAHR_12m, lower=hr_lower, upper=hr_upper, null=1),
   weighted_cox_6m  = summarise_estimator(est=hr, real=gAHR_6m, lower=hr_lower, upper=hr_upper, null=1),
-  weighted_cox_12m = summarise_estimator(est=hr, real=gahr_6m, lower=hr_lower, upper=hr_upper, null=1),
-  aft_weibull = summarise_estimator(est=coef, lower=lower, upper=upper, null=0),
-  aft_lognormal = summarise_estimator(est=coef, lower=lower, upper=upper, null=0),
+  weighted_cox_12m = summarise_estimator(est=hr, real=gAHR_12m, lower=hr_lower, upper=hr_upper, null=1),
+  aft_weibull = summarise_estimator(est=coef, real=NA_real_, lower=lower, upper=upper, null=0),
+  aft_lognormal = summarise_estimator(est=coef, real=NA_real_, lower=lower, upper=upper, null=0),
   diff_med_weibull = summarise_estimator(est=diff_med_est, real=median_survival_trt-median_survival_ctrl,lower=diff_med_lower, upper=diff_med_upper, null=0),
   # tests
   pw_exp_3 = summarise_test(alpha),
