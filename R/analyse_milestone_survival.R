@@ -61,7 +61,7 @@ analyse_milestone_survival <- function(times, what="quot", level=0.95, alternati
         param_type="logS",
         param_par=times,
         lvl=level,
-        alternative_test = alt_,
+        alternative_test = alternative,
         param_alternative = alt_
         ))
 
@@ -84,7 +84,7 @@ analyse_milestone_survival <- function(times, what="quot", level=0.95, alternati
         param_type="S",
         param_par=times,
         lvl=level,
-        alternative_test = alt_,
+        alternative_test = alternative,
         param_alternative = alt_
         ))
 
