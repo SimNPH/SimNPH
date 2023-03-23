@@ -43,3 +43,20 @@ censoring_prop_from_cumhaz <- function(n_trt, n_ctrl, censoring_prop, cumhaz_ctr
 
   (-b + sqrt(b^2 - 4*a*c))/(2*a*t_max)
 }
+
+#' Compute median survival from hazard rate
+#'
+#' Compute the median survival time in months from the hazard rate \code{lambda}.
+#' Assumes a constant hazard rate.
+#'
+#' @param lambda Hazard rate
+#'
+#' @return Median survival time in months
+#'
+#' @examples
+#' r2m(0.01)
+#'
+#' @export
+r2m <- function(lambda){
+  12*log(2)/(365.25*lambda)
+}
