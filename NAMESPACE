@@ -68,6 +68,7 @@ export(tabulate_methods)
 export(plot_sim_results)
 export(plot_parameter_scenario)
 export(analyse_aft)
+export(plot_nph_curves)
 
 importFrom(Rcpp,evalCpp)
 useDynLib(SimNPH, .registration = TRUE)

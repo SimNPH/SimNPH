@@ -73,19 +73,19 @@ plot_sim_results <- function(data,
   if(any((columns %in% names(data))==FALSE)){
     stop(paste("Column missing:",columns[which(!(columns %in% names(data)))]))
   }
-  filter(data,
+  plot_data <- filter(data,
          method %in% methods) |>
     filter(!!!filters) |>
-    select(all_of(columns)) |>
-    pivot_wider(names_from = "method",values_from = parameter_y) |> #View()
+    select(all_of(columns))
+  y_base = min(plot_data[[parameter_y]])*.9
+  plot_data |> pivot_wider(names_from = "method",values_from = parameter_y) |>
     looplot::nested_loop_plot(x=parameter_x,
                               grid_rows=parameter_row,
                               grid_cols=parameter_col,
                               steps=parameters_steps,
                               design_type = 'partial',
-                              grid_scale="free_y",
                               spu_x_shift = .2, #spase between groups
-                              # steps_y_base=0.5,
+                              steps_y_base= y_base,
                               # steps_y_height=0.1,
                               # steps_y_shift = 0.5,
                               colors = scales::brewer_pal(palette = "Set1"),
@@ -130,17 +130,21 @@ plot_parameter_scenario <- function(data,
   if(any((columns %in% names(data))==FALSE)){
     stop(paste("Column missing:",columns[which(!(columns %in% names(data)))]))
   }
-  filter(data,!!!filters) |>
-    select(all_of(columns)) |>
-    #    pivot_wider(names_from = "method",values_from = parameter_y) |> #View()
+  plot_data <- filter(data,!!!filters) |>
+    select(all_of(columns))
+  y_base <- plot_data |>
+    summarise(across(all_of(parameters),~min(.x))) |>
+    pivot_longer(everything()) |>
+    pull(value) |>
+    min()
+  plot_data |>
     looplot::nested_loop_plot(x=parameter_x,
                               grid_rows=parameter_row,
                               grid_cols=parameter_col,
                               steps=parameters_steps,
                               design_type = 'partial',
-                              grid_scale="free_y",
                               spu_x_shift = .2, #space between groups
-                              # steps_y_base=0.5,
+                              steps_y_base=y_base*0.9,
                               # steps_y_height=0.1,
                               # steps_y_shift = 0.5,
                               colors = scales::brewer_pal(palette = "Set1"),
@@ -153,4 +157,84 @@ plot_parameter_scenario <- function(data,
                                 )),...)
 }
 
+#' Plot Survival Curve
+#'
+#' Plot a survival curve for a given set of parameters.
+#'
+#' @param data A data frame containing the parameters needed to generate the survival curve. The required columns depend on the type of survival curve to generate.
+#' @param type A character string indicating the type of survival curve to generate. Valid values are 'delayed', 'progression', 'subgroup', and 'crossing'.
+#'
+#' @return A survival curve plot.
+#'
+#' @importFrom nph pchaz subpop_pchaz pop_pchaz plot_shhr
+#'
+#' @examples
+#' data <- data.frame(hazard_trt = 0.01, hazard_ctrl = 0.008, delay = 30, hazard_after_prog = 0.005, prog_rate_trt = 0.2, prog_rate_ctrl = 0.15, prevalence = 0.5)
+#' generate_survival_curve(data = data, type = 'delayed')
+#'
+#' @export
+plot_nph_curves <- function(data, type) {
 
+  # Determine t_max
+  t_max <- if (hasName(data, "descriptive.max_followup")) {
+    data$descriptive.max_followup
+  } else if (hasName(data, "hazard_ctrl")) {
+    log(100) / data$hazard_ctrl
+  } else {
+    1095.75
+  }
+
+  # Create plot
+  if (type == "delayed") {
+    if (data$delay == 0) {
+      pch_trt <- nph::pchaz(Tint = c(0, t_max), lambda = c(data$hazard_trt))
+    } else {
+      pch_trt <- nph::pchaz(Tint = c(0, data$delay, t_max), lambda = c(data$hazard_ctrl, data$hazard_trt))
+    }
+
+    pch_ctrl <- nph::pchaz(Tint = c(0, t_max), lambda = c(data$hazard_ctrl))
+
+  } else if (type == "progression") {
+    pch_trt <- nph::subpop_pchaz(
+      Tint=c(0, t_max),
+      lambda1 = data$hazard_trt,
+      lambda2 = data$hazard_after_prog,
+      lambdaProg = data$prog_rate_trt,
+      discrete_approximation = TRUE
+    )
+
+    pch_ctrl <- nph::subpop_pchaz(
+      Tint=c(0, t_max),
+      lambda1 = data$hazard_ctrl,
+      lambda2 = data$hazard_after_prog,
+      lambdaProg = data$prog_rate_ctrl,
+      discrete_approximation = TRUE
+    )
+
+  } else if (type == "subgroup") {
+    pch_trt <- nph::pop_pchaz(
+      Tint = c(0, t_max),
+      lambdaMat1 = matrix(c(data$hazard_trt, data$hazard_subgroup), 2, 1),
+      lambdaMat2 = matrix(0, 2, 1),
+      lambdaProgMat = matrix(0, 2, 1),
+      p = c((1 - data$prevalence), data$prevalence)
+    )
+
+    pch_ctrl <- nph::pchaz(
+      Tint = c(0, t_max),
+      lambda = data$hazard_ctrl
+    )
+
+  } else if (type == "crossing") {
+    if (data$crossing == 0) {
+      pch_trt <- nph::pchaz(Tint=c(0, t_max), lambda = c(data$hazard_trt_after))
+    } else {
+      pch_trt <- nph::pchaz(Tint=c(0, data$crossing, t_max), lambda = c(data$hazard_trt_before, data$hazard_trt_after))
+    }
+
+    pch_ctrl <- nph::pchaz(Tint=c(0, t_max), lambda = c(data$hazard_ctrl))
+  }
+
+  nph::plot_shhr(pch_trt, pch_ctrl)
+  legend(y=0,x=0, legend = c("control","treatment"), lty = 1, col = c("black", "green"), cex = 1.2, xjust=.5,yjust = 0,lwd=4)
+}
