@@ -136,9 +136,9 @@ my_analyse <- wrap_all_in_trycatch(my_analyse)
 # will later be replaced by sourcing scripts/run_simulations_common.R
 my_summarise <- create_summarise_function(
   logrank     = summarise_test(alpha),
-  cox = summarise_estimator(est=hr,real=NA_real_,lower=hr_lower, upper=hr_upper, null=1),
+  cox = summarise_estimator(est=hr,real=NA,lower=hr_lower, upper=hr_upper, null=1),
   # cox = summarise_estimator(est=hr, real=gAHR_12m, lower=hr_lower, upper=hr_upper, null=1),
-  aft_weibull = summarise_estimator(est=coef, lower=lower, upper=upper, null=0),
+  aft_weibull = summarise_estimator(est=coef,real=NA_real_, lower=lower, upper=upper, null=0),
   descriptive = summarise_describe()
 )
 
@@ -180,10 +180,10 @@ results$logrank.mean_n_evt
 results$logrank.sd_n_evt
 
 results |> select_at(vars(contains("cox")))
-results$cox.cover_upper
+results$cox.null_cover
 
 results |> select_at(vars(contains("aft")))
-
+results$aft_weibull.null_cover
 
 
 results |>
