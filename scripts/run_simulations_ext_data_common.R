@@ -15,12 +15,14 @@ N_sim <- 2500 # number of simulations per scenario
 run_parallel <- TRUE # should we parallelize?
 n_cores <- parallel::detectCores() - 2
 
-save_folder <- here::here(
+save_folder <- file.path(
+  "..",
   "data",
   paste0("simulation_common_ext_data_",
          Sys.info()["nodename"], "_",
          strftime(Sys.time(), "%Y-%m-%d_%H%M%S")))
-sim_data_dir <- here::here("..","..","parametric_simulations","sim_data","new_sim")
+
+sim_data_dir <- file.path("..","..","..","parametric_simulations","sim_data")
 
 alpha <- 0.025
 nominal_alpha <- ldbounds::ldBounds(c(0.5,1), sides=1, alpha=0.025)$nom.alpha
