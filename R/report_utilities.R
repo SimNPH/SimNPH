@@ -238,3 +238,58 @@ plot_nph_curves <- function(data, type) {
   nph::plot_shhr(pch_trt, pch_ctrl)
   legend(y=0,x=0, legend = c("control","treatment"), lty = 1, col = c("black", "green"), cex = 1.2, xjust=.5,yjust = 0,lwd=4)
 }
+
+#' Interactive Filters
+#'
+#' Utility function to define interactive (or not filters)
+#'
+#' If input is set to NULL a character vector with static default filters will be returned,
+#' this is useful for debugging without the need to rebuild the shiny document. Also input is not
+#' available to the function unless it is defined within the markdown document (even if only sourced)
+#' so you need to pass it from within the report.
+#'
+#' @param prefix prefix to identify shiny input panel
+#' @param input pass the shiny input object
+#'
+#' @return
+#' @export
+#'
+#' @examples
+interactive_filters <- function(prefix,input=NULL) {
+  if(!is.null(input)) {
+    c(str_c("abs(hazard_ctrl - nph::m2r(", input[[str_replace("prefix_median_survival_ctrl", "prefix_", prefix)]],"))<1e-6"),
+      str_c("recruitment == ", input[[str_replace("prefix_recruitment", "prefix_", prefix)]]),
+      str_c("censoring_prop == ", input[[str_replace("prefix_censoring", "prefix_", prefix)]]))
+  } else {
+    c("abs(hazard_ctrl - nph::m2r(12))<1e-6",
+      "recruitment == 18",
+      "censoring_prop == 0.0")
+  }
+}
+
+#' Generate a sidebar panel with select inputs for clinical trial parameters.
+#'
+#' @param prefix A character string to use as a prefix for the input IDs.
+#' @param default_mts The default value for the median survival time in the control arm.
+#' @param default_recruitment The default value for the time to recruit target number of subjects.
+#' @param default_censoring The default value for the proportion of subjects with random censoring.
+#'
+#' @return A sidebar panel with select inputs for clinical trial parameters.
+#'
+#' @examples
+#' \dontrun{
+#' # generate the sidebar panel with default values
+#' sidebar_panel <- generate_trial_inputs("trial1_", default_mts = 12, default_recruitment = 18, default_censoring = 0)
+#' }
+#'
+generate_trial_inputs <- function(prefix, default_mts = 12, default_recruitment = 18, default_censoring = 0) {
+  panel <- sidebarPanel(
+    selectInput(paste0(prefix,"median_survival_ctrl"), label = "Median Survival in Control arm (mts):",
+                choices = c(36, 12, 6), selected = default_mts),
+    selectInput(paste0(prefix,"recruitment"), label = "Time to recruit target number of subjects (mts):",
+                choices = c(18, 30), selected = default_recruitment),
+    selectInput(paste0(prefix,"censoring"), label = "Proportion of subjects with random censoring:",
+                choices = c(0, 0.1, 0.3), selected = default_censoring)
+  )
+  return(panel)
+}
