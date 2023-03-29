@@ -13,16 +13,18 @@ if(packageVersion("SimNPH") != "0.3.0"){
 N_sim <- 2500 # number of simulations per scenario
 
 run_parallel <- TRUE # should we parallelize?
-n_cores <- parallel::detectCores() - 2
+n_cores <- parallel::detectCores() - 4
 
 save_folder <- file.path(
-  "..",
+  #"..",
   "data",
   paste0("simulation_common_ext_data_",
          Sys.info()["nodename"], "_",
          strftime(Sys.time(), "%Y-%m-%d_%H%M%S")))
 
-sim_data_dir <- file.path("..","..","..","parametric_simulations","sim_data")
+sim_data_dir <- file.path("..","..","parametric_simulations","sim_data")
+
+design_table <- file.path("data","parameters","ext_data_2023-03-24.csv")
 
 alpha <- 0.025
 nominal_alpha <- ldbounds::ldBounds(c(0.5,1), sides=1, alpha=0.025)$nom.alpha
@@ -62,8 +64,10 @@ if(run_parallel){
 #
 # Design <- design_1
 # # |> dplyr::arrange(scenario)
-Design <- read.table("data/parameters/ext_data_2023-03-14.csv", sep=",", dec=".", header=TRUE)
-Design <- Design[1,]
+Design <- read.table(
+  design_table,
+  sep=",", dec=".", header=TRUE)
+#Design <- Design[c(3),]
 
 # Function to read in dataset ---------------------------------------------
 
@@ -94,7 +98,12 @@ generate_read <- function(condition, fixed_objects=NULL){
 
   dat <- dat |> dplyr::filter(FLAG!=1) |>
     dplyr::select("id"=ID,"t"=TIME,"evt"=DV,"trt"=TRT) |>
-    dplyr::mutate(trt=1-trt,evt=as.logical(evt))
+    dplyr::mutate(t=t/24,trt=1-trt,evt=as.logical(evt))
+
+  if(length(unique(dat$trt))==1) {
+    warning(filename," has only one group\n")
+    return(NULL)
+  }
 
   # rename the columns
   # names(dat) <- c("ID"="id", "TIME"="t", "DV"="evt", "TRT"="trt")[names(dat)]
@@ -125,27 +134,68 @@ my_generator <- function(condition, fixed_objects=NULL){
 # analyse
 # example with just logrank test and cox regression
 # will later be replaced by sourcing scripts/run_simulations_common.R
-my_analyse <- list(
-  logrank     = analyse_logrank(alternative = "one.sided"),
-  cox = analyse_coxph(alternative = "one.sided"),
-  aft_weibull = analyse_aft(dist="weibull", alternative = "one.sided"),
-  descriptive = analyse_describe()
-)
-my_analyse <- wrap_all_in_trycatch(my_analyse)
+# my_analyse <- list(
+#   logrank     = analyse_logrank(alternative = "one.sided"),
+#   cox = analyse_coxph(alternative = "one.sided"),
+#   aft_weibull = analyse_aft(dist="weibull", alternative = "one.sided"),
+#   ahr_6m   = analyse_ahr(type="AHR", max_time=m2d(6), alternative = "one.sided")
+#   )
+# my_analyse <- wrap_all_in_trycatch(my_analyse)
 
 # summarise
 # example with just logrank test, cox regression and descriptive statistics
 # will later be replaced by sourcing scripts/run_simulations_common.R
+# my_summarise <- create_summarise_function(
+#   logrank     = summarise_test(alpha),
+#   cox = summarise_estimator(est=hr, real=gAHR_12m, lower=hr_lower, upper=hr_upper, null=1),
+#   # cox = summarise_estimator(est=hr, real=gAHR_12m, lower=hr_lower, upper=hr_upper, null=1),
+#   aft_weibull = summarise_estimator(est=coef, real=NA_real_, lower=lower, upper=upper, null=0),
+#   ahr_6m  = summarise_estimator(est=AHR, real=AHR_6m, lower=AHR_lower, upper=AHR_upper, null=1)
+# )
+
+source("run_simulations_common.R")
+
 my_summarise <- create_summarise_function(
-  logrank     = summarise_test(alpha),
-  cox = summarise_estimator(est=hr,real=NA,lower=hr_lower, upper=hr_upper, null=1),
-  # cox = summarise_estimator(est=hr, real=gAHR_12m, lower=hr_lower, upper=hr_upper, null=1),
-  aft_weibull = summarise_estimator(est=coef,real=NA_real_, lower=lower, upper=upper, null=0),
+  # estimation
+  ahr_6m  = summarise_estimator(est=AHR, real=AHR_6m, lower=AHR_lower, upper=AHR_upper, null=1),
+  ahr_12m = summarise_estimator(est=AHR, real=AHR_12m, lower=AHR_lower, upper=AHR_upper, null=1),
+  gahr_6m  = summarise_estimator(est=gAHR, real=gAHR_6m, lower=gAHR_lower, upper=gAHR_upper, null=1),
+  gahr_12m = summarise_estimator(est=gAHR, real=gAHR_12m, lower=gAHR_lower, upper=gAHR_upper, null=1),
+  median_surv = summarise_estimator(est=diff_Q, real=med_diff, lower=diff_Q_lower, upper=diff_Q_upper, null=0),
+  milestone = summarise_estimator(est=milestone_surv_ratio[1], real= milestone_surv_ratio_6m, lower=milestone_surv_ratio_lower[1], upper=milestone_surv_ratio_upper[1], null=1, name="milestone_6" ),
+  milestone = summarise_estimator(est=milestone_surv_ratio[2], real=milestone_surv_ratio_12m, lower=milestone_surv_ratio_lower[2], upper=milestone_surv_ratio_upper[2], null=1, name="milestone_12"),
+  rmst_diff_6m  = summarise_estimator(est=rmst_diff, real=RMST_diff_6m, lower=rmst_diff_lower, upper=rmst_diff_upper, null=0),
+  rmst_diff_12m = summarise_estimator(est=rmst_diff, real=RMST_diff_12m, lower=rmst_diff_lower, upper=rmst_diff_upper, null=0),
+  cox = summarise_estimator(est=hr, real=gAHR_12m, lower=hr_lower, upper=hr_upper, null=1),
+  weighted_cox_6m  = summarise_estimator(est=hr, real=gAHR_6m, lower=hr_lower, upper=hr_upper, null=1),
+  weighted_cox_12m = summarise_estimator(est=hr, real=gAHR_12m, lower=hr_lower, upper=hr_upper, null=1),
+  aft_weibull = summarise_estimator(est=coef, real=NA_real_, lower=lower, upper=upper, null=0),
+  aft_lognormal = summarise_estimator(est=coef, real=NA_real_, lower=lower, upper=upper, null=0),
+  diff_med_weibull = summarise_estimator(est=diff_med_est, real=med_diff,lower=diff_med_lower, upper=diff_med_upper, null=0),
+  # tests
+  pw_exp_3 = summarise_test(alpha),
+  pw_exp_12 = summarise_test(alpha),
+  peto_peto = summarise_test(alpha),
+  fh_0_0 = summarise_test(alpha),
+  fh_0_1 = summarise_test(alpha),
+  fh_1_0 = summarise_test(alpha),
+  fh_1_1 = summarise_test(alpha),
+  logrank = summarise_test(alpha),
+  max_combo = summarise_test(alpha),
+  modest_6 = summarise_test(alpha),
+  modest_8 = summarise_test(alpha),
+  # tests group sequential
+  peto_peto_gs = summarise_group_sequential(),
+  fh_gs_0_0 = summarise_group_sequential(),
+  fh_gs_0_1 = summarise_group_sequential(),
+  fh_gs_1_0 = summarise_group_sequential(),
+  fh_gs_1_1 = summarise_group_sequential(),
+  logrank_gs = summarise_group_sequential(),
+  max_combo_gs = summarise_group_sequential(),
+  modest_gs_6 = summarise_group_sequential(),
+  modest_gs_8 = summarise_group_sequential(),
   descriptive = summarise_describe()
 )
-
-# source("scripts/run_simulations_common.R")
-
 
 # run simulations ---------------------------------------------------------
 
@@ -164,9 +214,11 @@ results <- runSimulation(
   #save_seeds = T, # if MPI
   # include_replication_index is crucial
   # if this argument is missing condition will not contain REPLICATIONS column
-  extra_options = list(include_replication_index=TRUE,
-                       store_warning_seeds = TRUE,
-                       allow_na = TRUE)
+  extra_options = list(
+    include_replication_index=TRUE,
+    store_warning_seeds = TRUE,
+    allow_na = TRUE
+  )
 )
 
 if(run_parallel) stopCluster(cl)
@@ -177,20 +229,34 @@ saveRDS(results, paste0(save_folder, "/results.Rds"))
 # results
 # names(results)
 # results$SEED
+View(results)
+results$hazard_ctrl
 results$logrank.rejection_0.025
+results$peto_peto.rejection_0.025
+
 results$logrank.mean_n_evt
 results$logrank.sd_n_evt
-
-results |> select_at(vars(contains("cox")))
 results$cox.null_cover
 
-results |> select_at(vars(contains("aft")))
 results$aft_weibull.null_cover
 
 
 results |>
-  dplyr::filter(effect_size_ph==0) |>
-  dplyr::select(logrank.rejection_0.025)
+  dplyr::filter(effect_size_ph==0.8) |>
+  dplyr::select(scenario,
+                logrank.rejection_0.025,
+                #aft_weibull.null_lower,
+                aft_weibull.null_upper,
+                diff_med_weibull.null_lower,
+                # diff_med_weibull.null_upper
+                ) |>
+  dplyr::mutate(pow_diff_med_weibull.null_lower=1-diff_med_weibull.null_lower,
+                pow_aft_weibull.null_upper= 1- aft_weibull.null_upper) |>
+  select(pow_aft_weibull.null_upper,pow_diff_med_weibull.null_lower,logrank.rejection_0.025)
+
 
 binom::binom.confint(results$logrank.rejection_0.025[1]*results$logrank.N[1],
                      results$logrank.N[1],methods="wilson")
+
+binom::binom.confint(0.025*2500,2500,methods="wilson")
+binom::binom.confint(0.975*2500,2500,methods="wilson")
