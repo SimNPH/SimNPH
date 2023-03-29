@@ -1,0 +1,298 @@
+#' Tabulate Parameters
+#'
+#' Return a table with selected parameters and corresponding unique values
+#'
+#' @param data tibble with simulation results (or parameter design) in long format
+#' @param parameters which parameters to select for tabulation
+#' @param .names column title for variables in table
+#'
+#' @return tibble containing selected parameters and corresponding unique values
+#' @export
+#'
+#' @examples
+tabulate_parameters <- function(data,parameters,.names="Parameter"){
+  summarise(data,across(all_of(parameters),~paste(unique(.x),collapse=', '))) |>
+    pivot_longer(everything(),names_to=.names,values_to = "Unique Values")
+}
+
+
+#' Tabulate Methods
+#'
+#' Return a table of all methods investigated in simulation results that
+#' categorizes whether methods provide tests, estimators, and/or CIs
+#'
+#' @param data tibble with simulation results in long format
+#'
+#' @return tibble containing methods and what they provide
+#' @export
+#'
+#' @examples
+tabulate_methods <- function(data){
+  mutate(data,
+         test = !{is.na(rejection)&is.na(`rejection_0.025`)},
+         estimator = !{is.na(bias)},
+         ci = !is.na(coverage)) |>
+    group_by(method) |>
+    summarise(across(all_of(c('test','estimator','ci')),~.x[1])) |>
+    mutate(across(2:4,~ifelse(.x,'X','')))
+}
+
+#' Nested Loop Plot of Simulation Results
+#'
+#' Generates a nested loop plot of simulation results
+#'
+#' Parameters selected for x-axis, rows, cols, and steps need to be such that together with filters all remaining scenarios uniquely identify a point on the y-axis.
+#'
+#' @param data tibble with simulation results in long format
+#' @param methods methods for which operating characteristics should be plotted
+#' @param parameter_x parameter to show on x-axis
+#' @param parameter_y characteristic to show on y-axis
+#' @param filters character vector defining filters to apply to dataset (see Details)
+#' @param parameter_row parameter to define row facets
+#' @param parameter_col parameter to defin column facets
+#' @param parameters_steps parameters across which x-scale is looped
+#' @param ... additional options to looplot
+#'
+#' @return
+#' @export
+#'
+#' @examples
+plot_sim_results <- function(data,
+                             methods,
+                             parameter_x,
+                             parameter_y,
+                             filters = c("median_survival_ctrl == 12",
+                                         "recruitment == 18",
+                                         "censoring_prop == 0"),
+                             parameter_row = "effect_size_ph",
+                             parameter_col = "n_pat_design",
+                             parameters_steps = NULL,...){
+  ## Limit to interesting scenarios, take from shiny input
+  filters = rlang::parse_exprs(filters)
+  columns = c("method",parameter_x,parameter_y,parameter_row,parameter_col,parameters_steps)
+  if(any((columns %in% names(data))==FALSE)){
+    stop(paste("Column missing:",columns[which(!(columns %in% names(data)))]))
+  }
+  plot_data <- filter(data,
+         method %in% methods) |>
+    filter(!!!filters) |>
+    select(all_of(columns))
+  y_base = min(plot_data[[parameter_y]])*.9
+  y_height = diff(range(plot_data[[parameter_y]]))/11
+  y_shift = 1.7*y_height
+  plot_data |> pivot_wider(names_from = "method",values_from = parameter_y) |>
+    looplot::nested_loop_plot(x=parameter_x,
+                              grid_rows=parameter_row,
+                              grid_cols=parameter_col,
+                              steps=parameters_steps,
+                              design_type = 'partial',
+                              spu_x_shift = .2, #spase between groups
+                              steps_y_base= y_base,
+                              steps_y_height= y_height,
+                              steps_y_shift = y_shift,
+                              colors = scales::brewer_pal(palette = "Set1"),
+                              steps_values_annotate = TRUE,
+                              steps_annotation_size = 2.5,
+                              post_processing = list(
+                                add_custom_theme = list(
+                                  axis.text.x = element_text(angle = -90,
+                                                             vjust = 0.5,
+                                                             size = 8)
+                                )),...)
+}
+
+#' Plot parameter scenarios
+#'
+#' Nested loop plot of parameter scenarios
+#'
+#' @param data tibble with simulation results in long format
+#' @param parameters which parameter values to show on y-axis
+#' @param parameter_x parameter to show on x-axis
+#' @param filters character vector defining filters to apply to dataset (see Details)
+#' @param parameter_row parameter to define row facets
+#' @param parameter_col parameter to defin column facets
+#' @param parameters_steps parameters across which x-scale is looped
+#' @param ...
+#'
+#' @return
+#' @export
+#'
+#' @examples
+plot_parameter_scenario <- function(data,
+                                    parameters,
+                                    parameter_x,
+                                    filters = c("median_survival_ctrl == 12",
+                                                "recruitment == 18",
+                                                "censoring_prop == 0"),
+                                    parameter_row = "effect_size_ph",
+                                    parameter_col = "n_pat",
+                                    parameters_steps = NULL,...){
+  ## Limit to interesting scenarios, take from shiny input
+  filters = rlang::parse_exprs(filters)
+  columns = c(parameter_x,parameters,parameter_row,parameter_col,parameters_steps)
+  if(any((columns %in% names(data))==FALSE)){
+    stop(paste("Column missing:",columns[which(!(columns %in% names(data)))]))
+  }
+  plot_data <- filter(data,!!!filters) |>
+    select(all_of(columns))
+  y_base <- plot_data |>
+    summarise(across(all_of(parameters),~min(.x))) |>
+    pivot_longer(everything()) |>
+    pull(value) |>
+    min()
+  plot_data |>
+    looplot::nested_loop_plot(x=parameter_x,
+                              grid_rows=parameter_row,
+                              grid_cols=parameter_col,
+                              steps=parameters_steps,
+                              design_type = 'partial',
+                              spu_x_shift = .2, #space between groups
+                              steps_y_base=y_base*0.9,
+                              # steps_y_height=0.1,
+                              # steps_y_shift = 0.5,
+                              colors = scales::brewer_pal(palette = "Set1"),
+                              steps_values_annotate = TRUE, steps_annotation_size = 2.5,
+                              post_processing = list(
+                                add_custom_theme = list(
+                                  axis.text.x = element_text(angle = -90,
+                                                             vjust = 0.5,
+                                                             size = 8)
+                                )),...)
+}
+
+#' Plot Survival Curve
+#'
+#' Plot a survival curve for a given set of parameters.
+#'
+#' @param data A data frame containing the parameters needed to generate the survival curve. The required columns depend on the type of survival curve to generate.
+#' @param type A character string indicating the type of survival curve to generate. Valid values are 'delayed', 'progression', 'subgroup', and 'crossing'.
+#'
+#' @return A survival curve plot.
+#'
+#' @importFrom nph pchaz subpop_pchaz pop_pchaz plot_shhr
+#'
+#' @examples
+#' data <- data.frame(hazard_trt = 0.01, hazard_ctrl = 0.008, delay = 30, hazard_after_prog = 0.005, prog_rate_trt = 0.2, prog_rate_ctrl = 0.15, prevalence = 0.5)
+#' generate_survival_curve(data = data, type = 'delayed')
+#'
+#' @export
+plot_nph_curves <- function(data, type) {
+
+  # Determine t_max
+  t_max <- if (hasName(data, "descriptive.max_followup")) {
+    data$descriptive.max_followup
+  } else if (hasName(data, "hazard_ctrl")) {
+    log(100) / data$hazard_ctrl
+  } else {
+    1095.75
+  }
+
+  # Create plot
+  if (type == "delayed") {
+    if (data$delay == 0) {
+      pch_trt <- nph::pchaz(Tint = c(0, t_max), lambda = c(data$hazard_trt))
+    } else {
+      pch_trt <- nph::pchaz(Tint = c(0, data$delay, t_max), lambda = c(data$hazard_ctrl, data$hazard_trt))
+    }
+
+    pch_ctrl <- nph::pchaz(Tint = c(0, t_max), lambda = c(data$hazard_ctrl))
+
+  } else if (type == "progression") {
+    pch_trt <- nph::subpop_pchaz(
+      Tint=c(0, t_max),
+      lambda1 = data$hazard_trt,
+      lambda2 = data$hazard_after_prog,
+      lambdaProg = data$prog_rate_trt,
+      discrete_approximation = TRUE
+    )
+
+    pch_ctrl <- nph::subpop_pchaz(
+      Tint=c(0, t_max),
+      lambda1 = data$hazard_ctrl,
+      lambda2 = data$hazard_after_prog,
+      lambdaProg = data$prog_rate_ctrl,
+      discrete_approximation = TRUE
+    )
+
+  } else if (type == "subgroup") {
+    pch_trt <- nph::pop_pchaz(
+      Tint = c(0, t_max),
+      lambdaMat1 = matrix(c(data$hazard_trt, data$hazard_subgroup), 2, 1),
+      lambdaMat2 = matrix(0, 2, 1),
+      lambdaProgMat = matrix(0, 2, 1),
+      p = c((1 - data$prevalence), data$prevalence)
+    )
+
+    pch_ctrl <- nph::pchaz(
+      Tint = c(0, t_max),
+      lambda = data$hazard_ctrl
+    )
+
+  } else if (type == "crossing") {
+    if (data$crossing == 0) {
+      pch_trt <- nph::pchaz(Tint=c(0, t_max), lambda = c(data$hazard_trt_after))
+    } else {
+      pch_trt <- nph::pchaz(Tint=c(0, data$crossing, t_max), lambda = c(data$hazard_trt_before, data$hazard_trt_after))
+    }
+
+    pch_ctrl <- nph::pchaz(Tint=c(0, t_max), lambda = c(data$hazard_ctrl))
+  }
+
+  nph::plot_shhr(pch_trt, pch_ctrl)
+  legend(y=0,x=0, legend = c("control","treatment"), lty = 1, col = c("black", "green"), cex = 1.2, xjust=.5,yjust = 0,lwd=4)
+}
+
+#' Interactive Filters
+#'
+#' Utility function to define interactive (or not filters)
+#'
+#' If input is set to NULL a character vector with static default filters will be returned,
+#' this is useful for debugging without the need to rebuild the shiny document. Also input is not
+#' available to the function unless it is defined within the markdown document (even if only sourced)
+#' so you need to pass it from within the report.
+#'
+#' @param prefix prefix to identify shiny input panel
+#' @param input pass the shiny input object
+#'
+#' @return
+#' @export
+#'
+#' @examples
+interactive_filters <- function(prefix,input=NULL) {
+  if(!is.null(input)) {
+    c(str_c("abs(hazard_ctrl - nph::m2r(", input[[str_replace("prefix_median_survival_ctrl", "prefix_", prefix)]],"))<1e-6"),
+      str_c("recruitment == ", input[[str_replace("prefix_recruitment", "prefix_", prefix)]]),
+      str_c("censoring_prop == ", input[[str_replace("prefix_censoring", "prefix_", prefix)]]))
+  } else {
+    c("abs(hazard_ctrl - nph::m2r(12))<1e-6",
+      "recruitment == 18",
+      "censoring_prop == 0.0")
+  }
+}
+
+#' Generate a sidebar panel with select inputs for clinical trial parameters.
+#'
+#' @param prefix A character string to use as a prefix for the input IDs.
+#' @param default_mts The default value for the median survival time in the control arm.
+#' @param default_recruitment The default value for the time to recruit target number of subjects.
+#' @param default_censoring The default value for the proportion of subjects with random censoring.
+#'
+#' @return A sidebar panel with select inputs for clinical trial parameters.
+#'
+#' @examples
+#' \dontrun{
+#' # generate the sidebar panel with default values
+#' sidebar_panel <- generate_trial_inputs("trial1_", default_mts = 12, default_recruitment = 18, default_censoring = 0)
+#' }
+#'
+generate_trial_inputs <- function(prefix, default_mts = 12, default_recruitment = 18, default_censoring = 0) {
+  panel <- sidebarPanel(
+    selectInput(paste0(prefix,"median_survival_ctrl"), label = "Median Survival in Control arm (mts):",
+                choices = c(36, 12, 6), selected = default_mts),
+    selectInput(paste0(prefix,"recruitment"), label = "Time to recruit target number of subjects (mts):",
+                choices = c(18, 30), selected = default_recruitment),
+    selectInput(paste0(prefix,"censoring"), label = "Proportion of subjects with random censoring:",
+                choices = c(0, 0.1, 0.3), selected = default_censoring)
+  )
+  return(panel)
+}
