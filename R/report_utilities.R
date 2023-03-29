@@ -78,6 +78,8 @@ plot_sim_results <- function(data,
     filter(!!!filters) |>
     select(all_of(columns))
   y_base = min(plot_data[[parameter_y]])*.9
+  y_height = diff(range(plot_data[[parameter_y]]))/11
+  y_shift = 1.7*y_height
   plot_data |> pivot_wider(names_from = "method",values_from = parameter_y) |>
     looplot::nested_loop_plot(x=parameter_x,
                               grid_rows=parameter_row,
@@ -86,10 +88,11 @@ plot_sim_results <- function(data,
                               design_type = 'partial',
                               spu_x_shift = .2, #spase between groups
                               steps_y_base= y_base,
-                              # steps_y_height=0.1,
-                              # steps_y_shift = 0.5,
+                              steps_y_height= y_height,
+                              steps_y_shift = y_shift,
                               colors = scales::brewer_pal(palette = "Set1"),
-                              steps_values_annotate = TRUE, steps_annotation_size = 2.5,
+                              steps_values_annotate = TRUE,
+                              steps_annotation_size = 2.5,
                               post_processing = list(
                                 add_custom_theme = list(
                                   axis.text.x = element_text(angle = -90,
