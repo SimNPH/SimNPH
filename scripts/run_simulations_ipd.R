@@ -1,11 +1,6 @@
-
 library(SimNPH)
 library(SimDesign)
 library(parallel)
-
-if(packageVersion("SimNPH") != "0.3.0"){
-  stop("Please run the simulations with the correct vesion of the SimNPH package for reproducability.")
-}
 
 N_sim <- 2500
 
@@ -28,6 +23,7 @@ clusterEvalQ(cl, {
 
 # setup data generation ---------------------------------------------------
 
+# files for IPD
 ipd_files <- data.frame(
   file = c(
     "data/ipd/506_time_to_relapse.Rdata",
@@ -41,9 +37,12 @@ ipd_files <- data.frame(
   )
 )
 
+# assumptions (null or real data)
 assumptions <- data.frame(
-  null = c(T,F)
+  null = c(TRUE, FALSE)
 )
+
+# TODO: add options (sample size, recruitment, admininstrative censoring)?
 
 design <- merge(
   ipd_files,
@@ -51,6 +50,7 @@ design <- merge(
   by=NULL
 )
 
+# read in the actual data
 ipd_data <- lapply(split(ipd_files, 1:nrow(ipd_files)), \(i){
   load(i$file)
   names(all_patients) <- c("t", "evt", "trt")
@@ -58,18 +58,25 @@ ipd_data <- lapply(split(ipd_files, 1:nrow(ipd_files)), \(i){
   all_patients
 })
 names(ipd_data) <- ipd_files$name
+# distribute data to all cluster nodes
 clusterExport(cl, "ipd_data")
 
 # define generator
 my_generator <- function(condition, fixed_objects=NULL){
+  # select dataset according to column in condition
   tmp_data <- ipd_data[[condition$name]]
   N <- nrow(tmp_data)
+
+  # under the null modify the dataset:
+  #   sample only from control
+  #   sample treatment from full dataset
   if(condition$null){
     tmp_trt <- tmp_data$trt
     tmp_data <- tmp_data[tmp_data$trt == 0, ]
     tmp_data$trt <- sample(tmp_trt, nrow(tmp_data), replace=TRUE)
   }
 
+  # return a sample of the same size as the original dataset
   tmp_data[sample(1:nrow(tmp_data), N, replace = TRUE), ]
 }
 
