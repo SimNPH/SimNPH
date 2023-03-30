@@ -23,7 +23,7 @@ save_folder <- file.path(
          Sys.info()["nodename"], "_",
          strftime(Sys.time(), "%Y-%m-%d_%H%M%S")))
 
-sim_data_dir <- file.path("..","..","parametric_simulations","sim_data_2")
+sim_data_dir <- file.path("..","..","parametric_simulations","sim_data_3")
 
 design_table <- file.path("data","parameters","ext_data_2023-04-12.csv")
 
@@ -68,7 +68,7 @@ if(run_parallel){
 Design <- read.table(
   design_table,
   sep=",", dec=".", header=TRUE)
-Design <- Design[c(25:48),]
+Design <- Design[c(39:48),]
 
 # Function to read in dataset ---------------------------------------------
 
