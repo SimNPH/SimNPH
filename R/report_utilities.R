@@ -173,10 +173,13 @@ plot_parameter_scenario <- function(data,
 #'
 #' @examples
 #' data <- data.frame(hazard_trt = 0.01, hazard_ctrl = 0.008, delay = 30, hazard_after_prog = 0.005, prog_rate_trt = 0.2, prog_rate_ctrl = 0.15, prevalence = 0.5)
-#' generate_survival_curve(data = data, type = 'delayed')
+#' plot_nph_curves(data = data, type = 'delay')
 #'
 #' @export
 plot_nph_curves <- function(data, type) {
+  if (!(type %in% c("delay", "progression", "subgroup", "crossing"))) {
+    stop("Error: 'type' argument must be one of 'delay', 'progression', 'subgroup', or 'crossing'")
+  }
 
   # Determine t_max
   t_max <- if (hasName(data, "descriptive.max_followup")) {
@@ -188,7 +191,7 @@ plot_nph_curves <- function(data, type) {
   }
 
   # Create plot
-  if (type == "delayed") {
+  if (type == "delay") {
     if (data$delay == 0) {
       pch_trt <- nph::pchaz(Tint = c(0, t_max), lambda = c(data$hazard_trt))
     } else {
@@ -239,7 +242,7 @@ plot_nph_curves <- function(data, type) {
   }
 
   nph::plot_shhr(pch_trt, pch_ctrl)
-  legend(y=0,x=0, legend = c("control","treatment"), lty = 1, col = c("black", "green"), cex = 1.2, xjust=.5,yjust = 0,lwd=4)
+  legend(y=1,x=0, legend = c("control","treatment"), lty = 1, col = c("black", "green"), cex = 1.2, xjust=.3,yjust = -2,lwd=4)
 }
 
 #' Interactive Filters
@@ -282,10 +285,10 @@ interactive_filters <- function(prefix,input=NULL) {
 #' @examples
 #' \dontrun{
 #' # generate the sidebar panel with default values
-#' sidebar_panel <- generate_trial_inputs("trial1_", default_mts = 12, default_recruitment = 18, default_censoring = 0)
+#' sidebar_panel <- input_trial_inputs("trial1_", default_mts = 12, default_recruitment = 18, default_censoring = 0)
 #' }
 #'
-generate_trial_inputs <- function(prefix, default_mts = 12, default_recruitment = 18, default_censoring = 0) {
+input_trial_inputs <- function(prefix, default_mts = 12, default_recruitment = 18, default_censoring = 0) {
   panel <- sidebarPanel(
     selectInput(paste0(prefix,"median_survival_ctrl"), label = "Median Survival in Control arm (mts):",
                 choices = c(36, 12, 6), selected = default_mts),
