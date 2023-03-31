@@ -72,6 +72,7 @@ export(plot_nph_curves)
 export(r2m)
 export(interactive_filters)
 export(generate_trial_inputs)
+export(shhr_gg)
 
 importFrom(Rcpp,evalCpp)
 useDynLib(SimNPH, .registration = TRUE)
