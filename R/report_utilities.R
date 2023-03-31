@@ -29,7 +29,7 @@ tabulate_parameters <- function(data,parameters,.names="Parameter"){
 #' @examples
 tabulate_methods <- function(data){
   mutate(data,
-         test = !{is.na(rejection)&is.na(`rejection_0.025`)},
+         test = !{is.na(rejection)&is.na(`rejection_0.025`)&is.na(null_lower)},
          estimator = !{is.na(bias)},
          ci = !is.na(coverage)) |>
     group_by(method) |>
