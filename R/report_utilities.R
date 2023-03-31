@@ -241,8 +241,8 @@ plot_nph_curves <- function(data, type) {
     pch_ctrl <- nph::pchaz(Tint=c(0, t_max), lambda = c(data$hazard_ctrl))
   }
 
-  nph::plot_shhr(pch_trt, pch_ctrl)
-  legend(y=1,x=0, legend = c("control","treatment"), lty = 1, col = c("black", "green"), cex = 1.2, xjust=.3,yjust = -2,lwd=4)
+  shhr_gg(pch_ctrl,pch_trt)
+#  legend(y=1,x=0, legend = c("control","treatment"), lty = 1, col = c("black", "green"), cex = 1.2, xjust=.3,yjust = -2,lwd=4)
 }
 
 #' Interactive Filters
