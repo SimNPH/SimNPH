@@ -226,37 +226,3 @@ if(run_parallel) stopCluster(cl)
 
 saveRDS(results, paste0(save_folder, "/results.Rds"))
 
-# results
-# names(results)
-# results$SEED
-View(results)
-results$hazard_ctrl
-results$logrank.rejection_0.025
-results$peto_peto.rejection_0.025
-
-results$logrank.mean_n_evt
-results$logrank.sd_n_evt
-results$cox.null_cover
-
-results$aft_weibull.null_cover
-
-
-results |>
-  dplyr::filter(effect_size_ph==0.8) |>
-  dplyr::select(scenario,
-                logrank.rejection_0.025,
-                #aft_weibull.null_lower,
-                aft_weibull.null_upper,
-                diff_med_weibull.null_lower,
-                # diff_med_weibull.null_upper
-                ) |>
-  dplyr::mutate(pow_diff_med_weibull.null_lower=1-diff_med_weibull.null_lower,
-                pow_aft_weibull.null_upper= 1- aft_weibull.null_upper) |>
-  select(pow_aft_weibull.null_upper,pow_diff_med_weibull.null_lower,logrank.rejection_0.025)
-
-
-binom::binom.confint(results$logrank.rejection_0.025[1]*results$logrank.N[1],
-                     results$logrank.N[1],methods="wilson")
-
-binom::binom.confint(0.025*2500,2500,methods="wilson")
-binom::binom.confint(0.975*2500,2500,methods="wilson")
