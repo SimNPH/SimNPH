@@ -15,6 +15,7 @@ N_sim <- 2500 # number of simulations per scenario
 run_parallel <- TRUE # should we parallelize?
 n_cores <- parallel::detectCores() - 4
 
+# assume we are in base directory of the package
 save_folder <- file.path(
   #"..",
   "data",
@@ -22,9 +23,9 @@ save_folder <- file.path(
          Sys.info()["nodename"], "_",
          strftime(Sys.time(), "%Y-%m-%d_%H%M%S")))
 
-sim_data_dir <- file.path("..","..","parametric_simulations","sim_data")
+sim_data_dir <- file.path("..","..","parametric_simulations","sim_data_2")
 
-design_table <- file.path("data","parameters","ext_data_2023-03-24.csv")
+design_table <- file.path("data","parameters","ext_data_2023-04-12.csv")
 
 alpha <- 0.025
 nominal_alpha <- ldbounds::ldBounds(c(0.5,1), sides=1, alpha=0.025)$nom.alpha
@@ -161,9 +162,9 @@ my_summarise <- create_summarise_function(
   ahr_12m = summarise_estimator(est=AHR, real=AHR_12m, lower=AHR_lower, upper=AHR_upper, null=1),
   gahr_6m  = summarise_estimator(est=gAHR, real=gAHR_6m, lower=gAHR_lower, upper=gAHR_upper, null=1),
   gahr_12m = summarise_estimator(est=gAHR, real=gAHR_12m, lower=gAHR_lower, upper=gAHR_upper, null=1),
-  median_surv = summarise_estimator(est=diff_Q, real=med_diff, lower=diff_Q_lower, upper=diff_Q_upper, null=0),
-  milestone = summarise_estimator(est=milestone_surv_ratio[1], real= milestone_surv_ratio_6m, lower=milestone_surv_ratio_lower[1], upper=milestone_surv_ratio_upper[1], null=1, name="milestone_6" ),
-  milestone = summarise_estimator(est=milestone_surv_ratio[2], real=milestone_surv_ratio_12m, lower=milestone_surv_ratio_lower[2], upper=milestone_surv_ratio_upper[2], null=1, name="milestone_12"),
+  median_surv = summarise_estimator(est=diff_Q, real=median_survival_trt-median_survival_ctrl, lower=diff_Q_lower, upper=diff_Q_upper, null=0),
+  milestone_6m = summarise_estimator(est=milestone_surv_ratio, real= milestone_surv_ratio_6m, lower=milestone_surv_ratio_lower, upper=milestone_surv_ratio_upper, null=1),
+  milestone_12m = summarise_estimator(est=milestone_surv_ratio, real=milestone_surv_ratio_12m, lower=milestone_surv_ratio_lower, upper=milestone_surv_ratio_upper, null=1),
   rmst_diff_6m  = summarise_estimator(est=rmst_diff, real=RMST_diff_6m, lower=rmst_diff_lower, upper=rmst_diff_upper, null=0),
   rmst_diff_12m = summarise_estimator(est=rmst_diff, real=RMST_diff_12m, lower=rmst_diff_lower, upper=rmst_diff_upper, null=0),
   cox = summarise_estimator(est=hr, real=gAHR_12m, lower=hr_lower, upper=hr_upper, null=1),
