@@ -71,7 +71,7 @@ export(analyse_aft)
 export(plot_nph_curves)
 export(r2m)
 export(interactive_filters)
-export(generate_trial_inputs)
+export(input_trial_inputs)
 export(shhr_gg)
 export(labs_from_labels)
 
