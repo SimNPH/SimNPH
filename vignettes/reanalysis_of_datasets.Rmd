@@ -1,0 +1,64 @@
+---
+title: "Re-Analysis of Datasets"
+author: "Tobias Fellinger"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(SimNPH)
+```
+
+```{r}
+# files for IPD
+ipd_files <- data.frame(
+  file = c(
+    "data/ipd/506_time_to_relapse.Rdata",
+    "data/ipd/6481_os.Rdata",
+    "data/ipd/9883_os.Rdata"
+  ),
+  name = c(
+    "Terifluomide",
+    "Nivolumab",
+    "Prembrolizumap"
+  )
+)
+
+ipd_data <- lapply(split(ipd_files, 1:nrow(ipd_files)), \(i){
+  load(i$file)
+  names(all_patients) <- c("t", "evt", "trt")
+  all_patients$evt <- as.logical(all_patients$evt)
+  all_patients
+})
+names(ipd_data) <- ipd_files$name
+
+ipd_data <- ipd_data[[1]]
+```
+
+## Kaplan-Meier Curves
+
+```{r}
+plot(survfit(Surv(t, evt)~trt, ipd_data), conf.int = 0.95, col=c(2,4))
+```
+
+## Median Survival Time
+
+```{r}
+survfit(Surv(t, evt)~trt, ipd_data)
+```
+
+## Time Dependent Coefficients
+
+### piecewise constant
+
+```{r}
+mod_ph <- coxph(
+  Surv(t, evt) ~ trt, 
+  ipd_data
+  )
+
+plot(cox.zph(mod_ph))
+```
+
+### splines
