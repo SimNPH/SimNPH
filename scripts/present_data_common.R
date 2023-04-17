@@ -1,8 +1,6 @@
 library(tidyverse)
 library(SimNPH)
 
-results_long <- results |>
-  results_pivot_longer()
 
 # metadata for methods ----------------------------------------------------
 
@@ -146,47 +144,71 @@ col_labels <- tibble::tribble(
 
 # transform data ----------------------------------------------------------
 
-# sort those columsn first
-colnames_first <- col_labels |>
-  filter(from == "parameter") |>
-  pull(colname)
+## First transform to long format: Not run
+# results_long <- results |>
+#   results_pivot_longer()
 
-results_long <- results_long |>
-  left_join(metadata, by = "method") |> # add metadata
-  mutate(
-    # one sided test based on CI
-    ci_based_one_sided_rejection = case_when(
-      direction == "lower" ~ 1 - null_upper,
-      direction == "higher" ~ 1 - null_lower,
-      TRUE ~ NA_real_
-    ),
-    # combine columsn with different names acros estimators/tests/gs-tests
-    # coalesce: take first value, if it is missing take second value
-    mean_n_pat = coalesce(mean_n_pat, n_pat),
-    mean_n_evt = coalesce(mean_n_evt, n_evt),
-    sd_n_pat   = coalesce(sd_n_pat, sd_npat),
-    sd_n_evt   = coalesce(sd_n_evt, sd_nevt),
-    study_time = coalesce(study_time, descriptive.study_time),
-    followup   = coalesce(followup, descriptive.max_followup),
-    rejection  = coalesce(rejection, rejection_0.025),
-    rejection  = coalesce(rejection, ci_based_one_sided_rejection)
-  ) |>
-  select( # deselect columsn
-    -n_pat, -n_evt, -sd_npat, -sd_nevt, rejection_0.025
-  ) |>
-  select( # reorder columns
-    method_name, any_of(colnames_first), everything()
-  )
+#' Add metadata and column labels to simulation results
+#'
+#' This function adds metadata and column labels to a long-format results table.
+#'
+#' @param results_long A data frame containing the long-format results table.
+#' @param metadata A data frame containing the metadata to be added to the results table.
+#' @param col_labels A data frame containing the column labels to be added to the results table.
+#'
+#' @return A data frame with added metadata and column labels.
+#' @export
+#'
+
+#' @import dplyr
+#' @importFrom tidyr left_join
+#' @importFrom purrr imap
+#' @importFrom stringr str_c
+add_meta_data <- function(results_long,metadata,col_labels){
+  # sort those columsn first
+  colnames_first <- col_labels |>
+    filter(from == "parameter") |>
+    pull(colname)
+
+  results_long <- results_long |>
+    left_join(metadata, by = "method") |> # add metadata
+    mutate(
+      # one sided test based on CI
+      ci_based_one_sided_rejection = case_when(
+        direction == "lower" ~ 1 - null_upper,
+        direction == "higher" ~ 1 - null_lower,
+        TRUE ~ NA_real_
+      ),
+      # combine columsn with different names acros estimators/tests/gs-tests
+      # coalesce: take first value, if it is missing take second value
+      mean_n_pat = coalesce(mean_n_pat, n_pat),
+      mean_n_evt = coalesce(mean_n_evt, n_evt),
+      sd_n_pat   = coalesce(sd_n_pat, sd_npat),
+      sd_n_evt   = coalesce(sd_n_evt, sd_nevt),
+      study_time = coalesce(study_time, descriptive.study_time),
+      followup   = coalesce(followup, descriptive.max_followup),
+      rejection  = coalesce(rejection, rejection_0.025),
+      rejection  = coalesce(rejection, ci_based_one_sided_rejection)
+    ) |>
+    select( # deselect columsn
+      -n_pat, -n_evt, -sd_npat, -sd_nevt, rejection_0.025
+    ) |>
+    select( # reorder columns
+      method_name, any_of(colnames_first), everything()
+    )
 
 
-# add labels to columns (shown in rstudio viewer) -------------------------
+  # add labels to columns (shown in rstudio viewer) -------------------------
 
-results_long <- results_long |>
-  imap(\(x,i){
-    label <- col_labels |>
-      filter(colname==i) |>
-      pull(col_label)
-    attr(x, "label") <- label
-    x
-  }) |>
-  as_tibble()
+  results_long <- results_long |>
+    imap(\(x,i){
+      label <- col_labels |>
+        filter(colname==i) |>
+        pull(col_label)
+      attr(x, "label") <- label
+      x
+    }) |>
+    as_tibble()
+
+  return(results_long)
+}
