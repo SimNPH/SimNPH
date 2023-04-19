@@ -14,9 +14,9 @@ library(SimNPH)
 # files for IPD
 ipd_files <- data.frame(
   file = c(
-    "data/ipd/506_time_to_relapse.Rdata",
-    "data/ipd/6481_os.Rdata",
-    "data/ipd/9883_os.Rdata"
+    "../data/ipd/506_time_to_relapse.Rdata",
+    "../data/ipd/6481_os.Rdata",
+    "../data/ipd/9883_os.Rdata"
   ),
   name = c(
     "Terifluomide",
@@ -60,15 +60,60 @@ mod_ph <- coxph(
 
 plot(cox.zph(mod_ph))
 ```
+
 ```{r}
-coxph(
+breaks <- c(0,30, 60, 100)
+
+mod_pw <- coxph(
   Surv(t, evt) ~ tt(trt), 
   tt=function(x, t, ...){
-    t_ <- cut(t, breaks = c(0,30,100))
+    t_ <- cut(t, breaks = breaks)
     x*model.matrix(~t_-1)
   }, 
   data=ipd_data
   )
+
+mod_pw
+```
+Plot for Stepfun
+```{r}
+x <- seq(0.1, 100, by=0.1)
+x_ <- cut(x, breaks = breaks)
+
+
+hr <- exp(
+  (model.matrix(~x_-1) %*% coefficients(mod_pw))
+)
+
+plot(x, hr, type="l", ylim=c(0,2))
+abline(h=1)
 ```
 
 ### splines
+
+```{r}
+knots <- seq(20, 80, by=20)
+
+mod_spline <- coxph(
+  Surv(t, evt) ~ tt(trt), 
+  tt=function(x, t, ...){
+    x*nsk(t, knots=knots)
+  }, 
+  data=ipd_data
+  )
+
+mod_spline
+```
+
+Plot for Spline
+```{r}
+x <- seq(0, 100, by=0.1)
+hr <- exp(
+  (nsk(x, knots=knots)[,-5] %*% coefficients(mod_spline)) + 
+    coefficients(mod_spline)[1]
+)
+
+plot(x, hr, type="l")
+abline(h=1)
+```
+
