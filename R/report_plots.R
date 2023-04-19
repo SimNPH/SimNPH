@@ -188,5 +188,39 @@ combined_plot <- function(
     geom_hline(yintercept=hlines)
 
   (plot_1 / plot_2) + plot_layout(heights=heights_plots)
+}
 
+
+#' Add ggplot axis labels from labels attribute
+#'
+#' @param gg a ggplot object
+#'
+#' @return a ggplot object
+#' @export
+#'
+#' @examples
+#' test <- mtcars
+#' # add a label attribute
+#' attr(test$cyl, "label") <- "cylinders"
+#'
+#' # plot witht the variable names as axis titles
+#' gg1 <- ggplot(test, aes(x=wt, y=cyl)) +
+#'   geom_point()
+#' gg1
+#'
+#' # add labels where defined in the attribute
+#' gg2 <- ggplot(test, aes(x=wt, y=cyl)) +
+#'   geom_point()
+#'
+#' gg2 <- labs_from_labels(gg2)
+#' gg2
+labs_from_labels <- function(gg){
+  new_labels <- gg$mapping |>
+    purrr::map(rlang::as_name) |>
+    purrr::map(\(i){
+      attr(gg$data[[i]], "label")
+    }) |>
+    unlist()
+
+  gg + ggplot2::labs(!!!new_labels)
 }

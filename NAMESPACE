@@ -73,6 +73,7 @@ export(r2m)
 export(interactive_filters)
 export(input_trial_inputs)
 export(shhr_gg)
+export(labs_from_labels)
 
 importFrom(Rcpp,evalCpp)
 useDynLib(SimNPH, .registration = TRUE)
