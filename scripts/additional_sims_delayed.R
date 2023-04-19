@@ -7,6 +7,10 @@ if(packageVersion("SimNPH") != "0.3.2"){
   stop("Please run the simulations with the correct vesion of the SimNPH package for reproducability.")
 }
 
+if(Sys.info()["nodename"] != "ims-node2"){
+  stop("Please run the simulations on the same nodes as the original ones to ensure reproduction of the simulated datasets")
+}
+
 N_sim <- 2500
 
 # Helper functions --------------------------------------------------------
@@ -29,7 +33,7 @@ clusterEvalQ(cl, {
 # setup data generation ---------------------------------------------------
 
 # load parameters
-design <- read.table("data/results/results_martin_2023-04/data/parameters/delayed_effect_2023-03-29.csv", sep=",", dec=".", header=TRUE)
+design <- read.table("data/parameters/additional_delayed_2023-04-19.csv", sep=",", dec=".", header=TRUE)
 
 # define generator
 my_generator <- function(condition, fixed_objects=NULL){
@@ -48,13 +52,13 @@ clusterExport(cl, "nominal_alpha")
 # define analysis and summarise functions ---------------------------------
 source("scripts/additional_sims_common.R")
 
-# load seeds --------------------------------------------------------------
-old_sims <- readRDS("data/results/results_martin_2023-04/data/simulation_delayed_effect_ims-node2_2023-04-05_151719/results.Rds")
-
 # run ---------------------------------------------------------------------
 
-save_folder <- "data/results/results_martin_2023-04/data/simulation_delayed_effect_ims-node2_2023-04-05_151719"
+save_folder <- "data/results/delayed"
 dir.create(save_folder)
+
+seeds_folder <- paste0(save_folder, "/seeds")
+dir.create(seeds_folder)
 
 results <- runSimulation(
   design,
@@ -62,11 +66,14 @@ results <- runSimulation(
   generate = my_generator,
   analyse = my_analyse,
   summarise = my_summarise,
-  seed = old_sims$SEED,
+  seed = design$old_seed,
   cl = cl,
   parallel = TRUE,
+  save_seeds = TRUE,
+
   save_details = list(
-    out_rootdir = save_folder
+    out_rootdir = save_folder,
+    save_seeds_dirname = seeds_folder
   ),
   extra_options = list(
     store_warning_seeds = TRUE,
@@ -74,6 +81,6 @@ results <- runSimulation(
   )
 )
 
-saveRDS(results, paste0(save_folder, Sys.info()["nodename"], "_", strftime(Sys.time(), "%Y-%m-%d_%H%M%S"), "/additional.Rds"))
+saveRDS(results, paste0(save_folder, "/additional_results_delayed_", Sys.info()["nodename"], "_", strftime(Sys.time(), "%Y-%m-%d_%H%M%S"), ".Rds"))
 
 
