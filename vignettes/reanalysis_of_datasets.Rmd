@@ -2,7 +2,9 @@
 title: "Re-Analysis of Datasets"
 author: "Tobias Fellinger"
 date: "`r Sys.Date()`"
-output: pdf_document
+output: 
+  pdf_document: 
+    latex_engine: lualatex
 ---
 
 ```{r setup, include=FALSE}
