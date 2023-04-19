@@ -68,7 +68,7 @@ if(run_parallel){
 Design <- read.table(
   design_table,
   sep=",", dec=".", header=TRUE)
-#Design <- Design[c(3),]
+Design <- Design[c(25:48),]
 
 # Function to read in dataset ---------------------------------------------
 
@@ -154,7 +154,7 @@ my_generator <- function(condition, fixed_objects=NULL){
 #   ahr_6m  = summarise_estimator(est=AHR, real=AHR_6m, lower=AHR_lower, upper=AHR_upper, null=1)
 # )
 
-source("run_simulations_common.R")
+source("scripts/run_simulations_common.R")
 
 my_summarise <- create_summarise_function(
   # estimation
