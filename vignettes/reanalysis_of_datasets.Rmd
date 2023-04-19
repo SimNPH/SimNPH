@@ -60,5 +60,15 @@ mod_ph <- coxph(
 
 plot(cox.zph(mod_ph))
 ```
+```{r}
+coxph(
+  Surv(t, evt) ~ tt(trt), 
+  tt=function(x, t, ...){
+    t_ <- cut(t, breaks = c(0,30,100))
+    x*model.matrix(~t_-1)
+  }, 
+  data=ipd_data
+  )
+```
 
 ### splines
