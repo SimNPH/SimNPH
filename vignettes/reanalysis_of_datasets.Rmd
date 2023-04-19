@@ -6,8 +6,18 @@ output: pdf_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(warning = FALSE)
+knitr::opts_chunk$set(error = FALSE)
+knitr::opts_chunk$set(message = FALSE)
+
 library(SimNPH)
+library(tidyverse)
+library(rlang)
+library(survival)
+
+# months to days
+m2d <- \(t) 365.25*t/12
 ```
 
 ```{r}
@@ -25,95 +35,41 @@ ipd_files <- data.frame(
   )
 )
 
-ipd_data <- lapply(split(ipd_files, 1:nrow(ipd_files)), \(i){
+all_ipd_data <- lapply(split(ipd_files, 1:nrow(ipd_files)), \(i){
   load(i$file)
   names(all_patients) <- c("t", "evt", "trt")
   all_patients$evt <- as.logical(all_patients$evt)
   all_patients
 })
-names(ipd_data) <- ipd_files$name
-
-ipd_data <- ipd_data[[1]]
+names(all_ipd_data) <- ipd_files$name
 ```
 
-## Kaplan-Meier Curves
+# Terifluomide
 
 ```{r}
-plot(survfit(Surv(t, evt)~trt, ipd_data), conf.int = 0.95, col=c(2,4))
+ipd_data <- all_ipd_data[["Terifluomide"]]
 ```
 
-## Median Survival Time
+```{r, child="reanalysis_of_datasets_child.Rmd"}
+
+```
+
+# Nivolumab
 
 ```{r}
-survfit(Surv(t, evt)~trt, ipd_data)
+ipd_data <- all_ipd_data[["Nivolumab"]]
 ```
 
-## Time Dependent Coefficients
+```{r, child="reanalysis_of_datasets_child.Rmd"}
 
-### piecewise constant
+```
+
+# Prembrolizumap
 
 ```{r}
-mod_ph <- coxph(
-  Surv(t, evt) ~ trt, 
-  ipd_data
-  )
-
-plot(cox.zph(mod_ph))
+ipd_data <- all_ipd_data[["Prembrolizumap"]]
 ```
 
-```{r}
-breaks <- c(0,30, 60, 100)
+```{r, child="reanalysis_of_datasets_child.Rmd"}
 
-mod_pw <- coxph(
-  Surv(t, evt) ~ tt(trt), 
-  tt=function(x, t, ...){
-    t_ <- cut(t, breaks = breaks)
-    x*model.matrix(~t_-1)
-  }, 
-  data=ipd_data
-  )
-
-mod_pw
 ```
-Plot for Stepfun
-```{r}
-x <- seq(0.1, 100, by=0.1)
-x_ <- cut(x, breaks = breaks)
-
-
-hr <- exp(
-  (model.matrix(~x_-1) %*% coefficients(mod_pw))
-)
-
-plot(x, hr, type="l", ylim=c(0,2))
-abline(h=1)
-```
-
-### splines
-
-```{r}
-knots <- seq(20, 80, by=20)
-
-mod_spline <- coxph(
-  Surv(t, evt) ~ tt(trt), 
-  tt=function(x, t, ...){
-    x*nsk(t, knots=knots)
-  }, 
-  data=ipd_data
-  )
-
-mod_spline
-```
-
-Plot for Spline
-```{r}
-x <- seq(0, 100, by=0.1)
-hr <- exp(
-  (nsk(x, knots=knots)[,-5] %*% coefficients(mod_spline)) + 
-    coefficients(mod_spline)[1]
-)
-
-plot(x, hr, type="l")
-abline(h=1)
-```
-

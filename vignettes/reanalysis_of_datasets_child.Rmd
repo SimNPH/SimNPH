@@ -1,0 +1,161 @@
+## Kaplan-Meier Curves
+
+```{r}
+plot(survfit(Surv(t, evt)~trt, ipd_data), conf.int = 0.95, col=c(2,4))
+```
+
+## Median Survival Time
+
+```{r}
+survfit(Surv(t, evt)~trt, ipd_data)
+```
+
+## Time Dependent Coefficients
+
+To be done: spline knots and breakpoints have to be choosen depending on the study
+
+### piecewise constant
+
+```{r}
+# breaks <- c(0,30, 60, 100)
+# 
+# mod_pw <- coxph(
+#   Surv(t, evt) ~ tt(trt), 
+#   tt=function(x, t, ...){
+#     t_ <- cut(t, breaks = breaks)
+#     x*model.matrix(~t_-1)
+#   }, 
+#   data=ipd_data
+#   )
+# 
+# mod_pw
+```
+Plot for Stepfun
+```{r}
+# x <- seq(0.1, 100, by=0.1)
+# x_ <- cut(x, breaks = breaks)
+# 
+# 
+# hr <- exp(
+#   (model.matrix(~x_-1) %*% coefficients(mod_pw))
+# )
+# 
+# plot(x, hr, type="l", ylim=c(0,2))
+# abline(h=1)
+```
+
+### splines
+
+```{r}
+# knots <- seq(20, 80, by=20)
+# 
+# mod_spline <- coxph(
+#   Surv(t, evt) ~ tt(trt), 
+#   tt=function(x, t, ...){
+#     x*nsk(t, knots=knots)
+#   }, 
+#   data=ipd_data
+#   )
+# 
+# mod_spline
+```
+
+Plot for Spline
+```{r}
+# x <- seq(0, 100, by=0.1)
+# hr <- exp(
+#   (nsk(x, knots=knots)[,-5] %*% coefficients(mod_spline)) +
+#     coefficients(mod_spline)[1]
+# )
+# 
+# plot(x, hr, type="l")
+# abline(h=1)
+```
+
+## Long- and Short-time Survival
+
+## Aalen Additive Hazard Model
+
+```{r}
+mod_aareg <- aareg(Surv(t, evt) ~ trt, ipd_data)
+mod_aareg
+```
+
+
+## All Methods Used in the Simulations
+
+
+
+### Tests
+```{r}
+my_tests <- list(
+  # tests
+  pw_exp_3  = analyse_piecewise_exponential(cuts=seq(3, 240, by= 3), testing_only=TRUE),
+  pw_exp_12 = analyse_piecewise_exponential(cuts=seq(12, 240, by=12), testing_only=TRUE),
+  peto_peto = analyse_gehan_wilcoxon(alternative = "one.sided"),
+  fh_0_0 = analyse_logrank_fh_weights(rho=0, gamma=0, alternative = "one.sided"),
+  fh_0_1 = analyse_logrank_fh_weights(rho=0, gamma=1, alternative = "one.sided"),
+  fh_1_0 = analyse_logrank_fh_weights(rho=1, gamma=0, alternative = "one.sided"),
+  fh_1_1 = analyse_logrank_fh_weights(rho=1, gamma=1, alternative = "one.sided"),
+  logrank = analyse_logrank(alternative = "one.sided"),
+  max_combo = analyse_maxcombo(alternative = "one.sided"),
+  modest_6 = analyse_modelstly_weighted(t_star=m2d(6)),
+  modest_8 = analyse_modelstly_weighted(t_star=m2d(8))
+)
+
+table_tests <- imap(my_tests, \(f,i){tibble(method=i, p=f(NA, ipd_data)$p)}) |> 
+  list_rbind()
+
+knitr::kable(table_tests)
+```
+
+### Estimators
+
+```{r}
+my_estimators <- list(
+  # estimation
+  ahr_6m   = analyse_ahr(type="AHR", max_time=(6), alternative = "one.sided"),
+  ahr_12m  = analyse_ahr(type="AHR", max_time=(12), alternative = "one.sided"),
+  gahr_6m  = analyse_ahr(type="gAHR", max_time=(6), alternative = "one.sided"),
+  gahr_12m = analyse_ahr(type="gAHR", max_time=(12), alternative = "one.sided"),
+  median_surv = analyse_diff_median_survival(alternative = "one.sided"),
+  milestone_6m = analyse_milestone_survival(times=(6), alternative = "one.sided"),
+  milestone_12m = analyse_milestone_survival(times=(12), alternative = "one.sided"),
+  rmst_diff_6m  = analyse_rmst_diff(max_time = (6), alternative = "one.sided"),
+  rmst_diff_12m = analyse_rmst_diff(max_time = (12), alternative = "one.sided"),
+  cox = analyse_coxph(alternative = "one.sided"),
+  aft_weibull = analyse_aft(dist="weibull", alternative = "one.sided"),
+  aft_lognormal = analyse_aft(dist="lognormal", alternative = "one.sided"),
+  diff_med_weibull = analyse_weibull(alternative = "two.sided")
+)
+
+extract_results <- list(
+  ahr_6m  = exprs(est=AHR, lower=AHR_lower, upper=AHR_upper, null=1),
+  ahr_12m = exprs(est=AHR, lower=AHR_lower, upper=AHR_upper, null=1),
+  gahr_6m  = exprs(est=gAHR, lower=gAHR_lower, upper=gAHR_upper, null=1),
+  gahr_12m = exprs(est=gAHR, lower=gAHR_lower, upper=gAHR_upper, null=1),
+  median_surv = exprs(est=diff_Q, lower=diff_Q_lower, upper=diff_Q_upper, null=0),
+  milestone_6m = exprs(est=milestone_surv_ratio, lower=milestone_surv_ratio_lower, upper=milestone_surv_ratio_upper, null=1),
+  milestone_12m = exprs(est=milestone_surv_ratio, lower=milestone_surv_ratio_lower, upper=milestone_surv_ratio_upper, null=1),
+  rmst_diff_6m  = exprs(est=rmst_diff, lower=rmst_diff_lower, upper=rmst_diff_upper, null=0),
+  rmst_diff_12m = exprs(est=rmst_diff, lower=rmst_diff_lower, upper=rmst_diff_upper, null=0),
+  cox = exprs(est=hr, lower=hr_lower, upper=hr_upper, null=1),
+  aft_weibull = exprs(est=coef, lower=lower, upper=upper, null=0),
+  aft_lognormal = exprs(est=coef, lower=lower, upper=upper, null=0),
+  diff_med_weibull = exprs(est=diff_med_est,lower=diff_med_lower, upper=diff_med_upper, null=0)
+)
+
+table_estimators <- map(names(my_estimators), \(i){
+  result <- my_estimators[[i]](NA, ipd_data)
+  data.frame(
+    method = i,
+    est = eval(extract_results[[i]][["est"]], envir = result),
+    lower = eval(extract_results[[i]][["lower"]], envir = result),
+    upper = eval(extract_results[[i]][["upper"]], envir = result)
+  )
+}) |>
+  list_rbind()
+
+row.names(table_estimators) <- NULL
+knitr::kable(table_estimators)
+```
