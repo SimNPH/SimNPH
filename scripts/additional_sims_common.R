@@ -9,8 +9,6 @@ my_analyse <- list(
   peto_peto = analyse_gehan_wilcoxon(alternative = "one.sided"),
   pw_exp_3  = analyse_piecewise_exponential(cuts=m2d(seq(3, 240, by= 3)), testing_only=TRUE),
   pw_exp_12 = analyse_piecewise_exponential(cuts=m2d(seq(12, 240, by=12)), testing_only=TRUE),
-  pw_exp_2_3 = analyse_piecewise_exponential(cuts=m2d(3), testing_only=TRUE),
-  pw_exp_2_12 = analyse_piecewise_exponential(cuts=m2d(12), testing_only=TRUE),
   # tests group sequential
   peto_peto_gs = analyse_group_sequential(
     followup = c(condition$interim_events, condition$final_events),
@@ -34,8 +32,6 @@ my_summarise <- create_summarise_function(
   peto_peto = summarise_test(alpha),
   pw_exp_3 = summarise_test(2*alpha),
   pw_exp_12 = summarise_test(2*alpha),
-  pw_exp_2_3 = summarise_test(2*alpha),
-  pw_exp_2_12 = summarise_test(2*alpha),
   # tests group sequential
   peto_peto_gs = summarise_group_sequential(),
   descriptive = summarise_describe()

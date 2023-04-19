@@ -57,9 +57,6 @@ source("scripts/additional_sims_common.R")
 save_folder <- "data/results/progression"
 dir.create(save_folder)
 
-seeds_folder <- paste0(save_folder, "/seeds")
-dir.create(seeds_folder)
-
 results <- runSimulation(
   design,
   replications = N_sim,
@@ -72,8 +69,7 @@ results <- runSimulation(
   save_seeds = TRUE,
 
   save_details = list(
-    out_rootdir = save_folder,
-    save_seeds_dirname = seeds_folder
+    out_rootdir = save_folder
   ),
   extra_options = list(
     store_warning_seeds = TRUE,
