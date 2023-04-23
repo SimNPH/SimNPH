@@ -42,6 +42,7 @@ tabulate_methods <- function(data){
 #' Generates a nested loop plot of simulation results
 #'
 #' Parameters selected for x-axis, rows, cols, and steps need to be such that together with filters all remaining scenarios uniquely identify a point on the y-axis.
+#' rel_logrank will plot the results relative to the logrank test, this requires that the corresponding y_parameter is available for the logrank test and practically is only sensible for plots of power
 #'
 #' @param data tibble with simulation results in long format
 #' @param methods methods for which operating characteristics should be plotted
@@ -51,6 +52,7 @@ tabulate_methods <- function(data){
 #' @param parameter_row parameter to define row facets
 #' @param parameter_col parameter to defin column facets
 #' @param parameters_steps parameters across which x-scale is looped
+#' @param rel_logrank should results be ploted relative to the logrank test (see Details)
 #' @param ... additional options to looplot
 #'
 #' @return
@@ -66,12 +68,19 @@ plot_sim_results <- function(data,
                                          "censoring_prop == 0"),
                              parameter_row = "effect_size_ph",
                              parameter_col = "n_pat_design",
-                             parameters_steps = NULL,...){
+                             parameters_steps = NULL,
+                             rel_logrank = FALSE,
+                             ...){
   ## Limit to interesting scenarios, take from shiny input
   filters = rlang::parse_exprs(filters)
   columns = c("method",parameter_x,parameter_y,parameter_row,parameter_col,parameters_steps)
   if(any((columns %in% names(data))==FALSE)){
     stop(paste("Column missing:",columns[which(!(columns %in% names(data)))]))
+  }
+  if(rel_logrank){
+    if(!'logrank' %in% methods){
+      stop("Error: cannot plot results relative to logrank in absence of logrank results")
+    }
   }
   plot_data <- filter(data,
          method %in% methods) |>
@@ -80,7 +89,11 @@ plot_sim_results <- function(data,
   y_base = min(plot_data[[parameter_y]])*.9
   y_height = diff(range(plot_data[[parameter_y]]))/11
   y_shift = 1.7*y_height
-  plot_data |> pivot_wider(names_from = "method",values_from = parameter_y) |>
+  plot_data <- plot_data |> pivot_wider(names_from = "method",values_from = parameter_y)
+  if(rel_logrank){
+    plot_data <- plot_data |> mutate(across(all_of(methods),~.x-logrank)) |> select(-logrank)
+  }
+  plot_data |>
     looplot::nested_loop_plot(x=parameter_x,
                               grid_rows=parameter_row,
                               grid_cols=parameter_col,
@@ -269,7 +282,7 @@ interactive_filters <- function(prefix,input=NULL) {
   } else {
     c("abs(hazard_ctrl - nph::m2r(12))<1e-6",
       "recruitment == 18",
-      "censoring_prop == 0.0")
+      "censoring_prop == 0.1")
   }
 }
 
@@ -299,3 +312,4 @@ input_trial_inputs <- function(prefix, default_mts = 12, default_recruitment = 1
   )
   return(panel)
 }
+

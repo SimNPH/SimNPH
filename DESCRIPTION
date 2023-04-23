@@ -30,7 +30,8 @@ Imports:
     nphRCT,
     Rcpp (>= 1.0.8),
     car,
-    withr
+    withr,
+    dplyr
 LinkingTo: Rcpp
 Config/testthat/edition: 3
 VignetteBuilder: knitr

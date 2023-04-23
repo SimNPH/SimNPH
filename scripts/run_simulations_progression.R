@@ -39,7 +39,7 @@ my_generator <- function(condition, fixed_objects=NULL){
     admin_censoring_events(condition$final_events)
 }
 
-alpha <- 0.05
+alpha <- 0.025
 nominal_alpha <- ldbounds::ldBounds(c(0.5,1))$nom.alpha
 
 clusterExport(cl, "nominal_alpha")
