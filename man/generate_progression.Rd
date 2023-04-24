@@ -29,7 +29,7 @@ hazard_before_progression_from_PH_effect_size(
   design,
   target_power_ph = NA_real_,
   final_events = NA_real_,
-  target_alpha = 0.05
+  target_alpha = 0.025
 )
 }
 \arguments{
