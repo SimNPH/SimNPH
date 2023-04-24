@@ -16,7 +16,7 @@ my_analyse <- list(
   weighted_cox_12m = analyse_coxph_weighted(type="G", max_time=m2d(12), alternative = "one.sided"),
   aft_weibull = analyse_aft(dist="weibull", alternative = "one.sided"),
   aft_lognormal = analyse_aft(dist="lognormal", alternative = "one.sided"),
-  diff_med_weibull = analyse_weibull(alternative = "two.sided"),
+  diff_med_weibull = analyse_weibull(alternative = "one.sided"),
   # tests
   pw_exp_3  = analyse_piecewise_exponential(cuts=m2d(seq(0, 240, by= 3)), testing_only=TRUE),
   pw_exp_12 = analyse_piecewise_exponential(cuts=m2d(seq(0, 240, by=12)), testing_only=TRUE),

@@ -3,7 +3,7 @@ library(SimNPH)
 library(SimDesign)
 library(parallel)
 
-if(packageVersion("SimNPH") != "0.2.0"){
+if(packageVersion("SimNPH") != "0.3.2"){
   stop("Please run the simulations with the correct vesion of the SimNPH package for reproducability.")
 }
 
@@ -29,7 +29,7 @@ clusterEvalQ(cl, {
 # setup data generation ---------------------------------------------------
 
 # load parameters
-design <- read.table("data/parameters/progression_os_2023-03-20.csv", sep=",", dec=".", header=TRUE)
+design <- read.table("data/parameters/progression_os_2023-04-24.csv", sep=",", dec=".", header=TRUE)
 
 # define generator
 my_generator <- function(condition, fixed_objects=NULL){
@@ -40,8 +40,7 @@ my_generator <- function(condition, fixed_objects=NULL){
 }
 
 alpha <- 0.025
-nominal_alpha <- ldbounds::ldBounds(c(0.5,1))$nom.alpha
-
+nominal_alpha <- ldbounds::ldBounds(c(0.5,1), sides=1, alpha = 0.025)$nom.alpha
 clusterExport(cl, "nominal_alpha")
 
 
