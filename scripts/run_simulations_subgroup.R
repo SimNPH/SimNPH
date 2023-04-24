@@ -3,7 +3,7 @@ library(SimNPH)
 library(SimDesign)
 library(parallel)
 
-if(packageVersion("SimNPH") != "0.3.1"){
+if(packageVersion("SimNPH") != "0.3.2"){
   stop("Please run the simulations with the correct vesion of the SimNPH package for reproducability.")
 }
 
