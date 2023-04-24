@@ -35,5 +35,5 @@ Imports:
 LinkingTo: Rcpp
 Config/testthat/edition: 3
 VignetteBuilder: knitr
-RoxygenNote: 7.2.0
+RoxygenNote: 7.2.3
 Roxygen: list(markdown = TRUE)
