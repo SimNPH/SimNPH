@@ -40,7 +40,7 @@ my_generator <- function(condition, fixed_objects=NULL){
 }
 
 alpha <- 0.025
-nominal_alpha <- ldbounds::ldBounds(c(0.5,1))$nom.alpha
+nominal_alpha <- ldbounds::ldBounds(c(0.5,1), sides=1, alpha = 0.025)$nom.alpha
 
 clusterExport(cl, "nominal_alpha")
 

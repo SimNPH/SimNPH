@@ -29,7 +29,7 @@ clusterEvalQ(cl, {
 # setup data generation ---------------------------------------------------
 
 # load parameters
-design <- read.table("data/parameters/subgroup_2023-03-29.csv", sep=",", dec=".", header=TRUE)
+design <- read.table("data/parameters/subgroup_2023-04-24.csv", sep=",", dec=".", header=TRUE)
 
 # define generator
 my_generator <- function(condition, fixed_objects=NULL){

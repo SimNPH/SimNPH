@@ -37,8 +37,8 @@ analyse_gehan_wilcoxon <- function(alternative="two.sided") {
                       one.sided = {
                         ifelse(
                           (model$obs - model$exp)[2] < 0,
-                          pchisq(model$chisq, df, lower.tail = FALSE),
-                          1 - pchisq(model$chisq, df, lower.tail = FALSE)
+                          pchisq(model$chisq, df, lower.tail = FALSE)/2,
+                          1
                         )
                       }
     )
