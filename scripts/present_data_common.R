@@ -1,49 +1,47 @@
 library(tidyverse)
 library(SimNPH)
 
-results_long <- results |>
-  results_pivot_longer()
 
 # metadata for methods ----------------------------------------------------
 
 metadata <- tibble::tribble(
-# method variable name      direction (one sided test)                                  name for output   estimator/test/gs-test
-  ~method,                 ~direction,                                                     ~method_name,                   ~type,
-  "ahr_6m",                   "lower",                                        "average hazard hatio 6m",             "estimator",
-  "ahr_12m",                  "lower",                                       "average hazard ratio 12m",             "estimator",
-  "gahr_6m",                  "lower",                              "geometric average hazard ratio 6m",             "estimator",
-  "gahr_12m",                 "lower",                             "geometric average hazard ratio 12m",             "estimator",
-  "median_surv",             "higher",                                  "difference in median survival",             "estimator",
-  "milestone.milestone_6",   "higher",                                    "milestone survival ratio 6m",             "estimator",
-  "milestone.milestone_12",  "higher",                                   "milestone survival ratio 12m",             "estimator",
-  "rmst_diff_6m",            "higher",                                           "RMST (6m) difference",             "estimator",
-  "rmst_diff_12m",           "higher",                                          "RMST (12m) difference",             "estimator",
-  "cox",                      "lower",                                                 "Cox regression",             "estimator",
-  "weighted_cox_6m",          "lower",                                     "weighted Cox regression 6m",             "estimator",
-  "weighted_cox_12m",         "lower",                                    "weighted Cox regression 12m",             "estimator",
-  "aft_weibull",             "higher",                                "AFT model, Weibull distribution",             "estimator",
-  "aft_lognormal",           "higher",                             "AFT model, log-normal distribution",             "estimator",
-  "diff_med_weibull",        "higher",             "difference in median survival based on Weibull glm",             "estimator",
-  "pw_exp_3",                      NA,                 "test bases on a piecewise exponential model 3m",                  "test",
-  "pw_exp_12",                     NA,                "test bases on a piecewise exponential model 12m",                  "test",
-  "peto_peto",                     NA,                                                 "Peto-Peto test",                  "test",
-  "fh_0_0",                        NA,                          "weighted logrank test, FH weights 0,1",                  "test",
-  "fh_0_1",                        NA,                          "weighted logrank test, FH weights 0,1",                  "test",
-  "fh_1_0",                        NA,                          "weighted logrank test, FH weights 0,1",                  "test",
-  "fh_1_1",                        NA,                          "weighted logrank test, FH weights 0,1",                  "test",
-  "logrank",                       NA,                                                   "logrank test",                  "test",
-  "max_combo",                     NA,                                                 "max-combo test",                  "test",
-  "modest_6",                      NA,                          "modestly weighted logrank test, t*=6m",                  "test",
-  "modest_8",                      NA,                          "modestly weighted logrank test, t*=8m",                  "test",
-  "peto_peto_gs",                  NA,                        "Peto-Peto test, group sequential design", "group sequential test",
-  "fh_gs_0_0",                     NA, "weighted logrank test, FH weights 0,1, group sequential design", "group sequential test",
-  "fh_gs_0_1",                     NA, "weighted logrank test, FH weights 0,1, group sequential design", "group sequential test",
-  "fh_gs_1_0",                     NA, "weighted logrank test, FH weights 0,1, group sequential design", "group sequential test",
-  "fh_gs_1_1",                     NA, "weighted logrank test, FH weights 0,1, group sequential design", "group sequential test",
-  "logrank_gs",                    NA,                          "logrank test, group sequential design", "group sequential test",
-  "max_combo_gs",                  NA,                        "max-combo test, group sequential design", "group sequential test",
-  "modest_gs_6",                   NA, "modestly weighted logrank test, t*=6m, group sequential design", "group sequential test",
-  "modest_gs_8",                   NA, "modestly weighted logrank test, t*=8m, group sequential design", "group sequential test",
+# method variable name      direction (one sided test)                                  name for output   estimator/test/gs-test  procedure category
+  ~method,                 ~direction,                                                     ~method_name,                   ~type,                        ~category,
+  "ahr_6m",                   "lower",                                        "average hazard hatio 6m",             "estimator",           "Average Hazard Ratio",
+  "ahr_12m",                  "lower",                                       "average hazard ratio 12m",             "estimator",           "Average Hazard Ratio",
+  "gahr_6m",                  "lower",                              "geometric average hazard ratio 6m",             "estimator", "Geometric Average Hazard Ratio",
+  "gahr_12m",                 "lower",                             "geometric average hazard ratio 12m",             "estimator", "Geometric Average Hazard Ratio",
+  "median_surv",             "higher",                                  "difference in median survival",             "estimator", "Diff. Median Survival",
+  "milestone.milestone_6",   "higher",                                    "milestone survival ratio 6m",             "estimator", "Ratio of Milestone Survival",
+  "milestone.milestone_12",  "higher",                                   "milestone survival ratio 12m",             "estimator", "Ratio of Milestone Survival",
+  "rmst_diff_6m",            "higher",                                           "RMST (6m) difference",             "estimator", "Diff. RMST",
+  "rmst_diff_12m",           "higher",                                          "RMST (12m) difference",             "estimator", "Diff. RMST",
+  "cox",                      "lower",                                                 "Cox regression",             "estimator", "Cox regression",
+  "weighted_cox_6m",          "lower",                                     "weighted Cox regression 6m",             "estimator", "Cox regression",
+  "weighted_cox_12m",         "lower",                                    "weighted Cox regression 12m",             "estimator", "Cox regression",
+  "aft_weibull",             "higher",                                "AFT model, Weibull distribution",             "estimator", "Accelerated Failure Time Model",
+  "aft_lognormal",           "higher",                             "AFT model, log-normal distribution",             "estimator", "Accelerated Failure Time Model",
+  "diff_med_weibull",        "higher",             "difference in median survival based on Weibull glm",             "estimator", "Diff. Median Survival",
+  "pw_exp_3",                      NA,                 "test bases on a piecewise exponential model 3m",                  "test", "Piece-wise Exponential Model",
+  "pw_exp_12",                     NA,                "test bases on a piecewise exponential model 12m",                  "test", "Piece-wise Exponential Model",
+  "peto_peto",                     NA,                                                 "Peto-Peto test",                  "test", "Peto-Peto Test",
+  "fh_0_0",                        NA,                          "weighted logrank test, FH weights 0,1",                  "test", "Fleming-Harrington Test",
+  "fh_0_1",                        NA,                          "weighted logrank test, FH weights 0,1",                  "test", "Fleming-Harrington Test",
+  "fh_1_0",                        NA,                          "weighted logrank test, FH weights 0,1",                  "test", "Fleming-Harrington Test",
+  "fh_1_1",                        NA,                          "weighted logrank test, FH weights 0,1",                  "test", "Fleming-Harrington Test",
+  "logrank",                       NA,                                                   "logrank test",                  "test", "Log-Rank Test",
+  "max_combo",                     NA,                                                 "max-combo test",                  "test", "Max-Combo Test",
+  "modest_6",                      NA,                          "modestly weighted logrank test, t*=6m",                  "test", "Modestly Weighted Test",
+  "modest_8",                      NA,                          "modestly weighted logrank test, t*=8m",                  "test", "Modestly Weighted Test",
+  "peto_peto_gs",                  NA,                        "Peto-Peto test, group sequential design", "group sequential test", "Fleming-Harrington Test",
+  "fh_gs_0_0",                     NA, "weighted logrank test, FH weights 0,1, group sequential design", "group sequential test", "Fleming-Harrington Test",
+  "fh_gs_0_1",                     NA, "weighted logrank test, FH weights 0,1, group sequential design", "group sequential test", "Fleming-Harrington Test",
+  "fh_gs_1_0",                     NA, "weighted logrank test, FH weights 0,1, group sequential design", "group sequential test", "Fleming-Harrington Test",
+  "fh_gs_1_1",                     NA, "weighted logrank test, FH weights 0,1, group sequential design", "group sequential test", "Fleming-Harrington Test",
+  "logrank_gs",                    NA,                          "logrank test, group sequential design", "group sequential test", "Log-Rank Test",
+  "max_combo_gs",                  NA,                        "max-combo test, group sequential design", "group sequential test", "Max-Combo Test",
+  "modest_gs_6",                   NA, "modestly weighted logrank test, t*=6m, group sequential design", "group sequential test", "Modestly Weighted Test",
+  "modest_gs_8",                   NA, "modestly weighted logrank test, t*=8m, group sequential design", "group sequential test", "Modestly Weighted Test"
 )
 
 # metadata for output columns ---------------------------------------------
@@ -146,47 +144,71 @@ col_labels <- tibble::tribble(
 
 # transform data ----------------------------------------------------------
 
-# sort those columsn first
-colnames_first <- col_labels |>
-  filter(from == "parameter") |>
-  pull(colname)
+## First transform to long format: Not run
+# results_long <- results |>
+#   results_pivot_longer()
 
-results_long <- results_long |>
-  left_join(metadata, by = "method") |> # add metadata
-  mutate(
-    # one sided test based on CI
-    ci_based_one_sided_rejection = case_when(
-      direction == "lower" ~ 1 - null_upper,
-      direction == "higher" ~ 1 - null_lower,
-      TRUE ~ NA_real_
-    ),
-    # combine columsn with different names acros estimators/tests/gs-tests
-    # coalesce: take first value, if it is missing take second value
-    mean_n_pat = coalesce(mean_n_pat, n_pat),
-    mean_n_evt = coalesce(mean_n_evt, n_evt),
-    sd_n_pat   = coalesce(sd_n_pat, sd_npat),
-    sd_n_evt   = coalesce(sd_n_evt, sd_nevt),
-    study_time = coalesce(study_time, descriptive.study_time),
-    followup   = coalesce(followup, descriptive.max_followup),
-    rejection  = coalesce(rejection, rejection_0.025),
-    rejection  = coalesce(rejection, ci_based_one_sided_rejection)
-  ) |>
-  select( # deselect columsn
-    -n_pat, -n_evt, -sd_npat, -sd_nevt, rejection_0.025
-  ) |>
-  select( # reorder columns
-    method_name, any_of(colnames_first), everything()
-  )
+#' Add metadata and column labels to simulation results
+#'
+#' This function adds metadata and column labels to a long-format results table.
+#'
+#' @param results_long A data frame containing the long-format results table.
+#' @param metadata A data frame containing the metadata to be added to the results table.
+#' @param col_labels A data frame containing the column labels to be added to the results table.
+#'
+#' @return A data frame with added metadata and column labels.
+#' @export
+#'
+
+#' @import dplyr
+#' @importFrom tidyr left_join
+#' @importFrom purrr imap
+#' @importFrom stringr str_c
+add_meta_data <- function(results_long,metadata,col_labels){
+  # sort those columsn first
+  colnames_first <- col_labels |>
+    filter(from == "parameter") |>
+    pull(colname)
+
+  results_long <- results_long |>
+    left_join(metadata, by = "method") |> # add metadata
+    mutate(
+      # one sided test based on CI
+      ci_based_one_sided_rejection = case_when(
+        direction == "lower" ~ 1 - null_upper,
+        direction == "higher" ~ 1 - null_lower,
+        TRUE ~ NA_real_
+      ),
+      # combine columsn with different names acros estimators/tests/gs-tests
+      # coalesce: take first value, if it is missing take second value
+      mean_n_pat = coalesce(mean_n_pat, n_pat),
+      mean_n_evt = coalesce(mean_n_evt, n_evt),
+      sd_n_pat   = coalesce(sd_n_pat, sd_npat),
+      sd_n_evt   = coalesce(sd_n_evt, sd_nevt),
+      study_time = coalesce(study_time, descriptive.study_time),
+      followup   = coalesce(followup, descriptive.max_followup),
+      rejection  = coalesce(rejection, rejection_0.025),
+      rejection  = coalesce(rejection, ci_based_one_sided_rejection)
+    ) |>
+    select( # deselect columsn
+      -n_pat, -n_evt, -sd_npat, -sd_nevt, rejection_0.025
+    ) |>
+    select( # reorder columns
+      method_name, any_of(colnames_first), everything()
+    )
 
 
-# add labels to columns (shown in rstudio viewer) -------------------------
+  # add labels to columns (shown in rstudio viewer) -------------------------
 
-results_long <- results_long |>
-  imap(\(x,i){
-    label <- col_labels |>
-      filter(colname==i) |>
-      pull(col_label)
-    attr(x, "label") <- label
-    x
-  }) |>
-  as_tibble()
+  results_long <- results_long |>
+    imap(\(x,i){
+      label <- col_labels |>
+        filter(colname==i) |>
+        pull(col_label)
+      attr(x, "label") <- label
+      x
+    }) |>
+    as_tibble()
+
+  return(results_long)
+}
