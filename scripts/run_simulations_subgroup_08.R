@@ -29,11 +29,16 @@ clusterEvalQ(cl, {
 # setup data generation ---------------------------------------------------
 
 # load parameters
-design <- read.table("data/parameters/crossing_hazards_2023-03-29.csv", sep=",", dec=".", header=TRUE)
+design <- read.table("data/parameters/subgroup_2023-04-24.csv", sep=",", dec=".", header=TRUE)
+
+design <- design |>
+  subset(
+    hr_subgroup_relative == 0.8
+  )
 
 # define generator
 my_generator <- function(condition, fixed_objects=NULL){
-  generate_crossing_hazards(condition, fixed_objects) |>
+  generate_subgroup(condition, fixed_objects) |>
     recruitment_uniform(condition$recruitment) |>
     random_censoring_exp(condition$random_withdrawal) |>
     admin_censoring_events(condition$final_events)
@@ -45,7 +50,6 @@ nominal_alpha <- ldbounds::ldBounds(c(0.5,1), sides=1, alpha = 0.025)$nom.alpha
 clusterExport(cl, "nominal_alpha")
 
 
-
 # define analysis and summarise functions ---------------------------------
 # this is the same for all scenarios
 
@@ -54,7 +58,7 @@ source("scripts/run_simulations_common.R")
 
 # run ---------------------------------------------------------------------
 
-save_folder <- paste0(paste0("data/simulation_crossing_hazards_", Sys.info()["nodename"], "_", strftime(Sys.time(), "%Y-%m-%d_%H%M%S")))
+save_folder <- paste0(paste0("data/simulation_subgroup_08_", Sys.info()["nodename"], "_", strftime(Sys.time(), "%Y-%m-%d_%H%M%S")))
 dir.create(save_folder)
 
 results <- runSimulation(

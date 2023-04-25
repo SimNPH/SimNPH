@@ -104,15 +104,93 @@ order_combine_xvars <- function(data, xvars, facet_vars=c(), height_x_axis=0.8, 
 #' @param scales passed on to facet_grid
 #' @param hlines position of horizontal lines, passed as `yintercept` to
 #'   `geom_hline`
+#' @param use_colours optional named vector of colours used in `scale_colour_manual`
+#' @param use_shapes optional named vector of shapes used in `scale_shape_manual`
 #'
 #' @return a ggplot/patchwork object conatining the plots
 #' @export
 #'
+#' @details `use_colours` and `use_shapes` both use the `method` variable in their respective aesthetics.
+#'
 #' @examples
 #' \dontrun{
-#'   results_long <- results_wide |>
-#'     results_pivot_longer()
-#'   combined_plot(results_long, c("logrank", "max_combo"), c("effect_size_ph", "delay", "hazard_ctrl", "n_pat_design", "recruitment", "censoring_prop"), "rejection_0.05", grid_level=2)
+#' # plot the rejection rate of two methods
+#' combined_plot(
+#'   results_long,
+#'   c("logrank", "max_combo"),
+#'   c("effect_size_ph", "delay", "hazard_ctrl", "n_pat_design", "recruitment", "censoring_prop"),
+#'   "rejection_0.025",
+#'   grid_level=2
+#' )
+#'
+#' # use custom colour and shape scales
+#' # this can be used to group methods by shape or colour
+#' # this is also helpful if methods should have the same aesthetics across plots
+#' my_colours <- c(
+#'   logrank="black",
+#'   max_combo="blue",
+#'   fh_1_0="green",
+#'   fh_0_1="red"
+#' )
+#'
+#' my_shapes <- c(
+#'   logrank=1,
+#'   max_combo=2,
+#'   fh_1_0=3,
+#'   fh_0_1=3
+#' )
+#'
+#' combined_plot(
+#'   results_long,
+#'   c("logrank", "max_combo", "fh_1_0", "fh_0_1"),
+#'   c("effect_size_ph", "delay", "hazard_ctrl", "n_pat_design", "recruitment", "censoring_prop"),
+#'   "rejection_0.025",
+#'   grid_level=2,
+#'   use_colours = my_colours,
+#'   use_shapes = my_shapes
+#' )
+#'
+#' combined_plot(
+#'   results_long,
+#'   c("logrank", "max_combo"),
+#'   c("effect_size_ph", "delay", "hazard_ctrl", "n_pat_design", "recruitment", "censoring_prop"),
+#'   "rejection_0.025",
+#'   grid_level=2,
+#'   use_colours = my_colours,
+#'   use_shapes = my_shapes
+#' )
+#'
+#' # if one has a dataset of metadata with categories of methods
+#' # one could uses those two definitions
+#' # colours for methods, same shapes for methods of same category
+#' my_colours <- ggplot2::scale_colour_discrete()$palette(n=nrow(metadata)) |>
+#'   sample() |>
+#'   setNames(metadata$method)
+#'
+#' my_shapes <- metadata$category |>
+#'   as.factor() |>
+#'   as.integer() |>
+#'   setNames(metadata$method)
+#'
+#'   combined_plot(
+#' results_long,
+#' c("logrank", "max_combo", "fh_1_0", "fh_0_1"),
+#' c("effect_size_ph", "delay", "hazard_ctrl", "n_pat_design", "recruitment", "censoring_prop"),
+#' "rejection_0.025",
+#' grid_level=2,
+#' use_colours = my_colours,
+#' use_shapes = my_shapes
+#' )
+#'
+#' combined_plot(
+#'   results_long,
+#'   c("logrank", "max_combo"),
+#'   c("effect_size_ph", "delay", "hazard_ctrl", "n_pat_design", "recruitment", "censoring_prop"),
+#'   "rejection_0.025",
+#'   grid_level=2,
+#'   use_colours = my_colours,
+#'   use_shapes = my_shapes
+#' )
 #' }
 combined_plot <- function(
     data,
@@ -125,7 +203,9 @@ combined_plot <- function(
     scale_stairs = 0.75,
     grid_level = 2,
     scales = "fixed",
-    hlines = numeric(0)
+    hlines = numeric(0),
+    use_colours = NULL,
+    use_shapes  = NULL
     ){
 
   if(!all(c("ggplot2", "patchwork") %in% .packages())){
@@ -171,8 +251,9 @@ combined_plot <- function(
       cols = vars(!!!facet_vars_x_sym)
     )
 
-  plot_1 <- ggplot(data, aes(x=x, y=!!yvar, group=method, colour=method)) +
+  plot_1 <- ggplot(data, aes(x=x, y=!!yvar, group=method, colour=method, shape=method)) +
     geom_line() +
+    geom_point () +
     scale_x_discrete(breaks = attr(data, "x_axis_breaks")) +
     theme(
       axis.text.x = element_blank(),
@@ -187,6 +268,50 @@ combined_plot <- function(
     ) +
     geom_hline(yintercept=hlines)
 
-  (plot_1 / plot_2) + plot_layout(heights=heights_plots)
+  if(!is.null(use_colours)){
+    plot_1 <- plot_1 +
+      scale_colour_manual(values=use_colours)
+  }
 
+  if(!is.null(use_shapes)){
+    plot_1 <- plot_1 +
+      scale_shape_manual(values=use_shapes)
+  }
+
+  (plot_1 / plot_2) + plot_layout(heights=heights_plots)
+}
+
+
+#' Add ggplot axis labels from labels attribute
+#'
+#' @param gg a ggplot object
+#'
+#' @return a ggplot object
+#' @export
+#'
+#' @examples
+#' test <- mtcars
+#' # add a label attribute
+#' attr(test$cyl, "label") <- "cylinders"
+#'
+#' # plot witht the variable names as axis titles
+#' gg1 <- ggplot(test, aes(x=wt, y=cyl)) +
+#'   geom_point()
+#' gg1
+#'
+#' # add labels where defined in the attribute
+#' gg2 <- ggplot(test, aes(x=wt, y=cyl)) +
+#'   geom_point()
+#'
+#' gg2 <- labs_from_labels(gg2)
+#' gg2
+labs_from_labels <- function(gg){
+  new_labels <- gg$mapping |>
+    purrr::map(rlang::as_name) |>
+    purrr::map(\(i){
+      attr(gg$data[[i]], "label")
+    }) |>
+    unlist()
+
+  gg + ggplot2::labs(!!!new_labels)
 }
