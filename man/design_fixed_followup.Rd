@@ -20,9 +20,9 @@ intended to be used to copy paste the code and edit the parameters.
 }
 \section{Functions}{
 \itemize{
-\item \code{design_fixed_followup}: generate default fixed design
-}}
+\item \code{design_fixed_followup()}: generate default fixed design
 
+}}
 \examples{
 Design <- design_fixed_followup()
 Design

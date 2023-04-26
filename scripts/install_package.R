@@ -1,6 +1,6 @@
 
-folder_name <- "sims_2"
-git_tag <- "sims_2"
+folder_name <- "sims_additional"
+git_tag <- "sims_additional"
 
 zip_name <- paste0(folder_name, ".zip")
 package_url <- paste0("https://github.com/SimNPH/SimNPH/archive/refs/tags/", git_tag, ".zip")

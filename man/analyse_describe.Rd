@@ -30,9 +30,9 @@ Create a Function for Descriptive Statistics of a Dataset
 }
 \section{Functions}{
 \itemize{
-\item \code{summarise_describe}: Summarise Descriptive Statistics
-}}
+\item \code{summarise_describe()}: Summarise Descriptive Statistics
 
+}}
 \examples{
 condition <- merge(
     assumptions_delayed_effect(),
