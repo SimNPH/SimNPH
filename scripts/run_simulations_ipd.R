@@ -2,7 +2,7 @@ library(SimNPH)
 library(SimDesign)
 library(parallel)
 
-N_sim <- 500
+N_sim <- 2500
 
 # Helper functions --------------------------------------------------------
 
