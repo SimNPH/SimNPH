@@ -132,19 +132,19 @@ hazard ratios that correspond to reasonable and realistic scenarios.
 }
 \section{Functions}{
 \itemize{
-\item \code{assumptions_progression}: generate default assumptions tibble
+\item \code{assumptions_progression()}: generate default assumptions tibble
 
-\item \code{generate_progression}: simulates a dataset with changing hazards after disease progression
+\item \code{generate_progression()}: simulates a dataset with changing hazards after disease progression
 
-\item \code{true_summary_statistics_progression}: calculate true summary statistics for scenarios with disease progression
+\item \code{true_summary_statistics_progression()}: calculate true summary statistics for scenarios with disease progression
 
-\item \code{progression_rate_from_progression_prop}: Calculate progression rate from proportion of patients who progress
+\item \code{progression_rate_from_progression_prop()}: Calculate progression rate from proportion of patients who progress
 
-\item \code{cen_rate_from_cen_prop_progression}: calculate censoring rate from censoring proportion
+\item \code{cen_rate_from_cen_prop_progression()}: calculate censoring rate from censoring proportion
 
-\item \code{hazard_before_progression_from_PH_effect_size}: Calculate hazard in the treatment arm before progression from PH effect size
+\item \code{hazard_before_progression_from_PH_effect_size()}: Calculate hazard in the treatment arm before progression from PH effect size
+
 }}
-
 \examples{
 Design <- assumptions_progression()
 Design

@@ -53,9 +53,9 @@ from an exact replication of the simulation results.
 }
 \section{Functions}{
 \itemize{
-\item \code{upsert_merge}: Update or add Rows and Columns
-}}
+\item \code{upsert_merge()}: Update or add Rows and Columns
 
+}}
 \examples{
 a <- data.frame(x=5:2, y=5:2, a=5:2)
 b <- data.frame(x=1:4, y=1:4+10, b=1:4*10)
