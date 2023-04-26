@@ -207,7 +207,7 @@ true_summary_statistics_subgroup <- function(Design, cutoff_stats=NULL, mileston
 #' @param design design data.frame
 #' @param target_power_ph target power under proportional hazards
 #' @param final_events target events for inversion of Schönfeld Formula, defaults to `condition$final_events`
-#' @param target_alpha target alpha level for the power calculation
+#' @param target_alpha target one-sided alpha level for the power calculation
 #'
 #' @return For hazard_subgroup_from_PH_effect_size: the design data.frame passed as
 #'   argument with the additional columns hazard_trt and hazard_subgroup.

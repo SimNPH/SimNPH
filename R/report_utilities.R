@@ -209,7 +209,8 @@ plot_nph_curves <- function(data, type) {
 
   # Determine t_max
   t_max <- if (hasName(data, "descriptive.max_followup")) {
-    data$descriptive.max_followup
+    ## data$descriptive.max_followup # - this leads to different x-axis ranges
+    log(100) / data$hazard_ctrl
   } else if (hasName(data, "hazard_ctrl")) {
     log(100) / data$hazard_ctrl
   } else {
