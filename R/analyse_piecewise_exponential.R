@@ -50,8 +50,8 @@ analyse_piecewise_exponential <- function(cuts, testing_only=FALSE){
         null_model <- glm(evt ~ interval-1+offset(log(t_interval)), data=dat3, family=poisson())
 
       } else {
-        model <- glm(evt ~ trt-1+offset(log(t_interval)), data=dat3, family=poisson())
-        null_model <- glm(evt ~ -1+offset(log(t_interval)), data=dat3, family=poisson())
+        model <- glm(evt ~ trt+offset(log(t_interval)), data=dat3, family=poisson())
+        null_model <- glm(evt ~ 1+offset(log(t_interval)), data=dat3, family=poisson())
       }
 
       overall_p_value <- anova(null_model, model, test="Chisq")[["Pr(>Chi)"]][2]

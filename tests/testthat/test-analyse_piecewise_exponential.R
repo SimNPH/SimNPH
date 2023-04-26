@@ -48,3 +48,16 @@ test_that("analyse_piecewise_exponential outputs plausible data.frame for delaye
 
   expect_named(res3, "p")
 })
+
+test_that("analyse_piecewise_exponential works if there's only events in one interval", {
+  testdata <- withr::with_seed(1, {
+    data.frame(
+      t = rexp(100, 0.1),
+      evt = TRUE,
+      trt = rep(c(0,1), each=50)
+    )
+  })
+
+  test_p_val <- analyse_piecewise_exponential(cuts=c(50, 100), testing_only = TRUE)(NA, testdata)$p
+  expect_gte(test_p_val, 0.5)
+})
