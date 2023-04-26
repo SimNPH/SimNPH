@@ -54,11 +54,11 @@ the analysis functions use random numbers.
 }
 \section{Functions}{
 \itemize{
-\item \code{wrap_all_in_trycatch}: Wrap all functions in a list in tryCatch calls
+\item \code{wrap_all_in_trycatch()}: Wrap all functions in a list in tryCatch calls
 
-\item \code{wrap_all_in_preserve_seed}: wrap all functions in \code{withr::with_preserve_seed}
+\item \code{wrap_all_in_preserve_seed()}: wrap all functions in \code{withr::with_preserve_seed}
+
 }}
-
 \examples{
 funs1 <- list(\(){stop("test")}, \(){1})
 funs2 <- wrap_all_in_trycatch(funs1)

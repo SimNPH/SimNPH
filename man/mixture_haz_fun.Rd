@@ -55,21 +55,21 @@ function relies on numeric root finding for each point.
 }
 \section{Functions}{
 \itemize{
-\item \code{mixture_haz_fun}: hazard function of mixture
+\item \code{mixture_haz_fun()}: hazard function of mixture
 
-\item \code{mixture_cumhaz_fun}: cumulative hazard function of mixture
+\item \code{mixture_cumhaz_fun()}: cumulative hazard function of mixture
 
-\item \code{mixture_cdf_fun}: cumulative density function of mixture
+\item \code{mixture_cdf_fun()}: cumulative density function of mixture
 
-\item \code{mixture_pdf_fun}: probability density function of mixture
+\item \code{mixture_pdf_fun()}: probability density function of mixture
 
-\item \code{mixture_surv_fun}: survival function of mixture
+\item \code{mixture_surv_fun()}: survival function of mixture
 
-\item \code{mixture_quant_fun}: quantile function of mixture
+\item \code{mixture_quant_fun()}: quantile function of mixture
 
-\item \code{mixture_rng_fun}: quantile function of mixture
+\item \code{mixture_rng_fun()}: quantile function of mixture
+
 }}
-
 \examples{
 haz <- mixture_haz_fun(
   p = c(0.3, 0.7),

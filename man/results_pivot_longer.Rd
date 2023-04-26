@@ -63,11 +63,11 @@ the simulation parameters.
 }
 \section{Functions}{
 \itemize{
-\item \code{results_pivot_longer}: pivot simulation results into long format
+\item \code{results_pivot_longer()}: pivot simulation results into long format
 
-\item \code{combined_plot}: Nested Loop Plot with optional Facets
+\item \code{combined_plot()}: Nested Loop Plot with optional Facets
+
 }}
-
 \examples{
 \dontrun{
   plot_data <- simulation_results |>

@@ -19,6 +19,6 @@ Plot a survival curve for a given set of parameters.
 }
 \examples{
 data <- data.frame(hazard_trt = 0.01, hazard_ctrl = 0.008, delay = 30, hazard_after_prog = 0.005, prog_rate_trt = 0.2, prog_rate_ctrl = 0.15, prevalence = 0.5)
-generate_survival_curve(data = data, type = 'delayed')
+plot_nph_curves(data = data, type = 'delay')
 
 }
