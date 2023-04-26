@@ -45,21 +45,21 @@ the last time interval extends to +Inf
 }
 \section{Functions}{
 \itemize{
-\item \code{fast_haz_fun}: fast hazard function
+\item \code{fast_haz_fun()}: fast hazard function
 
-\item \code{fast_cumhaz_fun}: fast cumulative hazard function
+\item \code{fast_cumhaz_fun()}: fast cumulative hazard function
 
-\item \code{fast_cdf_fun}: fast cumulative density function function
+\item \code{fast_cdf_fun()}: fast cumulative density function function
 
-\item \code{fast_pdf_fun}: fast probability density function
+\item \code{fast_pdf_fun()}: fast probability density function
 
-\item \code{fast_surv_fun}: fast survival function
+\item \code{fast_surv_fun()}: fast survival function
 
-\item \code{fast_quant_fun}: fast quantile function
+\item \code{fast_quant_fun()}: fast quantile function
 
-\item \code{fast_rng_fun}: fast random numbers from survival distribution
+\item \code{fast_rng_fun()}: fast random numbers from survival distribution
+
 }}
-
 \examples{
 haz <- fast_haz_fun(c(0, 10, 20), c(10, 15, 7))
 haz(seq(0, 30, by=0.1))
