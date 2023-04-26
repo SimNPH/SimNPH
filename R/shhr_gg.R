@@ -31,8 +31,8 @@ shhr_gg <- function(A, B, main=NULL, sub=NULL, group_names=c("control", "treatme
   plotdata$hr <- plotdata$haz_b / plotdata$haz_a
 
   gg_surv <- ggplot(plotdata, aes(x=t)) +
-    geom_line(aes(y=surv_a, colour=group_names[1], lty=group_names[1]), size=1.3) +
-    geom_line(aes(y=surv_b, colour=group_names[2], lty=group_names[2]), size=1.3) +
+    geom_line(aes(y=surv_a, colour=group_names[1], lty=group_names[1]), linewidth=1.3) +
+    geom_line(aes(y=surv_b, colour=group_names[2], lty=group_names[2]), linewidth=1.3) +
     labs(
       x=lab_time,
       y="Survival",
@@ -44,8 +44,8 @@ shhr_gg <- function(A, B, main=NULL, sub=NULL, group_names=c("control", "treatme
     )
 
   gg_haz <- ggplot(plotdata, aes(x=t)) +
-    geom_line(aes(y=haz_a, colour=group_names[1], lty=group_names[1]), size=1.3) +
-    geom_line(aes(y=haz_b, colour=group_names[2], lty=group_names[2]), size=1.3) +
+    geom_line(aes(y=haz_a, colour=group_names[1], lty=group_names[1]), linewidth=1.3) +
+    geom_line(aes(y=haz_b, colour=group_names[2], lty=group_names[2]), linewidth=1.3) +
     labs(
       x=lab_time,
       y="Hazard",
@@ -56,7 +56,7 @@ shhr_gg <- function(A, B, main=NULL, sub=NULL, group_names=c("control", "treatme
 
 
   gg_hr <- ggplot(plotdata, aes(x=t, y=hr)) +
-    geom_line(size=1.3) +
+    geom_line(linewidth=1.3) +
     labs(
       x=lab_time,
       y="Hazard ratio"
