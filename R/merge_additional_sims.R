@@ -63,6 +63,9 @@ merge_additional_results <- function(old, new, design_names=NULL, descriptive_re
     design_names <- intersect(attr(old, "design_names")$design, attr(new, "design_names")$design)
   }
 
+  design_names <- intersect(design_names, names(old))
+  design_names <- intersect(design_names, names(new))
+
   if(!is.null(descriptive_regex)){
     compare_old <- old |>
       dplyr::semi_join(new, by=design_names) |>
