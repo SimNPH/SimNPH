@@ -22,7 +22,7 @@ clusterEvalQ(cl, {
 })
 
 
-# setup data generation ---------------------------------------------------
+# ipd, assumptions, etc. --------------------------------------------------
 
 # files for IPD
 ipd_files <- data.frame(
@@ -66,8 +66,6 @@ assumptions <- data.frame(
   null = c(TRUE, FALSE)
 )
 
-# TODO: add options (sample size, recruitment, admininstrative censoring)?
-
 design <- merge(
   ipd_files,
   assumptions,
@@ -82,27 +80,50 @@ ipd_data <- lapply(split(ipd_files, 1:nrow(ipd_files)), \(i){
   all_patients
 })
 names(ipd_data) <- ipd_files$name
+
+
+# scale ipd data to days
+# weeks
+ipd_data[[1]]$t <- ipd_data[[1]]$t * 7
+# months
+ipd_data[[2]]$t <- m2d(ipd_data[[2]]$t)
+# months
+ipd_data[[3]]$t <- m2d(ipd_data[[3]]$t)
+
 # distribute data to all cluster nodes
 clusterExport(cl, "ipd_data")
+
+
+# data generation for "true" summary statistics ---------------------------
+# this data generator only takes one sample from the ipd datasets
+# to calculate the values of the summary statistics in the original data
 
 # define generator
 my_generator <- function(condition, fixed_objects=NULL){
   # select dataset according to column in condition
   tmp_data <- ipd_data[[condition$name]]
   N <- nrow(tmp_data)
-
-  # under the null modify the dataset:
-  #   sample only from control
-  #   sample treatment from full dataset
+  ntrt=sum(tmp_data$trt)
+  nc=N-ntrt
+  # under the null:  sample both groups from control
+  # under the alternative: sample trt from trt and control from control
   if(condition$null){
-    tmp_trt <- tmp_data$trt
-    tmp_data <- tmp_data[tmp_data$trt == 0, ]
-    tmp_data$trt <- sample(tmp_trt, nrow(tmp_data), replace=TRUE)
+    c_data <- tmp_data[tmp_data$trt == 0, ]
+    boot_data=rbind(c_data,c_data)
+    boot_data$trt=c(rep(0,nc),rep(1,ntrt))
   }
-
+  else
+  {
+    c_data <- tmp_data[tmp_data$trt == 0, ]
+    trt_data <- tmp_data[tmp_data$trt == 1, ]
+    boot_c_data=c_data
+    boot_trt_data=trt_data
+    boot_data=rbind(boot_c_data,boot_trt_data)
+  }
   # return a sample of the same size as the original dataset
-  tmp_data#[sample(1:nrow(tmp_data), N, replace = TRUE), ]
+  return(boot_data)
 }
+
 
 alpha <- 0.025
 nominal_alpha <- ldbounds::ldBounds(c(0.5,1), sides=1, alpha = 0.025)$nom.alpha
@@ -113,9 +134,9 @@ clusterExport(cl, "nominal_alpha")
 # define analysis and summarise functions ---------------------------------
 # this is the same for all scenarios
 
-source("scripts/run_simulations_common_ipd.R")
+source("scripts/run_simulations_common.R")
 
-# run ---------------------------------------------------------------------
+# run with only one replication -------------------------------------------
 
 ## we first run this with one replacition and no resampling to obtain "true" statistics which correspond to the estimates of the original data
 save_folder <- paste0(paste0("data/simulation_ipd_", Sys.info()["nodename"], "_", strftime(Sys.time(), "%Y-%m-%d_%H%M%S")))
@@ -138,8 +159,8 @@ results <- runSimulation(
   )
 )
 
-## we update the design (for now)
 
+# update the design with "true" summary statistics ------------------------
 design_true <- results |>
   mutate(AHR_6m = ahr_6m.mean_est,
          AHR_12m = ahr_12m.mean_est,
@@ -150,34 +171,44 @@ design_true <- results |>
          milestone_survival_ratio_12m = milestone_12m.mean_est,
          rmst_diff_6m = rmst_diff_6m.mean_est,
          rmst_diff_12m = rmst_diff_12m.mean_est
-         )
+  )
 
 
 design_sim <-  design_true[names(design)]
 ## To assess the bias we could also just compute the differences (and change analyse/summarise functions accordingly)
+
+
+# data generation for actual bootstrap ------------------------------------
 
 # define generator
 my_generator_sim <- function(condition, fixed_objects=NULL){
   # select dataset according to column in condition
   tmp_data <- ipd_data[[condition$name]]
   N <- nrow(tmp_data)
-
-  # under the null modify the dataset:
-  #   sample only from control
-  #   sample treatment from full dataset
+  ntrt=sum(tmp_data$trt)
+  nc=N-ntrt
+  # under the null:  sample both groups from control
+  # under the alternative: sample trt from trt and control from control
   if(condition$null){
-    tmp_trt <- tmp_data$trt
-    tmp_data <- tmp_data[tmp_data$trt == 0, ]
-    tmp_data$trt <- sample(tmp_trt, nrow(tmp_data), replace=TRUE)
+    c_data <- tmp_data[tmp_data$trt == 0, ]
+    boot_data=c_data[sample(nc, N, replace=TRUE),]
+    boot_data$trt=c(rep(0,nc),rep(1,ntrt))
   }
-
+  else
+  {
+    c_data <- tmp_data[tmp_data$trt == 0, ]
+    trt_data <- tmp_data[tmp_data$trt == 1, ]
+    boot_c_data=c_data[sample(nc, nc, replace=TRUE),]
+    boot_trt_data=trt_data[sample(ntrt, ntrt, replace=TRUE),]
+    boot_data=rbind(boot_c_data,boot_trt_data)
+  }
   # return a sample of the same size as the original dataset
-  tmp_data[sample(1:nrow(tmp_data), N, replace = TRUE), ]
+  return(boot_data)
 }
 
-# run ---------------------------------------------------------------------
 
 
+# run bootstrap -----------------------------------------------------------
 ## now we run it with N_sim replications and actual resampling
 
 results <- runSimulation(
@@ -197,20 +228,4 @@ results <- runSimulation(
   )
 )
 
-
-
-
 saveRDS(results, paste0(save_folder, "/results.Rds"))
-
-## For testing purposes
-
-# analyse_ahr(type="AHR", max_time=m2d(6), alternative = "one.sided")(design,ipd_data[[1]])
-# dat <- ipd_data[[1]]
-# nph::nphparams(dat$t,
-#                dat$evt,
-#                dat$trt,
-#                param_type=c("Q"),
-#                param_par=c(0.4))
-# my_analyse[[1]](design[1,],ipd_data[[1]])
-#
-#
