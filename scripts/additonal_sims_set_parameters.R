@@ -35,22 +35,22 @@ update_parameters_with_seed <- function(old_result_filename, add_summary_stats =
 
 new_parameters_delayed <- update_parameters_with_seed(
   "data/results/results_martin_2023-04/data/simulation_delayed_effect_ims-node2_2023-04-05_151719/results.Rds",
-  partial(true_summary_statistics_delayed_effect, cutoff_stats=m2d(360))
+  partial(true_summary_statistics_delayed_effect, cutoff_stats=m2d(c("360m"=360)))
 )
 
 new_parameters_crossing <- update_parameters_with_seed(
   "data/results/results_martin_2023-04/data/simulation_crossing_hazards_ims-node3_2023-04-05_151749/results.Rds",
-  partial(true_summary_statistics_crossing_hazards, cutoff_stats=m2d(360))
+  partial(true_summary_statistics_crossing_hazards, cutoff_stats=m2d(c("360m"=360)))
 )
 
 new_parameters_subgroup <- update_parameters_with_seed(
   "data/results/results_martin_2023-04/data/simulation_subgroup_ims-node5_2023-04-05_151813/results.Rds",
-  partial(true_summary_statistics_subgroup, cutoff_stats=m2d(360))
+  partial(true_summary_statistics_subgroup, cutoff_stats=m2d(("360m"=360)))
 )
 
 new_parameters_progression <- update_parameters_with_seed(
   "data/results/results_martin_2023-04/data/simulation_progression_ims-node1_2023-04-05_151339/results.Rds",
-  partial(true_summary_statistics_progression, cutoff_stats=m2d(360))
+  partial(true_summary_statistics_progression, cutoff_stats=m2d(("360m"=360)))
 )
 
 # save --------------------------------------------------------------------
