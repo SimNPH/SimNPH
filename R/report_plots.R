@@ -217,6 +217,19 @@ combined_plot <- function(
   xvars <- syms(xvars)
   yvar  <- sym(yvar)
 
+  # remove facets in which all y values are empty
+  # dont remove empty y-values in facets where there are some y-values
+  # (so gaps in lines remain gaps in each facet and only completely facets are
+  # dropped)
+  data <- data |>
+    ungroup() |>
+    group_by(!!!facet_vars_x_sym) |>
+    filter(!all(is.na(!!yvar))) |>
+    ungroup() |>
+    group_by(!!!facet_vars_y_sym) |>
+    filter(!all(is.na(!!yvar))) |>
+    ungroup()
+
   data <- data |>
     filter(method %in% methods) |>
     order_combine_xvars(xvars, facet_vars=facet_x_vars, height_x_axis=scale_stairs, grid_level=grid_level)
