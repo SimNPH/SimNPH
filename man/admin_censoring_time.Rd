@@ -77,13 +77,13 @@ the observed times as followup. "warn" does the same but gives a warning.
 }
 \section{Functions}{
 \itemize{
-\item \code{recruitment_uniform}: add recruitment time
+\item \code{recruitment_uniform()}: add recruitment time
 
-\item \code{admin_censoring_time}: apply administrative censoring after fixed time
+\item \code{admin_censoring_time()}: apply administrative censoring after fixed time
 
-\item \code{admin_censoring_events}: apply administrative censoring after fixed number of events
+\item \code{admin_censoring_events()}: apply administrative censoring after fixed number of events
+
 }}
-
 \examples{
 dat <- data.frame(t=c(0, 1, 2), trt=c(FALSE, FALSE, TRUE))
 recruitment_uniform(dat, 7, 0)

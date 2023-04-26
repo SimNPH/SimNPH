@@ -239,7 +239,7 @@ true_summary_statistics_subgroup <- function(Design, cutoff_stats=NULL, mileston
 #' my_design$hr_subgroup_relative <- 0.9
 #' my_design <- hazard_subgroup_from_PH_effect_size(my_design, target_power_ph=0.9)
 #' my_design
-hazard_subgroup_from_PH_effect_size <- function(design, target_power_ph=NA_real_, final_events=NA_real_, target_alpha=0.05){
+hazard_subgroup_from_PH_effect_size <- function(design, target_power_ph=NA_real_, final_events=NA_real_, target_alpha=0.025){
 
   get_hr_after <- function(condition, target_power_ph=NA_real_, final_events=NA_real_){
 

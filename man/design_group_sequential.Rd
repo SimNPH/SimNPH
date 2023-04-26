@@ -20,9 +20,9 @@ intended to be used to copy paste the code and edit the parameters.
 }
 \section{Functions}{
 \itemize{
-\item \code{design_group_sequential}: generate default group sequential desing
-}}
+\item \code{design_group_sequential()}: generate default group sequential desing
 
+}}
 \examples{
 Design <- design_group_sequential()
 Design
