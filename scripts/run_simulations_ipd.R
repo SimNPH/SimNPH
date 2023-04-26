@@ -110,7 +110,7 @@ my_generator <- function(condition, fixed_objects=NULL){
   if(condition$null){
     c_data <- tmp_data[tmp_data$trt == 0, ]
     boot_data=rbind(c_data,c_data)
-    boot_data$trt=c(rep(0,nc),rep(1,ntrt))
+    boot_data$trt=c(rep(0,nc),rep(1,nc))
   }
   else
   {
@@ -162,7 +162,7 @@ results <- runSimulation(
 
 # update the design with "true" summary statistics ------------------------
 design_true <- results |>
-  mutate(AHR_6m = ahr_6m.mean_est,
+  dplyr::mutate(AHR_6m = ahr_6m.mean_est,
          AHR_12m = ahr_12m.mean_est,
          gAHR_6m = gahr_6m.mean_est,
          gAHR_12m = gahr_12m.mean_est,
