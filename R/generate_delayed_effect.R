@@ -107,7 +107,7 @@ invisible(
 #' @param target_power_ph target power under proportional hazards
 #' @param final_events target events for inversion of Schönfeld Formula
 #' defaults to `condition$final_events`
-#' @param target_alpha target alpha level for the power calculation
+#' @param target_alpha target one-sided alpha level for the power calculation
 #'
 #' @return For hr_after_onset_from_PH_effect_size: the design data.frame passed as
 #'   argument with the additional column hazard_trt.
