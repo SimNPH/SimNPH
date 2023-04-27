@@ -245,7 +245,7 @@ combined_plot <- function(
     geom_text(
       data=attr(data, "x_labels"),
       mapping=aes(y=level-1, label=str_c("  ", label)),
-      x = 0,
+      x = 0.5,
       hjust = 0,
       vjust = 1,
       size = 2.84527559055118 # ggplot:::.pt
