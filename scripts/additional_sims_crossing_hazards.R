@@ -7,10 +7,6 @@ if(packageVersion("SimNPH") != "0.3.2"){
   stop("Please run the simulations with the correct vesion of the SimNPH package for reproducability.")
 }
 
-if(Sys.info()["nodename"] != "ims-node3"){
-  stop("Please run the simulations on the same nodes as the original ones to ensure reproduction of the simulated datasets")
-}
-
 N_sim <- 2500
 
 # Helper functions --------------------------------------------------------
@@ -66,8 +62,6 @@ results <- runSimulation(
   seed = design$old_seed,
   cl = cl,
   parallel = TRUE,
-  save_seeds = TRUE,
-
   save_details = list(
     out_rootdir = save_folder
   ),

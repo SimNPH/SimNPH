@@ -7,10 +7,6 @@ if(packageVersion("SimNPH") != "0.3.2"){
   stop("Please run the simulations with the correct vesion of the SimNPH package for reproducability.")
 }
 
-if(Sys.info()["nodename"] != "ims-node2"){
-  stop("Please run the simulations on the same nodes as the original ones to ensure reproduction of the simulated datasets")
-}
-
 N_sim <- 2500
 
 # Helper functions --------------------------------------------------------
@@ -33,7 +29,7 @@ clusterEvalQ(cl, {
 # setup data generation ---------------------------------------------------
 
 # load parameters
-design <- read.table("data/parameters/additional_delayed_2023-04-19.csv", sep=",", dec=".", header=TRUE)
+design <- read.table("data/parameters/additional_delayed_2023-04-26.csv", sep=",", dec=".", header=TRUE)
 
 # define generator
 my_generator <- function(condition, fixed_objects=NULL){
@@ -66,7 +62,6 @@ results <- runSimulation(
   seed = design$old_seed,
   cl = cl,
   parallel = TRUE,
-  save_seeds = TRUE,
   save_details = list(
     out_rootdir = save_folder
   ),
