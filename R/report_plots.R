@@ -49,10 +49,10 @@ results_pivot_longer <- function(data, exclude_from_methods=c("descriptive")){
 }
 
 order_combine_xvars <- function(data, xvars, facet_vars=c(), height_x_axis=0.8, grid_level=2){
+
   result <- data |>
-    complete(!!!xvars, method) |>
     arrange(!!!xvars) |>
-    unite(x, !!!xvars, remove=FALSE,na.rm=T) |>
+    unite(x, !!!xvars, remove=FALSE, na.rm=T) |>
     mutate(
       x = fct_inorder(x)
     )
@@ -217,6 +217,9 @@ combined_plot <- function(
   xvars <- syms(xvars)
   yvar  <- sym(yvar)
 
+  data <- data |>
+    filter(method %in% methods)
+
   # remove facets in which all y values are empty
   # dont remove empty y-values in facets where there are some y-values
   # (so gaps in lines remain gaps in each facet and only completely facets are
@@ -231,7 +234,6 @@ combined_plot <- function(
     ungroup()
 
   data <- data |>
-    filter(method %in% methods) |>
     order_combine_xvars(xvars, facet_vars=facet_x_vars, height_x_axis=scale_stairs, grid_level=grid_level)
 
 
