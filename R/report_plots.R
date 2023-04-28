@@ -52,7 +52,7 @@ order_combine_xvars <- function(data, xvars, facet_vars=c(), height_x_axis=0.8, 
 
   result <- data |>
     arrange(!!!xvars) |>
-    unite(x, !!!xvars, remove=FALSE, na.rm=T) |>
+    unite(x, !!!xvars, remove=FALSE) |>
     mutate(
       x = fct_inorder(x)
     )
@@ -231,6 +231,14 @@ combined_plot <- function(
     ungroup() |>
     group_by(!!!facet_vars_y_sym) |>
     filter(!all(is.na(!!yvar))) |>
+    ungroup()
+
+  len_x <- length(xvars)
+  lastvar <- xvars[[len_x]]
+  data <- data |>
+    group_by(method,!!!facet_vars_x_sym,!!!facet_vars_y_sym,!!!xvars[-len_x]) |>
+    group_modify(~add_row(.x,.before = 1)) |>
+    mutate(!!lastvar := ifelse(is.na(!!yvar),!!lastvar + .0,!!lastvar)) |>
     ungroup()
 
   data <- data |>
