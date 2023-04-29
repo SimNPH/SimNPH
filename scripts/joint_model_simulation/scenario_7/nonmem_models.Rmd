@@ -1,0 +1,38 @@
+---
+title: "Generate NONMEM datasets"
+output: html_document
+date: "2023-02-17"
+---
+
+```{r}
+
+library(RNMImport)
+
+
+```
+
+```{r}
+mod1 <- importNmMod("run1.mod")
+```
+```{r}
+####Generating 2500 copies of model file with name changes to data input file name ###"small_dataset(i).csv" and table output file name "simtab(i).csv"
+
+Raw_mod<-mod1$Raw
+
+Raw_mod
+for(i in 1:2500){
+  Raw_mod[5] <- paste("$DATA      small_dataset",i,".csv IGNORE=@", sep = '') 
+  Raw_mod[230] <- paste("\"   OPEN (99, FILE = 'simtab",i,".dat', POSITION='APPEND')", sep='')
+  Raw_mod[296] <- paste("-2.41 ; GROUP 1=1,GROUP 2 =0"  , sep='' )
+  Raw_mod[297] <- paste("-0.265 ; concentration in effect compartment"  , sep='' )
+  Raw_mod[309] <- paste("$SIMULATION (7",i,") (3",i," UNIFORM) (1",i," UNIFORM) ONLYSIM NSUB=1 ;", sep='' )
+ 
+ 
+ output_file<-file(paste('run',i,'.mod',sep=''))
+ 
+ write(assign(paste0("Raw_mod", i), Raw_mod), output_file )
+}
+
+
+```
+
