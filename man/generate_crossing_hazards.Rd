@@ -39,7 +39,7 @@ true_summary_statistics_crossing_hazards(
 
 \item{final_events}{target events for inversion of Schönfeld Formula, defaults to \code{condition$final_events}}
 
-\item{target_alpha}{target alpha level for the power calculation}
+\item{target_alpha}{target one-sided alpha level for the power calculation}
 
 \item{Design}{Design data.frame for crossing hazards}
 

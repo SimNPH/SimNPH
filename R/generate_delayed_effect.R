@@ -360,9 +360,8 @@ true_summary_statistics_delayed_effect <- function(Design, cutoff_stats=NULL, mi
 
   Design <- Design |>
     split(1:nrow(Design)) |>
-    lapply(true_summary_statistics_delayed_effect_rowwise, milestones=milestones, cutoff_stats=cutoff_stats)
-
-  Design <- do.call(rbind, Design)
+    purrr::map(true_summary_statistics_delayed_effect_rowwise, cutoff_stats = cutoff_stats, milestones=milestones, .progress = TRUE) |>
+    do.call(what=rbind)
 
   Design
 }

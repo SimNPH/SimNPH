@@ -45,7 +45,7 @@ cen_rate_from_cen_prop_subgroup(design)
 
 \item{final_events}{target events for inversion of Schönfeld Formula, defaults to \code{condition$final_events}}
 
-\item{target_alpha}{target alpha level for the power calculation}
+\item{target_alpha}{target one-sided alpha level for the power calculation}
 }
 \value{
 For generate_subgroup: A dataset with the columns t (time) and trt

@@ -371,9 +371,8 @@ true_summary_statistics_crossing_hazards <- function(Design, cutoff_stats=NULL, 
 
   Design <- Design |>
     split(1:nrow(Design)) |>
-    lapply(true_summary_statistics_crossing_hazards_rowwise, cutoff_stats = cutoff_stats, milestones=milestones)
-
-  Design <- do.call(rbind, Design)
+    purrr::map(true_summary_statistics_crossing_hazards_rowwise, cutoff_stats = cutoff_stats, milestones=milestones, .progress = TRUE) |>
+  do.call(what=rbind)
 
   Design
 }
