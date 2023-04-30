@@ -98,9 +98,10 @@ order_combine_xvars <- function(data, xvars, facet_vars=c(), height_x_axis=0.8, 
 #' @param yvar variable name of the variable to be displayed on the y axis (metric)
 #' @param facet_x_vars vector of variable names to create columns of facets
 #' @param facet_y_vars vector of variable names to create rows of facets
+#' @param split_var index of xvars along groups of which the plot should be split
 #' @param heights_plots relative heights of the main plot and the stairs on the bottom
 #' @param scale_stairs height of the stairs for each variable between 0 and 1
-#' @param grid_level depht of loops for which the grid-lines are drawn
+#' @param grid_level depth of loops for which the grid-lines are drawn
 #' @param scales passed on to facet_grid
 #' @param hlines position of horizontal lines, passed as `yintercept` to
 #'   `geom_hline`
@@ -199,6 +200,7 @@ combined_plot <- function(
     yvar,
     facet_x_vars=c(),
     facet_y_vars=c(),
+    split_var = 1,
     heights_plots = c(3,1),
     scale_stairs = 0.75,
     grid_level = 2,
@@ -233,13 +235,20 @@ combined_plot <- function(
     filter(!all(is.na(!!yvar))) |>
     ungroup()
 
+  ## split lines
+
   len_x <- length(xvars)
-  lastvar <- xvars[[len_x]]
-  data <- data |>
-    group_by(method,!!!facet_vars_x_sym,!!!facet_vars_y_sym,!!!xvars[-len_x]) |>
-    group_modify(~add_row(.x,.before = 1)) |>
-    mutate(!!lastvar := ifelse(is.na(!!yvar),!!lastvar + .0,!!lastvar)) |>
-    ungroup()
+  if(len_x > 1){
+    lastvar <- xvars[[len_x]]
+    splitvar <- xvars[[split_var]]
+    data <- data |>
+      group_by(method,!!!facet_vars_y_sym,!!!facet_vars_x_sym,!!splitvar) |>
+      group_modify(~add_row(.x,.before = 1)) |>
+      #    mutate(!!lastvar := ifelse(is.na(!!yvar),!!lastvar + .0,!!lastvar)) |>
+      fill(!!!xvars[-split_var],.direction='up') |>
+      ungroup()
+  }
+
 
   data <- data |>
     order_combine_xvars(xvars, facet_vars=facet_x_vars, height_x_axis=scale_stairs, grid_level=grid_level)
@@ -277,7 +286,7 @@ combined_plot <- function(
 
   plot_1 <- ggplot(data, aes(x=x, y=!!yvar, group=method, colour=method, shape=method)) +
     geom_line() +
-    geom_point () +
+    geom_point(size=4) +
     scale_x_discrete(breaks = attr(data, "x_axis_breaks")) +
     theme(
       axis.text.x = element_blank(),
