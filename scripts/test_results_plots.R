@@ -65,12 +65,12 @@ results_progression |>
                    split_var = 1)
 
 results_crossing |>
-  plot_sim_results(methods = c('logrank','cox','peto_peto','fh_0_1',"fh_1_1"),
+  plot_sim_results(methods = methods_ci_power,
                    parameter_x = c('hr_before','crossing'),
                    parameter_y = 'rejection')
 
 results_delay |>
-  plot_sim_results(methods = c('logrank','cox','peto_peto','fh_0_1',"fh_1_1"),
+  plot_sim_results(methods = methods_ci_power,
                    parameter_x = c('delay'),
                    parameter_y = 'rejection')
 
