@@ -167,3 +167,12 @@ results <- runSimulation(
 )
 
 
+results$gAHR_12m
+results$AHR_12m
+results$AHRoc_12m
+results$AHRoc_robust_12m
+
+results$gAHR_360m
+results$AHR_360m
+results$AHRoc_360m
+results$AHRoc_robust_360m
