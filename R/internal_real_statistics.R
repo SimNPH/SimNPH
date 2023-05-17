@@ -130,7 +130,8 @@ fast_real_statistics <- function(
             integrate(\(t){f(t) }, 0, cutoff, stop.on.error = FALSE)$value
           ),
         AHR = integrate(\(t){(haz_trt(t)/h(t)) * f(t) }, 0, cutoff, stop.on.error = FALSE)$value /
-          integrate(\(t){(haz_ctrl(t)/h(t)) * f(t)}, 0, cutoff, stop.on.error = FALSE)$value
+          integrate(\(t){(haz_ctrl(t)/h(t)) * f(t)}, 0, cutoff, stop.on.error = FALSE)$value,
+        AHRoc = 1
       )
 
       names(tmp) <- paste0(names(tmp), "_", label)
