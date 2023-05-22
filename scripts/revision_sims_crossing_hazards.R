@@ -1,3 +1,4 @@
+
 library(SimNPH)
 library(SimDesign)
 library(parallel)
@@ -28,11 +29,11 @@ clusterEvalQ(cl, {
 # setup data generation ---------------------------------------------------
 
 # load parameters
-design <- read.table("data/parameters/revision_delayed_effect_2023-05-22.csv", sep=",", dec=".", header=TRUE)
+design <- read.table("data/parameters/revision_crossing_hazards_2023-05-22.csv", sep=",", dec=".", header=TRUE)
 
 # define generator
 my_generator <- function(condition, fixed_objects=NULL){
-  generate_delayed_effect(condition, fixed_objects) |>
+  generate_crossing_hazards(condition, fixed_objects) |>
     recruitment_uniform(condition$recruitment) |>
     random_censoring_exp(condition$random_withdrawal) |>
     admin_censoring_events(condition$final_events)
@@ -44,8 +45,12 @@ nominal_alpha <- ldbounds::ldBounds(c(0.5,1), sides=1, alpha = 0.025)$nom.alpha
 clusterExport(cl, "nominal_alpha")
 
 
+
 # define analysis and summarise functions ---------------------------------
+# this is the same for all scenarios
+
 source("scripts/revision_sims_common.R")
+
 
 # run ---------------------------------------------------------------------
 
@@ -58,9 +63,7 @@ results <- runSimulation(
   generate = my_generator,
   analyse = my_analyse,
   summarise = my_summarise,
-  seed = design$old_seed,
   cl = cl,
-  parallel = TRUE,
   save_details = list(
     out_rootdir = save_folder
   ),
@@ -70,6 +73,5 @@ results <- runSimulation(
   )
 )
 
-saveRDS(results, paste0(save_folder, "/revision_results_delayed_", Sys.info()["nodename"], "_", strftime(Sys.time(), "%Y-%m-%d_%H%M%S"), ".Rds"))
-
+saveRDS(results, paste0(save_folder, "/revision_results_crossing_", Sys.info()["nodename"], "_", strftime(Sys.time(), "%Y-%m-%d_%H%M%S"), ".Rds"))
 

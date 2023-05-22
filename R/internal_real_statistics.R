@@ -121,7 +121,26 @@ fast_real_statistics <- function(
     h  <- \(t){haz_trt(t)+haz_ctrl(t)}
     f  <- \(t){(1/(N_trt+N_ctrl))*(N_trt*pdf_trt(t) + N_ctrl*pdf_ctrl(t))}
 
+    # rectangle rule (more robust in some settings where integrate fails)
+    myint<-function(f,lower,upper,steps=1000) {
+      delta<-(upper-lower)/steps
+      x<-seq(lower+delta/2,upper-delta/2,delta)
+      sum(f(x)*delta)
+    }
+
     rmst_ahr <- purrr::imap(cutoff, function(cutoff, label){
+      #AHRoc
+      true_avg_HR_fun0<-function(x) surv_ctrl(x)*pdf_trt(x)
+      true_avg_HR_fun1<-function(x) surv_trt(x)*pdf_ctrl(x)
+      #integrate can run into numeric problems with NPH objects, myint is more robust
+      Int0<-myint(true_avg_HR_fun0,lower=0,upper=cutoff)
+      Int1<-myint(true_avg_HR_fun1,lower=0,upper=cutoff)
+      AHRoc_myint<-Int0/Int1
+
+      Int0A<-integrate(true_avg_HR_fun0,lower=0,upper=cutoff)
+      Int1A<-integrate(true_avg_HR_fun1,lower=0,upper=cutoff)
+      AHRoc_integrate<-Int0A$value/Int1A$value
+
       tmp <- data.frame(
         rmst_trt = integrate(surv_trt, 0, cutoff)$value,
         rmst_ctrl = integrate(surv_ctrl, 0, cutoff)$value,
@@ -131,8 +150,10 @@ fast_real_statistics <- function(
           ),
         AHR = integrate(\(t){(haz_trt(t)/h(t)) * f(t) }, 0, cutoff, stop.on.error = FALSE)$value /
           integrate(\(t){(haz_ctrl(t)/h(t)) * f(t)}, 0, cutoff, stop.on.error = FALSE)$value,
-        AHRoc = 1
-      )
+        #### Add correctly weighted AHR here
+        AHRoc = AHRoc_integrate,
+        AHRoc_robust = AHRoc_myint
+        )
 
       names(tmp) <- paste0(names(tmp), "_", label)
       tmp
