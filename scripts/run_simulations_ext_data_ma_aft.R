@@ -9,25 +9,30 @@ if(packageVersion("SimNPH") != "0.3.2"){
   stop("Please run the simulations with the correct vesion of the SimNPH package for reproducability.")
 }
 
-source("./R/analyse_ma_aft.R")
-
 # Script options/settings --------------------------------------------------------
-N_sim <- 5 # number of simulations per scenario
+
+root_dir <- "/Users/ancho179/Documents/_PROJECTS/NPH_EMA/repo/SimNPH"
+
+source(file.path(root_dir,"R/analyse_ma_aft.R"))
+
+N_sim <- 500 # number of replicate simulations per scenario
+n_boot <- 1000 # number of bootstrap samples per replicate scenario
 
 run_parallel <- TRUE # should we parallelize?
-n_cores <- parallel::detectCores() - 4
+n_cores <- parallel::detectCores() - 6
 
 # assume we are in base directory of the package
-save_folder <- file.path(
-  #"..",
-  "data",
-  paste0("simulation_ext_data_ma_aft",
-         Sys.info()["nodename"], "_",
-         strftime(Sys.time(), "%Y-%m-%d_%H%M%S")))
+save_folder <-
+  file.path(
+    root_dir,
+    "data",
+    paste0("simulation_ext_data_ma_aft",
+           Sys.info()["nodename"], "_",
+           strftime(Sys.time(), "%Y-%m-%d_%H%M%S")))
 
-sim_data_dir <- file.path("..","..","parametric_simulations","sim_data_3")
+sim_data_dir <- file.path(root_dir,"..","..","parametric_simulations","sim_data_3")
 
-design_table <- file.path("data","parameters","ext_data_2023-04-22.csv")
+design_table <- file.path(root_dir,"data","parameters","ext_data_2023-04-22.csv")
 
 alpha <- 0.025
 nominal_alpha <- ldbounds::ldBounds(c(0.5,1), sides=1, alpha=0.025)$nom.alpha
@@ -49,7 +54,7 @@ if(run_parallel){
     library(parallel)
   })
 
-  clusterExport(cl, c("sim_data_dir","save_folder","alpha","nominal_alpha"))
+  clusterExport(cl, c("sim_data_dir","save_folder","alpha","nominal_alpha","n_boot"))
 
 }
 
@@ -145,7 +150,7 @@ my_generator <- function(condition, fixed_objects=NULL){
 # example with just logrank test and cox regression
 # will later be replaced by sourcing scripts/run_simulations_common.R
 my_analyse <- list(
-  ma_aft = analyse_ma_aft(alternative = "one.sided",n_boot=10)
+  ma_aft = analyse_ma_aft(alternative = "one.sided",n_boot=n_boot)
   # logrank     = analyse_logrank(alternative = "one.sided"),
   # cox = analyse_coxph(alternative = "one.sided"),
   # aft_weibull = analyse_aft(dist="weibull", alternative = "one.sided"),
