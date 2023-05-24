@@ -49,7 +49,7 @@ clusterExport(cl, "nominal_alpha")
 # define analysis and summarise functions ---------------------------------
 # this is the same for all scenarios
 
-source("scripts/revision_sims_common.R")
+source("scripts/revision_sims_common2.R")
 
 
 # run ---------------------------------------------------------------------

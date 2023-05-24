@@ -28,11 +28,11 @@ clusterEvalQ(cl, {
 # setup data generation ---------------------------------------------------
 
 # load parameters
-design <- read.table("data/parameters/revision_delayed_effect_2023-05-22.csv", sep=",", dec=".", header=TRUE)
+design <- read.table("data/parameters/revision_progression_os_2023-05-24.csv", sep=",", dec=".", header=TRUE)
 
 # define generator
 my_generator <- function(condition, fixed_objects=NULL){
-  generate_delayed_effect(condition, fixed_objects) |>
+  generate_progression(condition, fixed_objects) |>
     recruitment_uniform(condition$recruitment) |>
     random_censoring_exp(condition$random_withdrawal) |>
     admin_censoring_events(condition$final_events)
@@ -70,6 +70,6 @@ results <- runSimulation(
   )
 )
 
-saveRDS(results, paste0(save_folder, "/revision_results_delayed_", Sys.info()["nodename"], "_", strftime(Sys.time(), "%Y-%m-%d_%H%M%S"), ".Rds"))
+saveRDS(results, paste0(save_folder, "/revision_results_progression_", Sys.info()["nodename"], "_", strftime(Sys.time(), "%Y-%m-%d_%H%M%S"), ".Rds"))
 
 
