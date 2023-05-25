@@ -74,5 +74,5 @@ results <- runSimulation(
   )
 )
 
-saveRDS(results, paste0(save_folder, "/revision_results_subgroup_", Sys.info()["nodename"], "_", strftime(Sys.time(), "%Y-%m-%d_%H%M%S"), ".Rds"))
+saveRDS(results, paste0(save_folder, "/revision_results_subgroup_05_", Sys.info()["nodename"], "_", strftime(Sys.time(), "%Y-%m-%d_%H%M%S"), ".Rds"))
 
