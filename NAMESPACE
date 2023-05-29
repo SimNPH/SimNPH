@@ -76,6 +76,8 @@ export(shhr_gg)
 export(labs_from_labels)
 export(merge_additional_results)
 export(upsert_merge)
+export(rename_results_column)
+export(rename_results_column_pattern)
 
 importFrom(Rcpp,evalCpp)
 useDynLib(SimNPH, .registration = TRUE)

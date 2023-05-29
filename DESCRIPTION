@@ -1,7 +1,7 @@
 Package: SimNPH
 Type: Package
 Title: Helper Functions to Simulate non Proprotional Hazards
-Version: 0.3.2
+Version: 0.4.0
 Author: Tobias Fellinger
 Maintainer: Tobias Fellinger <tobias.fellinger@ages.at>
 Description: This package provides helper functions to simulate and analyse time to event datasets with non-proportional hazards. It includes functions to generate datasets in common scenarios with non proportional hazards and functions that implement common tests and models for analysis. All functions can readily be used in the framework of the SimDesign package.
@@ -31,7 +31,8 @@ Imports:
     Rcpp (>= 1.0.8),
     car,
     withr,
-    dplyr
+    dplyr,
+    stringr
 LinkingTo: Rcpp
 Config/testthat/edition: 3
 VignetteBuilder: knitr

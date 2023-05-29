@@ -235,35 +235,30 @@ combined_plot <- function(
     order_combine_xvars(xvars, facet_vars=facet_x_vars, height_x_axis=scale_stairs, grid_level=grid_level)
 
 
-  plot_2 <- ggplot(NULL) +
-    geom_step(
-      data=attr(data, "x_axis"),
-      mapping=aes(y=y, group=name, x=x)
-    ) +
-    geom_text(
-      data=attr(data, "x_labels"),
-      mapping=aes(y=level-1, label=str_c("  ", label)),
-      x = 0,
-      hjust = 0,
-      vjust = 1,
-      size = 2.84527559055118 # ggplot:::.pt
-    ) +
-    theme_void() +
-    scale_y_reverse(
-      breaks=1:100
-    ) +
-    theme(
-      panel.grid.major.y = element_line(
-        colour="darkgray"
-      ),
-      axis.text.x = element_blank(),
-      axis.ticks.x = element_blank(),
-      axis.title.x = element_blank(),
-      strip.text = element_blank()
-    )  +
-    facet_grid(
-      cols = vars(!!!facet_vars_x_sym)
-    )
+  plot_2 <- lapply(xvars, \(xx){
+      ggplot(data, aes(x=x, y=factor(format(!!xx, digits=3)), group=method)) +
+        geom_step(linewidth=0.25) +
+        theme_void(
+          base_size = 9
+        ) +
+        theme(
+          axis.text.y = element_text(),
+          axis.title.y = element_text(angle=75),
+          strip.background = element_blank(),
+          strip.text = element_blank(),
+          panel.grid.major.y = element_line(
+            linewidth = 0.125,
+            colour="lightgray"
+          )
+        ) +
+        ylab(as.character(xx))  +
+        facet_grid(
+          cols = vars(!!!facet_vars_x_sym)
+        )
+    })
+
+  plot_2 <- Reduce(`/`, plot_2)
+
 
   plot_1 <- ggplot(data, aes(x=x, y=!!yvar, group=method, colour=method, shape=method)) +
     geom_line() +
