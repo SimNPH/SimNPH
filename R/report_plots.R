@@ -49,10 +49,10 @@ results_pivot_longer <- function(data, exclude_from_methods=c("descriptive")){
 }
 
 order_combine_xvars <- function(data, xvars, facet_vars=c(), height_x_axis=0.8, grid_level=2){
+
   result <- data |>
-    complete(!!!xvars, method) |>
     arrange(!!!xvars) |>
-    unite(x, !!!xvars, remove=FALSE,na.rm=T) |>
+    unite(x, !!!xvars, remove=FALSE) |>
     mutate(
       x = fct_inorder(x)
     )
@@ -98,9 +98,10 @@ order_combine_xvars <- function(data, xvars, facet_vars=c(), height_x_axis=0.8, 
 #' @param yvar variable name of the variable to be displayed on the y axis (metric)
 #' @param facet_x_vars vector of variable names to create columns of facets
 #' @param facet_y_vars vector of variable names to create rows of facets
+#' @param split_var index of xvars along groups of which the plot should be split
 #' @param heights_plots relative heights of the main plot and the stairs on the bottom
 #' @param scale_stairs height of the stairs for each variable between 0 and 1
-#' @param grid_level depht of loops for which the grid-lines are drawn
+#' @param grid_level depth of loops for which the grid-lines are drawn
 #' @param scales passed on to facet_grid
 #' @param hlines position of horizontal lines, passed as `yintercept` to
 #'   `geom_hline`
@@ -199,6 +200,7 @@ combined_plot <- function(
     yvar,
     facet_x_vars=c(),
     facet_y_vars=c(),
+    split_var = 1,
     heights_plots = c(3,1),
     scale_stairs = 0.75,
     grid_level = 2,
@@ -217,6 +219,9 @@ combined_plot <- function(
   xvars <- syms(xvars)
   yvar  <- sym(yvar)
 
+  data <- data |>
+    filter(method %in% methods)
+
   # remove facets in which all y values are empty
   # dont remove empty y-values in facets where there are some y-values
   # (so gaps in lines remain gaps in each facet and only completely facets are
@@ -230,8 +235,22 @@ combined_plot <- function(
     filter(!all(is.na(!!yvar))) |>
     ungroup()
 
+  ## split lines
+
+  len_x <- length(xvars)
+  if(len_x > 1){
+    lastvar <- xvars[[len_x]]
+    splitvar <- xvars[[split_var]]
+    data <- data |>
+      group_by(method,!!!facet_vars_y_sym,!!!facet_vars_x_sym,!!splitvar) |>
+      group_modify(~add_row(.x,.before = 1)) |>
+      #    mutate(!!lastvar := ifelse(is.na(!!yvar),!!lastvar + .0,!!lastvar)) |>
+      fill(!!!xvars[-split_var],.direction='up') |>
+      ungroup()
+  }
+
+
   data <- data |>
-    filter(method %in% methods) |>
     order_combine_xvars(xvars, facet_vars=facet_x_vars, height_x_axis=scale_stairs, grid_level=grid_level)
 
 
@@ -243,7 +262,7 @@ combined_plot <- function(
     geom_text(
       data=attr(data, "x_labels"),
       mapping=aes(y=level-1, label=str_c("  ", label)),
-      x = 0,
+      x = 0.5,
       hjust = 0,
       vjust = 1,
       size = 2.84527559055118 # ggplot:::.pt
@@ -267,7 +286,7 @@ combined_plot <- function(
 
   plot_1 <- ggplot(data, aes(x=x, y=!!yvar, group=method, colour=method, shape=method)) +
     geom_line() +
-    geom_point () +
+    geom_point(size=4) +
     scale_x_discrete(breaks = attr(data, "x_axis_breaks")) +
     theme(
       axis.text.x = element_blank(),
