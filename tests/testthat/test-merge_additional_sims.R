@@ -25,6 +25,7 @@ test_that("merge results works", {
     a = c(5L, 4L, 3L, 2L, NA),
     b = c(NA, 40, 30, 20, 10)
   )
+  attr(expected, "design_names")  <- list()
 
   expect_equal(c, expected)
 })

@@ -3,7 +3,7 @@ library(SimNPH)
 library(SimDesign)
 library(parallel)
 
-if(packageVersion("SimNPH") != "0.3.2"){
+if(packageVersion("SimNPH") != "0.4.0"){
   stop("Please run the simulations with the correct vesion of the SimNPH package for reproducability.")
 }
 
@@ -29,12 +29,9 @@ clusterEvalQ(cl, {
 # setup data generation ---------------------------------------------------
 
 # load parameters
-design <- read.table("data/parameters/subgroup_2023-04-24.csv", sep=",", dec=".", header=TRUE)
+design <- read.table("data/parameters/revision_subgroup_2023-05-22.csv", sep=",", dec=".", header=TRUE)
 
-design <- design |>
-  subset(
-    hr_subgroup_relative == 0.7
-  )
+design <- design[design$prevalence == 0.5, ]
 
 # define generator
 my_generator <- function(condition, fixed_objects=NULL){
@@ -53,12 +50,12 @@ clusterExport(cl, "nominal_alpha")
 # define analysis and summarise functions ---------------------------------
 # this is the same for all scenarios
 
-source("scripts/run_simulations_common.R")
+source("scripts/revision_sims_common2.R")
 
 
 # run ---------------------------------------------------------------------
 
-save_folder <- paste0(paste0("data/simulation_subgroup_07_", Sys.info()["nodename"], "_", strftime(Sys.time(), "%Y-%m-%d_%H%M%S")))
+save_folder <- "data/results/revision"
 dir.create(save_folder)
 
 results <- runSimulation(
@@ -77,5 +74,5 @@ results <- runSimulation(
   )
 )
 
-saveRDS(results, paste0(save_folder, "/results.Rds"))
+saveRDS(results, paste0(save_folder, "/revision_results_subgroup_05_", Sys.info()["nodename"], "_", strftime(Sys.time(), "%Y-%m-%d_%H%M%S"), ".Rds"))
 
