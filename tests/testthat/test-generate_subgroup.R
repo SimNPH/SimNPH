@@ -106,8 +106,8 @@ test_that("test that true_summary_statistics_subgroup works", {
   expect_named(test_design1, c("n_trt", "n_ctrl", "prevalence", "hazard_ctrl", "hazard_trt",
                                "hazard_subgroup", "random_withdrawal",
                                "median_survival_trt", "median_survival_ctrl", "rmst_trt_7",
-                               "rmst_ctrl_7", "gAHR_7", "AHR_7", "rmst_trt_15", "rmst_ctrl_15",
-                               "gAHR_15", "AHR_15", "milestone_survival_trt_10", "milestone_survival_ctrl_10"
+                               "rmst_ctrl_7", "gAHR_7", "AHR_7", "AHRoc_7", "AHRoc_robust_7", "rmst_trt_15", "rmst_ctrl_15",
+                               "gAHR_15", "AHR_15", "AHRoc_15", "AHRoc_robust_15", "milestone_survival_trt_10", "milestone_survival_ctrl_10"
   ))
 
   expect(all(test_design1$gAHR_7[(test_design1$prevalence == 0) & (test_design1$hazard_ctrl == test_design1$hazard_trt)] == 1), "all gAHR should be 1 for equal hazards and prevalence == 0")
