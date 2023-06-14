@@ -63,7 +63,7 @@ plot_sim_results <- function(data,
                              methods,
                              parameter_x,
                              parameter_y,
-                             filters = c("median_survival_ctrl == 12",
+                             filters = c("abs(hazard_ctrl - nph::m2r(12))<1e-5",
                                          "recruitment == 18",
                                          "censoring_prop == 0"),
                              parameter_row = "effect_size_ph",
@@ -119,8 +119,9 @@ plot_sim_results <- function(data,
                   use_shapes = my_shapes,
                   grid_level = 2,
                   scale_stairs = .5,
-                  heights_plots = c(4,1))
-
+                  heights_plots = c(4,1),
+                  ...)
+   gg[[1]] <- gg[[1]] + scale_shape_manual(values = c(as.character(c(1:9)),letters))
    gg[[1]] <- gg[[1]] |> labs_from_labels()
    gg
 }

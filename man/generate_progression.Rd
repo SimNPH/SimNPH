@@ -51,7 +51,7 @@ hazard_before_progression_from_PH_effect_size(
 
 \item{final_events}{target events for inversion of Schönfeld Formula, defaults to \code{condition$final_events}}
 
-\item{target_alpha}{target alpha level for the power calculation}
+\item{target_alpha}{target one-sided alpha level for the power calculation}
 }
 \value{
 For generate_progression: a design tibble with default values invisibly

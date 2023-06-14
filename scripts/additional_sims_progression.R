@@ -29,16 +29,11 @@ clusterEvalQ(cl, {
 # setup data generation ---------------------------------------------------
 
 # load parameters
-design <- read.table("data/parameters/subgroup_2023-04-24.csv", sep=",", dec=".", header=TRUE)
-
-design <- design |>
-  subset(
-    hr_subgroup_relative == 0.8
-  )
+design <- read.table("data/parameters/additional_progression_os_2023-04-19.csv", sep=",", dec=".", header=TRUE)
 
 # define generator
 my_generator <- function(condition, fixed_objects=NULL){
-  generate_subgroup(condition, fixed_objects) |>
+  generate_progression(condition, fixed_objects) |>
     recruitment_uniform(condition$recruitment) |>
     random_censoring_exp(condition$random_withdrawal) |>
     admin_censoring_events(condition$final_events)
@@ -51,14 +46,11 @@ clusterExport(cl, "nominal_alpha")
 
 
 # define analysis and summarise functions ---------------------------------
-# this is the same for all scenarios
-
-source("scripts/run_simulations_common.R")
-
+source("scripts/additional_sims_common.R")
 
 # run ---------------------------------------------------------------------
 
-save_folder <- paste0(paste0("data/simulation_subgroup_08_", Sys.info()["nodename"], "_", strftime(Sys.time(), "%Y-%m-%d_%H%M%S")))
+save_folder <- "data/results/progression"
 dir.create(save_folder)
 
 results <- runSimulation(
@@ -67,7 +59,9 @@ results <- runSimulation(
   generate = my_generator,
   analyse = my_analyse,
   summarise = my_summarise,
+  seed = design$old_seed,
   cl = cl,
+  parallel = TRUE,
   save_details = list(
     out_rootdir = save_folder
   ),
@@ -77,5 +71,7 @@ results <- runSimulation(
   )
 )
 
-saveRDS(results, paste0(save_folder, "/results.Rds"))
+
+saveRDS(results, paste0(save_folder, "/additional_results_progression_", Sys.info()["nodename"], "_", strftime(Sys.time(), "%Y-%m-%d_%H%M%S"), ".Rds"))
+
 

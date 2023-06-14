@@ -14,6 +14,7 @@ combined_plot(
   yvar,
   facet_x_vars = c(),
   facet_y_vars = c(),
+  split_var = 1,
   heights_plots = c(3, 1),
   scale_stairs = 0.75,
   grid_level = 2,
@@ -38,11 +39,13 @@ combined_plot(
 
 \item{facet_y_vars}{vector of variable names to create rows of facets}
 
+\item{split_var}{index of xvars along groups of which the plot should be split}
+
 \item{heights_plots}{relative heights of the main plot and the stairs on the bottom}
 
 \item{scale_stairs}{height of the stairs for each variable between 0 and 1}
 
-\item{grid_level}{depht of loops for which the grid-lines are drawn}
+\item{grid_level}{depth of loops for which the grid-lines are drawn}
 
 \item{scales}{passed on to facet_grid}
 
