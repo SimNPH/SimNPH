@@ -70,8 +70,8 @@ internal_real_statistics_pchaz_discrete <- function(data_gen_model_trt, data_gen
 
     milestones <- purrr:::imap(milestones, function(v, label){
       tmp <- data.frame(
-        milestone_survival_trt  = tail(data_gen_model_trt$S[data_gen_model_trt$t <= v], 1),
-        milestone_survival_ctrl = tail(data_gen_model_ctrl$S[data_gen_model_ctrl$t <= v], 1)
+        milestone_survival_trt  = tail(data_gen_model_trt$S[data_gen_model_trt$t < v], 1),
+        milestone_survival_ctrl = tail(data_gen_model_ctrl$S[data_gen_model_ctrl$t < v], 1)
       )
 
       names(tmp) <- paste0(names(tmp), "_", label)
