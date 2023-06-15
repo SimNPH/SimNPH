@@ -44,19 +44,58 @@ censoring_prop_from_cumhaz <- function(n_trt, n_ctrl, censoring_prop, cumhaz_ctr
   (-b + sqrt(b^2 - 4*a*c))/(2*a*t_max)
 }
 
-#' Compute median survival from hazard rate
+#' Utility Functions
 #'
-#' Compute the median survival time in months from the hazard rate \code{lambda}.
-#' Assumes a constant hazard rate.
+#' Some functions to convert between days and months and rates and medians.
 #'
-#' @param lambda Hazard rate
+#' @describeIn r2m daily rate to median in months
 #'
-#' @return Median survival time in months
+#' @param lambda hazard rate
+#'
+#' @return median survival time in months (`r2m`)
 #'
 #' @examples
-#' r2m(0.01)
-#'
+#' r2m(0.002)
 #' @export
 r2m <- function(lambda){
   12*log(2)/(365.25*lambda)
+}
+
+#' @describeIn r2m median to months to daily rate
+#'
+#' @param med median in months
+#'
+#' @return hazard rate per day (`m2r`)
+#' @export
+#'
+#' @examples
+#' m2r(12)
+m2r <- function(med){
+  (12*log(2))/(med*365.25)
+}
+
+#' @describeIn r2m months to days
+#'
+#' @param mon time in months
+#'
+#' @return time in days (`m2d`)
+#' @export
+#'
+#' @examples
+#' m2d(1)
+m2d <- function(mon){
+  365.25*mon/12
+}
+
+#' @describeIn r2m days to months
+#'
+#' @param day time in days
+#'
+#' @return time in months (`d2m`)
+#' @export
+#'
+#' @examples
+#' d2m(31)
+d2m <- function(day){
+  12*day/365.25
 }
