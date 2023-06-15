@@ -13,3 +13,10 @@ test_that("trycatch_nphparams works", {
     )
   ))
 })
+
+test_that("utility functions work", {
+  expect_equal(r2m((12*log(2))/365.25), 1)
+  expect_equal(m2r((12*log(2)/365.25)), 1)
+  expect_equal(m2d(12), 365.25)
+  expect_equal(d2m(365.25), 12)
+})

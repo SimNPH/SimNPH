@@ -16,3 +16,8 @@ tibble containing methods and what they provide
 Return a table of all methods investigated in simulation results that
 categorizes whether methods provide tests, estimators, and/or CIs
 }
+\examples{
+\dontrun{
+tabulate_methods(delayed_long)
+}
+}

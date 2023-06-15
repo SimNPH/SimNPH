@@ -10,4 +10,12 @@ test_that("shhr ggplot works", {
 
   expect_s3_class(my_obj, "patchwork")
 
+
+  withr::with_package("ggplot2", {
+    withr::with_package("patchwork", {
+      my_obj <- shhr_gg(A, B, lab_time="Months", trafo_time=d2m)
+    })
+  })
+
+  expect_s3_class(my_obj, "patchwork")
 })

@@ -19,3 +19,8 @@ tibble containing selected parameters and corresponding unique values
 \description{
 Return a table with selected parameters and corresponding unique values
 }
+\examples{
+\dontrun{
+tabulate_parameters(sim_results_long, c("bias", "mse"))
+}
+}

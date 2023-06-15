@@ -7,6 +7,7 @@
 #' @param group_names Group Names
 #' @param lab_time Title for the time axis
 #' @param lab_group Title group legend
+#' @param trafo_time Function to transform time
 #'
 #' @return a `patchwork` object as defined in the patchwork package
 #'
@@ -18,7 +19,8 @@
 #' B <- pchaz(c(0, 10, 100), c(0.1, 0.05))
 #' A <- pchaz(c(0, 100), c(0.1))
 #' shhr_gg(A, B)
-shhr_gg <- function(A, B, main=NULL, sub=NULL, group_names=c("control", "treatment"), lab_time="Days", lab_group="Group"){
+#' shhr_gg(A, B, lab_time="Months", trafo_time=d2m)
+shhr_gg <- function(A, B, main=NULL, sub=NULL, group_names=c("control", "treatment"), lab_time="Days", lab_group="Group", trafo_time=identity){
 
   plotdata <- data.frame(
     t     = sort(unique(union(A$t, B$t)))
@@ -29,6 +31,8 @@ shhr_gg <- function(A, B, main=NULL, sub=NULL, group_names=c("control", "treatme
   plotdata$haz_a <- A$haz[match(plotdata$t, A$t)]
   plotdata$haz_b <- B$haz[match(plotdata$t, B$t)]
   plotdata$hr <- plotdata$haz_b / plotdata$haz_a
+
+  plotdata$t <- trafo_time(plotdata$t)
 
   gg_surv <- ggplot(plotdata, aes(x=t)) +
     geom_line(aes(y=surv_a, colour=group_names[1], lty=group_names[1]), linewidth=1.3) +

@@ -10,7 +10,10 @@
 #' @export
 #'
 #' @examples
-tabulate_parameters <- function(data,parameters,.names="Parameter"){
+#' \dontrun{
+#' tabulate_parameters(sim_results_long, c("bias", "mse"))
+#' }
+tabulate_parameters <- function(data, parameters, .names="Parameter"){
   summarise(data,across(all_of(parameters),~paste(unique(.x),collapse=', '))) |>
     pivot_longer(everything(),names_to=.names,values_to = "Unique Values")
 }
@@ -27,6 +30,9 @@ tabulate_parameters <- function(data,parameters,.names="Parameter"){
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' tabulate_methods(delayed_long)
+#' }
 tabulate_methods <- function(data){
   mutate(data,
          test = !{is.na(rejection)&is.na(`rejection_0.025`)&is.na(null_lower)},
