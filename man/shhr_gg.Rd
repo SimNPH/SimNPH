@@ -11,7 +11,8 @@ shhr_gg(
   sub = NULL,
   group_names = c("control", "treatment"),
   lab_time = "Days",
-  lab_group = "Group"
+  lab_group = "Group",
+  trafo_time = identity
 )
 }
 \arguments{
@@ -28,6 +29,8 @@ shhr_gg(
 \item{lab_time}{Title for the time axis}
 
 \item{lab_group}{Title group legend}
+
+\item{trafo_time}{Function to transform time}
 }
 \value{
 a \code{patchwork} object as defined in the patchwork package
@@ -41,4 +44,5 @@ library(patchwork)
 B <- pchaz(c(0, 10, 100), c(0.1, 0.05))
 A <- pchaz(c(0, 100), c(0.1))
 shhr_gg(A, B)
+shhr_gg(A, B, lab_time="Months", trafo_time=d2m)
 }
