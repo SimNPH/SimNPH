@@ -22,7 +22,7 @@
 #' columns:
 #'
 #' * `milestone_surv_ratio` / `milestone_surv_diff` ratio or differnce of survival probabilities
-#' * `times` followup times at which the the survival are compared
+#' * `time` followup time at which the the survival are compared
 #' * `N_pat` number of patients
 #' * `N_evt` number of events
 #' * `p` p value for the H0 that the ratios are 1 or the differnce is 0 respectively
@@ -44,7 +44,7 @@
 #' dat <- generate_delayed_effect(condition)
 #' analyse_milestone_survival(3:5)(condition, dat)
 #' analyse_milestone_survival(3:5, what="diff")(condition, dat)
-analyse_milestone_survival <- function(times, what="quot", level=0.95, alternative="two.sided"){
+analyse_milestone_survival <- function(time, what="quot", level=0.95, alternative="two.sided"){
   stopifnot(alternative %in% c("two.sided", "one.sided"))
 
   alt_ <- switch(alternative,
@@ -59,7 +59,7 @@ analyse_milestone_survival <- function(times, what="quot", level=0.95, alternati
       model <- trycatch_nphparams(nph::nphparams(
         dat$t, dat$evt, dat$trt,
         param_type="logS",
-        param_par=times,
+        param_par=time,
         lvl=level,
         alternative_test = alternative,
         param_alternative = alt_
@@ -72,7 +72,7 @@ analyse_milestone_survival <- function(times, what="quot", level=0.95, alternati
         milestone_surv_ratio_lower = model$tab$lwr_unadj ,
         milestone_surv_ratio_upper = model$tab$upr_unadj,
         CI_level=level,
-        times = times,
+        time = time,
         N_pat=nrow(dat),
         N_evt=sum(dat$evt)
       )
@@ -82,7 +82,7 @@ analyse_milestone_survival <- function(times, what="quot", level=0.95, alternati
       model <- trycatch_nphparams(nph::nphparams(
         dat$t, dat$evt, dat$trt,
         param_type="S",
-        param_par=times,
+        param_par=time,
         lvl=level,
         alternative_test = alternative,
         param_alternative = alt_
@@ -95,7 +95,7 @@ analyse_milestone_survival <- function(times, what="quot", level=0.95, alternati
         milestone_surv_diff_lower = model$tab$lwr_unadj ,
         milestone_surv_diff_upper = model$tab$upr_unadj,
         CI_level=level,
-        times = times,
+        time = time,
         N_pat=nrow(dat),
         N_evt=sum(dat$evt)
       )

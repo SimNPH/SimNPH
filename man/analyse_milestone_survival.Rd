@@ -5,20 +5,20 @@
 \title{Analyse the Dataset using difference or quotient of milestone survival}
 \usage{
 analyse_milestone_survival(
-  times,
+  time,
   what = "quot",
   level = 0.95,
   alternative = "two.sided"
 )
 }
 \arguments{
-\item{times}{followup times at which the the survival should be compared}
-
 \item{what}{"quot" for quotient and "diff" for differnce of surival probabilities}
 
 \item{level}{confidence level for CI computation}
 
 \item{alternative}{alternative hypothesis for the tests "two.sided" or "one.sieded"}
+
+\item{times}{followup times at which the the survival should be compared}
 }
 \value{
 Returns an analysis function, that can be used in runSimulations
@@ -39,7 +39,7 @@ The data.frame returned by the created function includes the follwing
 columns:
 \itemize{
 \item \code{milestone_surv_ratio} / \code{milestone_surv_diff} ratio or differnce of survival probabilities
-\item \code{times} followup times at which the the survival are compared
+\item \code{time} followup time at which the the survival are compared
 \item \code{N_pat} number of patients
 \item \code{N_evt} number of events
 \item \code{p} p value for the H0 that the ratios are 1 or the differnce is 0 respectively
