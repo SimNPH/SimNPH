@@ -9,10 +9,12 @@ plot_sim_results(
   methods,
   parameter_x,
   parameter_y,
-  filters = c("median_survival_ctrl == 12", "recruitment == 18", "censoring_prop == 0"),
+  filters = c("abs(hazard_ctrl - nph::m2r(12))<1e-5", "recruitment == 18",
+    "censoring_prop == 0"),
   parameter_row = "effect_size_ph",
   parameter_col = "n_pat_design",
   parameters_steps = NULL,
+  rel_logrank = FALSE,
   ...
 )
 }
@@ -33,6 +35,8 @@ plot_sim_results(
 
 \item{parameters_steps}{parameters across which x-scale is looped}
 
+\item{rel_logrank}{should results be ploted relative to the logrank test (see Details)}
+
 \item{...}{additional options to looplot}
 }
 \description{
@@ -40,4 +44,5 @@ Generates a nested loop plot of simulation results
 }
 \details{
 Parameters selected for x-axis, rows, cols, and steps need to be such that together with filters all remaining scenarios uniquely identify a point on the y-axis.
+rel_logrank will plot the results relative to the logrank test, this requires that the corresponding y_parameter is available for the logrank test and practically is only sensible for plots of power
 }

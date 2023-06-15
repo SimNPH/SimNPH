@@ -33,13 +33,22 @@ internal_real_statistics_pchaz_discrete <- function(data_gen_model_trt, data_gen
     f2 <- c(diff(data_gen_model_ctrl$F), 0)
     f <- (1/(N_trt+N_ctrl))*(N_trt*f1 + N_ctrl*f2)
 
+    #AHRoc
+    true_avg_HR_fun0 <- data_gen_model_ctrl$S * c(diff(data_gen_model_trt$F), 0)
+    true_avg_HR_fun1 <- data_gen_model_trt$S * c(diff(data_gen_model_ctrl$F), 0)
+
     rmst_ahr <- purrr::imap(cutoff, function(cutoff, label){
+      Int0 <- sum(true_avg_HR_fun0[data_gen_model_trt$t <= cutoff])
+      Int1 <- sum(true_avg_HR_fun1[data_gen_model_trt$t <= cutoff])
+
       tmp <- data.frame(
         rmst_trt            = sum(data_gen_model_trt$S[data_gen_model_trt$t <= cutoff]),
         rmst_ctrl           = sum(data_gen_model_ctrl$S[data_gen_model_ctrl$t <= cutoff]),
         gAHR                = exp(sum( (log(data_gen_model_trt$haz / data_gen_model_ctrl$haz) * f)[data_gen_model_trt$t <= cutoff] , na.rm=TRUE)),
         AHR                 = sum(((data_gen_model_trt$haz/h) * f)[data_gen_model_trt$t <= cutoff], na.rm=TRUE) /
-          sum(((data_gen_model_ctrl$haz/h) * f)[data_gen_model_ctrl$t <= cutoff], na.rm=TRUE)
+          sum(((data_gen_model_ctrl$haz/h) * f)[data_gen_model_ctrl$t <= cutoff], na.rm=TRUE),
+        AHRoc = Int0/Int1,
+        AHRoc_robust = Int0/Int1
       )
 
       names(tmp) <- paste0(names(tmp), "_", label)
@@ -121,7 +130,26 @@ fast_real_statistics <- function(
     h  <- \(t){haz_trt(t)+haz_ctrl(t)}
     f  <- \(t){(1/(N_trt+N_ctrl))*(N_trt*pdf_trt(t) + N_ctrl*pdf_ctrl(t))}
 
+    # rectangle rule (more robust in some settings where integrate fails)
+    myint<-function(f,lower,upper,steps=1000) {
+      delta<-(upper-lower)/steps
+      x<-seq(lower+delta/2,upper-delta/2,delta)
+      sum(f(x)*delta)
+    }
+
     rmst_ahr <- purrr::imap(cutoff, function(cutoff, label){
+      #AHRoc
+      true_avg_HR_fun0<-function(x) surv_ctrl(x)*pdf_trt(x)
+      true_avg_HR_fun1<-function(x) surv_trt(x)*pdf_ctrl(x)
+      #integrate can run into numeric problems with NPH objects, myint is more robust
+      Int0<-myint(true_avg_HR_fun0,lower=0,upper=cutoff)
+      Int1<-myint(true_avg_HR_fun1,lower=0,upper=cutoff)
+      AHRoc_myint<-Int0/Int1
+
+      Int0A<-integrate(true_avg_HR_fun0,lower=0,upper=cutoff)
+      Int1A<-integrate(true_avg_HR_fun1,lower=0,upper=cutoff)
+      AHRoc_integrate<-Int0A$value/Int1A$value
+
       tmp <- data.frame(
         rmst_trt = integrate(surv_trt, 0, cutoff)$value,
         rmst_ctrl = integrate(surv_ctrl, 0, cutoff)$value,
@@ -130,8 +158,11 @@ fast_real_statistics <- function(
             integrate(\(t){f(t) }, 0, cutoff, stop.on.error = FALSE)$value
           ),
         AHR = integrate(\(t){(haz_trt(t)/h(t)) * f(t) }, 0, cutoff, stop.on.error = FALSE)$value /
-          integrate(\(t){(haz_ctrl(t)/h(t)) * f(t)}, 0, cutoff, stop.on.error = FALSE)$value
-      )
+          integrate(\(t){(haz_ctrl(t)/h(t)) * f(t)}, 0, cutoff, stop.on.error = FALSE)$value,
+        #### Add correctly weighted AHR here
+        AHRoc = AHRoc_integrate,
+        AHRoc_robust = AHRoc_myint
+        )
 
       names(tmp) <- paste0(names(tmp), "_", label)
       tmp

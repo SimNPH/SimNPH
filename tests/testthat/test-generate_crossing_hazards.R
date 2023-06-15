@@ -123,17 +123,19 @@ test_that("test that true_summary_statistics_crossing_hazards works", {
 
   expect_named(test_design1, c("n_trt", "n_ctrl", "crossing", "hazard_ctrl", "hazard_trt_before",
                                "hazard_trt_after", "median_survival_trt", "median_survival_ctrl",
-                               "rmst_trt_7", "rmst_ctrl_7", "gAHR_7", "AHR_7", "rmst_trt_15",
-                               "rmst_ctrl_15", "gAHR_15", "AHR_15"))
+                               "rmst_trt_7", "rmst_ctrl_7", "gAHR_7", "AHR_7", "AHRoc_7", "AHRoc_robust_7",
+                               "rmst_trt_15", "rmst_ctrl_15", "gAHR_15", "AHR_15", "AHRoc_15",
+                               "AHRoc_robust_15"))
 
   expect_named(test_design2, c("n_trt", "n_ctrl", "crossing", "hazard_ctrl", "hazard_trt_before",
                                "hazard_trt_after", "median_survival_trt", "median_survival_ctrl"))
 
   expect_named(test_design4, c("n_trt", "n_ctrl", "crossing", "hazard_ctrl", "hazard_trt_before",
                                "hazard_trt_after", "median_survival_trt", "median_survival_ctrl",
-                               "rmst_trt_7", "rmst_ctrl_7", "gAHR_7", "AHR_7", "rmst_trt_15",
-                               "rmst_ctrl_15", "gAHR_15", "AHR_15",
-                               "milestone_survival_trt_milestone1", "milestone_survival_ctrl_milestone1"))
+                               "rmst_trt_7", "rmst_ctrl_7", "gAHR_7", "AHR_7", "AHRoc_7", "AHRoc_robust_7",
+                               "rmst_trt_15", "rmst_ctrl_15", "gAHR_15", "AHR_15", "AHRoc_15",
+                               "AHRoc_robust_15", "milestone_survival_trt_milestone1", "milestone_survival_ctrl_milestone1"
+  ))
 
   expect(
     with(

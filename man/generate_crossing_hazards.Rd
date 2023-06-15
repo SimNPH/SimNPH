@@ -39,7 +39,7 @@ true_summary_statistics_crossing_hazards(
 
 \item{final_events}{target events for inversion of Schönfeld Formula, defaults to \code{condition$final_events}}
 
-\item{target_alpha}{target alpha level for the power calculation}
+\item{target_alpha}{target one-sided alpha level for the power calculation}
 
 \item{Design}{Design data.frame for crossing hazards}
 
@@ -115,18 +115,18 @@ hazard ratios and RMST, that are only calculated up to a certain point.
 }
 \section{Functions}{
 \itemize{
-\item \code{generate_crossing_hazards}: simulates a dataset with crossing
+\item \code{generate_crossing_hazards()}: simulates a dataset with crossing
 hazards
 
-\item \code{assumptions_crossing_hazards}: generate default design tibble
+\item \code{assumptions_crossing_hazards()}: generate default design tibble
 
-\item \code{hr_after_crossing_from_PH_effect_size}: Calculate hr after crossing of the hazards from PH effect size
+\item \code{hr_after_crossing_from_PH_effect_size()}: Calculate hr after crossing of the hazards from PH effect size
 
-\item \code{cen_rate_from_cen_prop_crossing_hazards}: calculate censoring rate from censoring proportion
+\item \code{cen_rate_from_cen_prop_crossing_hazards()}: calculate censoring rate from censoring proportion
 
-\item \code{true_summary_statistics_crossing_hazards}: calculate true summary statistics for crossing hazards
+\item \code{true_summary_statistics_crossing_hazards()}: calculate true summary statistics for crossing hazards
+
 }}
-
 \examples{
 one_simulation <- merge(
     assumptions_crossing_hazards(),

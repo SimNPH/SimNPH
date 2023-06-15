@@ -50,9 +50,9 @@ in the columsn \code{p}, \code{N_pat} and \code{N_evt}.
 }
 \section{Functions}{
 \itemize{
-\item \code{summarise_group_sequential}: Summarise Output from Analyse Functions for Group Sequential Design
-}}
+\item \code{summarise_group_sequential()}: Summarise Output from Analyse Functions for Group Sequential Design
 
+}}
 \examples{
 # create a function to analyse after interim_events and maximum followup time
 # given in the condition row of the design data.frame with given

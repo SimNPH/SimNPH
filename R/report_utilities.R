@@ -42,6 +42,7 @@ tabulate_methods <- function(data){
 #' Generates a nested loop plot of simulation results
 #'
 #' Parameters selected for x-axis, rows, cols, and steps need to be such that together with filters all remaining scenarios uniquely identify a point on the y-axis.
+#' rel_logrank will plot the results relative to the logrank test, this requires that the corresponding y_parameter is available for the logrank test and practically is only sensible for plots of power
 #'
 #' @param data tibble with simulation results in long format
 #' @param methods methods for which operating characteristics should be plotted
@@ -51,6 +52,7 @@ tabulate_methods <- function(data){
 #' @param parameter_row parameter to define row facets
 #' @param parameter_col parameter to defin column facets
 #' @param parameters_steps parameters across which x-scale is looped
+#' @param rel_logrank should results be ploted relative to the logrank test (see Details)
 #' @param ... additional options to looplot
 #'
 #' @return
@@ -61,45 +63,70 @@ plot_sim_results <- function(data,
                              methods,
                              parameter_x,
                              parameter_y,
-                             filters = c("median_survival_ctrl == 12",
+                             filters = c("abs(hazard_ctrl - nph::m2r(12))<1e-5",
                                          "recruitment == 18",
                                          "censoring_prop == 0"),
                              parameter_row = "effect_size_ph",
                              parameter_col = "n_pat_design",
-                             parameters_steps = NULL,...){
+                             parameters_steps = NULL,
+                             rel_logrank = FALSE,
+                             ...){
   ## Limit to interesting scenarios, take from shiny input
   filters = rlang::parse_exprs(filters)
   columns = c("method",parameter_x,parameter_y,parameter_row,parameter_col,parameters_steps)
   if(any((columns %in% names(data))==FALSE)){
     stop(paste("Column missing:",columns[which(!(columns %in% names(data)))]))
   }
+  if(rel_logrank){
+    if(!'logrank' %in% methods){
+      stop("Error: cannot plot results relative to logrank in absence of logrank results")
+    }
+  }
+
+  #  ggplot2::scale_colour_discrete()$palette(n=length(unique(metadata$category))) |>
+  pal <- rep(ggsci::pal_jco()(10),2)
+  my_colours <- pal[1:length(unique(metadata$category))] |>
+    setNames(unique(metadata$category))
+  my_colours <- my_colours[metadata$category] |> setNames(metadata$method)
+
+  my_shapes <- metadata |> group_by(category) |>
+    mutate(symbol = 1:n()) |> pull(symbol) |>
+    setNames(metadata$method)
+
+
   plot_data <- filter(data,
-         method %in% methods) |>
+                      method %in% methods) |>
     filter(!!!filters) |>
     select(all_of(columns))
-  y_base = min(plot_data[[parameter_y]])*.9
-  y_height = diff(range(plot_data[[parameter_y]]))/11
-  y_shift = 1.7*y_height
-  plot_data |> pivot_wider(names_from = "method",values_from = parameter_y) |>
-    looplot::nested_loop_plot(x=parameter_x,
-                              grid_rows=parameter_row,
-                              grid_cols=parameter_col,
-                              steps=parameters_steps,
-                              design_type = 'partial',
-                              spu_x_shift = .2, #spase between groups
-                              steps_y_base= y_base,
-                              steps_y_height= y_height,
-                              steps_y_shift = y_shift,
-                              colors = scales::brewer_pal(palette = "Set1"),
-                              steps_values_annotate = TRUE,
-                              steps_annotation_size = 2.5,
-                              post_processing = list(
-                                add_custom_theme = list(
-                                  axis.text.x = element_text(angle = -90,
-                                                             vjust = 0.5,
-                                                             size = 8)
-                                )),...)
+
+    plot_rows <- plot_data[[parameter_row]] |> unique() |> length()
+
+  if(rel_logrank){
+    plot_data <- plot_data |>
+      pivot_wider(names_from = method,values_from = all_of(parameter_y)) |>
+      mutate(across(all_of(methods),~.x-logrank)) |>
+      select(-logrank) |>
+      pivot_longer(any_of(methods),values_to = parameter_y,names_to = "method")
+  }
+
+  gg <- plot_data |>
+    combined_plot(yvar = parameter_y,
+                  methods = methods,
+                  facet_x_vars = parameter_col,
+                  facet_y_vars = parameter_row,
+                  xvars = c(parameters_steps,parameter_x),
+                  use_colours = my_colours,
+                  use_shapes = my_shapes,
+                  grid_level = 2,
+                  scale_stairs = .5,
+                  heights_plots = c(4,1),
+                  ...)
+   gg[[1]] <- gg[[1]] + scale_shape_manual(values = c(as.character(c(1:9)),letters))
+   gg[[1]] <- gg[[1]] |> labs_from_labels()
+   gg
 }
+
+
 
 #' Plot parameter scenarios
 #'
@@ -183,7 +210,8 @@ plot_nph_curves <- function(data, type) {
 
   # Determine t_max
   t_max <- if (hasName(data, "descriptive.max_followup")) {
-    data$descriptive.max_followup
+    ## data$descriptive.max_followup # - this leads to different x-axis ranges
+    log(100) / data$hazard_ctrl
   } else if (hasName(data, "hazard_ctrl")) {
     log(100) / data$hazard_ctrl
   } else {
@@ -269,7 +297,7 @@ interactive_filters <- function(prefix,input=NULL) {
   } else {
     c("abs(hazard_ctrl - nph::m2r(12))<1e-6",
       "recruitment == 18",
-      "censoring_prop == 0.0")
+      "censoring_prop == 0.1")
   }
 }
 
@@ -299,3 +327,4 @@ input_trial_inputs <- function(prefix, default_mts = 12, default_recruitment = 1
   )
   return(panel)
 }
+

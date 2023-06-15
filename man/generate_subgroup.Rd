@@ -23,7 +23,7 @@ hazard_subgroup_from_PH_effect_size(
   design,
   target_power_ph = NA_real_,
   final_events = NA_real_,
-  target_alpha = 0.05
+  target_alpha = 0.025
 )
 
 cen_rate_from_cen_prop_subgroup(design)
@@ -45,7 +45,7 @@ cen_rate_from_cen_prop_subgroup(design)
 
 \item{final_events}{target events for inversion of Schönfeld Formula, defaults to \code{condition$final_events}}
 
-\item{target_alpha}{target alpha level for the power calculation}
+\item{target_alpha}{target one-sided alpha level for the power calculation}
 }
 \value{
 For generate_subgroup: A dataset with the columns t (time) and trt
@@ -110,18 +110,18 @@ event, without regard to administrative censoring.
 }
 \section{Functions}{
 \itemize{
-\item \code{generate_subgroup}: simulates a dataset with a mixture of cured
+\item \code{generate_subgroup()}: simulates a dataset with a mixture of cured
 patients
 
-\item \code{assumptions_subgroup}: generate default assumptions tibble
+\item \code{assumptions_subgroup()}: generate default assumptions tibble
 
-\item \code{true_summary_statistics_subgroup}: calculate true summary statistics for subgroup
+\item \code{true_summary_statistics_subgroup()}: calculate true summary statistics for subgroup
 
-\item \code{hazard_subgroup_from_PH_effect_size}: Calculate hazards in treatement arm
+\item \code{hazard_subgroup_from_PH_effect_size()}: Calculate hazards in treatement arm
 
-\item \code{cen_rate_from_cen_prop_subgroup}: calculate censoring rate from censoring proportion
+\item \code{cen_rate_from_cen_prop_subgroup()}: calculate censoring rate from censoring proportion
+
 }}
-
 \examples{
 one_simulation <- merge(
     assumptions_subgroup(),

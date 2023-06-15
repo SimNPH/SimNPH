@@ -14,11 +14,14 @@ combined_plot(
   yvar,
   facet_x_vars = c(),
   facet_y_vars = c(),
+  split_var = 1,
   heights_plots = c(3, 1),
   scale_stairs = 0.75,
   grid_level = 2,
   scales = "fixed",
-  hlines = numeric(0)
+  hlines = numeric(0),
+  use_colours = NULL,
+  use_shapes = NULL
 )
 }
 \arguments{
@@ -36,16 +39,22 @@ combined_plot(
 
 \item{facet_y_vars}{vector of variable names to create rows of facets}
 
+\item{split_var}{index of xvars along groups of which the plot should be split}
+
 \item{heights_plots}{relative heights of the main plot and the stairs on the bottom}
 
 \item{scale_stairs}{height of the stairs for each variable between 0 and 1}
 
-\item{grid_level}{depht of loops for which the grid-lines are drawn}
+\item{grid_level}{depth of loops for which the grid-lines are drawn}
 
 \item{scales}{passed on to facet_grid}
 
 \item{hlines}{position of horizontal lines, passed as \code{yintercept} to
 \code{geom_hline}}
+
+\item{use_colours}{optional named vector of colours used in \code{scale_colour_manual}}
+
+\item{use_shapes}{optional named vector of shapes used in \code{scale_shape_manual}}
 }
 \value{
 dataset in long format with one row per method and scenario and one
@@ -60,22 +69,98 @@ Functions for Plotting and Reporting Results
 With \code{exclude_from_methods} descriptive statistics or results of
 reference methods can be kept as own columns and used like the columns of
 the simulation parameters.
+
+\code{use_colours} and \code{use_shapes} both use the \code{method} variable in their respective aesthetics.
 }
 \section{Functions}{
 \itemize{
-\item \code{results_pivot_longer}: pivot simulation results into long format
+\item \code{results_pivot_longer()}: pivot simulation results into long format
 
-\item \code{combined_plot}: Nested Loop Plot with optional Facets
+\item \code{combined_plot()}: Nested Loop Plot with optional Facets
+
 }}
-
 \examples{
 \dontrun{
   plot_data <- simulation_results |>
   results_pivot_longer
 }
 \dontrun{
-  results_long <- results_wide |>
-    results_pivot_longer()
-  combined_plot(results_long, c("logrank", "max_combo"), c("effect_size_ph", "delay", "hazard_ctrl", "n_pat_design", "recruitment", "censoring_prop"), "rejection_0.05", grid_level=2)
+# plot the rejection rate of two methods
+combined_plot(
+  results_long,
+  c("logrank", "max_combo"),
+  c("effect_size_ph", "delay", "hazard_ctrl", "n_pat_design", "recruitment", "censoring_prop"),
+  "rejection_0.025",
+  grid_level=2
+)
+
+# use custom colour and shape scales
+# this can be used to group methods by shape or colour
+# this is also helpful if methods should have the same aesthetics across plots
+my_colours <- c(
+  logrank="black",
+  max_combo="blue",
+  fh_1_0="green",
+  fh_0_1="red"
+)
+
+my_shapes <- c(
+  logrank=1,
+  max_combo=2,
+  fh_1_0=3,
+  fh_0_1=3
+)
+
+combined_plot(
+  results_long,
+  c("logrank", "max_combo", "fh_1_0", "fh_0_1"),
+  c("effect_size_ph", "delay", "hazard_ctrl", "n_pat_design", "recruitment", "censoring_prop"),
+  "rejection_0.025",
+  grid_level=2,
+  use_colours = my_colours,
+  use_shapes = my_shapes
+)
+
+combined_plot(
+  results_long,
+  c("logrank", "max_combo"),
+  c("effect_size_ph", "delay", "hazard_ctrl", "n_pat_design", "recruitment", "censoring_prop"),
+  "rejection_0.025",
+  grid_level=2,
+  use_colours = my_colours,
+  use_shapes = my_shapes
+)
+
+# if one has a dataset of metadata with categories of methods
+# one could uses those two definitions
+# colours for methods, same shapes for methods of same category
+my_colours <- ggplot2::scale_colour_discrete()$palette(n=nrow(metadata)) |>
+  sample() |>
+  setNames(metadata$method)
+
+my_shapes <- metadata$category |>
+  as.factor() |>
+  as.integer() |>
+  setNames(metadata$method)
+
+  combined_plot(
+results_long,
+c("logrank", "max_combo", "fh_1_0", "fh_0_1"),
+c("effect_size_ph", "delay", "hazard_ctrl", "n_pat_design", "recruitment", "censoring_prop"),
+"rejection_0.025",
+grid_level=2,
+use_colours = my_colours,
+use_shapes = my_shapes
+)
+
+combined_plot(
+  results_long,
+  c("logrank", "max_combo"),
+  c("effect_size_ph", "delay", "hazard_ctrl", "n_pat_design", "recruitment", "censoring_prop"),
+  "rejection_0.025",
+  grid_level=2,
+  use_colours = my_colours,
+  use_shapes = my_shapes
+)
 }
 }

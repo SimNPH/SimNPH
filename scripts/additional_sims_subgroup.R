@@ -29,7 +29,7 @@ clusterEvalQ(cl, {
 # setup data generation ---------------------------------------------------
 
 # load parameters
-design <- read.table("data/results/results_martin_2023-04/data/parameters/subgroup_2023-03-29.csv", sep=",", dec=".", header=TRUE)
+design <- read.table("data/parameters/additional_subgroup_2023-04-19.csv", sep=",", dec=".", header=TRUE)
 
 # define generator
 my_generator <- function(condition, fixed_objects=NULL){
@@ -48,12 +48,9 @@ clusterExport(cl, "nominal_alpha")
 # define analysis and summarise functions ---------------------------------
 source("scripts/additional_sims_common.R")
 
-# load seeds --------------------------------------------------------------
-old_sims <- readRDS("data/results/results_martin_2023-04/data/simulation_subgroup_ims-node5_2023-04-05_151813/results.Rds")
-
 # run ---------------------------------------------------------------------
 
-save_folder <- "data/results/results_martin_2023-04/data/simulation_subgroup_ims-node5_2023-04-05_151813"
+save_folder <- "data/results/subgroup"
 dir.create(save_folder)
 
 results <- runSimulation(
@@ -62,7 +59,7 @@ results <- runSimulation(
   generate = my_generator,
   analyse = my_analyse,
   summarise = my_summarise,
-  seed = old_sims$SEED,
+  seed = design$old_seed,
   cl = cl,
   parallel = TRUE,
   save_details = list(
@@ -74,6 +71,6 @@ results <- runSimulation(
   )
 )
 
-saveRDS(results, paste0(save_folder, Sys.info()["nodename"], "_", strftime(Sys.time(), "%Y-%m-%d_%H%M%S"), "/additional.Rds"))
+saveRDS(results, paste0(save_folder, "/additional_results_subgroup_", Sys.info()["nodename"], "_", strftime(Sys.time(), "%Y-%m-%d_%H%M%S"), ".Rds"))
 
 

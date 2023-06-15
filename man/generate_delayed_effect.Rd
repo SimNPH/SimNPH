@@ -40,7 +40,7 @@ true_summary_statistics_delayed_effect(
 \item{final_events}{target events for inversion of Schönfeld Formula
 defaults to \code{condition$final_events}}
 
-\item{target_alpha}{target alpha level for the power calculation}
+\item{target_alpha}{target one-sided alpha level for the power calculation}
 
 \item{Design}{Design data.frame for delayed effect}
 
@@ -115,18 +115,18 @@ hazard ratios and RMST, that are only calculated up to a certain point.
 }
 \section{Functions}{
 \itemize{
-\item \code{generate_delayed_effect}: simulates a dataset with delayed
+\item \code{generate_delayed_effect()}: simulates a dataset with delayed
 treatment effect
 
-\item \code{assumptions_delayed_effect}: generate default design tibble
+\item \code{assumptions_delayed_effect()}: generate default design tibble
 
-\item \code{hr_after_onset_from_PH_effect_size}: Calculate hr after onset of treatment effect of the hazards from PH effect size
+\item \code{hr_after_onset_from_PH_effect_size()}: Calculate hr after onset of treatment effect of the hazards from PH effect size
 
-\item \code{cen_rate_from_cen_prop_delayed_effect}: calculate censoring rate from censoring proportion
+\item \code{cen_rate_from_cen_prop_delayed_effect()}: calculate censoring rate from censoring proportion
 
-\item \code{true_summary_statistics_delayed_effect}: calculate true summary statistics for delayed effect
+\item \code{true_summary_statistics_delayed_effect()}: calculate true summary statistics for delayed effect
+
 }}
-
 \examples{
 one_simulation <- merge(
     assumptions_delayed_effect(),
