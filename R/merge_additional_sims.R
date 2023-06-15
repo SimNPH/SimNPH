@@ -63,6 +63,9 @@ merge_additional_results <- function(old, new, design_names=NULL, descriptive_re
     design_names <- intersect(attr(old, "design_names")$design, attr(new, "design_names")$design)
   }
 
+  design_names <- intersect(design_names, names(old))
+  design_names <- intersect(design_names, names(new))
+
   if(!is.null(descriptive_regex)){
     compare_old <- old |>
       dplyr::semi_join(new, by=design_names) |>
@@ -87,5 +90,68 @@ merge_additional_results <- function(old, new, design_names=NULL, descriptive_re
 
   combined <- upsert_merge(old, new, by=design_names)
 
+  # update design names attribute
+  attr(combined, "design_names") <- mapply(
+    union,
+    attr(old, "design_names"),
+    attr(new, "design_names"),
+    SIMPLIFY = FALSE
+    )
+  attributes(combined)[c("ERROR_msg", "WARNING_msg", "extra_info")] <- NULL
+
   combined
+}
+
+#' Rename Columns in Simulation Results and Update Attributes
+#'
+#' @param results `SimDesign` object
+#' @param rename named vector of new names
+#'
+#' @return `SimDesign` object with updated column names
+#' @export
+#'
+#' @describeIn rename_results_column Rename Columns in Simulation Results
+#'
+#' @examples
+#' \dontrun{
+#' results2 <- rename_results_column(results, c("old_name"="new_name"))
+#' }
+rename_results_column <- function(results, rename){
+  rename_helper <- function(x, rename){
+    x[x %in% names(rename)] <- rename[x[x %in% names(rename)]]
+    x
+  }
+
+  names(results) <- rename_helper(names(results), rename)
+  attr(results, "design_names") <- lapply(
+    attr(results, "design_names"),
+    rename_helper,
+    rename=rename
+  )
+
+  results
+}
+
+#' @param pattern regexp pattern as understood by `stringr::str_replace_all`
+#' @param replacement replacement as understood by `stringr::str_replace_all`
+#'
+#' @export
+#'
+#' @describeIn rename_results_column Rename Columns in Simulation Results by Pattern
+#'
+#' @examples
+#' \dontrun{
+#' results2 <- rename_results_column_pattern(results, "old_name", "new_name")
+#' }
+rename_results_column_pattern <- function(results, pattern, replacement){
+  names(results) <- stringr::str_replace_all(names(results), pattern, replacement)
+
+  attr(results, "design_names") <- lapply(
+    attr(results, "design_names"),
+    stringr::str_replace_all,
+    pattern=pattern,
+    replacement=replacement
+  )
+
+  results
 }
