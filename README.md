@@ -24,6 +24,18 @@ The current unstable version can be installed with:
 remotes::install_git("https://github.com/SimNPH/SimNPH.git")
 ```
 
+Some functions require functions from the `nph` package, that have an error in
+the current CRAN version. A patched version can be installed from this
+repository with the code below. The errors should be fixed in `nph` in an
+upcoming CRAN release.
+
+```
+install.packages(
+  "https://github.com/SimNPH/SimNPH/raw/sims_week12/nph_2.1-1.tar.gz",
+  repos=NULL
+)
+```
+
 ### Getting Started
 
 Some examples of data generation, testing and estimation can be found in this
