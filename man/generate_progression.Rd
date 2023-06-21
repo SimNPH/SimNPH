@@ -157,13 +157,15 @@ one_simulation <- merge(
   generate_progression()
 head(one_simulation)
 tail(one_simulation)
+
 my_design <- merge(
-    assumptions_progression(),
-    design_fixed_followup(),
-    by=NULL
-  )
-my_design_os  <- true_summary_statistics_subgroup(my_design, "os")
-my_design_pfs <- true_summary_statistics_subgroup(my_design, "pfs")
+  assumptions_progression(),
+  design_fixed_followup(),
+  by=NULL
+)
+
+my_design_os  <- true_summary_statistics_progression(my_design, "os")
+my_design_pfs <- true_summary_statistics_progression(my_design, "pfs")
 my_design_os
 my_design_pfs
 my_design <- merge(

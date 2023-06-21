@@ -148,13 +148,15 @@ generate_progression <- function(condition, fixed_objects=NULL){
 #' @describeIn generate_progression calculate true summary statistics for scenarios with disease progression
 #'
 #' @examples
+#'
 #' my_design <- merge(
-#'     assumptions_progression(),
-#'     design_fixed_followup(),
-#'     by=NULL
-#'   )
-#' my_design_os  <- true_summary_statistics_subgroup(my_design, "os")
-#' my_design_pfs <- true_summary_statistics_subgroup(my_design, "pfs")
+#'   assumptions_progression(),
+#'   design_fixed_followup(),
+#'   by=NULL
+#' )
+#'
+#' my_design_os  <- true_summary_statistics_progression(my_design, "os")
+#' my_design_pfs <- true_summary_statistics_progression(my_design, "pfs")
 #' my_design_os
 #' my_design_pfs
 true_summary_statistics_progression <- function(Design, what="os", cutoff_stats=NULL, fixed_objects=NULL, milestones=NULL){

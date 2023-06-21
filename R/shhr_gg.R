@@ -14,12 +14,14 @@
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' library(ggplot2)
 #' library(patchwork)
 #' B <- pchaz(c(0, 10, 100), c(0.1, 0.05))
 #' A <- pchaz(c(0, 100), c(0.1))
 #' shhr_gg(A, B)
 #' shhr_gg(A, B, lab_time="Months", trafo_time=d2m)
+#' }
 shhr_gg <- function(A, B, main=NULL, sub=NULL, group_names=c("control", "treatment"), lab_time="Days", lab_group="Group", trafo_time=identity){
 
   plotdata <- data.frame(

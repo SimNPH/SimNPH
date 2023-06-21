@@ -110,7 +110,7 @@ pdf <- mixture_pdf_fun(
   )
 )
 plot(pdf(seq(0, 30, by=0.15)), type="l")
-surv <- mixture_pdf_fun(
+surv <- mixture_surv_fun(
   p = c(0.3, 0.7),
   survs = list(
     fast_surv_fun(0, 0.1),
@@ -118,14 +118,21 @@ surv <- mixture_pdf_fun(
   )
 )
 plot(surv(seq(0, 30, by=0.15)), type="l")
+
 quant <- mixture_quant_fun(
   p = c(0.3, 0.7),
   cdfs = list(
     fast_cdf_fun(0, 0.1),
     fast_cdf_fun(c(0,5), c(0.1, 0.12))
+  ),
+  quants = list(
+    fast_quant_fun(0, 0.1),
+    fast_quant_fun(c(0,5), c(0.1, 0.12))
   )
 )
-plot(surv(seq(0, 30, by=0.15)), type="l")
+
+x <- seq(0, 1, by=0.015)
+plot(x, quant(x), type="l")
 rng <- mixture_rng_fun(
   p = c(0.3, 0.7),
   rngs = list(

@@ -246,14 +246,16 @@ hr_after_crossing_from_PH_effect_size <- function(design, target_power_ph=NA_rea
 #'   event, without regard to administrative censoring.
 #'
 #' @examples
-#' design <- expand.grid(
-#'   crossing=seq(0, 10, by=5),         # crossing at 0, 1, ..., 10 days
-#'   hazard_ctrl=0.2,                   # hazard under control and before treatment effect
-#'   hazard_trt=0.02,                   # hazard after onset of treatment effect
-#'   censoring_prop=c(0.1, 0.25, 0.01), # 10%, 25%, 1% random censoring
-#'   followup=100,                      # followup of 100 days
-#'   n_trt=50,                          # 50 patients treatment
-#'   n_ctrl=50                          # 50 patients control
+#' design <- data.frame(
+#'   crossing = c(2, 4, 6),
+#'   hazard_ctrl = c(0.05, 0.05, 0.05),
+#'   hazard_trt_before = c(0.025, 0.025, 0.025),
+#'   hazard_trt_after = c(0.1, 0.1, 0.1),
+#'   censoring_prop = c(0.1, 0.3, 0.2),
+#'   n_trt = c(50, 50, 50),
+#'   n_ctrl = c(50, 50, 50),
+#'   followup = c(200, 200, 200),
+#'   recruitment = c(50, 50, 50)
 #' )
 #' cen_rate_from_cen_prop_crossing_hazards(design)
 cen_rate_from_cen_prop_crossing_hazards <- function(design){

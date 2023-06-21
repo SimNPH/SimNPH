@@ -114,7 +114,7 @@ mixture_pdf_fun    <- function(p, pdfs){
 #' @export
 #'
 #' @examples
-#' surv <- mixture_pdf_fun(
+#' surv <- mixture_surv_fun(
 #'   p = c(0.3, 0.7),
 #'   survs = list(
 #'     fast_surv_fun(0, 0.1),
@@ -140,14 +140,21 @@ mixture_surv_fun   <- function(p, survs){
 #'   not as fast as fast_quant_fun.
 #'
 #' @examples
+#'
 #' quant <- mixture_quant_fun(
 #'   p = c(0.3, 0.7),
 #'   cdfs = list(
 #'     fast_cdf_fun(0, 0.1),
 #'     fast_cdf_fun(c(0,5), c(0.1, 0.12))
+#'   ),
+#'   quants = list(
+#'     fast_quant_fun(0, 0.1),
+#'     fast_quant_fun(c(0,5), c(0.1, 0.12))
 #'   )
 #' )
-#' plot(surv(seq(0, 30, by=0.15)), type="l")
+#'
+#' x <- seq(0, 1, by=0.015)
+#' plot(x, quant(x), type="l")
 mixture_quant_fun   <- function(p, cdfs, quants){
   p <- prepare_p(p)
   check_lists(p, cdfs, quants)
@@ -161,6 +168,10 @@ mixture_quant_fun   <- function(p, cdfs, quants){
   function(v){
     sapply(v, \(y){
       lims <- range(sapply(quants, \(q){q(y)}))
+      if(!(lims[1] < lims[2])){
+        lims[2] <- lims[1]+10*.Machine$double.eps
+      }
+
       uniroot(
         target_fun,
         v=y,

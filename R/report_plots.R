@@ -316,6 +316,7 @@ combined_plot <- function(
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' test <- mtcars
 #' # add a label attribute
 #' attr(test$cyl, "label") <- "cylinders"
@@ -331,6 +332,7 @@ combined_plot <- function(
 #'
 #' gg2 <- labs_from_labels(gg2)
 #' gg2
+#' }
 labs_from_labels <- function(gg){
   new_labels <- gg$mapping |>
     purrr::map(rlang::as_name) |>
