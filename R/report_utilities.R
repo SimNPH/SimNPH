@@ -315,13 +315,13 @@ interactive_filters <- function(prefix,input=NULL) {
 #' @param default_censoring The default value for the proportion of subjects with random censoring.
 #'
 #' @return A sidebar panel with select inputs for clinical trial parameters.
+#' @export
 #'
 #' @examples
 #' \dontrun{
 #' # generate the sidebar panel with default values
 #' sidebar_panel <- input_trial_inputs("trial1_", default_mts = 12, default_recruitment = 18, default_censoring = 0)
 #' }
-#'
 input_trial_inputs <- function(prefix, default_mts = 12, default_recruitment = 18, default_censoring = 0) {
   panel <- sidebarPanel(
     selectInput(paste0(prefix,"median_survival_ctrl"), label = "Median Survival in Control arm (mts):",

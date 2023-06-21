@@ -31,5 +31,4 @@ Generate a sidebar panel with select inputs for clinical trial parameters.
 # generate the sidebar panel with default values
 sidebar_panel <- input_trial_inputs("trial1_", default_mts = 12, default_recruitment = 18, default_censoring = 0)
 }
-
 }
