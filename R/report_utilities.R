@@ -145,7 +145,7 @@ plot_sim_results <- function(data,
 #' @param parameter_row parameter to define row facets
 #' @param parameter_col parameter to defin column facets
 #' @param parameters_steps parameters across which x-scale is looped
-#' @param ...
+#' @param ... passed on to loopplot
 #'
 #' @return
 #' @export

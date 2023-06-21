@@ -33,6 +33,8 @@ mixture_rng_fun(p, rngs)
 
 \item{cdfs}{list of cumulative density functions of the mixture components}
 
+\item{quants}{list of quantile functions of the mixture components}
+
 \item{rngs}{random number generating functions of the components}
 }
 \value{

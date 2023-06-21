@@ -30,7 +30,7 @@ plot_parameter_scenario(
 
 \item{parameters_steps}{parameters across which x-scale is looped}
 
-\item{...}{}
+\item{...}{passed on to loopplot}
 }
 \description{
 Nested loop plot of parameter scenarios

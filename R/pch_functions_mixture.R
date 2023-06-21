@@ -134,6 +134,7 @@ mixture_surv_fun   <- function(p, survs){
 #' @export
 #'
 #' @param cdfs list of cumulative density functions of the mixture components
+#' @param quants list of quantile functions of the mixture components
 #'
 #' @details mixture_quant_fun relies on numeric root finding and is therefore
 #'   not as fast as fast_quant_fun.
