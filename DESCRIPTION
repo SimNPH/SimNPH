@@ -30,7 +30,6 @@ Imports:
     nphRCT,
     Rcpp (>= 1.0.8),
     car,
-    withr,
     dplyr,
     stringr
 LinkingTo: Rcpp
