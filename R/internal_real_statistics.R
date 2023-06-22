@@ -68,7 +68,7 @@ internal_real_statistics_pchaz_discrete <- function(data_gen_model_trt, data_gen
       names(milestones)[names(milestones) %in% c("", NA_character_)] <- as.character(milestones[names(milestones) %in% c("", NA_character_)])
     }
 
-    milestones <- purrr:::imap(milestones, function(v, label){
+    milestones <- purrr::imap(milestones, function(v, label){
       tmp <- data.frame(
         milestone_survival_trt  = tail(data_gen_model_trt$S[data_gen_model_trt$t < v], 1),
         milestone_survival_ctrl = tail(data_gen_model_ctrl$S[data_gen_model_ctrl$t < v], 1)
@@ -182,7 +182,7 @@ fast_real_statistics <- function(
       names(milestones)[names(milestones) %in% c("", NA_character_)] <- as.character(milestones[names(milestones) %in% c("", NA_character_)])
     }
 
-    milestones <- purrr:::imap(milestones, function(v, label){
+    milestones <- purrr::imap(milestones, function(v, label){
       tmp <- data.frame(
         milestone_survival_trt  = surv_trt(v),
         milestone_survival_ctrl = surv_ctrl(v)

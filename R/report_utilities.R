@@ -133,66 +133,6 @@ plot_sim_results <- function(data,
 }
 
 
-
-#' Plot parameter scenarios
-#'
-#' Nested loop plot of parameter scenarios
-#'
-#' @param data tibble with simulation results in long format
-#' @param parameters which parameter values to show on y-axis
-#' @param parameter_x parameter to show on x-axis
-#' @param filters character vector defining filters to apply to dataset (see Details)
-#' @param parameter_row parameter to define row facets
-#' @param parameter_col parameter to defin column facets
-#' @param parameters_steps parameters across which x-scale is looped
-#' @param ... passed on to loopplot
-#'
-#' @return
-#' @export
-#'
-#' @examples
-plot_parameter_scenario <- function(data,
-                                    parameters,
-                                    parameter_x,
-                                    filters = c("median_survival_ctrl == 12",
-                                                "recruitment == 18",
-                                                "censoring_prop == 0"),
-                                    parameter_row = "effect_size_ph",
-                                    parameter_col = "n_pat",
-                                    parameters_steps = NULL,...){
-  ## Limit to interesting scenarios, take from shiny input
-  filters = rlang::parse_exprs(filters)
-  columns = c(parameter_x,parameters,parameter_row,parameter_col,parameters_steps)
-  if(any((columns %in% names(data))==FALSE)){
-    stop(paste("Column missing:",columns[which(!(columns %in% names(data)))]))
-  }
-  plot_data <- filter(data,!!!filters) |>
-    select(all_of(columns))
-  y_base <- plot_data |>
-    summarise(across(all_of(parameters),~min(.x))) |>
-    pivot_longer(everything()) |>
-    pull(value) |>
-    min()
-  plot_data |>
-    looplot::nested_loop_plot(x=parameter_x,
-                              grid_rows=parameter_row,
-                              grid_cols=parameter_col,
-                              steps=parameters_steps,
-                              design_type = 'partial',
-                              spu_x_shift = .2, #space between groups
-                              steps_y_base=y_base*0.9,
-                              # steps_y_height=0.1,
-                              # steps_y_shift = 0.5,
-                              colors = scales::brewer_pal(palette = "Set1"),
-                              steps_values_annotate = TRUE, steps_annotation_size = 2.5,
-                              post_processing = list(
-                                add_custom_theme = list(
-                                  axis.text.x = element_text(angle = -90,
-                                                             vjust = 0.5,
-                                                             size = 8)
-                                )),...)
-}
-
 #' Plot Survival Curve
 #'
 #' Plot a survival curve for a given set of parameters.
@@ -206,7 +146,15 @@ plot_parameter_scenario <- function(data,
 #'
 #' @examples
 #' \dontrun{
-#' data <- data.frame(hazard_trt = 0.01, hazard_ctrl = 0.008, delay = 30, hazard_after_prog = 0.005, prog_rate_trt = 0.2, prog_rate_ctrl = 0.15, prevalence = 0.5)
+#' data <- data.frame(
+#'   hazard_trt = 0.01,
+#'   hazard_ctrl = 0.008,
+#'   delay = 30,
+#'   hazard_after_prog = 0.005,
+#'   prog_rate_trt = 0.2,
+#'   prog_rate_ctrl = 0.15,
+#'   prevalence = 0.5
+#' )
 #' plot_nph_curves(data = data, type = 'delay')
 #' }
 #' @export
@@ -321,7 +269,12 @@ interactive_filters <- function(prefix,input=NULL) {
 #' @examples
 #' \dontrun{
 #' # generate the sidebar panel with default values
-#' sidebar_panel <- input_trial_inputs("trial1_", default_mts = 12, default_recruitment = 18, default_censoring = 0)
+#' sidebar_panel <- input_trial_inputs(
+#'   "trial1_",
+#'   default_mts = 12,
+#'   default_recruitment = 18,
+#'   default_censoring = 0
+#' )
 #' }
 input_trial_inputs <- function(prefix, default_mts = 12, default_recruitment = 18, default_censoring = 0) {
   panel <- sidebarPanel(

@@ -32,7 +32,12 @@ Imports:
     Rcpp (>= 1.0.8),
     car,
     dplyr,
-    stringr
+    stringr,
+    methods,
+    tidyr,
+    scales,
+    memoise,
+    ggsci
 LinkingTo: Rcpp
 Config/testthat/edition: 3
 VignetteBuilder: R.rsp

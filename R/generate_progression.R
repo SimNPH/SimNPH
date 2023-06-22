@@ -315,15 +315,15 @@ progression_rate_from_progression_prop <- function(design){
 #'
 #' @examples
 #' design <- expand.grid(
-#' hazard_ctrl         = 0.001518187, # hazard under control (med. survi. 15m)
-#' hazard_trt          = 0.001265156, # hazard under treatment (med. surv. 18m)
-#' hazard_after_prog   = 0.007590934, # hazard after progression (med. surv. 3m)
-#' prog_rate_ctrl      = 0.001897734, # hazard rate for disease progression under control (med. time to progression 12m)
-#' prog_rate_trt       = c(0.001897734, 0.001423300, 0.001265156), # hazard rate for disease progression unter treatment (med. time to progression 12m, 16m, 18m)
-#' censoring_prop      = 0.1,         # rate of random withdrawal
-#' followup            = 100,         # follow up time
-#' n_trt               = 50,          # patients in treatment arm
-#' n_ctrl              = 50           # patients in control arm
+#' hazard_ctrl         = m2r(15),          # hazard under control
+#' hazard_trt          = m2r(18),          # hazard under treatment
+#' hazard_after_prog   = m2r(3),           # hazard after progression
+#' prog_rate_ctrl      = m2r(12),          # hazard for disease progression under control
+#' prog_rate_trt       = m2r(c(12,16,18)), # hazard for disease progression unter treatment
+#' censoring_prop      = 0.1,              # rate of random withdrawal
+#' followup            = 100,              # follow up time
+#' n_trt               = 50,               # patients in treatment arm
+#' n_ctrl              = 50                # patients in control arm
 #' )
 #' cen_rate_from_cen_prop_progression(design)
 cen_rate_from_cen_prop_progression <- function(design){

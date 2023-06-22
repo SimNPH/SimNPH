@@ -117,9 +117,6 @@ test_that("test that true_summary_statistics_delayed_effect works", {
   test_design1 <- test_design |>
     true_summary_statistics_delayed_effect(cutoff_stats = my_cutoff_stats)
 
-  test_design2 <- test_design |>
-    true_summary_statistics_delayed_effect(cutoff_stats = my_cutoff_stats)
-
   expect_named(
     test_design1,
     c("n_trt", "n_ctrl", "delay", "hazard_ctrl", "hazard_trt", "followup",
