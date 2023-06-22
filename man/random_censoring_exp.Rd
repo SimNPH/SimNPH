@@ -22,17 +22,17 @@ indicator to \code{FALSE} for censored observations.
 Apply Random Exponentially Distributed Censoring
 }
 \examples{
-# generate a sample with delayed effect
+
 one_simulation <- merge(
-    assumptions_delayed_effect(),
-    design_fixed_followup(),
-    by=NULL
-  ) |>
+  assumptions_delayed_effect(),
+  design_fixed_followup(),
+  by=NULL
+) |>
   head(1) |>
   generate_delayed_effect()
 
 # apply censoring to dataset
-censored_sim <- (random_censoring_exp(0.01))(one_simulation)
+censored_sim <- random_censoring_exp(one_simulation, 0.01)
 
 # plot
 # uncensored (blue) observations are the same for original and modified

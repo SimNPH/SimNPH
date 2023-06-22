@@ -26,7 +26,7 @@ analyse_gehan_wilcoxon <- function(alternative="two.sided") {
   stopifnot(alternative %in% c("two.sided", "one.sided"))
 
   function(condition, dat, fixed_objects = NULL) {
-    # according to survival:::print.survdiff
+    # according to ?survival::print.survdiff
     model <- survival::survdiff(survival::Surv(t, evt) ~ trt, dat, rho = 1)
     df <- sum(model$exp > 0) - 1
 

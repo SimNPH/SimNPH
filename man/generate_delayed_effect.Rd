@@ -140,11 +140,12 @@ tail(one_simulation)
 Design <- assumptions_delayed_effect()
 Design
 my_design <- merge(
-    assumptions_crossing_hazards(),
-    design_fixed_followup(),
-    by=NULL
-  )
+  assumptions_delayed_effect(),
+  design_fixed_followup(),
+  by=NULL
+)
 
+my_design$hazard_ctrl <- 0.05
 my_design$final_events <- ceiling((my_design$n_trt + my_design$n_ctrl)*0.75)
 my_design$hazard_trt <- NA
 my_design <- hr_after_onset_from_PH_effect_size(my_design, target_power_ph=0.9)

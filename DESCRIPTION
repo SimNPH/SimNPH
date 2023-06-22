@@ -21,7 +21,8 @@ Suggests:
     withr,
     ldbounds,
     ggplot2,
-    patchwork
+    patchwork,
+    R.rsp
 Imports:
     purrr (>= 1.0.0),
     rlang,
@@ -30,11 +31,15 @@ Imports:
     nphRCT,
     Rcpp (>= 1.0.8),
     car,
-    withr,
     dplyr,
-    stringr
+    stringr,
+    methods,
+    tidyr,
+    scales,
+    memoise,
+    ggsci
 LinkingTo: Rcpp
 Config/testthat/edition: 3
-VignetteBuilder: knitr
+VignetteBuilder: R.rsp
 RoxygenNote: 7.2.3
 Roxygen: list(markdown = TRUE)

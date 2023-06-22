@@ -1,11 +1,11 @@
 ---
 title: "Some Simple Examples for the Usage of the SimNPH Package"
 subtitle: "Generate Data, Test and Estimate, Summarise"
-output: rmarkdown::html_vignette
-vignette: >
-  %\VignetteIndexEntry{simple_example}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+output:
+  html_document:
+    toc: true
+    toc_depth: 2
+    self_contained: yes
 ---
 
 ```{r, include = FALSE}
@@ -209,7 +209,6 @@ Summarise <- create_summarise_function(
   maxcombo_seq = summarise_group_sequential(),
   logrank_seq = summarise_group_sequential()
 )
-
 ```
 
 ## Putting it all together
