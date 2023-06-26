@@ -16,4 +16,12 @@
 NULL
 #> NULL
 
+# declaring varibles to avoid R CMD check notes.
+# those are mostly column names that occur in with, within, subset functioncs,
+# dplyr verbs and ggplot calls.
+globalVariables(c(
+  "interval", "trt", "method", "x", "name", "value", "level", "y", "n_pat",
+  "surv_a", "surv_b", "haz_a", "haz_b", "hr"
+))
+
 

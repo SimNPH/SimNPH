@@ -60,7 +60,7 @@ order_combine_xvars <- function(data, xvars, facet_vars=c(), height_x_axis=0.8, 
   x_axis <- result |>
     dplyr::select(x, !!!xvars, !!!facet_vars) |>
     unique() |>
-    tidyr::pivot_longer(cols=c(-x, -any_of(facet_vars))) |>
+    tidyr::pivot_longer(cols=c(-x, -dplyr::any_of(facet_vars))) |>
     dplyr::group_by(name) |>
     dplyr::mutate(
       y=(as.integer(as.factor(value))-1) / (length(unique(value))-1)
