@@ -68,41 +68,6 @@ subpop_pzhaz_simnph_internal <- function(Tint, lambda1, lambda2, lambdaProg, int
   out
 }
 
-
-
-subpop_pchaz_simnph <- function (Tint, lambda1, lambda2, lambdaProg,
-          int_control = list(rel.tol = .Machine$double.eps^0.4, abs.tol = 1e-09), t)
-{
-  call <- match.call()
-  if (any(diff(Tint) <= 0)) {
-    stop("Tint should be non-decreasing")
-  }
-
-  if (!all(c("rel.tol", "abs.tol") %in% names(int_control))) {
-    int_control = list(rel.tol = .Machine$double.eps^0.4,
-                       abs.tol = 1e-09)
-  }
-  if (all(lambdaProg == Inf)) {
-    funs = internal_pchaz(Tint, lambda2)
-  }
-  else if (all(lambdaProg == 0)) {
-    funs = internal_pchaz(Tint, lambda1)
-  }
-  else {
-    funs = subpop_pzhaz_simnph_internal(Tint, lambda1, lambda2,
-                                 lambdaProg, int_control)
-  }
-  haz = funs$haz_f(t)
-  cumhaz = funs$cumhaz_f(t)
-  S = funs$surv_f(t)
-  F = funs$cdf_f(t)
-  out <- list(haz = haz, cumhaz = cumhaz, S = S, F = F, t = t,
-              Tint = Tint, lambda1 = lambda1, lambda2 = lambda2, lambdaProg = lambdaProg,
-              timezero = FALSE, call = call, funs = funs)
-  class(out) <- c("mixpch", "subpop")
-  out
-}
-
 subpop_hazVfun_simnph <- function (Tint, lambda1, lambda2, lambdaProg,
                                    timezero = FALSE){
   stopifnot(timezero)
