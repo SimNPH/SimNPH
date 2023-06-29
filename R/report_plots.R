@@ -54,7 +54,7 @@ order_combine_xvars <- function(data, xvars, facet_vars=c(), height_x_axis=0.8, 
     dplyr::arrange(!!!xvars) |>
     tidyr::unite(x, !!!xvars, remove=FALSE) |>
     dplyr::mutate(
-      x = forcats::fct_inorder(x)
+      x = factor(x, levels=unique(x))
     )
 
   x_axis <- result |>
