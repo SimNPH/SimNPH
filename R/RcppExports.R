@@ -3,5 +3,5 @@
 
 # Register entry points for exported C++ functions
 methods::setLoadAction(function(ns) {
-    .Call('_SimNPH_RcppExport_registerCCallable', PACKAGE = 'SimNPH')
+    .Call(`_SimNPH_RcppExport_registerCCallable`)
 })
