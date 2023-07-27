@@ -81,8 +81,8 @@ the simulation parameters.
 }}
 \examples{
 \dontrun{
-  plot_data <- simulation_results |>
-  results_pivot_longer
+plot_data <- simulation_results |>
+  results_pivot_longer()
 }
 \dontrun{
 # plot the rejection rate of two methods

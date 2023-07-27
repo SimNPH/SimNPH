@@ -16,8 +16,8 @@
 #'
 #' @examples
 #' \dontrun{
-#'   plot_data <- simulation_results |>
-#'   results_pivot_longer
+#' plot_data <- simulation_results |>
+#'   results_pivot_longer()
 #' }
 results_pivot_longer <- function(data, exclude_from_methods=c("descriptive")){
   # delete potentially huge attributes that are not needed for plots
