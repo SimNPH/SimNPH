@@ -5,7 +5,7 @@
 \alias{m2r}
 \alias{m2d}
 \alias{d2m}
-\title{Utility Functions}
+\title{Functions to Convert Between Days and Months and Medians and Rates}
 \usage{
 r2m(lambda)
 

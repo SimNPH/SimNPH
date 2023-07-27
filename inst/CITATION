@@ -1,16 +1,5 @@
 citHeader("To cite SimNPH in publications use:")
 
-citEntry(
-  entry    = "Misc",
-  title    = "Statistical methods for time-to-event endpoints with non-proportional hazards in clinical trials pivotal for benefit risk decision making",
-  author   = "CONFIRMS Consortium",
-  year     = 2023,
-  url      = "https://www.encepp.eu/encepp/openAttachment/fullProtocol/49769",
-  textVersion = paste(
-    "Statistical methods for time-to-event endpoints with non-proportional hazards in clinical trials pivotal for benefit risk decision making, Simulation Study Protocol, CONFIRMS Consortium, 2023, https://www.encepp.eu/encepp/openAttachment/fullProtocol/49769"
-  )
-)
-
 bibentry(
   bibtype = "Misc",
   title = "Statistical methods for time-to-event endpoints with non-proportional hazards in clinical trials pivotal for benefit risk decision making",

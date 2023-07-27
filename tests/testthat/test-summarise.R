@@ -134,7 +134,7 @@ test_that("creating a summarise function for an estimator works", {
     apply(1, paste, collapse="") |>
     unname()
 
-  expected_names <- c(names(condition), expected_names, c("REPLICATIONS", "SIM_TIME", "COMPLETED", "SEED"))
+  expected_names <- c(names(condition), expected_names, c("REPLICATIONS", "SIM_TIME", "COMPLETED", "SEED", "RAM_USED"))
 
   expect_named(sim_results, expected_names, ignore.order = TRUE)
 

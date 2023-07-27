@@ -44,7 +44,7 @@ censoring_prop_from_cumhaz <- function(n_trt, n_ctrl, censoring_prop, cumhaz_ctr
   (-b + sqrt(b^2 - 4*a*c))/(2*a*t_max)
 }
 
-#' Utility Functions
+#' Functions to Convert Between Days and Months and Medians and Rates
 #'
 #' Some functions to convert between days and months and rates and medians.
 #'
