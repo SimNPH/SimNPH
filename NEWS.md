@@ -1,3 +1,3 @@
-# SimNPH 0.4.1
+# SimNPH 0.4.2
 
-* Initial CRAN submission.
+* Built first version of pkdown Site
