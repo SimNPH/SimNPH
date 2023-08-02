@@ -12,10 +12,6 @@ can readily be used as `generate`, `analyse` and `summarise` arguments in
 
 ## Usage
 
-**Please be aware, that this package is in an early stage of development.
-Neither is it feature complete nor is the interface completely stable, expect
-bugs, changes and missing functionality!**
-
 ### Installation
 
 The current unstable version can be installed with:
@@ -38,8 +34,11 @@ install.packages(
 
 ### Getting Started
 
-Some examples of data generation, testing and estimation can be found in this
-[vignette](https://simnph.github.io/SimNPH/doc/simple_example.html).
+Documentation for all functions can be found in the respective help topics in
+the package after installation or
+[here](https://simnph.github.io/SimNPH/reference/index.html)
 
-Documentation for all functions can be found in the respective help topics.
+Some examples of data generation, testing and estimation can be found in this
+[vignette](https://simnph.github.io/SimNPH/articles/vignettes_prebuild/simple_example.html).
+
 

@@ -166,7 +166,7 @@ test_that("test that hr_after_onset_from_PH_effect_size works", {
     )
   )
   my_design$hazard_trt <- NA
-  my_design$hazard_ctrl <- 0.1
+  my_design$hazard_ctrl <- m2r(8)
 
   my_design$followup <- NULL
   my_design$final_events <- (my_design$n_trt + my_design$n_ctrl) * 0.75
