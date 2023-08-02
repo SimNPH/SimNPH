@@ -44,10 +44,18 @@ internal_real_statistics_pchaz_discrete <- function(data_gen_model_trt, data_gen
       Int0 <- sum(true_avg_HR_fun0[ind])
       Int1 <- sum(true_avg_HR_fun1[ind])
 
+      log_quot <- suppressWarnings({
+        log(data_gen_model_trt$haz[ind] / data_gen_model_ctrl$haz[ind])
+      })
+
+      if(any(is.nan(log_quot))){
+        warning("NaN values in log hazard ratio, check cutoff value.")
+      }
+
       tmp <- data.frame(
         rmst_trt            = sum(data_gen_model_trt$S[ind]),
         rmst_ctrl           = sum(data_gen_model_ctrl$S[ind]),
-        gAHR                = exp(sum( (log(data_gen_model_trt$haz[ind] / data_gen_model_ctrl$haz[ind]) * f[ind]) , na.rm=TRUE)),
+        gAHR                = exp(sum( (log_quot * f[ind]) , na.rm=TRUE)),
         AHR                 = sum(((data_gen_model_trt$haz[ind]/h[ind]) * f[ind]), na.rm=TRUE) /
           sum(((data_gen_model_ctrl$haz[ind]/h[ind]) * f[ind]), na.rm=TRUE),
         AHRoc = Int0/Int1,

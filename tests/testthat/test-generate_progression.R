@@ -78,16 +78,18 @@ test_that("true summary statistics progression works", {
   summaries_os_3   <- true_summary_statistics_progression(design_2, what="os", cutoff=c("a"=m2d(24)), milestones=m2d(c("first"=6, "second"=12)))
   summaries_pfs_3  <- true_summary_statistics_progression(design_2, what="pfs", cutoff=c("a"=m2d(24)), milestones=m2d(c("first"=6, "second"=12)))
 
+  expect_warning(true_summary_statistics_progression(head(design,1), what="os", cutoff=Inf))
+
   expect_error(true_summary_statistics_progression(design, what="something else"))
 
   expect_named(
     summaries_pfs,
     c(
       names(design),
-      "median_survival_trt", "median_survival_ctrl", "rmst_trt_75",
-      "rmst_ctrl_75", "gAHR_75", "AHR_75", "AHRoc_75", "AHRoc_robust_75",
-      "milestone_survival_trt_50", "milestone_survival_ctrl_50",
-      "milestone_survival_trt_100", "milestone_survival_ctrl_100"
+      "median_survival_trt", "median_survival_ctrl", "rmst_trt_730.5",
+      "rmst_ctrl_730.5", "gAHR_730.5", "AHR_730.5", "AHRoc_730.5", "AHRoc_robust_730.5",
+      "milestone_survival_trt_182.625", "milestone_survival_ctrl_182.625",
+      "milestone_survival_trt_365.25", "milestone_survival_ctrl_365.25"
     )
   )
 
@@ -95,10 +97,10 @@ test_that("true summary statistics progression works", {
     summaries_os,
     c(
       names(design),
-      "median_survival_trt", "median_survival_ctrl", "rmst_trt_75",
-      "rmst_ctrl_75", "gAHR_75", "AHR_75", "AHRoc_75", "AHRoc_robust_75",
-      "milestone_survival_trt_50", "milestone_survival_ctrl_50",
-      "milestone_survival_trt_100", "milestone_survival_ctrl_100"
+      "median_survival_trt", "median_survival_ctrl", "rmst_trt_730.5",
+      "rmst_ctrl_730.5", "gAHR_730.5", "AHR_730.5", "AHRoc_730.5", "AHRoc_robust_730.5",
+      "milestone_survival_trt_182.625", "milestone_survival_ctrl_182.625",
+      "milestone_survival_trt_365.25", "milestone_survival_ctrl_365.25"
     )
   )
 
