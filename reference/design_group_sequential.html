@@ -77,16 +77,16 @@ intended to be used to copy paste the code and edit the parameters.</p>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">Design</span> <span class="op">&lt;-</span> <span class="fu">design_group_sequential</span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> expand.grid(</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   n_trt=50,          # 100 patients in the treatment arm</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   n_ctrl=50,         # 100 patients in the control arm</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   followup=200,      # maximum followup time</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   recruitment=50,    # recruitment time</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   interim_events=25, # events interim analysis</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   final_events=50    # events final analysis</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   n_trt=200,          # 200 patients in the treatment arm</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   n_ctrl=200,         # 200 patients in the control arm</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   followup=m2d(48),   # maximum followup time 4 years</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   recruitment=m2d(6), # recruitment time 6 months</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   interim_events=150, # interim analysis after 150 events</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   final_events=300    # final analysis after 300 events</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> )</span>
 <span class="r-in"><span><span class="va">Design</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   n_trt n_ctrl followup recruitment interim_events final_events</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1    50     50      200          50             25           50</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1   200    200     1461     182.625            150          300</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

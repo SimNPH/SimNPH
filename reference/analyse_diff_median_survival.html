@@ -107,34 +107,34 @@ columns:</p><ul><li><p><code>p</code> p value of the test, see Details</p></li>
 <span class="r-in"><span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> expand.grid(</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   delay=seq(0, 10, by=2), # delay of 0, 1, ..., 10 days</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   hazard_ctrl=0.2,        # hazard under control and before treatment effect</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   hazard_trt=0.02,        # hazard after onset of treatment effect</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   random_withdrawal=0.01  # rate of random withdrawal</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   delay=m2d(seq(0, 10, by=2)), # delay of 0, 1, ..., 10 months</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   hazard_ctrl=m2r(24),         # median survival control of 24 months</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   hazard_trt=m2r(36),          # median survival treatment of 36 months</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   random_withdrawal=m2r(120)   # median time to random withdrawal 10 years</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> )</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> expand.grid(</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   n_trt=50,      # 100 patients in the treatment arm</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   n_ctrl=50,     # 100 patients in the control arm</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   followup=200,  # fixed followup time</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   recruitment=50 # recruitment time</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   n_trt=150,         # 150 patients in the treatment arm</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   n_ctrl=150,        # 150 patients in the control arm</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   followup=m2d(24),  # followup 2 years</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   recruitment=m2d(6) # recruitment time 6 months</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> )</span>
 <span class="r-in"><span><span class="va">dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="generate_delayed_effect.html">generate_delayed_effect</a></span><span class="op">(</span><span class="va">condition</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">analyse_diff_median_survival</span><span class="op">(</span><span class="op">)</span><span class="op">(</span><span class="va">condition</span>, <span class="va">dat</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $p</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.0001655204</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.01076978</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $alternative</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "two.sided"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $diff_Q</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 27</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 402</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $diff_Q_lower</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 12.95026</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 93.02728</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $diff_Q_upper</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 41.04974</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 710.9727</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $CI_level</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.95</span>
@@ -143,10 +143,10 @@ columns:</p><ul><li><p><code>p</code> p value of the test, see Details</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.5</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $N_pat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 100</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 300</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $N_evt</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 100</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 300</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 </code></pre></div>
     </div>

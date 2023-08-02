@@ -207,22 +207,22 @@ hazard ratios that correspond to reasonable and realistic scenarios.</p>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">Design</span> <span class="op">&lt;-</span> <span class="fu">assumptions_progression</span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> expand.grid(</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   hazard_ctrl       = 0.001518187, # hazard under control (med. survi. 15m)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   hazard_trt        = 0.001265156, # hazard under treatment (med. surv. 18m)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   hazard_after_prog = 0.007590934, # hazard after progression (med. surv. 3m)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   prog_rate_ctrl    = 0.001897734, # hazard rate for disease progression under control</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   prog_rate_trt     = c(0.001897734, 0.001423300, 0.001265156), # haz. rate for progression, trt.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   random_withdrawal = 0.01         # rate of random withdrawal</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   hazard_ctrl= m2r(24),              # med. survival ctrl 24 months</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   hazard_trt= m2r(36),               # med. survival trt 36 months</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   hazard_after_prog=m2r(6),          # med. survival after prorg. 6 months</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   prog_rate_ctrl=m2r(12),            # med. time to prog. ctrl 12 months</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   prog_rate_trt= m2r(c(12, 16, 18)), # med. time to prog. trt 12, 16, 18 months</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   random_withdrawal=m2r(120)         # median time to random withdrawal 10 years</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> )</span>
 <span class="r-in"><span><span class="va">Design</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   hazard_ctrl  hazard_trt hazard_after_prog prog_rate_ctrl prog_rate_trt</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.001518187 0.001265156       0.007590934    0.001897734   0.001897734</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2 0.001518187 0.001265156       0.007590934    0.001897734   0.001423300</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3 0.001518187 0.001265156       0.007590934    0.001897734   0.001265156</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    hazard_ctrl   hazard_trt hazard_after_prog prog_rate_ctrl prog_rate_trt</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.0009488668 0.0006325779       0.003795467    0.001897734   0.001897734</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 0.0009488668 0.0006325779       0.003795467    0.001897734   0.001423300</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 0.0009488668 0.0006325779       0.003795467    0.001897734   0.001265156</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   random_withdrawal</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1              0.01</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2              0.01</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3              0.01</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1      0.0001897734</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2      0.0001897734</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3      0.0001897734</span>
 <span class="r-in"><span><span class="va">one_simulation</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/merge.html" class="external-link">merge</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>    <span class="fu">assumptions_progression</span><span class="op">(</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>    <span class="fu"><a href="design_fixed_followup.html">design_fixed_followup</a></span><span class="op">(</span><span class="op">)</span>,</span></span>
@@ -231,36 +231,36 @@ hazard ratios that correspond to reasonable and realistic scenarios.</p>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">tail</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>  <span class="fu">generate_progression</span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> expand.grid(</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   hazard_ctrl       = 0.001518187, # hazard under control (med. survi. 15m)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   hazard_trt        = 0.001265156, # hazard under treatment (med. surv. 18m)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   hazard_after_prog = 0.007590934, # hazard after progression (med. surv. 3m)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   prog_rate_ctrl    = 0.001897734, # hazard rate for disease progression under control</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   prog_rate_trt     = c(0.001897734, 0.001423300, 0.001265156), # haz. rate for progression, trt.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   random_withdrawal = 0.01         # rate of random withdrawal</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   hazard_ctrl= m2r(24),              # med. survival ctrl 24 months</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   hazard_trt= m2r(36),               # med. survival trt 36 months</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   hazard_after_prog=m2r(6),          # med. survival after prorg. 6 months</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   prog_rate_ctrl=m2r(12),            # med. time to prog. ctrl 12 months</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   prog_rate_trt= m2r(c(12, 16, 18)), # med. time to prog. trt 12, 16, 18 months</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   random_withdrawal=m2r(120)         # median time to random withdrawal 10 years</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> )</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> expand.grid(</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   n_trt=50,      # 100 patients in the treatment arm</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   n_ctrl=50,     # 100 patients in the control arm</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   followup=200,  # fixed followup time</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   recruitment=50 # recruitment time</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   n_trt=150,         # 150 patients in the treatment arm</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   n_ctrl=150,        # 150 patients in the control arm</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   followup=m2d(24),  # followup 2 years</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   recruitment=m2d(6) # recruitment time 6 months</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> )</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">one_simulation</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     t trt  evt t_ice   ice</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 170   1 TRUE   Inf FALSE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2  52   1 TRUE   Inf FALSE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3 231   1 TRUE   Inf FALSE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4 532   1 TRUE   477  TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5 276   1 TRUE   Inf FALSE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6 421   1 TRUE   350  TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 145   1 TRUE   Inf FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 144   1 TRUE   Inf FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 681   1 TRUE   165  TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4 551   1 TRUE   415  TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5 243   1 TRUE   Inf FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6 596   1 TRUE   Inf FALSE</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">tail</a></span><span class="op">(</span><span class="va">one_simulation</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       t trt  evt t_ice   ice</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 95  125   0 TRUE   Inf FALSE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 96  433   0 TRUE   Inf FALSE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 97  689   0 TRUE   626  TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 98  203   0 TRUE    89  TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 99  282   0 TRUE   Inf FALSE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 100 549   0 TRUE   Inf FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        t trt  evt t_ice   ice</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 295 1684   0 TRUE   Inf FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 296   92   0 TRUE    70  TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 297  124   0 TRUE     1  TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 298   62   0 TRUE   Inf FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 299  334   0 TRUE   Inf FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 300 1455   0 TRUE   932  TRUE</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">my_design</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/merge.html" class="external-link">merge</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>  <span class="fu">assumptions_progression</span><span class="op">(</span><span class="op">)</span>,</span></span>
@@ -268,67 +268,67 @@ hazard ratios that correspond to reasonable and realistic scenarios.</p>
 <span class="r-in"><span>  by<span class="op">=</span><span class="cn">NULL</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> expand.grid(</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   hazard_ctrl       = 0.001518187, # hazard under control (med. survi. 15m)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   hazard_trt        = 0.001265156, # hazard under treatment (med. surv. 18m)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   hazard_after_prog = 0.007590934, # hazard after progression (med. surv. 3m)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   prog_rate_ctrl    = 0.001897734, # hazard rate for disease progression under control</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   prog_rate_trt     = c(0.001897734, 0.001423300, 0.001265156), # haz. rate for progression, trt.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   random_withdrawal = 0.01         # rate of random withdrawal</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   hazard_ctrl= m2r(24),              # med. survival ctrl 24 months</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   hazard_trt= m2r(36),               # med. survival trt 36 months</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   hazard_after_prog=m2r(6),          # med. survival after prorg. 6 months</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   prog_rate_ctrl=m2r(12),            # med. time to prog. ctrl 12 months</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   prog_rate_trt= m2r(c(12, 16, 18)), # med. time to prog. trt 12, 16, 18 months</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   random_withdrawal=m2r(120)         # median time to random withdrawal 10 years</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> )</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> expand.grid(</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   n_trt=50,      # 100 patients in the treatment arm</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   n_ctrl=50,     # 100 patients in the control arm</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   followup=200,  # fixed followup time</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   recruitment=50 # recruitment time</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   n_trt=150,         # 150 patients in the treatment arm</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   n_ctrl=150,        # 150 patients in the control arm</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   followup=m2d(24),  # followup 2 years</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   recruitment=m2d(6) # recruitment time 6 months</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> )</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">my_design_os</span>  <span class="op">&lt;-</span> <span class="fu">true_summary_statistics_progression</span><span class="op">(</span><span class="va">my_design</span>, <span class="st">"os"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">my_design_pfs</span> <span class="op">&lt;-</span> <span class="fu">true_summary_statistics_progression</span><span class="op">(</span><span class="va">my_design</span>, <span class="st">"pfs"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">my_design_os</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   hazard_ctrl  hazard_trt hazard_after_prog prog_rate_ctrl prog_rate_trt</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.001518187 0.001265156       0.007590934    0.001897734   0.001897734</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2 0.001518187 0.001265156       0.007590934    0.001897734   0.001423300</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3 0.001518187 0.001265156       0.007590934    0.001897734   0.001265156</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    hazard_ctrl   hazard_trt hazard_after_prog prog_rate_ctrl prog_rate_trt</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.0009488668 0.0006325779       0.003795467    0.001897734   0.001897734</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 0.0009488668 0.0006325779       0.003795467    0.001897734   0.001423300</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 0.0009488668 0.0006325779       0.003795467    0.001897734   0.001265156</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   random_withdrawal n_trt n_ctrl followup recruitment median_survival_trt</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1              0.01    50     50      200          50                 307</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2              0.01    50     50      200          50                 337</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3              0.01    50     50      200          50                 349</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1      0.0001897734   150    150    730.5     182.625                 480</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2      0.0001897734   150    150    730.5     182.625                 533</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3      0.0001897734   150    150    730.5     182.625                 556</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   median_survival_ctrl</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1                  284</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2                  284</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3                  284</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1                  422</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2                  422</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3                  422</span>
 <span class="r-in"><span><span class="va">my_design_pfs</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   hazard_ctrl  hazard_trt hazard_after_prog prog_rate_ctrl prog_rate_trt</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.001518187 0.001265156       0.007590934    0.001897734   0.001897734</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2 0.001518187 0.001265156       0.007590934    0.001897734   0.001423300</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3 0.001518187 0.001265156       0.007590934    0.001897734   0.001265156</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    hazard_ctrl   hazard_trt hazard_after_prog prog_rate_ctrl prog_rate_trt</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.0009488668 0.0006325779       0.003795467    0.001897734   0.001897734</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 0.0009488668 0.0006325779       0.003795467    0.001897734   0.001423300</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 0.0009488668 0.0006325779       0.003795467    0.001897734   0.001265156</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   random_withdrawal n_trt n_ctrl followup recruitment median_survival_trt</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1              0.01    50     50      200          50            219.1499</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2              0.01    50     50      200          50            257.8235</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3              0.01    50     50      200          50            273.9374</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1      0.0001897734   150    150    730.5     182.625            273.9375</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2      0.0001897734   150    150    730.5     182.625            337.1538</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3      0.0001897734   150    150    730.5     182.625            365.2500</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   median_survival_ctrl</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1             202.9166</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2             202.9166</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3             202.9166</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1                243.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2                243.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3                243.5</span>
 <span class="r-in"><span><span class="va">my_design</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/merge.html" class="external-link">merge</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>    <span class="fu">assumptions_progression</span><span class="op">(</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>    <span class="fu"><a href="design_fixed_followup.html">design_fixed_followup</a></span><span class="op">(</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>    by<span class="op">=</span><span class="cn">NULL</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> expand.grid(</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   hazard_ctrl       = 0.001518187, # hazard under control (med. survi. 15m)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   hazard_trt        = 0.001265156, # hazard under treatment (med. surv. 18m)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   hazard_after_prog = 0.007590934, # hazard after progression (med. surv. 3m)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   prog_rate_ctrl    = 0.001897734, # hazard rate for disease progression under control</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   prog_rate_trt     = c(0.001897734, 0.001423300, 0.001265156), # haz. rate for progression, trt.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   random_withdrawal = 0.01         # rate of random withdrawal</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   hazard_ctrl= m2r(24),              # med. survival ctrl 24 months</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   hazard_trt= m2r(36),               # med. survival trt 36 months</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   hazard_after_prog=m2r(6),          # med. survival after prorg. 6 months</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   prog_rate_ctrl=m2r(12),            # med. time to prog. ctrl 12 months</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   prog_rate_trt= m2r(c(12, 16, 18)), # med. time to prog. trt 12, 16, 18 months</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   random_withdrawal=m2r(120)         # median time to random withdrawal 10 years</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> )</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> expand.grid(</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   n_trt=50,      # 100 patients in the treatment arm</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   n_ctrl=50,     # 100 patients in the control arm</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   followup=200,  # fixed followup time</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   recruitment=50 # recruitment time</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   n_trt=150,         # 150 patients in the treatment arm</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   n_ctrl=150,        # 150 patients in the control arm</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   followup=m2d(24),  # followup 2 years</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   recruitment=m2d(6) # recruitment time 6 months</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> )</span>
 <span class="r-in"><span><span class="va">my_design</span><span class="op">$</span><span class="va">prog_rate_ctrl</span> <span class="op">&lt;-</span> <span class="cn">NA_real_</span></span></span>
@@ -337,14 +337,14 @@ hazard ratios that correspond to reasonable and realistic scenarios.</p>
 <span class="r-in"><span><span class="va">my_design</span><span class="op">$</span><span class="va">prog_prop_ctrl</span> <span class="op">&lt;-</span> <span class="fl">0.3</span></span></span>
 <span class="r-in"><span><span class="va">my_design</span> <span class="op">&lt;-</span> <span class="fu">progression_rate_from_progression_prop</span><span class="op">(</span><span class="va">my_design</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">my_design</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   hazard_ctrl  hazard_trt hazard_after_prog prog_rate_ctrl prog_rate_trt</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.001518187 0.001265156       0.007590934   0.0006506516   0.000316289</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2 0.001518187 0.001265156       0.007590934   0.0006506516   0.000316289</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3 0.001518187 0.001265156       0.007590934   0.0006506516   0.000316289</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    hazard_ctrl   hazard_trt hazard_after_prog prog_rate_ctrl prog_rate_trt</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.0009488668 0.0006325779       0.003795467   0.0004066572  0.0001581445</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 0.0009488668 0.0006325779       0.003795467   0.0004066572  0.0001581445</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 0.0009488668 0.0006325779       0.003795467   0.0004066572  0.0001581445</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   random_withdrawal n_trt n_ctrl followup recruitment prog_prop_trt</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1              0.01    50     50      200          50           0.2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2              0.01    50     50      200          50           0.2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3              0.01    50     50      200          50           0.2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1      0.0001897734   150    150    730.5     182.625           0.2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2      0.0001897734   150    150    730.5     182.625           0.2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3      0.0001897734   150    150    730.5     182.625           0.2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   prog_prop_ctrl</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1            0.3</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2            0.3</span>
@@ -354,7 +354,7 @@ hazard ratios that correspond to reasonable and realistic scenarios.</p>
 <span class="r-in"><span>hazard_trt          <span class="op">=</span> <span class="fu"><a href="r2m.html">m2r</a></span><span class="op">(</span><span class="fl">18</span><span class="op">)</span>,          <span class="co"># hazard under treatment</span></span></span>
 <span class="r-in"><span>hazard_after_prog   <span class="op">=</span> <span class="fu"><a href="r2m.html">m2r</a></span><span class="op">(</span><span class="fl">3</span><span class="op">)</span>,           <span class="co"># hazard after progression</span></span></span>
 <span class="r-in"><span>prog_rate_ctrl      <span class="op">=</span> <span class="fu"><a href="r2m.html">m2r</a></span><span class="op">(</span><span class="fl">12</span><span class="op">)</span>,          <span class="co"># hazard for disease progression under control</span></span></span>
-<span class="r-in"><span>prog_rate_trt       <span class="op">=</span> <span class="fu"><a href="r2m.html">m2r</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">12</span>,<span class="fl">16</span>,<span class="fl">18</span><span class="op">)</span><span class="op">)</span>, <span class="co"># hazard for disease progression unter treatment</span></span></span>
+<span class="r-in"><span>prog_rate_trt       <span class="op">=</span> <span class="fu"><a href="r2m.html">m2r</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">12</span>,<span class="fl">16</span>,<span class="fl">18</span><span class="op">)</span><span class="op">)</span>, <span class="co"># hazard for disease progression under treatment</span></span></span>
 <span class="r-in"><span>censoring_prop      <span class="op">=</span> <span class="fl">0.1</span>,              <span class="co"># rate of random withdrawal</span></span></span>
 <span class="r-in"><span>followup            <span class="op">=</span> <span class="fl">100</span>,              <span class="co"># follow up time</span></span></span>
 <span class="r-in"><span>n_trt               <span class="op">=</span> <span class="fl">50</span>,               <span class="co"># patients in treatment arm</span></span></span>

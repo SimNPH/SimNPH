@@ -85,16 +85,16 @@ appended to the name of the analysis method in the final results</p></dd>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">tail</a></span><span class="op">(</span><span class="fl">4</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> expand.grid(</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   delay=seq(0, 10, by=2), # delay of 0, 1, ..., 10 days</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   hazard_ctrl=0.2,        # hazard under control and before treatment effect</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   hazard_trt=0.02,        # hazard after onset of treatment effect</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   random_withdrawal=0.01  # rate of random withdrawal</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   delay=m2d(seq(0, 10, by=2)), # delay of 0, 1, ..., 10 months</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   hazard_ctrl=m2r(24),         # median survival control of 24 months</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   hazard_trt=m2r(36),          # median survival treatment of 36 months</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   random_withdrawal=m2r(120)   # median time to random withdrawal 10 years</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> )</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> expand.grid(</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   n_trt=50,      # 100 patients in the treatment arm</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   n_ctrl=50,     # 100 patients in the control arm</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   followup=200,  # fixed followup time</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   recruitment=50 # recruitment time</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   n_trt=150,         # 150 patients in the treatment arm</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   n_ctrl=150,        # 150 patients in the control arm</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   followup=m2d(24),  # followup 2 years</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   recruitment=m2d(6) # recruitment time 6 months</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> )</span>
 <span class="r-in"><span></span></span>
@@ -113,17 +113,17 @@ appended to the name of the analysis method in the final results</p></dd>
 <span class="r-in"><span>  summarise <span class="op">=</span> <span class="va">summarise_all</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Design row: 1/1;   RAM used: 170.7 Mb;   Total elapsed time: 0.00s </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Conditions: delay=4, hzrd_c=0.2, hzrd_t=0.02, rndm_w=0.01, n_trt=50, n_ctrl=50, follwp=200, rcrtmn=50</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Design row: 1/1;   RAM used: 170.1 Mb;   Total elapsed time: 0.00s </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Conditions: delay=121., hzrd_c=0.0009, hzrd_t=0.0006, rndm_w=0.0001, n_trt=150, n_ctrl=150, follwp=730., rcrtmn=182.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Simulation complete. Total execution time: 0.54s</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Simulation complete. Total execution time: 1.78s</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">sim_results</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"rejection"</span>, <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">sim_results</span><span class="op">)</span><span class="op">)</span><span class="op">]</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 4</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   logrank.rejection_0.5 logrank.rejection_0.9 logrank.rejection_0.95</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>                 <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>                  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>                     1                     1                      1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>                  0.98                  0.99                   0.99</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 1 more variable: logrank.rejection_0.99 &lt;dbl&gt;</span></span>
 </code></pre></div>
     </div>

@@ -120,18 +120,18 @@ varying from 0 to 10.</p>
 <span></span>
 <span><span class="va">Assumptions</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/generate_delayed_effect.html">assumptions_delayed_effect</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; expand.grid(</span></span>
-<span><span class="co">#&gt;   delay=seq(0, 10, by=2), # delay of 0, 1, ..., 10 days</span></span>
-<span><span class="co">#&gt;   hazard_ctrl=0.2,        # hazard under control and before treatment effect</span></span>
-<span><span class="co">#&gt;   hazard_trt=0.02,        # hazard after onset of treatment effect</span></span>
-<span><span class="co">#&gt;   random_withdrawal=0.01  # rate of random withdrawal</span></span>
+<span><span class="co">#&gt;   delay=m2d(seq(0, 10, by=2)), # delay of 0, 1, ..., 10 months</span></span>
+<span><span class="co">#&gt;   hazard_ctrl=m2r(24),         # median survival control of 24 months</span></span>
+<span><span class="co">#&gt;   hazard_trt=m2r(36),          # median survival treatment of 36 months</span></span>
+<span><span class="co">#&gt;   random_withdrawal=m2r(120)   # median time to random withdrawal 10 years</span></span>
 <span><span class="co">#&gt; )</span></span>
 <span></span>
 <span><span class="va">Options</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/design_fixed_followup.html">design_fixed_followup</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; expand.grid(</span></span>
-<span><span class="co">#&gt;   n_trt=50,      # 100 patients in the treatment arm</span></span>
-<span><span class="co">#&gt;   n_ctrl=50,     # 100 patients in the control arm</span></span>
-<span><span class="co">#&gt;   followup=200,  # fixed followup time</span></span>
-<span><span class="co">#&gt;   recruitment=50 # recruitment time</span></span>
+<span><span class="co">#&gt;   n_trt=150,         # 150 patients in the treatment arm</span></span>
+<span><span class="co">#&gt;   n_ctrl=150,        # 150 patients in the control arm</span></span>
+<span><span class="co">#&gt;   followup=m2d(24),  # followup 2 years</span></span>
+<span><span class="co">#&gt;   recruitment=m2d(6) # recruitment time 6 months</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; )</span></span>
 <span></span>
@@ -140,13 +140,13 @@ varying from 0 to 10.</p>
 <span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">Design</span><span class="op">)</span></span></code></pre></div>
 <table class="table">
 <colgroup>
-<col width="7%">
+<col width="9%">
 <col width="14%">
 <col width="13%">
-<col width="22%">
+<col width="21%">
 <col width="7%">
 <col width="8%">
-<col width="11%">
+<col width="10%">
 <col width="14%">
 </colgroup>
 <thead><tr class="header">
@@ -161,64 +161,64 @@ varying from 0 to 10.</p>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td align="right">0</td>
-<td align="right">0.2</td>
-<td align="right">0.02</td>
-<td align="right">0.01</td>
-<td align="right">50</td>
-<td align="right">50</td>
-<td align="right">200</td>
-<td align="right">50</td>
+<td align="right">0.000</td>
+<td align="right">0.0009489</td>
+<td align="right">0.0006326</td>
+<td align="right">0.0001898</td>
+<td align="right">150</td>
+<td align="right">150</td>
+<td align="right">730.5</td>
+<td align="right">182.625</td>
 </tr>
 <tr class="even">
-<td align="right">2</td>
-<td align="right">0.2</td>
-<td align="right">0.02</td>
-<td align="right">0.01</td>
-<td align="right">50</td>
-<td align="right">50</td>
-<td align="right">200</td>
-<td align="right">50</td>
+<td align="right">60.875</td>
+<td align="right">0.0009489</td>
+<td align="right">0.0006326</td>
+<td align="right">0.0001898</td>
+<td align="right">150</td>
+<td align="right">150</td>
+<td align="right">730.5</td>
+<td align="right">182.625</td>
 </tr>
 <tr class="odd">
-<td align="right">4</td>
-<td align="right">0.2</td>
-<td align="right">0.02</td>
-<td align="right">0.01</td>
-<td align="right">50</td>
-<td align="right">50</td>
-<td align="right">200</td>
-<td align="right">50</td>
+<td align="right">121.750</td>
+<td align="right">0.0009489</td>
+<td align="right">0.0006326</td>
+<td align="right">0.0001898</td>
+<td align="right">150</td>
+<td align="right">150</td>
+<td align="right">730.5</td>
+<td align="right">182.625</td>
 </tr>
 <tr class="even">
-<td align="right">6</td>
-<td align="right">0.2</td>
-<td align="right">0.02</td>
-<td align="right">0.01</td>
-<td align="right">50</td>
-<td align="right">50</td>
-<td align="right">200</td>
-<td align="right">50</td>
+<td align="right">182.625</td>
+<td align="right">0.0009489</td>
+<td align="right">0.0006326</td>
+<td align="right">0.0001898</td>
+<td align="right">150</td>
+<td align="right">150</td>
+<td align="right">730.5</td>
+<td align="right">182.625</td>
 </tr>
 <tr class="odd">
-<td align="right">8</td>
-<td align="right">0.2</td>
-<td align="right">0.02</td>
-<td align="right">0.01</td>
-<td align="right">50</td>
-<td align="right">50</td>
-<td align="right">200</td>
-<td align="right">50</td>
+<td align="right">243.500</td>
+<td align="right">0.0009489</td>
+<td align="right">0.0006326</td>
+<td align="right">0.0001898</td>
+<td align="right">150</td>
+<td align="right">150</td>
+<td align="right">730.5</td>
+<td align="right">182.625</td>
 </tr>
 <tr class="even">
-<td align="right">10</td>
-<td align="right">0.2</td>
-<td align="right">0.02</td>
-<td align="right">0.01</td>
-<td align="right">50</td>
-<td align="right">50</td>
-<td align="right">200</td>
-<td align="right">50</td>
+<td align="right">304.375</td>
+<td align="right">0.0009489</td>
+<td align="right">0.0006326</td>
+<td align="right">0.0001898</td>
+<td align="right">150</td>
+<td align="right">150</td>
+<td align="right">730.5</td>
+<td align="right">182.625</td>
 </tr>
 </tbody>
 </table>
@@ -290,7 +290,7 @@ defined before and the simulations should be run in parallel.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Number of parallel clusters in use: 8</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Simulation complete. Total execution time: 9.69s</span></span></code></pre></div>
+<span><span class="co">#&gt; Simulation complete. Total execution time: 24.68s</span></span></code></pre></div>
 <p>Finally we select the interesting columns from the output. Since all
 other parameters are the same for each scenario we just select delay.
 And we are interested in the rejection rate of the tests.</p>
@@ -306,34 +306,34 @@ And we are interested in the rejection rate of the tests.</p>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td align="right">0</td>
-<td align="right">1.00</td>
-<td align="right">1.00</td>
+<td align="right">0.000</td>
+<td align="right">0.59</td>
+<td align="right">0.61</td>
 </tr>
 <tr class="even">
-<td align="right">2</td>
-<td align="right">1.00</td>
-<td align="right">1.00</td>
+<td align="right">60.875</td>
+<td align="right">0.52</td>
+<td align="right">0.46</td>
 </tr>
 <tr class="odd">
-<td align="right">4</td>
-<td align="right">0.99</td>
-<td align="right">0.88</td>
+<td align="right">121.750</td>
+<td align="right">0.38</td>
+<td align="right">0.34</td>
 </tr>
 <tr class="even">
-<td align="right">6</td>
-<td align="right">0.83</td>
-<td align="right">0.47</td>
-</tr>
-<tr class="odd">
-<td align="right">8</td>
-<td align="right">0.40</td>
+<td align="right">182.625</td>
+<td align="right">0.27</td>
 <td align="right">0.19</td>
 </tr>
+<tr class="odd">
+<td align="right">243.500</td>
+<td align="right">0.24</td>
+<td align="right">0.20</td>
+</tr>
 <tr class="even">
-<td align="right">10</td>
+<td align="right">304.375</td>
 <td align="right">0.15</td>
-<td align="right">0.11</td>
+<td align="right">0.14</td>
 </tr>
 </tbody>
 </table>
@@ -350,27 +350,27 @@ events after which an interim analysis should be done.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">Options</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/design_group_sequential.html">design_group_sequential</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; expand.grid(</span></span>
-<span><span class="co">#&gt;   n_trt=50,          # 100 patients in the treatment arm</span></span>
-<span><span class="co">#&gt;   n_ctrl=50,         # 100 patients in the control arm</span></span>
-<span><span class="co">#&gt;   followup=200,      # maximum followup time</span></span>
-<span><span class="co">#&gt;   recruitment=50,    # recruitment time</span></span>
-<span><span class="co">#&gt;   interim_events=25, # events interim analysis</span></span>
-<span><span class="co">#&gt;   final_events=50    # events final analysis</span></span>
+<span><span class="co">#&gt;   n_trt=200,          # 200 patients in the treatment arm</span></span>
+<span><span class="co">#&gt;   n_ctrl=200,         # 200 patients in the control arm</span></span>
+<span><span class="co">#&gt;   followup=m2d(48),   # maximum followup time 4 years</span></span>
+<span><span class="co">#&gt;   recruitment=m2d(6), # recruitment time 6 months</span></span>
+<span><span class="co">#&gt;   interim_events=150, # interim analysis after 150 events</span></span>
+<span><span class="co">#&gt;   final_events=300    # final analysis after 300 events</span></span>
 <span><span class="co">#&gt; )</span></span>
 <span></span>
 <span><span class="va">Design</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/merge.html" class="external-link">merge</a></span><span class="op">(</span><span class="va">Assumptions</span>, <span class="va">Options</span>, by<span class="op">=</span><span class="cn">NULL</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">Design</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
+<table style="width:100%;" class="table">
 <colgroup>
-<col width="5%">
-<col width="11%">
+<col width="7%">
 <col width="10%">
+<col width="9%">
 <col width="16%">
 <col width="5%">
 <col width="6%">
 <col width="8%">
-<col width="11%">
+<col width="10%">
 <col width="13%">
 <col width="11%">
 </colgroup>
@@ -388,76 +388,76 @@ events after which an interim analysis should be done.</p>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td align="right">0</td>
-<td align="right">0.2</td>
-<td align="right">0.02</td>
-<td align="right">0.01</td>
-<td align="right">50</td>
-<td align="right">50</td>
+<td align="right">0.000</td>
+<td align="right">0.0009489</td>
+<td align="right">0.0006326</td>
+<td align="right">0.0001898</td>
 <td align="right">200</td>
-<td align="right">50</td>
-<td align="right">25</td>
-<td align="right">50</td>
+<td align="right">200</td>
+<td align="right">1461</td>
+<td align="right">182.625</td>
+<td align="right">150</td>
+<td align="right">300</td>
 </tr>
 <tr class="even">
-<td align="right">2</td>
-<td align="right">0.2</td>
-<td align="right">0.02</td>
-<td align="right">0.01</td>
-<td align="right">50</td>
-<td align="right">50</td>
+<td align="right">60.875</td>
+<td align="right">0.0009489</td>
+<td align="right">0.0006326</td>
+<td align="right">0.0001898</td>
 <td align="right">200</td>
-<td align="right">50</td>
-<td align="right">25</td>
-<td align="right">50</td>
+<td align="right">200</td>
+<td align="right">1461</td>
+<td align="right">182.625</td>
+<td align="right">150</td>
+<td align="right">300</td>
 </tr>
 <tr class="odd">
-<td align="right">4</td>
-<td align="right">0.2</td>
-<td align="right">0.02</td>
-<td align="right">0.01</td>
-<td align="right">50</td>
-<td align="right">50</td>
+<td align="right">121.750</td>
+<td align="right">0.0009489</td>
+<td align="right">0.0006326</td>
+<td align="right">0.0001898</td>
 <td align="right">200</td>
-<td align="right">50</td>
-<td align="right">25</td>
-<td align="right">50</td>
+<td align="right">200</td>
+<td align="right">1461</td>
+<td align="right">182.625</td>
+<td align="right">150</td>
+<td align="right">300</td>
 </tr>
 <tr class="even">
-<td align="right">6</td>
-<td align="right">0.2</td>
-<td align="right">0.02</td>
-<td align="right">0.01</td>
-<td align="right">50</td>
-<td align="right">50</td>
+<td align="right">182.625</td>
+<td align="right">0.0009489</td>
+<td align="right">0.0006326</td>
+<td align="right">0.0001898</td>
 <td align="right">200</td>
-<td align="right">50</td>
-<td align="right">25</td>
-<td align="right">50</td>
+<td align="right">200</td>
+<td align="right">1461</td>
+<td align="right">182.625</td>
+<td align="right">150</td>
+<td align="right">300</td>
 </tr>
 <tr class="odd">
-<td align="right">8</td>
-<td align="right">0.2</td>
-<td align="right">0.02</td>
-<td align="right">0.01</td>
-<td align="right">50</td>
-<td align="right">50</td>
+<td align="right">243.500</td>
+<td align="right">0.0009489</td>
+<td align="right">0.0006326</td>
+<td align="right">0.0001898</td>
 <td align="right">200</td>
-<td align="right">50</td>
-<td align="right">25</td>
-<td align="right">50</td>
+<td align="right">200</td>
+<td align="right">1461</td>
+<td align="right">182.625</td>
+<td align="right">150</td>
+<td align="right">300</td>
 </tr>
 <tr class="even">
-<td align="right">10</td>
-<td align="right">0.2</td>
-<td align="right">0.02</td>
-<td align="right">0.01</td>
-<td align="right">50</td>
-<td align="right">50</td>
+<td align="right">304.375</td>
+<td align="right">0.0009489</td>
+<td align="right">0.0006326</td>
+<td align="right">0.0001898</td>
 <td align="right">200</td>
-<td align="right">50</td>
-<td align="right">25</td>
-<td align="right">50</td>
+<td align="right">200</td>
+<td align="right">1461</td>
+<td align="right">182.625</td>
+<td align="right">150</td>
+<td align="right">300</td>
 </tr>
 </tbody>
 </table>
@@ -529,7 +529,7 @@ functions are included in the result.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Number of parallel clusters in use: 8</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Simulation complete. Total execution time: 14.32s</span></span></code></pre></div>
+<span><span class="co">#&gt; Simulation complete. Total execution time: 57.73s</span></span></code></pre></div>
 <p>In the case of a group sequential design we are also interested in
 the average running time of the study in terms of patients recruited,
 number of events and running time of the study.</p>
@@ -545,14 +545,14 @@ number of events and running time of the study.</p>
 <span>  <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <table class="table">
 <colgroup>
-<col width="3%">
+<col width="4%">
 <col width="13%">
-<col width="13%">
+<col width="12%">
 <col width="11%">
 <col width="10%">
 <col width="11%">
 <col width="10%">
-<col width="13%">
+<col width="12%">
 <col width="12%">
 </colgroup>
 <thead><tr class="header">
@@ -568,70 +568,70 @@ number of events and running time of the study.</p>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td align="right">0</td>
-<td align="right">1.00</td>
-<td align="right">1.00</td>
-<td align="right">52.67</td>
-<td align="right">52.40</td>
-<td align="right">26.03</td>
-<td align="right">25.81</td>
-<td align="right">23.79</td>
-<td align="right">23.61</td>
+<td align="right">0.000</td>
+<td align="right">0.89</td>
+<td align="right">0.89</td>
+<td align="right">400</td>
+<td align="right">400</td>
+<td align="right">208.54</td>
+<td align="right">205.75</td>
+<td align="right">1224.65</td>
+<td align="right">1203.12</td>
 </tr>
 <tr class="even">
-<td align="right">2</td>
-<td align="right">0.99</td>
-<td align="right">0.94</td>
-<td align="right">61.70</td>
-<td align="right">70.97</td>
-<td align="right">37.99</td>
-<td align="right">45.22</td>
-<td align="right">26.81</td>
-<td align="right">31.33</td>
-</tr>
-<tr class="odd">
-<td align="right">4</td>
+<td align="right">60.875</td>
 <td align="right">0.83</td>
-<td align="right">0.53</td>
-<td align="right">70.73</td>
-<td align="right">71.45</td>
-<td align="right">48.95</td>
-<td align="right">49.68</td>
-<td align="right">29.68</td>
-<td align="right">30.02</td>
-</tr>
-<tr class="even">
-<td align="right">6</td>
-<td align="right">0.28</td>
-<td align="right">0.14</td>
-<td align="right">68.02</td>
-<td align="right">68.02</td>
-<td align="right">50.78</td>
-<td align="right">50.78</td>
-<td align="right">27.18</td>
-<td align="right">27.18</td>
+<td align="right">0.84</td>
+<td align="right">400</td>
+<td align="right">400</td>
+<td align="right">221.26</td>
+<td align="right">222.32</td>
+<td align="right">1317.36</td>
+<td align="right">1326.46</td>
 </tr>
 <tr class="odd">
-<td align="right">8</td>
-<td align="right">0.19</td>
-<td align="right">0.09</td>
-<td align="right">66.14</td>
-<td align="right">66.14</td>
-<td align="right">50.72</td>
-<td align="right">50.72</td>
-<td align="right">26.38</td>
-<td align="right">26.38</td>
+<td align="right">121.750</td>
+<td align="right">0.74</td>
+<td align="right">0.71</td>
+<td align="right">400</td>
+<td align="right">400</td>
+<td align="right">227.51</td>
+<td align="right">228.61</td>
+<td align="right">1366.49</td>
+<td align="right">1374.52</td>
 </tr>
 <tr class="even">
-<td align="right">10</td>
-<td align="right">0.08</td>
-<td align="right">0.05</td>
-<td align="right">65.64</td>
-<td align="right">65.64</td>
-<td align="right">50.85</td>
-<td align="right">50.85</td>
-<td align="right">23.49</td>
-<td align="right">23.49</td>
+<td align="right">182.625</td>
+<td align="right">0.74</td>
+<td align="right">0.65</td>
+<td align="right">400</td>
+<td align="right">400</td>
+<td align="right">233.59</td>
+<td align="right">236.18</td>
+<td align="right">1404.69</td>
+<td align="right">1427.33</td>
+</tr>
+<tr class="odd">
+<td align="right">243.500</td>
+<td align="right">0.66</td>
+<td align="right">0.55</td>
+<td align="right">400</td>
+<td align="right">400</td>
+<td align="right">239.14</td>
+<td align="right">240.85</td>
+<td align="right">1428.09</td>
+<td align="right">1443.15</td>
+</tr>
+<tr class="even">
+<td align="right">304.375</td>
+<td align="right">0.54</td>
+<td align="right">0.39</td>
+<td align="right">400</td>
+<td align="right">400</td>
+<td align="right">241.55</td>
+<td align="right">242.51</td>
+<td align="right">1442.91</td>
+<td align="right">1450.71</td>
 </tr>
 </tbody>
 </table>
@@ -652,10 +652,10 @@ columns.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">Options</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/design_fixed_followup.html">design_fixed_followup</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; expand.grid(</span></span>
-<span><span class="co">#&gt;   n_trt=50,      # 100 patients in the treatment arm</span></span>
-<span><span class="co">#&gt;   n_ctrl=50,     # 100 patients in the control arm</span></span>
-<span><span class="co">#&gt;   followup=200,  # fixed followup time</span></span>
-<span><span class="co">#&gt;   recruitment=50 # recruitment time</span></span>
+<span><span class="co">#&gt;   n_trt=150,         # 150 patients in the treatment arm</span></span>
+<span><span class="co">#&gt;   n_ctrl=150,        # 150 patients in the control arm</span></span>
+<span><span class="co">#&gt;   followup=m2d(24),  # followup 2 years</span></span>
+<span><span class="co">#&gt;   recruitment=m2d(6) # recruitment time 6 months</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; )</span></span>
 <span></span>
@@ -665,9 +665,9 @@ columns.</p>
 <span>  <span class="fu"><a href="../../reference/generate_delayed_effect.html">true_summary_statistics_delayed_effect</a></span><span class="op">(</span>cutoff_stats <span class="op">=</span> <span class="fl">20</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">Design</span><span class="op">)</span></span></code></pre></div>
-<table style="width:100%;" class="table">
+<table class="table">
 <colgroup>
-<col width="3%">
+<col width="4%">
 <col width="6%">
 <col width="5%">
 <col width="9%">
@@ -704,112 +704,112 @@ columns.</p>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td align="right">0</td>
-<td align="right">0.2</td>
-<td align="right">0.02</td>
-<td align="right">0.01</td>
-<td align="right">50</td>
-<td align="right">50</td>
-<td align="right">200</td>
-<td align="right">50</td>
-<td align="right">34.657359</td>
-<td align="right">3.465736</td>
-<td align="right">16.483998</td>
-<td align="right">4.908422</td>
-<td align="right">0.1000000</td>
-<td align="right">0.1000000</td>
-<td align="right">0.1000000</td>
-<td align="right">0.1000000</td>
+<td align="right">0.000</td>
+<td align="right">0.0009489</td>
+<td align="right">0.0006326</td>
+<td align="right">0.0001898</td>
+<td align="right">150</td>
+<td align="right">150</td>
+<td align="right">730.5</td>
+<td align="right">182.625</td>
+<td align="right">1095.7500</td>
+<td align="right">730.5</td>
+<td align="right">19.87402</td>
+<td align="right">19.81142</td>
+<td align="right">0.6666667</td>
+<td align="right">0.6666667</td>
+<td align="right">0.6666667</td>
+<td align="right">0.6666667</td>
 </tr>
 <tr class="even">
-<td align="right">2</td>
-<td align="right">0.2</td>
-<td align="right">0.02</td>
-<td align="right">0.01</td>
-<td align="right">50</td>
-<td align="right">50</td>
-<td align="right">200</td>
-<td align="right">50</td>
-<td align="right">16.657359</td>
-<td align="right">3.465736</td>
-<td align="right">11.781083</td>
-<td align="right">4.908422</td>
-<td align="right">0.2725859</td>
-<td align="right">0.3681189</td>
-<td align="right">0.4665548</td>
-<td align="right">0.4665546</td>
+<td align="right">60.875</td>
+<td align="right">0.0009489</td>
+<td align="right">0.0006326</td>
+<td align="right">0.0001898</td>
+<td align="right">150</td>
+<td align="right">150</td>
+<td align="right">730.5</td>
+<td align="right">182.625</td>
+<td align="right">1065.3125</td>
+<td align="right">730.5</td>
+<td align="right">19.81142</td>
+<td align="right">19.81142</td>
+<td align="right">1.0000000</td>
+<td align="right">1.0000000</td>
+<td align="right">1.0000000</td>
+<td align="right">1.0000000</td>
 </tr>
 <tr class="odd">
-<td align="right">4</td>
-<td align="right">0.2</td>
-<td align="right">0.02</td>
-<td align="right">0.01</td>
-<td align="right">50</td>
-<td align="right">50</td>
-<td align="right">200</td>
-<td align="right">50</td>
-<td align="right">3.465736</td>
-<td align="right">3.465736</td>
-<td align="right">8.905814</td>
-<td align="right">4.908422</td>
-<td align="right">0.4627014</td>
-<td align="right">0.5700493</td>
-<td align="right">0.7222632</td>
-<td align="right">0.7222634</td>
+<td align="right">121.750</td>
+<td align="right">0.0009489</td>
+<td align="right">0.0006326</td>
+<td align="right">0.0001898</td>
+<td align="right">150</td>
+<td align="right">150</td>
+<td align="right">730.5</td>
+<td align="right">182.625</td>
+<td align="right">1034.8750</td>
+<td align="right">730.5</td>
+<td align="right">19.81142</td>
+<td align="right">19.81142</td>
+<td align="right">1.0000000</td>
+<td align="right">1.0000000</td>
+<td align="right">1.0000000</td>
+<td align="right">1.0000000</td>
 </tr>
 <tr class="even">
-<td align="right">6</td>
-<td align="right">0.2</td>
-<td align="right">0.02</td>
-<td align="right">0.01</td>
-<td align="right">50</td>
-<td align="right">50</td>
-<td align="right">200</td>
-<td align="right">50</td>
-<td align="right">3.465736</td>
-<td align="right">3.465736</td>
-<td align="right">7.171856</td>
-<td align="right">4.908422</td>
-<td align="right">0.6263149</td>
-<td align="right">0.7148821</td>
-<td align="right">0.8672163</td>
-<td align="right">0.8672234</td>
+<td align="right">182.625</td>
+<td align="right">0.0009489</td>
+<td align="right">0.0006326</td>
+<td align="right">0.0001898</td>
+<td align="right">150</td>
+<td align="right">150</td>
+<td align="right">730.5</td>
+<td align="right">182.625</td>
+<td align="right">1004.4375</td>
+<td align="right">730.5</td>
+<td align="right">19.81142</td>
+<td align="right">19.81142</td>
+<td align="right">1.0000000</td>
+<td align="right">1.0000000</td>
+<td align="right">1.0000000</td>
+<td align="right">1.0000000</td>
 </tr>
 <tr class="odd">
-<td align="right">8</td>
-<td align="right">0.2</td>
-<td align="right">0.02</td>
-<td align="right">0.01</td>
-<td align="right">50</td>
-<td align="right">50</td>
-<td align="right">200</td>
-<td align="right">50</td>
-<td align="right">3.465736</td>
-<td align="right">3.465736</td>
-<td align="right">6.144473</td>
-<td align="right">4.908422</td>
-<td align="right">0.7510355</td>
-<td align="right">0.8153231</td>
-<td align="right">0.9397548</td>
-<td align="right">0.9397488</td>
+<td align="right">243.500</td>
+<td align="right">0.0009489</td>
+<td align="right">0.0006326</td>
+<td align="right">0.0001898</td>
+<td align="right">150</td>
+<td align="right">150</td>
+<td align="right">730.5</td>
+<td align="right">182.625</td>
+<td align="right">974.0000</td>
+<td align="right">730.5</td>
+<td align="right">19.81142</td>
+<td align="right">19.81142</td>
+<td align="right">1.0000000</td>
+<td align="right">1.0000000</td>
+<td align="right">1.0000000</td>
+<td align="right">1.0000000</td>
 </tr>
 <tr class="even">
-<td align="right">10</td>
-<td align="right">0.2</td>
-<td align="right">0.02</td>
-<td align="right">0.01</td>
-<td align="right">50</td>
-<td align="right">50</td>
-<td align="right">200</td>
-<td align="right">50</td>
-<td align="right">3.465736</td>
-<td align="right">3.465736</td>
-<td align="right">5.549930</td>
-<td align="right">4.908422</td>
-<td align="right">0.8401165</td>
-<td align="right">0.8834094</td>
-<td align="right">0.9736475</td>
-<td align="right">0.9736475</td>
+<td align="right">304.375</td>
+<td align="right">0.0009489</td>
+<td align="right">0.0006326</td>
+<td align="right">0.0001898</td>
+<td align="right">150</td>
+<td align="right">150</td>
+<td align="right">730.5</td>
+<td align="right">182.625</td>
+<td align="right">943.5625</td>
+<td align="right">730.5</td>
+<td align="right">19.81142</td>
+<td align="right">19.81142</td>
+<td align="right">1.0000000</td>
+<td align="right">1.0000000</td>
+<td align="right">1.0000000</td>
+<td align="right">1.0000000</td>
 </tr>
 </tbody>
 </table>
@@ -860,7 +860,7 @@ different summary statistics.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Number of parallel clusters in use: 8</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Simulation complete. Total execution time: 1.93s</span></span></code></pre></div>
+<span><span class="co">#&gt; Simulation complete. Total execution time: 1.78s</span></span></code></pre></div>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">res</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span>select<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
@@ -870,7 +870,7 @@ different summary statistics.</p>
 <span>  <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <table class="table">
 <colgroup>
-<col width="5%">
+<col width="7%">
 <col width="13%">
 <col width="15%">
 <col width="12%">
@@ -889,58 +889,58 @@ different summary statistics.</p>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td align="right">0</td>
-<td align="right">0.0030463</td>
-<td align="right">0.0030463</td>
-<td align="right">0.0010532</td>
-<td align="right">0.0010532</td>
+<td align="right">0.000</td>
+<td align="right">-0.0032248</td>
+<td align="right">-0.0032248</td>
+<td align="right">0.0143831</td>
+<td align="right">0.0143831</td>
 <td align="right">0.96</td>
 <td align="right">0.96</td>
 </tr>
 <tr class="even">
-<td align="right">2</td>
-<td align="right">0.2061537</td>
-<td align="right">0.0335678</td>
-<td align="right">0.0493083</td>
-<td align="right">0.0079358</td>
-<td align="right">0.04</td>
-<td align="right">0.90</td>
+<td align="right">60.875</td>
+<td align="right">0.0389059</td>
+<td align="right">-0.2944275</td>
+<td align="right">0.0177986</td>
+<td align="right">0.1029725</td>
+<td align="right">0.96</td>
+<td align="right">0.50</td>
 </tr>
 <tr class="odd">
-<td align="right">4</td>
-<td align="right">0.4447043</td>
-<td align="right">0.0820029</td>
-<td align="right">0.2097706</td>
-<td align="right">0.0187332</td>
-<td align="right">0.00</td>
-<td align="right">0.92</td>
+<td align="right">121.750</td>
+<td align="right">0.0983316</td>
+<td align="right">-0.2350017</td>
+<td align="right">0.0291507</td>
+<td align="right">0.0747074</td>
+<td align="right">0.93</td>
+<td align="right">0.67</td>
 </tr>
 <tr class="even">
-<td align="right">6</td>
-<td align="right">0.5911912</td>
-<td align="right">0.0648763</td>
-<td align="right">0.3684020</td>
-<td align="right">0.0231039</td>
-<td align="right">0.00</td>
-<td align="right">0.94</td>
+<td align="right">182.625</td>
+<td align="right">0.1527395</td>
+<td align="right">-0.1805939</td>
+<td align="right">0.0450935</td>
+<td align="right">0.0543783</td>
+<td align="right">0.83</td>
+<td align="right">0.81</td>
 </tr>
 <tr class="odd">
-<td align="right">8</td>
-<td align="right">0.6944091</td>
-<td align="right">0.0433736</td>
-<td align="right">0.5055110</td>
-<td align="right">0.0251882</td>
-<td align="right">0.00</td>
-<td align="right">0.96</td>
+<td align="right">243.500</td>
+<td align="right">0.1682144</td>
+<td align="right">-0.1651189</td>
+<td align="right">0.0503163</td>
+<td align="right">0.0492845</td>
+<td align="right">0.83</td>
+<td align="right">0.88</td>
 </tr>
 <tr class="even">
-<td align="right">10</td>
-<td align="right">0.8005646</td>
-<td align="right">0.0604481</td>
-<td align="right">0.6810172</td>
-<td align="right">0.0437675</td>
-<td align="right">0.00</td>
-<td align="right">0.95</td>
+<td align="right">304.375</td>
+<td align="right">0.2116401</td>
+<td align="right">-0.1216932</td>
+<td align="right">0.0669433</td>
+<td align="right">0.0369610</td>
+<td align="right">0.71</td>
+<td align="right">0.91</td>
 </tr>
 </tbody>
 </table>
