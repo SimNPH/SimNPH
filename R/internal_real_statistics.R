@@ -37,16 +37,19 @@ internal_real_statistics_pchaz_discrete <- function(data_gen_model_trt, data_gen
     true_avg_HR_fun0 <- data_gen_model_ctrl$S * c(diff(data_gen_model_trt$F), 0)
     true_avg_HR_fun1 <- data_gen_model_trt$S * c(diff(data_gen_model_ctrl$F), 0)
 
+
     rmst_ahr <- purrr::imap(cutoff, function(cutoff, label){
-      Int0 <- sum(true_avg_HR_fun0[data_gen_model_trt$t <= cutoff])
-      Int1 <- sum(true_avg_HR_fun1[data_gen_model_trt$t <= cutoff])
+      ind <- (data_gen_model_trt$t <= cutoff)
+
+      Int0 <- sum(true_avg_HR_fun0[ind])
+      Int1 <- sum(true_avg_HR_fun1[ind])
 
       tmp <- data.frame(
-        rmst_trt            = sum(data_gen_model_trt$S[data_gen_model_trt$t <= cutoff]),
-        rmst_ctrl           = sum(data_gen_model_ctrl$S[data_gen_model_ctrl$t <= cutoff]),
-        gAHR                = exp(sum( (log(data_gen_model_trt$haz / data_gen_model_ctrl$haz) * f)[data_gen_model_trt$t <= cutoff] , na.rm=TRUE)),
-        AHR                 = sum(((data_gen_model_trt$haz/h) * f)[data_gen_model_trt$t <= cutoff], na.rm=TRUE) /
-          sum(((data_gen_model_ctrl$haz/h) * f)[data_gen_model_ctrl$t <= cutoff], na.rm=TRUE),
+        rmst_trt            = sum(data_gen_model_trt$S[ind]),
+        rmst_ctrl           = sum(data_gen_model_ctrl$S[ind]),
+        gAHR                = exp(sum( (log(data_gen_model_trt$haz[ind] / data_gen_model_ctrl$haz[ind]) * f[ind]) , na.rm=TRUE)),
+        AHR                 = sum(((data_gen_model_trt$haz[ind]/h[ind]) * f[ind]), na.rm=TRUE) /
+          sum(((data_gen_model_ctrl$haz[ind]/h[ind]) * f[ind]), na.rm=TRUE),
         AHRoc = Int0/Int1,
         AHRoc_robust = Int0/Int1
       )

@@ -71,12 +71,12 @@ test_that("true summary statistics progression works", {
   design_2 <- design
   design_2$followup <- NULL
 
-  summaries_os     <- true_summary_statistics_progression(design, what="os", cutoff=c(75), milestones=c(50, 100))
-  summaries_pfs    <- true_summary_statistics_progression(design, what="pfs", cutoff=c(75), milestones=c(50, 100))
+  summaries_os     <- true_summary_statistics_progression(design, what="os", cutoff=m2d(24), milestones=m2d(c(6, 12)))
+  summaries_pfs    <- true_summary_statistics_progression(design, what="pfs", cutoff=m2d(24), milestones=m2d(c(6, 12)))
   summaries_os_2   <- true_summary_statistics_progression(design, what="os", fixed_objects = list(t_max=10000))
   summaries_pfs_2  <- true_summary_statistics_progression(design, what="pfs", fixed_objects = list(t_max=10000))
-  summaries_os_3   <- true_summary_statistics_progression(design_2, what="os", cutoff=c("a"=75), milestones=c("first"=50, "second"=100))
-  summaries_pfs_3  <- true_summary_statistics_progression(design_2, what="pfs", cutoff=c("a"=75), milestones=c("first"=50, "second"=100))
+  summaries_os_3   <- true_summary_statistics_progression(design_2, what="os", cutoff=c("a"=m2d(24)), milestones=m2d(c("first"=6, "second"=12)))
+  summaries_pfs_3  <- true_summary_statistics_progression(design_2, what="pfs", cutoff=c("a"=m2d(24)), milestones=m2d(c("first"=6, "second"=12)))
 
   expect_error(true_summary_statistics_progression(design, what="something else"))
 
