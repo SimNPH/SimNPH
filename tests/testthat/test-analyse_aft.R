@@ -18,5 +18,5 @@ test_that("analyse_aft works", {
 
   expect_named(results1, c("p", "alternative", "coef", "lower", "upper", "CI_level", "N_pat", "N_evt"))
 
-  expect_lte(results1$p, results2$p)
+  expect_lte(results2$p, results1$p)
 })

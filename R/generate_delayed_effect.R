@@ -86,10 +86,10 @@ generate_delayed_effect <- function(condition, fixed_objects=NULL){
 #' Design
 assumptions_delayed_effect <- function(){
   skel <- "expand.grid(
-  delay=seq(0, 10, by=2), # delay of 0, 1, ..., 10 days
-  hazard_ctrl=0.2,        # hazard under control and before treatment effect
-  hazard_trt=0.02,        # hazard after onset of treatment effect
-  random_withdrawal=0.01  # rate of random withdrawal
+  delay=m2d(seq(0, 10, by=2)), # delay of 0, 1, ..., 10 months
+  hazard_ctrl=m2r(24),         # median survival control of 24 months
+  hazard_trt=m2r(36),          # median survival treatment of 36 months
+  random_withdrawal=m2r(120)   # median time to random withdrawal 10 years
 )
 "
 

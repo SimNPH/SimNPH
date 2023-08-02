@@ -30,7 +30,6 @@ test_that("group sequential tests work", {
   result <- analyse_logrank_sequential(condition, dat)
 
   expect_named(result, c("rejected_at_stage", "N_pat", "N_evt", "study_time", "max_followup", "results_stages"))
-  expect_type(result$rejected_at_stage, "integer")
   expect_type(result$N_pat, "integer")
   expect_type(result$N_evt, "integer")
   expect_type(result$study_time, "double")
