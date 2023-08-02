@@ -15,10 +15,10 @@
 #' Design
 design_fixed_followup <- function(){
   skel <- "expand.grid(
-  n_trt=50,      # 100 patients in the treatment arm
-  n_ctrl=50,     # 100 patients in the control arm
-  followup=200,  # fixed followup time
-  recruitment=50 # recruitment time
+  n_trt=150,         # 150 patients in the treatment arm
+  n_ctrl=150,        # 150 patients in the control arm
+  followup=m2d(24),  # followup 2 years
+  recruitment=m2d(6) # recruitment time 6 months
 
 )
 "
@@ -49,12 +49,12 @@ invisible(
 #' Design
 design_group_sequential <- function(){
   skel <- "expand.grid(
-  n_trt=50,          # 100 patients in the treatment arm
-  n_ctrl=50,         # 100 patients in the control arm
-  followup=200,      # maximum followup time
-  recruitment=50,    # recruitment time
-  interim_events=25, # events interim analysis
-  final_events=50    # events final analysis
+  n_trt=200,          # 200 patients in the treatment arm
+  n_ctrl=200,         # 200 patients in the control arm
+  followup=m2d(48),   # maximum followup time 4 years
+  recruitment=m2d(6), # recruitment time 6 months
+  interim_events=150, # interim analysis after 150 events
+  final_events=300    # final analysis after 300 events
 )
 "
 

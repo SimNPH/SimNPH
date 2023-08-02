@@ -96,11 +96,11 @@ generate_crossing_hazards <- function(condition, fixed_objects=NULL){
 #' Design
 assumptions_crossing_hazards <- function(){
   skel <- "expand.grid(
-  crossing=seq(0, 10, by=2),  # crossing of hazards after 0, 1, ..., 10 days
-  hazard_ctrl=0.05,        # hazard under control and before treatment effect
-  hazard_trt_before=0.025, # hazard before crossing of the hazard curves
-  hazard_trt_after=0.1,    # hazard after crossing of the hazard curves
-  random_withdrawal=0.01  # rate of random withdrawal
+  crossing=m2d(seq(0, 10, by=2)), # crossing after of 0, 1, ..., 10 months
+  hazard_ctrl=m2r(24),            # median survival control of 24 months
+  hazard_trt_before=m2r(18),      # median survival before crossing 18 months
+  hazard_trt_after=m2r(36),       # median survival after crossing 36 months
+  random_withdrawal=m2r(120)      # median time to random withdrawal 10 years
 )
 "
 

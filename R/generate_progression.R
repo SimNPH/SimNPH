@@ -15,12 +15,12 @@
 #' Design
 assumptions_progression <- function(){
   skel <- "expand.grid(
-  hazard_ctrl       = 0.001518187, # hazard under control (med. survi. 15m)
-  hazard_trt        = 0.001265156, # hazard under treatment (med. surv. 18m)
-  hazard_after_prog = 0.007590934, # hazard after progression (med. surv. 3m)
-  prog_rate_ctrl    = 0.001897734, # hazard rate for disease progression under control
-  prog_rate_trt     = c(0.001897734, 0.001423300, 0.001265156), # haz. rate for progression, trt.
-  random_withdrawal = 0.01         # rate of random withdrawal
+  hazard_ctrl= m2r(24),              # med. survival ctrl 24 months
+  hazard_trt= m2r(36),               # med. survival trt 36 months
+  hazard_after_prog=m2r(6),          # med. survival after prorg. 6 months
+  prog_rate_ctrl=m2r(12),            # med. time to prog. ctrl 12 months
+  prog_rate_trt= m2r(c(12, 16, 18)), # med. time to prog. trt 12, 16, 18 months
+  random_withdrawal=m2r(120)         # median time to random withdrawal 10 years
 )
 "
 
@@ -319,7 +319,7 @@ progression_rate_from_progression_prop <- function(design){
 #' hazard_trt          = m2r(18),          # hazard under treatment
 #' hazard_after_prog   = m2r(3),           # hazard after progression
 #' prog_rate_ctrl      = m2r(12),          # hazard for disease progression under control
-#' prog_rate_trt       = m2r(c(12,16,18)), # hazard for disease progression unter treatment
+#' prog_rate_trt       = m2r(c(12,16,18)), # hazard for disease progression under treatment
 #' censoring_prop      = 0.1,              # rate of random withdrawal
 #' followup            = 100,              # follow up time
 #' n_trt               = 50,               # patients in treatment arm
