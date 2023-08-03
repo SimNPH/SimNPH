@@ -44,7 +44,7 @@ mixture_haz_fun    <- function(p, pdfs, survs){
   function(v){
     pdf <- sapply(pdfs, \(pdf) pdf(v)) %*% p
     surv <- sapply(survs, \(surv) surv(v)) %*% p
-    pdf/surv
+    as.numeric(pdf/surv)
   }
 }
 
@@ -65,7 +65,7 @@ mixture_cumhaz_fun <- function(p, survs){
   p <- prepare_p(p)
   function(v){
     surv <- sapply(survs, \(surv) surv(v)) %*% p
-    -log(surv)
+    as.numeric(-log(surv))
   }
 }
 
@@ -85,7 +85,7 @@ mixture_cumhaz_fun <- function(p, survs){
 mixture_cdf_fun    <- function(p, cdfs){
   p <- prepare_p(p)
   function(v){
-    sapply(cdfs, \(cdf) cdf(v)) %*% p
+    as.numeric(sapply(cdfs, \(cdf) cdf(v)) %*% p)
   }
 }
 
@@ -102,10 +102,11 @@ mixture_cdf_fun    <- function(p, cdfs){
 #'   )
 #' )
 #' plot(pdf(seq(0, 30, by=0.15)), type="l")
+
 mixture_pdf_fun    <- function(p, pdfs){
   p <- prepare_p(p)
   function(v){
-    sapply(pdfs, \(pdf) pdf(v)) %*% p
+    as.numeric(sapply(pdfs, \(pdf) pdf(v)) %*% p)
   }
 }
 
@@ -125,7 +126,7 @@ mixture_pdf_fun    <- function(p, pdfs){
 mixture_surv_fun   <- function(p, survs){
   p <- prepare_p(p)
   function(v){
-    sapply(survs, \(surv) surv(v)) %*% p
+    as.numeric(sapply(survs, \(surv) surv(v)) %*% p)
   }
 }
 
