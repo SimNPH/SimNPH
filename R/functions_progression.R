@@ -1,73 +1,7 @@
-subpop_pzhaz_simnph_internal <- function(Tint, lambda1, lambda2, lambdaProg, int_control){
-
-  cumhaz_tod <- fast_cumhaz_fun(Tint, lambda1)
-  cumhaz_tod_nach_switch <- fast_cumhaz_fun(Tint, lambda2)
-  pdf_switch <- fast_pdf_fun(Tint, lambdaProg)
-  haz_tod <- fast_haz_fun(Tint, lambda1)
-  haz_tod_nach_switch <- fast_haz_fun(Tint, lambda2)
-
-  Smix_ <- function(v){
-    int_fun <- function(s, t){
-      t1 = cumhaz_tod(pmin(s, t))
-      t2 = (cumhaz_tod_nach_switch(t - s)) * (s < t)
-      exp(-(t1 + t2)) * pdf_switch(s)
-    }
-
-    mapply(
-      function(x){
-        integrate(
-          f=int_fun,
-          lower=0,
-          upper=Inf,
-          t=x,
-          rel.tol = int_control$rel.tol, abs.tol = int_control$abs.tol
-        )$value
-      },
-      v
-    )
-  }
-
-  Smix <- memoise::memoise(Smix_)
-
-  hmix <- function(v){
-    int_fun <- function(s,t){
-      t1 = cumhaz_tod(pmin(s,t))
-      t2 = cumhaz_tod_nach_switch(t-s) * (s < t)
-
-      exp(-(t2+t1)) * pdf_switch(s) * haz_tod(t) * (s > t) +
-        haz_tod_nach_switch(t-s) * (s < t)
-    }
-
-    mapply(
-      function(x){
-        invS <- (1/Smix(x))
-        Ss = integrate(
-          f=int_fun,
-          lower=0,
-          upper=Inf,
-          t=x,
-          rel.tol = int_control$rel.tol, abs.tol = int_control$abs.tol
-        )$value
-
-        invS * Ss
-      },
-      v
-    )
-  }
-
-  cummixhaz <- function(v){
-    -log(Smix(v))
-  }
-
-  Fmix <- function(v){
-    1 - Smix(v)
-  }
-
-  out <- list(haz_f = hmix, cumhaz_f = cummixhaz, surv_f = Smix,
-              cdf_f = Fmix)
-  out
-}
-
+# Tint: time intervals
+# lambda1: hazard for death before progression
+# lambda2: hazard for death after progression
+# lambdaProg: hazard for progression
 subpop_hazVfun_simnph <- function (Tint, lambda1, lambda2, lambdaProg,
                                    timezero = FALSE){
   stopifnot(timezero)
