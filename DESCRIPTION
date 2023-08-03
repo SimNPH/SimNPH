@@ -41,3 +41,4 @@ VignetteBuilder: R.rsp
 RoxygenNote: 7.2.3
 Roxygen: list(markdown = TRUE)
 URL: https://simnph.github.io/SimNPH
+BugReports: https://github.com/SimNPH/SimNPH/issues
