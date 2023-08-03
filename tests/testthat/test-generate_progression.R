@@ -172,3 +172,43 @@ test_that("progression rate from progression prop works", {
   expect_equal(order(res$prog_rate_trt), order(res$prog_prop_trt))
   expect_equal(order(res$prog_rate_ctrl), order(res$prog_prop_ctrl))
 })
+
+test_that("hazard_before_progression_from_PH_effect_size works", {
+
+  capture_output(
+    my_design <- merge(
+      assumptions_progression(),
+      design_group_sequential(),
+      by=NULL
+    )
+  )
+
+  design_2 <- my_design
+  design_2$effect_size_ph <- 0.9
+  design_2$final_event <- NULL
+
+  design_3 <- my_design
+  design_3$final_events <- NULL
+
+  design_4 <- my_design[1, ]
+  design_4$hazard_trt <- 6e-5
+  design_4$prog_rate_trt <- 0
+
+  # to hide progressbar in test output
+  withr::with_options(
+    list(
+      cli.default_handler = function(...) { },
+      usethis.quiet = TRUE
+    ),
+    {
+      res_1 <- hazard_before_progression_from_PH_effect_size(my_design[1, ], target_power_ph=0)
+      res_2 <- hazard_before_progression_from_PH_effect_size(design_2, final_events=300)
+      res_3 <- hazard_before_progression_from_PH_effect_size(design_4, final_events=300, target_power_ph=0.9)
+    }
+  )
+
+  expect_equal(res_1$hazard_ctrl, res_1$hazard_trt)
+
+  expect_error(hazard_before_progression_from_PH_effect_size(design_3))
+  expect_error(hazard_before_progression_from_PH_effect_size(my_design))
+})
