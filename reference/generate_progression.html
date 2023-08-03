@@ -39,7 +39,13 @@ Calculate hr after onset of treatment effect"><!-- mathjax --><script src="https
       </ul><form class="form-inline my-2 my-lg-0" role="search">
         <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off"></form>
 
-      <ul class="navbar-nav"></ul></div>
+      <ul class="navbar-nav"><li class="nav-item">
+  <a class="external-link nav-link" href="https://github.com/SimNPH/SimNPH/" aria-label="github">
+    <span class="fab fa fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
+      </ul></div>
 
     
   </div>
@@ -47,7 +53,7 @@ Calculate hr after onset of treatment effect"><!-- mathjax --><script src="https
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="" class="logo" alt=""><h1>Create an empty assumtions data.frame for generate_progression</h1>
-      
+      <small class="dont-index">Source: <a href="https://github.com/SimNPH/SimNPH/blob/HEAD/R/generate_progression.R" class="external-link"><code>R/generate_progression.R</code></a></small>
       <div class="d-none name"><code>generate_progression.Rd</code></div>
     </div>
 
@@ -246,21 +252,21 @@ hazard ratios that correspond to reasonable and realistic scenarios.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> )</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">one_simulation</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     t trt  evt t_ice   ice</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 259   1 TRUE    23  TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2  28   1 TRUE   Inf FALSE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3 424   1 TRUE   343  TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4  72   1 TRUE   Inf FALSE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5 551   1 TRUE   352  TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6 470   1 TRUE   447  TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      t trt  evt t_ice   ice</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1   21   1 TRUE   Inf FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 1062   1 TRUE   908  TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  953   1 TRUE   899  TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4  574   1 TRUE   164  TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5  398   1 TRUE   Inf FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6  218   1 TRUE   Inf FALSE</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">tail</a></span><span class="op">(</span><span class="va">one_simulation</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        t trt  evt t_ice   ice</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 295  408   0 TRUE    64  TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 296  994   0 TRUE   391  TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 297 1755   0 TRUE   905  TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 298  333   0 TRUE   Inf FALSE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 299  361   0 TRUE   336  TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 300   49   0 TRUE    12  TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 295 1662   0 TRUE   718  TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 296  169   0 TRUE   Inf FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 297  906   0 TRUE     3  TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 298  684   0 TRUE    71  TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 299  251   0 TRUE   Inf FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 300  333   0 TRUE   284  TRUE</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">my_design</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/merge.html" class="external-link">merge</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>  <span class="fu">assumptions_progression</span><span class="op">(</span><span class="op">)</span>,</span></span>

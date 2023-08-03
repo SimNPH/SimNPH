@@ -33,7 +33,13 @@
       </ul><form class="form-inline my-2 my-lg-0" role="search">
         <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off"></form>
 
-      <ul class="navbar-nav"></ul></div>
+      <ul class="navbar-nav"><li class="nav-item">
+  <a class="external-link nav-link" href="https://github.com/SimNPH/SimNPH/" aria-label="github">
+    <span class="fab fa fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
+      </ul></div>
 
     
   </div>
@@ -41,7 +47,7 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="" class="logo" alt=""><h1>Create Analyse function for piecewise exponential model</h1>
-      
+      <small class="dont-index">Source: <a href="https://github.com/SimNPH/SimNPH/blob/HEAD/R/analyse_piecewise_exponential.R" class="external-link"><code>R/analyse_piecewise_exponential.R</code></a></small>
       <div class="d-none name"><code>analyse_piecewise_exponential.Rd</code></div>
     </div>
 
@@ -102,31 +108,31 @@ versions.</p>
 <span class="r-in"><span><span class="va">dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="generate_delayed_effect.html">generate_delayed_effect</a></span><span class="op">(</span><span class="va">condition</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">analyse_piecewise_exponential</span><span class="op">(</span>cuts<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">90</span>, <span class="fl">360</span><span class="op">)</span><span class="op">)</span><span class="op">(</span><span class="va">condition</span>, <span class="va">dat</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $p</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.2040748</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.06499323</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $hr_s</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 3</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   `trt:intervalI1` `trt:intervalI2` `trt:intervalI3`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>            0.419            0.763            0.959</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>            0.486            0.644            0.848</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $p_s</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 3</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   `trt:intervalI1` `trt:intervalI2` `trt:intervalI3`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>           0.074<span style="text-decoration: underline;">4</span>            0.315            0.752</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>            0.119           0.075<span style="text-decoration: underline;">4</span>            0.231</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $hr_s_lower</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 3</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   `trt:intervalI1` `trt:intervalI2` `trt:intervalI3`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>            -<span style="color: #BB0000;">1.91</span>           -<span style="color: #BB0000;">0.805</span>           -<span style="color: #BB0000;">0.304</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>            -<span style="color: #BB0000;">1.69</span>           -<span style="color: #BB0000;">0.935</span>           -<span style="color: #BB0000;">0.435</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $hr_s_upper</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 3</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   `trt:intervalI1` `trt:intervalI2` `trt:intervalI3`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>           0.042<span style="text-decoration: underline;">9</span>            0.255            0.221</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>            0.155           0.041<span style="text-decoration: underline;">0</span>            0.106</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $N_pat</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 300</span>
@@ -137,9 +143,9 @@ versions.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $interval_table</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        0   1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   I1 280  20</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   I2 224  56</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   I3   0 224</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   I1 279  21</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   I2 212  67</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   I3   0 212</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 </code></pre></div>
     </div>

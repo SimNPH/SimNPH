@@ -52,7 +52,14 @@
         <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../../search.json" id="search-input" placeholder="Search for" autocomplete="off">
 </form>
 
-      <ul class="navbar-nav"></ul>
+      <ul class="navbar-nav">
+<li class="nav-item">
+  <a class="external-link nav-link" href="https://github.com/SimNPH/SimNPH/" aria-label="github">
+    <span class="fab fa fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
+      </ul>
 </div>
 
     
@@ -69,7 +76,7 @@
 Estimate, Summarise</h3>
             
       
-      
+      <small class="dont-index">Source: <a href="https://github.com/SimNPH/SimNPH/blob/HEAD/vignettes/vignettes_prebuild/simple_example.Rmd" class="external-link"><code>vignettes/vignettes_prebuild/simple_example.Rmd</code></a></small>
       <div class="d-none name"><code>simple_example.Rmd</code></div>
     </div>
 
@@ -290,7 +297,7 @@ defined before and the simulations should be run in parallel.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Number of parallel clusters in use: 8</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Simulation complete. Total execution time: 25.22s</span></span></code></pre></div>
+<span><span class="co">#&gt; Simulation complete. Total execution time: 30.20s</span></span></code></pre></div>
 <p>Finally we select the interesting columns from the output. Since all
 other parameters are the same for each scenario we just select delay.
 And we are interested in the rejection rate of the tests.</p>
@@ -308,32 +315,32 @@ And we are interested in the rejection rate of the tests.</p>
 <tr class="odd">
 <td align="right">0.000</td>
 <td align="right">0.50</td>
-<td align="right">0.55</td>
+<td align="right">0.53</td>
 </tr>
 <tr class="even">
 <td align="right">60.875</td>
 <td align="right">0.44</td>
-<td align="right">0.40</td>
+<td align="right">0.43</td>
 </tr>
 <tr class="odd">
 <td align="right">121.750</td>
-<td align="right">0.34</td>
+<td align="right">0.38</td>
 <td align="right">0.32</td>
 </tr>
 <tr class="even">
 <td align="right">182.625</td>
-<td align="right">0.35</td>
-<td align="right">0.30</td>
+<td align="right">0.39</td>
+<td align="right">0.34</td>
 </tr>
 <tr class="odd">
 <td align="right">243.500</td>
-<td align="right">0.17</td>
-<td align="right">0.13</td>
+<td align="right">0.31</td>
+<td align="right">0.24</td>
 </tr>
 <tr class="even">
 <td align="right">304.375</td>
-<td align="right">0.29</td>
 <td align="right">0.18</td>
+<td align="right">0.14</td>
 </tr>
 </tbody>
 </table>
@@ -529,7 +536,7 @@ functions are included in the result.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Number of parallel clusters in use: 8</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Simulation complete. Total execution time: 59.75s</span></span></code></pre></div>
+<span><span class="co">#&gt; Simulation complete. Total execution time: 01m 10.97s</span></span></code></pre></div>
 <p>In the case of a group sequential design we are also interested in
 the average running time of the study in terms of patients recruited,
 number of events and running time of the study.</p>
@@ -569,69 +576,69 @@ number of events and running time of the study.</p>
 <tbody>
 <tr class="odd">
 <td align="right">0.000</td>
-<td align="right">0.83</td>
-<td align="right">0.85</td>
+<td align="right">0.87</td>
+<td align="right">0.89</td>
 <td align="right">400</td>
 <td align="right">400</td>
-<td align="right">215.05</td>
-<td align="right">212.50</td>
-<td align="right">1278.43</td>
-<td align="right">1256.04</td>
+<td align="right">215.95</td>
+<td align="right">214.79</td>
+<td align="right">1286.33</td>
+<td align="right">1278.10</td>
 </tr>
 <tr class="even">
 <td align="right">60.875</td>
-<td align="right">0.86</td>
-<td align="right">0.85</td>
+<td align="right">0.88</td>
+<td align="right">0.87</td>
 <td align="right">400</td>
 <td align="right">400</td>
-<td align="right">218.40</td>
-<td align="right">216.44</td>
-<td align="right">1296.73</td>
-<td align="right">1275.05</td>
+<td align="right">220.80</td>
+<td align="right">223.86</td>
+<td align="right">1309.62</td>
+<td align="right">1339.40</td>
 </tr>
 <tr class="odd">
 <td align="right">121.750</td>
-<td align="right">0.71</td>
-<td align="right">0.73</td>
+<td align="right">0.76</td>
+<td align="right">0.70</td>
 <td align="right">400</td>
 <td align="right">400</td>
-<td align="right">226.70</td>
-<td align="right">226.48</td>
-<td align="right">1362.79</td>
-<td align="right">1360.89</td>
+<td align="right">224.15</td>
+<td align="right">227.69</td>
+<td align="right">1340.89</td>
+<td align="right">1371.36</td>
 </tr>
 <tr class="even">
 <td align="right">182.625</td>
-<td align="right">0.76</td>
-<td align="right">0.69</td>
+<td align="right">0.71</td>
+<td align="right">0.64</td>
 <td align="right">400</td>
 <td align="right">400</td>
-<td align="right">229.62</td>
-<td align="right">231.54</td>
-<td align="right">1373.28</td>
-<td align="right">1389.23</td>
+<td align="right">235.98</td>
+<td align="right">235.20</td>
+<td align="right">1411.56</td>
+<td align="right">1403.97</td>
 </tr>
 <tr class="odd">
 <td align="right">243.500</td>
-<td align="right">0.56</td>
-<td align="right">0.48</td>
+<td align="right">0.60</td>
+<td align="right">0.59</td>
 <td align="right">400</td>
 <td align="right">400</td>
-<td align="right">238.06</td>
-<td align="right">240.02</td>
-<td align="right">1419.80</td>
-<td align="right">1436.61</td>
+<td align="right">234.64</td>
+<td align="right">239.13</td>
+<td align="right">1397.68</td>
+<td align="right">1436.92</td>
 </tr>
 <tr class="even">
 <td align="right">304.375</td>
-<td align="right">0.52</td>
-<td align="right">0.44</td>
+<td align="right">0.58</td>
+<td align="right">0.47</td>
 <td align="right">400</td>
 <td align="right">400</td>
-<td align="right">239.17</td>
-<td align="right">242.76</td>
-<td align="right">1420.91</td>
-<td align="right">1451.03</td>
+<td align="right">239.02</td>
+<td align="right">241.74</td>
+<td align="right">1426.76</td>
+<td align="right">1449.94</td>
 </tr>
 </tbody>
 </table>
@@ -860,7 +867,7 @@ different summary statistics.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Number of parallel clusters in use: 8</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Simulation complete. Total execution time: 1.98s</span></span></code></pre></div>
+<span><span class="co">#&gt; Simulation complete. Total execution time: 2.22s</span></span></code></pre></div>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">res</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span>select<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
@@ -890,57 +897,57 @@ different summary statistics.</p>
 <tbody>
 <tr class="odd">
 <td align="right">0.000</td>
-<td align="right">-0.0001684</td>
-<td align="right">-0.0001684</td>
-<td align="right">0.0174746</td>
-<td align="right">0.0174746</td>
-<td align="right">0.98</td>
-<td align="right">0.98</td>
+<td align="right">0.0072227</td>
+<td align="right">0.0072227</td>
+<td align="right">0.0180613</td>
+<td align="right">0.0180613</td>
+<td align="right">0.96</td>
+<td align="right">0.96</td>
 </tr>
 <tr class="even">
 <td align="right">60.875</td>
-<td align="right">0.0446791</td>
-<td align="right">-0.2886543</td>
-<td align="right">0.0164999</td>
-<td align="right">0.0978249</td>
+<td align="right">0.0490439</td>
+<td align="right">-0.2842895</td>
+<td align="right">0.0237530</td>
+<td align="right">0.1021682</td>
 <td align="right">0.94</td>
-<td align="right">0.52</td>
+<td align="right">0.57</td>
 </tr>
 <tr class="odd">
 <td align="right">121.750</td>
-<td align="right">0.1121081</td>
-<td align="right">-0.2212252</td>
-<td align="right">0.0338849</td>
-<td align="right">0.0702573</td>
-<td align="right">0.86</td>
-<td align="right">0.74</td>
+<td align="right">0.1149941</td>
+<td align="right">-0.2183392</td>
+<td align="right">0.0358428</td>
+<td align="right">0.0702912</td>
+<td align="right">0.91</td>
+<td align="right">0.72</td>
 </tr>
 <tr class="even">
 <td align="right">182.625</td>
-<td align="right">0.1431061</td>
-<td align="right">-0.1902272</td>
-<td align="right">0.0560118</td>
-<td align="right">0.0717188</td>
+<td align="right">0.1212511</td>
+<td align="right">-0.2120823</td>
+<td align="right">0.0398753</td>
+<td align="right">0.0701524</td>
 <td align="right">0.83</td>
-<td align="right">0.71</td>
+<td align="right">0.70</td>
 </tr>
 <tr class="odd">
 <td align="right">243.500</td>
-<td align="right">0.1613795</td>
-<td align="right">-0.1719538</td>
-<td align="right">0.0469716</td>
-<td align="right">0.0504964</td>
-<td align="right">0.81</td>
+<td align="right">0.1655525</td>
+<td align="right">-0.1677808</td>
+<td align="right">0.0554802</td>
+<td align="right">0.0562230</td>
+<td align="right">0.80</td>
 <td align="right">0.82</td>
 </tr>
 <tr class="even">
 <td align="right">304.375</td>
-<td align="right">0.2217517</td>
-<td align="right">-0.1115816</td>
-<td align="right">0.0690590</td>
-<td align="right">0.0323356</td>
-<td align="right">0.72</td>
-<td align="right">0.92</td>
+<td align="right">0.2082235</td>
+<td align="right">-0.1251099</td>
+<td align="right">0.0749643</td>
+<td align="right">0.0472598</td>
+<td align="right">0.73</td>
+<td align="right">0.88</td>
 </tr>
 </tbody>
 </table>

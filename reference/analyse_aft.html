@@ -33,7 +33,13 @@
       </ul><form class="form-inline my-2 my-lg-0" role="search">
         <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off"></form>
 
-      <ul class="navbar-nav"></ul></div>
+      <ul class="navbar-nav"><li class="nav-item">
+  <a class="external-link nav-link" href="https://github.com/SimNPH/SimNPH/" aria-label="github">
+    <span class="fab fa fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
+      </ul></div>
 
     
   </div>
@@ -41,7 +47,7 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="" class="logo" alt=""><h1>Analyse Dataset with accelarated failure time models</h1>
-      
+      <small class="dont-index">Source: <a href="https://github.com/SimNPH/SimNPH/blob/HEAD/R/analyse_aft.R" class="external-link"><code>R/analyse_aft.R</code></a></small>
       <div class="d-none name"><code>analyse_aft.Rd</code></div>
     </div>
 
@@ -113,20 +119,20 @@ survival than control.</p>
 <span class="r-in"><span><span class="va">dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="generate_delayed_effect.html">generate_delayed_effect</a></span><span class="op">(</span><span class="va">condition</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">analyse_aft</span><span class="op">(</span><span class="op">)</span><span class="op">(</span><span class="va">condition</span>, <span class="va">dat</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $p</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.001032411</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.0003035136</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $alternative</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "two.sided"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $coef</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       trt </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 0.4048639 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 0.4209347 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $lower</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.1630511</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.1925426</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $upper</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.6466766</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.6493268</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $CI_level</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.95</span>
@@ -139,20 +145,20 @@ survival than control.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span><span class="fu">analyse_aft</span><span class="op">(</span>dist<span class="op">=</span><span class="st">"lognormal"</span><span class="op">)</span><span class="op">(</span><span class="va">condition</span>, <span class="va">dat</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $p</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.008154769</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.002444881</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $alternative</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "two.sided"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $coef</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       trt </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 0.4235161 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 0.4486886 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $lower</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.1097581</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.1584609</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $upper</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.7372741</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.7389163</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $CI_level</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.95</span>

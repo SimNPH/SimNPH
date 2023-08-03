@@ -37,7 +37,13 @@ Apply Administrative Censoring After Fixed Number of Events"><!-- mathjax --><sc
       </ul><form class="form-inline my-2 my-lg-0" role="search">
         <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off"></form>
 
-      <ul class="navbar-nav"></ul></div>
+      <ul class="navbar-nav"><li class="nav-item">
+  <a class="external-link nav-link" href="https://github.com/SimNPH/SimNPH/" aria-label="github">
+    <span class="fab fa fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
+      </ul></div>
 
     
   </div>
@@ -45,7 +51,7 @@ Apply Administrative Censoring After Fixed Number of Events"><!-- mathjax --><sc
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="" class="logo" alt=""><h1>Add recruitment time to Dataset</h1>
-      
+      <small class="dont-index">Source: <a href="https://github.com/SimNPH/SimNPH/blob/HEAD/R/censoring_adminstrative.R" class="external-link"><code>R/censoring_adminstrative.R</code></a></small>
       <div class="d-none name"><code>admin_censoring_time.Rd</code></div>
     </div>
 
@@ -154,7 +160,7 @@ the observed times as followup. "warn" does the same but gives a warning.
 <span class="r-out co"><span class="r-pr">#&gt;</span>   t   trt rec_time</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1 0 FALSE        3</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2 1 FALSE        2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3 2  TRUE        5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 2  TRUE        4</span>
 <span class="r-in"><span><span class="va">dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>  t <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">10</span>,</span></span>
 <span class="r-in"><span>  rec_time <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>, each<span class="op">=</span><span class="fl">2</span><span class="op">)</span>,</span></span>

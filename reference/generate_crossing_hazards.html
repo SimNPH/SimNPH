@@ -39,7 +39,13 @@ Calculate true summary statistics for scenarios with crossing hazards"><!-- math
       </ul><form class="form-inline my-2 my-lg-0" role="search">
         <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off"></form>
 
-      <ul class="navbar-nav"></ul></div>
+      <ul class="navbar-nav"><li class="nav-item">
+  <a class="external-link nav-link" href="https://github.com/SimNPH/SimNPH/" aria-label="github">
+    <span class="fab fa fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
+      </ul></div>
 
     
   </div>
@@ -47,7 +53,7 @@ Calculate true summary statistics for scenarios with crossing hazards"><!-- math
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="" class="logo" alt=""><h1>Generate Dataset with crossing hazards</h1>
-      
+      <small class="dont-index">Source: <a href="https://github.com/SimNPH/SimNPH/blob/HEAD/R/generate_crossing_hazards.R" class="external-link"><code>R/generate_crossing_hazards.R</code></a></small>
       <div class="d-none name"><code>generate_crossing_hazards.Rd</code></div>
     </div>
 
@@ -211,20 +217,20 @@ hazards</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> )</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">one_simulation</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      t trt  evt</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1  746   1 TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2  398   1 TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3 1313   1 TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4 2038   1 TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5  323   1 TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6  136   1 TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 3553   1 TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  166   1 TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 1917   1 TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4  358   1 TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5 1958   1 TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6  341   1 TRUE</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">tail</a></span><span class="op">(</span><span class="va">one_simulation</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        t trt  evt</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 295  430   0 TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 296 3111   0 TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 297 1055   0 TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 298 1302   0 TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 299 1694   0 TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 300  456   0 TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 295  585   0 TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 296  233   0 TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 297  335   0 TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 298  372   0 TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 299    8   0 TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 300 1148   0 TRUE</span>
 <span class="r-in"><span><span class="va">Design</span> <span class="op">&lt;-</span> <span class="fu">assumptions_crossing_hazards</span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> expand.grid(</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   crossing=m2d(seq(0, 10, by=2)), # crossing after of 0, 1, ..., 10 months</span>

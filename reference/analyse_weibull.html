@@ -33,7 +33,13 @@
       </ul><form class="form-inline my-2 my-lg-0" role="search">
         <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off"></form>
 
-      <ul class="navbar-nav"></ul></div>
+      <ul class="navbar-nav"><li class="nav-item">
+  <a class="external-link nav-link" href="https://github.com/SimNPH/SimNPH/" aria-label="github">
+    <span class="fab fa fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
+      </ul></div>
 
     
   </div>
@@ -41,7 +47,7 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="" class="logo" alt=""><h1>Analyse Dataset with Weibull Regression</h1>
-      
+      <small class="dont-index">Source: <a href="https://github.com/SimNPH/SimNPH/blob/HEAD/R/analyse_weibull.R" class="external-link"><code>R/analyse_weibull.R</code></a></small>
       <div class="d-none name"><code>analyse_weibull.Rd</code></div>
     </div>
 
@@ -105,37 +111,37 @@ the medians and respective variances with the delta-method.</p>
 <span class="r-in"><span><span class="va">dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="generate_delayed_effect.html">generate_delayed_effect</a></span><span class="op">(</span><span class="va">condition</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">analyse_weibull</span><span class="op">(</span><span class="op">)</span><span class="op">(</span><span class="va">condition</span>, <span class="va">dat</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $p</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.001328059</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.8429616</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $alternative</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "two.sided"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $med_trt_est</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 620.7553</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 814.9862</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $med_trt_lower</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 499.9696</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 676.5175</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $med_trt_upper</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 741.541</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 953.4549</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $med_ctrl_est</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 982.6314</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 793.182</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $med_ctrl_lower</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 797.6006</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 627.7694</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $med_ctrl_upper</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1167.662</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 958.5946</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $diff_med_est</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 361.876</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] -21.80421</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $diff_med_lower</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 140.9109</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] -237.5237</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $diff_med_upper</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 582.8411</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 193.9153</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $CI_level</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.95</span>

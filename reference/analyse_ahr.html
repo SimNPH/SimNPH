@@ -33,7 +33,13 @@
       </ul><form class="form-inline my-2 my-lg-0" role="search">
         <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off"></form>
 
-      <ul class="navbar-nav"></ul></div>
+      <ul class="navbar-nav"><li class="nav-item">
+  <a class="external-link nav-link" href="https://github.com/SimNPH/SimNPH/" aria-label="github">
+    <span class="fab fa fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
+      </ul></div>
 
     
   </div>
@@ -41,7 +47,7 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="" class="logo" alt=""><h1>Analyse the dataset using extimators for the the average hazard ratio</h1>
-      
+      <small class="dont-index">Source: <a href="https://github.com/SimNPH/SimNPH/blob/HEAD/R/analyse_ahr.R" class="external-link"><code>R/analyse_ahr.R</code></a></small>
       <div class="d-none name"><code>analyse_ahr.Rd</code></div>
     </div>
 
@@ -130,19 +136,19 @@ columns:</p><ul><li><p><code>p</code> p value of the test, see Details</p></li>
 <span class="r-in"><span><span class="va">dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="generate_delayed_effect.html">generate_delayed_effect</a></span><span class="op">(</span><span class="va">condition</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">analyse_ahr</span><span class="op">(</span><span class="op">)</span><span class="op">(</span><span class="va">condition</span>, <span class="va">dat</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $p</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.000274194</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.006605864</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $alternative</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "two.sided"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $AHR</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.6107922</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.6894161</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $AHR_lower</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.4683398</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.5271418</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $AHR_upper</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.7965736</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.9016445</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $CI_level</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.95</span>
@@ -155,19 +161,19 @@ columns:</p><ul><li><p><code>p</code> p value of the test, see Details</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span><span class="fu">analyse_ahr</span><span class="op">(</span>type <span class="op">=</span> <span class="st">"gAHR"</span><span class="op">)</span><span class="op">(</span><span class="va">condition</span>, <span class="va">dat</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $p</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 8.104691e-05</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 5.653937e-05</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $alternative</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "two.sided"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $gAHR</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.6234828</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.6114705</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $gAHR_lower</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.4929383</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.4812805</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $gAHR_upper</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.7885993</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.7768779</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $CI_level</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.95</span>
@@ -180,19 +186,19 @@ columns:</p><ul><li><p><code>p</code> p value of the test, see Details</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span><span class="fu">analyse_ahr</span><span class="op">(</span>max_time <span class="op">=</span> <span class="fl">50</span>, type <span class="op">=</span> <span class="st">"AHR"</span><span class="op">)</span><span class="op">(</span><span class="va">condition</span>, <span class="va">dat</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $p</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.9797146</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.2536466</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $alternative</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "two.sided"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $AHR</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1.014789</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 2.011978</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $AHR_lower</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.3272697</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.6057824</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $AHR_upper</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 3.146632</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 6.68236</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $CI_level</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.95</span>
@@ -205,19 +211,19 @@ columns:</p><ul><li><p><code>p</code> p value of the test, see Details</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span><span class="fu">analyse_ahr</span><span class="op">(</span>max_time <span class="op">=</span> <span class="fl">50</span>, type <span class="op">=</span> <span class="st">"gAHR"</span><span class="op">)</span><span class="op">(</span><span class="va">condition</span>, <span class="va">dat</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $p</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.9898453</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.2510016</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $alternative</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "two.sided"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $gAHR</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1.007365</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 2.018422</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $gAHR_lower</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.3254164</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.6084614</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $gAHR_upper</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 3.118416</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 6.695625</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $CI_level</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.95</span>
