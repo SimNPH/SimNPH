@@ -162,20 +162,20 @@ in the column <code>null_cover</code></p>
 <span class="r-in"><span>  summarise <span class="op">=</span> <span class="va">summarise_all</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Design row: 1/1;   RAM used: 170.1 Mb;   Total elapsed time: 0.00s </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Design row: 1/1;   RAM used: 168.2 Mb;   Total elapsed time: 0.00s </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  Conditions: delay=121., hzrd_c=0.0009, hzrd_t=0.0006, rndm_w=0.0001, n_trt=150, n_ctrl=150, follwp=730., rcrtmn=182., mdn_srvvl_t=1034, mdn_srvvl_c=730., rmst_t_15=14.8, rmst_c_15=14.8, gAHR_1=1, AHR_15=1, AHRc_15=1, AHR__1=1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>NAs introduced by coercion</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>NAs introduced by coercion</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Simulation complete. Total execution time: 0.06s</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Simulation complete. Total execution time: 0.05s</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># mse is missing for the summarise function in which the real value was NA</span></span></span>
 <span class="r-in"><span><span class="va">sim_results</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">sim_results</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span>pattern<span class="op">=</span><span class="st">"mse"</span><span class="op">)</span><span class="op">]</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 4</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   coxph.HR.mse coxph.HR.sd_mse coxph.1.mse coxph.1.sd_mse</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>     0.013<span style="text-decoration: underline;">372</span>        0.021<span style="text-decoration: underline;">337</span>         <span style="color: #BB0000;">NaN</span>             <span style="color: #BB0000;">NA</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>    0.008<span style="text-decoration: underline;">372</span>3        0.011<span style="text-decoration: underline;">633</span>         <span style="color: #BB0000;">NaN</span>             <span style="color: #BB0000;">NA</span></span>
 <span class="r-in"><span><span class="co"># but the variance can be estimated in all cases</span></span></span>
 <span class="r-in"><span><span class="va">sim_results</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">sim_results</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span>pattern<span class="op">=</span><span class="st">"var"</span><span class="op">)</span><span class="op">]</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 0</span></span>
