@@ -134,7 +134,7 @@ test_that("creating a summarise function for an estimator works", {
     apply(1, paste, collapse="") |>
     unname()
 
-  expected_names <- c(names(condition), expected_names, c("REPLICATIONS", "SIM_TIME", "COMPLETED", "SEED"))
+  expected_names <- c(names(condition), expected_names, c("REPLICATIONS", "SIM_TIME", "COMPLETED", "SEED", "RAM_USED"))
 
   expect_named(sim_results, expected_names, ignore.order = TRUE)
 
@@ -192,7 +192,7 @@ test_that("generic summarise for tests works", {
   expect_lte(sim_results$logrank.rejection_0.99,           1)
   expect_lte(sim_results$logrank.innovative.rejection_0.9, 1)
   expect_equal(sim_results$logrank.innovative.sd_n_pat, 0)
-  expect_equal(sim_results$logrank.innovative.mean_n_evt, 100)
+  expect_equal(sim_results$logrank.innovative.mean_n_evt, 300)
 })
 
 test_that("missings are treated correctly for summarise estimator", {

@@ -11,3 +11,8 @@
 ^notes_drafts_etc$
 ^testdata$
 ^\.github$
+^LICENSE\.md$
+^vignettes_prebuild$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$

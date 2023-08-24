@@ -157,13 +157,15 @@ one_simulation <- merge(
   generate_progression()
 head(one_simulation)
 tail(one_simulation)
+
 my_design <- merge(
-    assumptions_progression(),
-    design_fixed_followup(),
-    by=NULL
-  )
-my_design_os  <- true_summary_statistics_subgroup(my_design, "os")
-my_design_pfs <- true_summary_statistics_subgroup(my_design, "pfs")
+  assumptions_progression(),
+  design_fixed_followup(),
+  by=NULL
+)
+
+my_design_os  <- true_summary_statistics_progression(my_design, "os")
+my_design_pfs <- true_summary_statistics_progression(my_design, "pfs")
 my_design_os
 my_design_pfs
 my_design <- merge(
@@ -178,15 +180,15 @@ my_design$prog_prop_ctrl <- 0.3
 my_design <- progression_rate_from_progression_prop(my_design)
 my_design
 design <- expand.grid(
-hazard_ctrl         = 0.001518187, # hazard under control (med. survi. 15m)
-hazard_trt          = 0.001265156, # hazard under treatment (med. surv. 18m)
-hazard_after_prog   = 0.007590934, # hazard after progression (med. surv. 3m)
-prog_rate_ctrl      = 0.001897734, # hazard rate for disease progression under control (med. time to progression 12m)
-prog_rate_trt       = c(0.001897734, 0.001423300, 0.001265156), # hazard rate for disease progression unter treatment (med. time to progression 12m, 16m, 18m)
-censoring_prop      = 0.1,         # rate of random withdrawal
-followup            = 100,         # follow up time
-n_trt               = 50,          # patients in treatment arm
-n_ctrl              = 50           # patients in control arm
+hazard_ctrl         = m2r(15),          # hazard under control
+hazard_trt          = m2r(18),          # hazard under treatment
+hazard_after_prog   = m2r(3),           # hazard after progression
+prog_rate_ctrl      = m2r(12),          # hazard for disease progression under control
+prog_rate_trt       = m2r(c(12,16,18)), # hazard for disease progression under treatment
+censoring_prop      = 0.1,              # rate of random withdrawal
+followup            = 100,              # follow up time
+n_trt               = 50,               # patients in treatment arm
+n_ctrl              = 50                # patients in control arm
 )
 cen_rate_from_cen_prop_progression(design)
 \dontrun{

@@ -7,18 +7,30 @@
 #' @param group_names Group Names
 #' @param lab_time Title for the time axis
 #' @param lab_group Title group legend
+#' @param trafo_time Function to transform time
+#' @param colours vector of two colours
+#' @param linetypes vector of two linetypes
+#' @param linewidths vector of two linewidths
 #'
 #' @return a `patchwork` object as defined in the patchwork package
 #'
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' library(ggplot2)
 #' library(patchwork)
 #' B <- pchaz(c(0, 10, 100), c(0.1, 0.05))
 #' A <- pchaz(c(0, 100), c(0.1))
 #' shhr_gg(A, B)
-shhr_gg <- function(A, B, main=NULL, sub=NULL, group_names=c("control", "treatment"), lab_time="Days", lab_group="Group"){
+#' shhr_gg(A, B, lab_time="Months", trafo_time=d2m)
+#' }
+shhr_gg <- function(A, B, main=NULL, sub=NULL, group_names=c("control", "treatment"), lab_time="Days", lab_group="Group", trafo_time=identity, colours=palette()[c(1,3)], linetypes=c(1,3), linewidths=c(1.3, 1.3)){
+
+  if( !(requireNamespace("ggplot2", quietly = TRUE) & requireNamespace("patchwork", quietly = TRUE)) ){
+    message("Packages ggplot2 and patchwork required for plotting functionality.")
+    return(invisible(NULL))
+  }
 
   plotdata <- data.frame(
     t     = sort(unique(union(A$t, B$t)))
@@ -30,54 +42,56 @@ shhr_gg <- function(A, B, main=NULL, sub=NULL, group_names=c("control", "treatme
   plotdata$haz_b <- B$haz[match(plotdata$t, B$t)]
   plotdata$hr <- plotdata$haz_b / plotdata$haz_a
 
-  gg_surv <- ggplot(plotdata, aes(x=t)) +
-    geom_line(aes(y=surv_a, colour=group_names[1], lty=group_names[1]), linewidth=1.3) +
-    geom_line(aes(y=surv_b, colour=group_names[2], lty=group_names[2]), linewidth=1.3) +
-    labs(
+  plotdata$t <- trafo_time(plotdata$t)
+
+  gg_surv <- ggplot2::ggplot(plotdata, ggplot2::aes(x=t)) +
+    ggplot2::geom_line(ggplot2::aes(y=surv_a, colour=group_names[1], lty=group_names[1]), linewidth=linewidths[1]) +
+    ggplot2::geom_line(ggplot2::aes(y=surv_b, colour=group_names[2], lty=group_names[2]), linewidth=linewidths[2]) +
+    ggplot2::labs(
       x=lab_time,
       y="Survival",
       colour=lab_group,
       lty=lab_group
     ) +
-    scale_y_continuous(
+    ggplot2::scale_y_continuous(
       limits = c(0,1)
     )
 
-  gg_haz <- ggplot(plotdata, aes(x=t)) +
-    geom_line(aes(y=haz_a, colour=group_names[1], lty=group_names[1]), linewidth=1.3) +
-    geom_line(aes(y=haz_b, colour=group_names[2], lty=group_names[2]), linewidth=1.3) +
-    labs(
+  gg_haz <- ggplot2::ggplot(plotdata, ggplot2::aes(x=t)) +
+    ggplot2::geom_line(ggplot2::aes(y=haz_a, colour=group_names[1], lty=group_names[1]), linewidth=linewidths[1]) +
+    ggplot2::geom_line(ggplot2::aes(y=haz_b, colour=group_names[2], lty=group_names[2]), linewidth=linewidths[2]) +
+    ggplot2::labs(
       x=lab_time,
       y="Hazard",
       colour=lab_group,
       lty=lab_group
     ) +
-    expand_limits(y=0)
+    ggplot2::expand_limits(y=0)
 
 
-  gg_hr <- ggplot(plotdata, aes(x=t, y=hr)) +
-    geom_line(linewidth=1.3) +
-    labs(
+  gg_hr <- ggplot2::ggplot(plotdata, ggplot2::aes(x=t, y=hr)) +
+    ggplot2::geom_line(linewidth=linewidths[1]) +
+    ggplot2::labs(
       x=lab_time,
       y="Hazard ratio"
     ) +
-    expand_limits(y=1)
+    ggplot2::expand_limits(y=1)
 
-  tmp_colours <- palette()[c(1,3)]
+  tmp_colours <- colours
   names(tmp_colours) <- group_names
 
-  tmp_lty <- c(1, 3)
+  tmp_lty <- linetypes
   names(tmp_lty) <- group_names
 
-  (gg_surv + gg_haz + gg_hr) +
-    plot_layout(guides = "collect") +
-    plot_annotation(main, subtitle = sub) &
-    theme_bw() &
-    theme(legend.position="bottom") &
-    scale_colour_manual(
+  patchwork::wrap_plots(gg_surv, gg_haz, gg_hr) +
+    patchwork::plot_layout(guides = "collect") +
+    patchwork::plot_annotation(main, subtitle = sub) &
+    ggplot2::theme_bw() &
+    ggplot2::theme(legend.position="bottom") &
+    ggplot2::scale_colour_manual(
       values = tmp_colours
     ) &
-    scale_linetype_manual(
+    ggplot2::scale_linetype_manual(
       values = tmp_lty
     )
 }

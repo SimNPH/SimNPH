@@ -79,11 +79,11 @@ generate_subgroup <- function(condition, fixed_objects=NULL){
 #' Design
 assumptions_subgroup <- function(){
   skel <- "expand.grid(
-  hazard_ctrl       = 0.003795467,       # hazard under control (med. survi. 6m)
-  hazard_trt        = 0.001265156,       # hazard under treatment (med. surv. 18m)
-  hazard_subgroup   = 9.488668e-05,      # hazard for subgroup under treatment (med. surv. 20y)
-  prevalence        = seq(0, 1, by=0.2), # proportion of patients belonging to subgroup
-  random_withdrawal = 0.01               # rate of random withdrawal
+  hazard_ctrl=m2r(24),              # med. survival ctrl. 24 months
+  hazard_trt=m2r(36),               # med. survival trt 36 months
+  hazard_subgroup=m2r(240),         # med. survival subgroup 20 years
+  prevalence=seq(0.2, 0.8, by=0.2), # prevalence 0.2, 0.4, 0.6, 0.8
+  random_withdrawal=m2r(120)        # median time to random withdrawal 10 years
 )
 "
 
@@ -229,14 +229,17 @@ true_summary_statistics_subgroup <- function(Design, cutoff_stats=NULL, mileston
 #'   hazard ratios that correspond to reasonable and realistic scenarios.
 #'
 #' @examples
+#'
 #' my_design <- merge(
-#'     assumptions_subgroup(),
-#'     design_fixed_followup(),
-#'     by=NULL
-#'   )
+#'   assumptions_subgroup(),
+#'   design_fixed_followup(),
+#'   by=NULL
+#' )
+#'
 #' my_design$hazard_trt <- NA
 #' my_design$hazard_subgroup <- NA
 #' my_design$hr_subgroup_relative <- 0.9
+#' my_design$final_events <- ceiling((my_design$n_ctrl + my_design$n_trt) * 0.75)
 #' my_design <- hazard_subgroup_from_PH_effect_size(my_design, target_power_ph=0.9)
 #' my_design
 hazard_subgroup_from_PH_effect_size <- function(design, target_power_ph=NA_real_, final_events=NA_real_, target_alpha=0.025){

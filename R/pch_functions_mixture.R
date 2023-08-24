@@ -44,7 +44,7 @@ mixture_haz_fun    <- function(p, pdfs, survs){
   function(v){
     pdf <- sapply(pdfs, \(pdf) pdf(v)) %*% p
     surv <- sapply(survs, \(surv) surv(v)) %*% p
-    pdf/surv
+    as.numeric(pdf/surv)
   }
 }
 
@@ -65,7 +65,7 @@ mixture_cumhaz_fun <- function(p, survs){
   p <- prepare_p(p)
   function(v){
     surv <- sapply(survs, \(surv) surv(v)) %*% p
-    -log(surv)
+    as.numeric(-log(surv))
   }
 }
 
@@ -85,7 +85,7 @@ mixture_cumhaz_fun <- function(p, survs){
 mixture_cdf_fun    <- function(p, cdfs){
   p <- prepare_p(p)
   function(v){
-    sapply(cdfs, \(cdf) cdf(v)) %*% p
+    as.numeric(sapply(cdfs, \(cdf) cdf(v)) %*% p)
   }
 }
 
@@ -102,10 +102,11 @@ mixture_cdf_fun    <- function(p, cdfs){
 #'   )
 #' )
 #' plot(pdf(seq(0, 30, by=0.15)), type="l")
+
 mixture_pdf_fun    <- function(p, pdfs){
   p <- prepare_p(p)
   function(v){
-    sapply(pdfs, \(pdf) pdf(v)) %*% p
+    as.numeric(sapply(pdfs, \(pdf) pdf(v)) %*% p)
   }
 }
 
@@ -114,7 +115,7 @@ mixture_pdf_fun    <- function(p, pdfs){
 #' @export
 #'
 #' @examples
-#' surv <- mixture_pdf_fun(
+#' surv <- mixture_surv_fun(
 #'   p = c(0.3, 0.7),
 #'   survs = list(
 #'     fast_surv_fun(0, 0.1),
@@ -125,7 +126,7 @@ mixture_pdf_fun    <- function(p, pdfs){
 mixture_surv_fun   <- function(p, survs){
   p <- prepare_p(p)
   function(v){
-    sapply(survs, \(surv) surv(v)) %*% p
+    as.numeric(sapply(survs, \(surv) surv(v)) %*% p)
   }
 }
 
@@ -134,19 +135,27 @@ mixture_surv_fun   <- function(p, survs){
 #' @export
 #'
 #' @param cdfs list of cumulative density functions of the mixture components
+#' @param quants list of quantile functions of the mixture components
 #'
 #' @details mixture_quant_fun relies on numeric root finding and is therefore
 #'   not as fast as fast_quant_fun.
 #'
 #' @examples
+#'
 #' quant <- mixture_quant_fun(
 #'   p = c(0.3, 0.7),
 #'   cdfs = list(
 #'     fast_cdf_fun(0, 0.1),
 #'     fast_cdf_fun(c(0,5), c(0.1, 0.12))
+#'   ),
+#'   quants = list(
+#'     fast_quant_fun(0, 0.1),
+#'     fast_quant_fun(c(0,5), c(0.1, 0.12))
 #'   )
 #' )
-#' plot(surv(seq(0, 30, by=0.15)), type="l")
+#'
+#' x <- seq(0, 1, by=0.015)
+#' plot(x, quant(x), type="l")
 mixture_quant_fun   <- function(p, cdfs, quants){
   p <- prepare_p(p)
   check_lists(p, cdfs, quants)
@@ -160,6 +169,10 @@ mixture_quant_fun   <- function(p, cdfs, quants){
   function(v){
     sapply(v, \(y){
       lims <- range(sapply(quants, \(q){q(y)}))
+      if(!(lims[1] < lims[2])){
+        lims[2] <- lims[1]+10*.Machine$double.eps
+      }
+
       uniroot(
         target_fun,
         v=y,

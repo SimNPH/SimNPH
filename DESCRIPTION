@@ -1,11 +1,11 @@
 Package: SimNPH
 Type: Package
-Title: Helper Functions to Simulate non Proprotional Hazards
-Version: 0.4.1
-Author: Tobias Fellinger
+Title: Helper Functions to Simulate Non-Proportional Hazards
+Version: 0.4.2
+Author: Tobias Fellinger, Florian Klinglmüller
 Maintainer: Tobias Fellinger <tobias.fellinger@ages.at>
-Description: This package provides helper functions to simulate and analyse time to event datasets with non-proportional hazards. It includes functions to generate datasets in common scenarios with non proportional hazards and functions that implement common tests and models for analysis. All functions can readily be used in the framework of the SimDesign package.
 License: proprietary
+Description: Functions to facilitate simulation studies for time to event endpoints with non-proportional hazards. The package includes functions to simulate time to event data in different scenarios with non-proportional hazards, functions to simulate different trial-designs including fixed-followup and event driven designs as well as group sequential designs. Functions to calculate the true values of common summary statistics for the implemented scenarios are included as well as common analysis methods for time to event data. Additionally the package contains some helper functions to facilitate running simulations with the "SimDesign" package and aggregating and presenting the results.
 Encoding: UTF-8
 LazyData: true
 Depends:
@@ -17,11 +17,11 @@ Suggests:
     rmarkdown,
     testthat (>= 3.0.0),
     covr,
-    survRM2,
     withr,
     ldbounds,
     ggplot2,
-    patchwork
+    patchwork,
+    R.rsp
 Imports:
     purrr (>= 1.0.0),
     rlang,
@@ -30,11 +30,15 @@ Imports:
     nphRCT,
     Rcpp (>= 1.0.8),
     car,
-    withr,
     dplyr,
-    stringr
+    stringr,
+    methods,
+    tidyr,
+    memoise
 LinkingTo: Rcpp
 Config/testthat/edition: 3
-VignetteBuilder: knitr
+VignetteBuilder: R.rsp
 RoxygenNote: 7.2.3
 Roxygen: list(markdown = TRUE)
+URL: https://simnph.github.io/SimNPH, https://github.com/SimNPH/SimNPH
+BugReports: https://github.com/SimNPH/SimNPH/issues

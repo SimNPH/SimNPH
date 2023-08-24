@@ -2,21 +2,54 @@
 % Please edit documentation in R/helper_functions.R
 \name{r2m}
 \alias{r2m}
-\title{Compute median survival from hazard rate}
+\alias{m2r}
+\alias{m2d}
+\alias{d2m}
+\title{Functions to Convert Between Days and Months and Medians and Rates}
 \usage{
 r2m(lambda)
+
+m2r(med)
+
+m2d(mon)
+
+d2m(day)
 }
 \arguments{
-\item{lambda}{Hazard rate}
+\item{lambda}{hazard rate}
+
+\item{med}{median in months}
+
+\item{mon}{time in months}
+
+\item{day}{time in days}
 }
 \value{
-Median survival time in months
+median survival time in months (\code{r2m})
+
+hazard rate per day (\code{m2r})
+
+time in days (\code{m2d})
+
+time in months (\code{d2m})
 }
 \description{
-Compute the median survival time in months from the hazard rate \code{lambda}.
-Assumes a constant hazard rate.
+Some functions to convert between days and months and rates and medians.
 }
-\examples{
-r2m(0.01)
+\section{Functions}{
+\itemize{
+\item \code{r2m()}: daily rate to median in months
 
+\item \code{m2r()}: median to months to daily rate
+
+\item \code{m2d()}: months to days
+
+\item \code{d2m()}: days to months
+
+}}
+\examples{
+r2m(0.002)
+m2r(12)
+m2d(1)
+d2m(31)
 }

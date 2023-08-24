@@ -37,16 +37,27 @@ internal_real_statistics_pchaz_discrete <- function(data_gen_model_trt, data_gen
     true_avg_HR_fun0 <- data_gen_model_ctrl$S * c(diff(data_gen_model_trt$F), 0)
     true_avg_HR_fun1 <- data_gen_model_trt$S * c(diff(data_gen_model_ctrl$F), 0)
 
+
     rmst_ahr <- purrr::imap(cutoff, function(cutoff, label){
-      Int0 <- sum(true_avg_HR_fun0[data_gen_model_trt$t <= cutoff])
-      Int1 <- sum(true_avg_HR_fun1[data_gen_model_trt$t <= cutoff])
+      ind <- (data_gen_model_trt$t <= cutoff)
+
+      Int0 <- sum(true_avg_HR_fun0[ind])
+      Int1 <- sum(true_avg_HR_fun1[ind])
+
+      log_quot <- suppressWarnings({
+        log(data_gen_model_trt$haz[ind] / data_gen_model_ctrl$haz[ind])
+      })
+
+      if(any(is.nan(log_quot))){
+        warning("NaN values in log hazard ratio, check cutoff value.")
+      }
 
       tmp <- data.frame(
-        rmst_trt            = sum(data_gen_model_trt$S[data_gen_model_trt$t <= cutoff]),
-        rmst_ctrl           = sum(data_gen_model_ctrl$S[data_gen_model_ctrl$t <= cutoff]),
-        gAHR                = exp(sum( (log(data_gen_model_trt$haz / data_gen_model_ctrl$haz) * f)[data_gen_model_trt$t <= cutoff] , na.rm=TRUE)),
-        AHR                 = sum(((data_gen_model_trt$haz/h) * f)[data_gen_model_trt$t <= cutoff], na.rm=TRUE) /
-          sum(((data_gen_model_ctrl$haz/h) * f)[data_gen_model_ctrl$t <= cutoff], na.rm=TRUE),
+        rmst_trt            = sum(data_gen_model_trt$S[ind]),
+        rmst_ctrl           = sum(data_gen_model_ctrl$S[ind]),
+        gAHR                = exp(sum( (log_quot * f[ind]) , na.rm=TRUE)),
+        AHR                 = sum(((data_gen_model_trt$haz[ind]/h[ind]) * f[ind]), na.rm=TRUE) /
+          sum(((data_gen_model_ctrl$haz[ind]/h[ind]) * f[ind]), na.rm=TRUE),
         AHRoc = Int0/Int1,
         AHRoc_robust = Int0/Int1
       )
@@ -68,7 +79,7 @@ internal_real_statistics_pchaz_discrete <- function(data_gen_model_trt, data_gen
       names(milestones)[names(milestones) %in% c("", NA_character_)] <- as.character(milestones[names(milestones) %in% c("", NA_character_)])
     }
 
-    milestones <- purrr:::imap(milestones, function(v, label){
+    milestones <- purrr::imap(milestones, function(v, label){
       tmp <- data.frame(
         milestone_survival_trt  = tail(data_gen_model_trt$S[data_gen_model_trt$t < v], 1),
         milestone_survival_ctrl = tail(data_gen_model_ctrl$S[data_gen_model_ctrl$t < v], 1)
@@ -182,7 +193,7 @@ fast_real_statistics <- function(
       names(milestones)[names(milestones) %in% c("", NA_character_)] <- as.character(milestones[names(milestones) %in% c("", NA_character_)])
     }
 
-    milestones <- purrr:::imap(milestones, function(v, label){
+    milestones <- purrr::imap(milestones, function(v, label){
       tmp <- data.frame(
         milestone_survival_trt  = surv_trt(v),
         milestone_survival_ctrl = surv_ctrl(v)

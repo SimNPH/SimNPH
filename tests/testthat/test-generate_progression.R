@@ -71,33 +71,63 @@ test_that("true summary statistics progression works", {
   design_2 <- design
   design_2$followup <- NULL
 
-  summaries_os     <- true_summary_statistics_progression(design, what="os", cutoff=c(75), milestones=c(50, 100))
-  summaries_pfs    <- true_summary_statistics_progression(design, what="pfs", cutoff=c(75), milestones=c(50, 100))
+  summaries_os     <- true_summary_statistics_progression(design, what="os", cutoff=m2d(24), milestones=m2d(c(6, 12)))
+  summaries_pfs    <- true_summary_statistics_progression(design, what="pfs", cutoff=m2d(24), milestones=m2d(c(6, 12)))
   summaries_os_2   <- true_summary_statistics_progression(design, what="os", fixed_objects = list(t_max=10000))
   summaries_pfs_2  <- true_summary_statistics_progression(design, what="pfs", fixed_objects = list(t_max=10000))
-  summaries_os_3   <- true_summary_statistics_progression(design_2, what="os", cutoff=c("a"=75), milestones=c("first"=50, "second"=100))
-  summaries_pfs_3  <- true_summary_statistics_progression(design_2, what="pfs", cutoff=c("a"=75), milestones=c("first"=50, "second"=100))
+  summaries_os_3   <- true_summary_statistics_progression(design_2, what="os", cutoff=c("a"=m2d(24)), milestones=m2d(c("first"=6, "second"=12)))
+  summaries_pfs_3  <- true_summary_statistics_progression(design_2, what="pfs", cutoff=c("a"=m2d(24)), milestones=m2d(c("first"=6, "second"=12)))
+
+  expect_warning(true_summary_statistics_progression(head(design,1), what="os", cutoff=Inf))
 
   expect_error(true_summary_statistics_progression(design, what="something else"))
 
+  expect_named(
+    summaries_pfs,
+    c(
+      names(design),
+      "median_survival_trt", "median_survival_ctrl", "rmst_trt_730.5",
+      "rmst_ctrl_730.5", "gAHR_730.5", "AHR_730.5", "AHRoc_730.5", "AHRoc_robust_730.5",
+      "milestone_survival_trt_182.625", "milestone_survival_ctrl_182.625",
+      "milestone_survival_trt_365.25", "milestone_survival_ctrl_365.25"
+    )
+  )
 
-
-  expect_named(summaries_pfs, c(names(design), "median_survival_trt", "median_survival_ctrl",
-                                "rmst_trt_75", "rmst_ctrl_75", "gAHR_75", "AHR_75", "milestone_survival_trt_50",
-                                "milestone_survival_ctrl_50", "milestone_survival_trt_100", "milestone_survival_ctrl_100"))
-  expect_named(summaries_os , c(names(design), "median_survival_trt", "median_survival_ctrl",
-                                "rmst_trt_75", "rmst_ctrl_75", "gAHR_75", "AHR_75", "milestone_survival_trt_50",
-                                "milestone_survival_ctrl_50", "milestone_survival_trt_100", "milestone_survival_ctrl_100"))
+  expect_named(
+    summaries_os,
+    c(
+      names(design),
+      "median_survival_trt", "median_survival_ctrl", "rmst_trt_730.5",
+      "rmst_ctrl_730.5", "gAHR_730.5", "AHR_730.5", "AHRoc_730.5", "AHRoc_robust_730.5",
+      "milestone_survival_trt_182.625", "milestone_survival_ctrl_182.625",
+      "milestone_survival_trt_365.25", "milestone_survival_ctrl_365.25"
+    )
+  )
 
   expect_named(summaries_pfs_2, c(names(design), "median_survival_trt", "median_survival_ctrl"))
   expect_named(summaries_os_2 , c(names(design), "median_survival_trt", "median_survival_ctrl"))
 
-  expect_named(summaries_pfs_3, c(names(design_2), "median_survival_trt", "median_survival_ctrl",
-                                  "rmst_trt_a", "rmst_ctrl_a", "gAHR_a", "AHR_a", "milestone_survival_trt_first",
-                                  "milestone_survival_ctrl_first", "milestone_survival_trt_second", "milestone_survival_ctrl_second"))
-  expect_named(summaries_os_3 , c(names(design_2), "median_survival_trt", "median_survival_ctrl",
-                                  "rmst_trt_a", "rmst_ctrl_a", "gAHR_a", "AHR_a", "milestone_survival_trt_first",
-                                  "milestone_survival_ctrl_first", "milestone_survival_trt_second", "milestone_survival_ctrl_second"))
+  expect_named(
+    summaries_pfs_3,
+    c(
+      names(design_2),
+      "median_survival_trt", "median_survival_ctrl", "rmst_trt_a",
+      "rmst_ctrl_a", "gAHR_a", "AHR_a", "AHRoc_a", "AHRoc_robust_a",
+      "milestone_survival_trt_first", "milestone_survival_ctrl_first",
+      "milestone_survival_trt_second", "milestone_survival_ctrl_second"
+      )
+  )
+
+  expect_named(
+    summaries_os_3,
+    c(
+      names(design_2),
+      "median_survival_trt", "median_survival_ctrl", "rmst_trt_a",
+      "rmst_ctrl_a", "gAHR_a", "AHR_a", "AHRoc_a", "AHRoc_robust_a",
+      "milestone_survival_trt_first", "milestone_survival_ctrl_first",
+      "milestone_survival_trt_second", "milestone_survival_ctrl_second"
+    )
+  )
 })
 
 test_that("censoring rate from censoring proportion for disease progression works", {
@@ -141,4 +171,44 @@ test_that("progression rate from progression prop works", {
   expect_named(res, c(names(my_design), c("prog_rate_trt", "prog_rate_ctrl")))
   expect_equal(order(res$prog_rate_trt), order(res$prog_prop_trt))
   expect_equal(order(res$prog_rate_ctrl), order(res$prog_prop_ctrl))
+})
+
+test_that("hazard_before_progression_from_PH_effect_size works", {
+
+  capture_output(
+    my_design <- merge(
+      assumptions_progression(),
+      design_group_sequential(),
+      by=NULL
+    )
+  )
+
+  design_2 <- my_design
+  design_2$effect_size_ph <- 0.9
+  design_2$final_event <- NULL
+
+  design_3 <- my_design
+  design_3$final_events <- NULL
+
+  design_4 <- my_design[1, ]
+  design_4$hazard_trt <- 6e-5
+  design_4$prog_rate_trt <- 0
+
+  # to hide progressbar in test output
+  withr::with_options(
+    list(
+      cli.default_handler = function(...) { },
+      usethis.quiet = TRUE
+    ),
+    {
+      res_1 <- hazard_before_progression_from_PH_effect_size(my_design[1, ], target_power_ph=0)
+      res_2 <- hazard_before_progression_from_PH_effect_size(design_2, final_events=300)
+      res_3 <- hazard_before_progression_from_PH_effect_size(design_4, final_events=300, target_power_ph=0.9)
+    }
+  )
+
+  expect_equal(res_1$hazard_ctrl, res_1$hazard_trt)
+
+  expect_error(hazard_before_progression_from_PH_effect_size(design_3))
+  expect_error(hazard_before_progression_from_PH_effect_size(my_design))
 })

@@ -16,8 +16,8 @@
 #'
 #' @examples
 #' \dontrun{
-#'   plot_data <- simulation_results |>
-#'   results_pivot_longer
+#' plot_data <- simulation_results |>
+#'   results_pivot_longer()
 #' }
 results_pivot_longer <- function(data, exclude_from_methods=c("descriptive")){
   # delete potentially huge attributes that are not needed for plots
@@ -31,18 +31,18 @@ results_pivot_longer <- function(data, exclude_from_methods=c("descriptive")){
 
   summaries <- attr(data, "design_names") |>
     getElement("sim") |>
-    stringr::str_remove(str_c(methods, "."))
+    stringr::str_remove(stringr::str_c(methods, "."))
 
   include <- !(methods %in% exclude_from_methods)
 
-  pivot_spec <- tibble(
+  pivot_spec <- tibble::tibble(
     .name=attr(data, "design_names")$sim[include],
     .value=summaries[include],
     method=methods[include]
     )
 
   result <- data |>
-    rename(
+    dplyr::rename(
       n_pat_design = n_pat
     ) |>
     tidyr::pivot_longer_spec(pivot_spec)
@@ -51,38 +51,38 @@ results_pivot_longer <- function(data, exclude_from_methods=c("descriptive")){
 order_combine_xvars <- function(data, xvars, facet_vars=c(), height_x_axis=0.8, grid_level=2){
 
   result <- data |>
-    arrange(!!!xvars) |>
-    unite(x, !!!xvars, remove=FALSE) |>
-    mutate(
-      x = fct_inorder(x)
+    dplyr::arrange(!!!xvars) |>
+    tidyr::unite(x, !!!xvars, remove=FALSE) |>
+    dplyr::mutate(
+      x = factor(x, levels=unique(x))
     )
 
   x_axis <- result |>
-    select(x, !!!xvars, !!!facet_vars) |>
+    dplyr::select(x, !!!xvars, !!!facet_vars) |>
     unique() |>
-    pivot_longer(cols=c(-x, -any_of(facet_vars))) |>
-    group_by(name) |>
-    mutate(
+    tidyr::pivot_longer(cols=c(-x, -dplyr::any_of(facet_vars))) |>
+    dplyr::group_by(name) |>
+    dplyr::mutate(
       y=(as.integer(as.factor(value))-1) / (length(unique(value))-1)
     ) |>
-    ungroup() |>
-    mutate(
+    dplyr::ungroup() |>
+    dplyr::mutate(
       level = match(name, xvars),
       y = level - (y*height_x_axis) - (0.5 * (1-height_x_axis))
     )
 
   x_axis_labels <- x_axis |>
-    group_by(name) |>
-    summarise(
-      level=first(level),
-      label=str_c(first(name), ": ", str_c(unique(value), collapse=", "))
+    dplyr::group_by(name) |>
+    dplyr::summarise(
+      level=dplyr::first(level),
+      label=stringr::str_c(dplyr::first(name), ": ", stringr::str_c(unique(value), collapse=", "))
     )
 
   x_axis_breaks <- result |>
-    select(!!!xvars[1:grid_level], x) |>
-    group_by(!!!xvars[1:grid_level]) |>
-    filter(1:n() == 1) |>
-    pull(x)
+    dplyr::select(!!!xvars[1:grid_level], x) |>
+    dplyr::group_by(!!!xvars[1:grid_level]) |>
+    dplyr::filter(1:dplyr::n() == 1) |>
+    dplyr::pull(x)
 
   attr(result, "x_axis") <- x_axis
   attr(result, "x_labels") <- x_axis_labels
@@ -210,30 +210,31 @@ combined_plot <- function(
     use_shapes  = NULL
     ){
 
-  if(!all(c("ggplot2", "patchwork") %in% .packages())){
-    stop(gettext("Packages ggplot2 and patchwork need to be loaded for the functionality provided in the plot functions."))
+  if( !(requireNamespace("ggplot2", quietly = TRUE) & requireNamespace("patchwork", quietly = TRUE)) ){
+    message("Packages ggplot2 and patchwork required for plotting functionality.")
+    return(invisible(NULL))
   }
 
-  facet_vars_y_sym <- syms(facet_y_vars)
-  facet_vars_x_sym <- syms(facet_x_vars)
-  xvars <- syms(xvars)
-  yvar  <- sym(yvar)
+  facet_vars_y_sym <- rlang::syms(facet_y_vars)
+  facet_vars_x_sym <- rlang::syms(facet_x_vars)
+  xvars <- rlang::syms(xvars)
+  yvar  <- rlang::sym(yvar)
 
   data <- data |>
-    filter(method %in% methods)
+    dplyr::filter(method %in% methods)
 
   # remove facets in which all y values are empty
   # dont remove empty y-values in facets where there are some y-values
   # (so gaps in lines remain gaps in each facet and only completely facets are
   # dropped)
   data <- data |>
-    ungroup() |>
-    group_by(!!!facet_vars_x_sym) |>
-    filter(!all(is.na(!!yvar))) |>
-    ungroup() |>
-    group_by(!!!facet_vars_y_sym) |>
-    filter(!all(is.na(!!yvar))) |>
-    ungroup()
+    dplyr::ungroup() |>
+    dplyr::group_by(!!!facet_vars_x_sym) |>
+    dplyr::filter(!all(is.na(!!yvar))) |>
+    dplyr::ungroup() |>
+    dplyr::group_by(!!!facet_vars_y_sym) |>
+    dplyr::filter(!all(is.na(!!yvar))) |>
+    dplyr::ungroup()
 
   ## split lines
 
@@ -242,69 +243,68 @@ combined_plot <- function(
     lastvar <- xvars[[len_x]]
     splitvar <- xvars[[split_var]]
     data <- data |>
-      group_by(method,!!!facet_vars_y_sym,!!!facet_vars_x_sym,!!splitvar) |>
-      group_modify(~add_row(.x,.before = 1)) |>
+      dplyr::group_by(method,!!!facet_vars_y_sym,!!!facet_vars_x_sym,!!splitvar) |>
+      dplyr::group_modify(~tibble::add_row(.x,.before = 1)) |>
       #    mutate(!!lastvar := ifelse(is.na(!!yvar),!!lastvar + .0,!!lastvar)) |>
-      fill(!!!xvars[-split_var],.direction='up') |>
-      ungroup()
+      tidyr::fill(!!!xvars[-split_var],.direction='up') |>
+      dplyr::ungroup()
   }
 
 
   data <- data |>
     order_combine_xvars(xvars, facet_vars=facet_x_vars, height_x_axis=scale_stairs, grid_level=grid_level)
 
-
   plot_2 <- lapply(xvars, \(xx){
-      ggplot(data, aes(x=x, y=factor(format(!!xx, digits=3)), group=method)) +
-        geom_step(linewidth=0.25) +
-        theme_void(
-          base_size = 9
-        ) +
-        theme(
-          axis.text.y = element_text(),
-          axis.title.y = element_text(angle=75),
-          strip.background = element_blank(),
-          strip.text = element_blank(),
-          panel.grid.major.y = element_line(
-            linewidth = 0.125,
-            colour="lightgray"
-          )
-        ) +
-        ylab(as.character(xx))  +
-        facet_grid(
-          cols = vars(!!!facet_vars_x_sym)
+    ggplot2::ggplot(data, ggplot2::aes(x=x, y=factor(format(!!xx, digits=3)), group=method)) +
+      ggplot2::geom_step(linewidth=0.25) +
+      ggplot2::theme_void(
+        base_size = 9
+      ) +
+      ggplot2::theme(
+        axis.text.y = ggplot2::element_text(),
+        axis.title.y = ggplot2::element_text(angle=75),
+        strip.background = ggplot2::element_blank(),
+        strip.text = ggplot2::element_blank(),
+        panel.grid.major.y = ggplot2::element_line(
+          linewidth = 0.125,
+          colour="lightgray"
         )
-    })
+      ) +
+      ggplot2::ylab(as.character(xx))  +
+      ggplot2::facet_grid(
+        cols = dplyr::vars(!!!facet_vars_x_sym)
+      )
+  })
 
-  plot_2 <- Reduce(`/`, plot_2)
+  plot_2 <- patchwork::wrap_plots(plot_2, ncol=1)
 
-  plot_1 <- ggplot(data, aes(x=x, y=!!yvar, group=method, colour=method, shape=method)) +
-    geom_line() +
-    geom_point(size=4) +
-    scale_x_discrete(breaks = attr(data, "x_axis_breaks")) +
-    theme(
-      axis.text.x = element_blank(),
-      axis.ticks.x = element_blank(),
-      axis.title.x = element_blank()
+  plot_1 <- ggplot2::ggplot(data, ggplot2::aes(x=x, y=!!yvar, group=method, colour=method, shape=method)) +
+    ggplot2::geom_line() +
+    ggplot2::geom_point(size=4) +
+    ggplot2::scale_x_discrete(breaks = attr(data, "x_axis_breaks")) +
+    ggplot2::theme(
+      axis.text.x = ggplot2::element_blank(),
+      axis.ticks.x = ggplot2::element_blank(),
+      axis.title.x = ggplot2::element_blank()
     )  +
-    facet_grid(
-      cols = vars(!!!facet_vars_x_sym),
-      rows = vars(!!!facet_vars_y_sym),
-      labeller = label_both,
+    ggplot2::facet_grid(
+      cols = dplyr::vars(!!!facet_vars_x_sym),
+      rows = dplyr::vars(!!!facet_vars_y_sym),
+      labeller = ggplot2::label_both,
       scales = scales
     ) +
-    geom_hline(yintercept=hlines)
+    ggplot2::geom_hline(yintercept=hlines)
 
   if(!is.null(use_colours)){
     plot_1 <- plot_1 +
-      scale_colour_manual(values=use_colours)
+      ggplot2::scale_colour_manual(values=use_colours)
   }
 
   if(!is.null(use_shapes)){
     plot_1 <- plot_1 +
-      scale_shape_manual(values=use_shapes)
+      ggplot2::scale_shape_manual(values=use_shapes)
   }
-  (plot_1 / plot_2) + plot_layout(heights=heights_plots)
+  (plot_1 / plot_2) + patchwork::plot_layout(heights=heights_plots)
 }
 
 
@@ -316,6 +316,7 @@ combined_plot <- function(
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' test <- mtcars
 #' # add a label attribute
 #' attr(test$cyl, "label") <- "cylinders"
@@ -331,6 +332,7 @@ combined_plot <- function(
 #'
 #' gg2 <- labs_from_labels(gg2)
 #' gg2
+#' }
 labs_from_labels <- function(gg){
   new_labels <- gg$mapping |>
     purrr::map(rlang::as_name) |>

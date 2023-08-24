@@ -141,14 +141,17 @@ my_design <- merge(
   )
 my_design <- true_summary_statistics_subgroup(my_design)
 my_design
+
 my_design <- merge(
-    assumptions_subgroup(),
-    design_fixed_followup(),
-    by=NULL
-  )
+  assumptions_subgroup(),
+  design_fixed_followup(),
+  by=NULL
+)
+
 my_design$hazard_trt <- NA
 my_design$hazard_subgroup <- NA
 my_design$hr_subgroup_relative <- 0.9
+my_design$final_events <- ceiling((my_design$n_ctrl + my_design$n_trt) * 0.75)
 my_design <- hazard_subgroup_from_PH_effect_size(my_design, target_power_ph=0.9)
 my_design
 design <- expand.grid(

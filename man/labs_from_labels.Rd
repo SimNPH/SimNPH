@@ -16,6 +16,7 @@ a ggplot object
 Add ggplot axis labels from labels attribute
 }
 \examples{
+\dontrun{
 test <- mtcars
 # add a label attribute
 attr(test$cyl, "label") <- "cylinders"
@@ -31,4 +32,5 @@ gg2 <- ggplot(test, aes(x=wt, y=cyl)) +
 
 gg2 <- labs_from_labels(gg2)
 gg2
+}
 }

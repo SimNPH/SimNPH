@@ -17,10 +17,10 @@
 #' upsert_merge(a, b, by="x")
 upsert_merge <- function(x, y, by){
   y_upsert <- y |>
-    dplyr::select(any_of(colnames(x)))
+    dplyr::select(dplyr::any_of(colnames(x)))
 
   y_merge <- y |>
-    dplyr::select(any_of(by), any_of(setdiff(colnames(y), colnames(x))))
+    dplyr::select(dplyr::any_of(by), dplyr::any_of(setdiff(colnames(y), colnames(x))))
 
   res <- x |>
     dplyr::rows_upsert(y_upsert, by=by) |>
@@ -69,12 +69,12 @@ merge_additional_results <- function(old, new, design_names=NULL, descriptive_re
   if(!is.null(descriptive_regex)){
     compare_old <- old |>
       dplyr::semi_join(new, by=design_names) |>
-      dplyr::select(all_of(design_names), matches(descriptive_regex)) |>
+      dplyr::select(dplyr::all_of(design_names), dplyr::matches(descriptive_regex)) |>
       dplyr::arrange(!!!design_names)
 
     compare_new <- new |>
       dplyr::semi_join(compare_old, by=design_names) |>
-      dplyr::select(all_of(design_names), matches(descriptive_regex)) |>
+      dplyr::select(dplyr::all_of(design_names), dplyr::matches(descriptive_regex)) |>
       dplyr::arrange(!!!design_names)
 
     common_names <- intersect(names(compare_old), names(compare_new)) |>

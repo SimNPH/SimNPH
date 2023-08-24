@@ -86,10 +86,10 @@ generate_delayed_effect <- function(condition, fixed_objects=NULL){
 #' Design
 assumptions_delayed_effect <- function(){
   skel <- "expand.grid(
-  delay=seq(0, 10, by=2), # delay of 0, 1, ..., 10 days
-  hazard_ctrl=0.2,        # hazard under control and before treatment effect
-  hazard_trt=0.02,        # hazard after onset of treatment effect
-  random_withdrawal=0.01  # rate of random withdrawal
+  delay=m2d(seq(0, 10, by=2)), # delay of 0, 1, ..., 10 months
+  hazard_ctrl=m2r(24),         # median survival control of 24 months
+  hazard_trt=m2r(36),          # median survival treatment of 36 months
+  random_withdrawal=m2r(120)   # median time to random withdrawal 10 years
 )
 "
 
@@ -129,11 +129,12 @@ invisible(
 #'
 #' @examples
 #' my_design <- merge(
-#'     assumptions_crossing_hazards(),
-#'     design_fixed_followup(),
-#'     by=NULL
-#'   )
+#'   assumptions_delayed_effect(),
+#'   design_fixed_followup(),
+#'   by=NULL
+#' )
 #'
+#' my_design$hazard_ctrl <- 0.05
 #' my_design$final_events <- ceiling((my_design$n_trt + my_design$n_ctrl)*0.75)
 #' my_design$hazard_trt <- NA
 #' my_design <- hr_after_onset_from_PH_effect_size(my_design, target_power_ph=0.9)

@@ -1,2 +1,4 @@
-*.html
-*.R
+*
+!.gitignore
+!vignettes_prebuild
+!vignettes_prebuild/*

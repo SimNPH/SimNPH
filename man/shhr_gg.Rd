@@ -11,7 +11,11 @@ shhr_gg(
   sub = NULL,
   group_names = c("control", "treatment"),
   lab_time = "Days",
-  lab_group = "Group"
+  lab_group = "Group",
+  trafo_time = identity,
+  colours = palette()[c(1, 3)],
+  linetypes = c(1, 3),
+  linewidths = c(1.3, 1.3)
 )
 }
 \arguments{
@@ -28,6 +32,14 @@ shhr_gg(
 \item{lab_time}{Title for the time axis}
 
 \item{lab_group}{Title group legend}
+
+\item{trafo_time}{Function to transform time}
+
+\item{colours}{vector of two colours}
+
+\item{linetypes}{vector of two linetypes}
+
+\item{linewidths}{vector of two linewidths}
 }
 \value{
 a \code{patchwork} object as defined in the patchwork package
@@ -36,9 +48,12 @@ a \code{patchwork} object as defined in the patchwork package
 Plot of survival, hazard and hazard ratio of two groups as a function of time using ggplot and patchwork
 }
 \examples{
+\dontrun{
 library(ggplot2)
 library(patchwork)
 B <- pchaz(c(0, 10, 100), c(0.1, 0.05))
 A <- pchaz(c(0, 100), c(0.1))
 shhr_gg(A, B)
+shhr_gg(A, B, lab_time="Months", trafo_time=d2m)
+}
 }

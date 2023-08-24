@@ -1,11 +1,11 @@
 ---
-title: "Some Simple Examples for the Usage of the SimNPH Package"
+title: "Examples for the Usage of the SimNPH Package"
 subtitle: "Generate Data, Test and Estimate, Summarise"
-output: rmarkdown::html_vignette
-vignette: >
-  %\VignetteIndexEntry{simple_example}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+output:
+  html_document:
+    toc: true
+    toc_depth: 2
+    self_contained: yes
 ---
 
 ```{r, include = FALSE}
@@ -87,18 +87,17 @@ my_generator <- function(condition, fixed_objects=NULL){
 
 Next, we need to specify a summary function that computes the desired operating
 characteristics for each simulation scenario, and each analysis method. In the
-example below, we specify a summary function that computes the power (as we
-consider scenarios under the alternative in the example) of the log-rank test
-and the max-combo test across simulated scenarios. For each scenario we just
-average the number of times the computed p-value is below the significance level
-obtain the power.
+example below, we use a summary function that computes the power (as we consider
+scenarios under the alternative in the example) of the log-rank test and the
+max-combo test across simulated scenarios. For each scenario the function just
+averages the number of times the computed p-value is below the significance
+level obtain the power.
 
 The results object contains the results of all replications of the corresponding
 method for each row of the `Design` object. In this example `results$p` contains
 all `N_sim` p-values returned by the `analyse_maxcombo` or `analyse_logrank`
-functions respectively. The Summary will contain two columns
-`rejection.maxcombo` and `rejection.logrank` with the empirical rejection rates
-of both tests for each scenario.
+functions respectively. The Summary will contain columns with the rejection rate
+and some other summary statistics for both methods.
 
 ```{r}
 alpha <- 0.05
@@ -119,10 +118,6 @@ analyse each replication of each scenario with the two functions
 the `Summarise` function defined before and the simulations should be run in
 parallel.
 
-Finally we select the interesting columns from the output. Since all other
-parameters are the same for each scenario we just select delay and the powers of
-the two tests.
-
 ```{r, results='hide'}
 res <- runSimulation(
   Design,
@@ -138,6 +133,10 @@ res <- runSimulation(
 )
 
 ```
+
+Finally we select the interesting columns from the output. Since all other
+parameters are the same for each scenario we just select delay. And we are
+interested in the rejection rate of the tests.
 
 ```{r}
 res |> 
@@ -195,7 +194,7 @@ Analyse <-  list(
 ## A 'Summarise' function for the more complex scenario
 
 The output of the function created with `analyse_group_sequential` contains
-additional columsn. `rejected_at_stage` includes the stage at which the null was
+additional columns. `rejected_at_stage` includes the stage at which the null was
 first rejected or `Inf` if the null was not rejected, `N_pat` and `N_evt`
 contain the number of patients recruited and the number of events observed
 before the null was rejected and `followup` contains the time after study start
@@ -209,7 +208,6 @@ Summarise <- create_summarise_function(
   maxcombo_seq = summarise_group_sequential(),
   logrank_seq = summarise_group_sequential()
 )
-
 ```
 
 ## Putting it all together
@@ -229,6 +227,10 @@ res <- runSimulation(
   save=FALSE
 )
 ```
+
+In the case of a group sequential design we are also interested in the average
+running time of the study in terms of patients recruited, number of events and
+running time of the study.
 
 ```{r}
 res |>
@@ -267,19 +269,17 @@ knitr::kable(Design)
 
 In the Summarise function the true value against which the estimator should be
 compared has to be specified. If coverage and average width of the confidence
-intervalls should be estimated, the CI bounds should also be specified.
+intervals should be estimated, the CI bounds should also be specified.
 
-The arguments to the functions are left unevaluated and are later evaluated in
+The arguments to the functions are left un-evaluated and are later evaluated in
 the `results` and `condition` datasets respectively. So any expressions using
 variables from results can be used for the estimated value and the CI bounds and
 expressions using variables from condition can be used in the argument for the
 real value.
 
-In this case we want to compare the hazard ratio estimated by the cox model to
-the geometric average hazard ratio (the summary statistic the Cox model acutally
-computes under non proportional hazards) as well as to the hazard ratio after
-onset of treatment, calculated from the two respective columns of the Design
-data.frame.
+In this case we want to compare the hazard ratio estimated by the Cox model to
+the geometric average hazard ratio as well as to the hazard ratio after onset of
+treatment, calculated from the two respective columns of the Design data.frame.
 
 Note that one name can be used twice to summarise the output of one analysis
 method two times, like in this case, comparing it to two different summary

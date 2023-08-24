@@ -117,13 +117,14 @@ test_that("test that true_summary_statistics_delayed_effect works", {
   test_design1 <- test_design |>
     true_summary_statistics_delayed_effect(cutoff_stats = my_cutoff_stats)
 
-  test_design2 <- test_design |>
-    true_summary_statistics_delayed_effect(cutoff_stats = my_cutoff_stats)
-
-  expect_named(test_design1, c("n_trt", "n_ctrl", "delay", "hazard_ctrl", "hazard_trt", "followup", paste0("median_survival_", c("trt", "ctrl")),
-                               "rmst_trt_6", "rmst_ctrl_6", "gAHR_6", "AHR_6",
-                               "rmst_trt_12", "rmst_ctrl_12", "gAHR_12", "AHR_12"
-                               ))
+  expect_named(
+    test_design1,
+    c("n_trt", "n_ctrl", "delay", "hazard_ctrl", "hazard_trt", "followup",
+      "median_survival_trt", "median_survival_ctrl", "rmst_trt_6",
+      "rmst_ctrl_6", "gAHR_6", "AHR_6", "AHRoc_6", "AHRoc_robust_6",
+      "rmst_trt_12", "rmst_ctrl_12", "gAHR_12", "AHR_12", "AHRoc_12",
+      "AHRoc_robust_12")
+  )
 
   expect(all(test_design1$AHR_6[test_design1$hazard_ctrl == test_design1$hazard_trt] == 1), "all average hazard ratios should be 1 for equal hazards")
   expect(all(test_design1$AHR_6[test_design1$delay >= 6] == 1), "all average hazard ratios should be 1 if effect starts after cutoff")
@@ -165,7 +166,7 @@ test_that("test that hr_after_onset_from_PH_effect_size works", {
     )
   )
   my_design$hazard_trt <- NA
-  my_design$hazard_ctrl <- 0.1
+  my_design$hazard_ctrl <- m2r(8)
 
   my_design$followup <- NULL
   my_design$final_events <- (my_design$n_trt + my_design$n_ctrl) * 0.75
@@ -200,3 +201,4 @@ test_that("cen_rate_from_cen_prop_delayed_effect works", {
   expect(all(result$random_withdrawal>=0, na.rm = TRUE), "all rates >= 0")
   expect(all(result$random_withdrawal[design$censoring_prop == 0]==0, na.rm = TRUE), "rate 0 if proportion 0")
 })
+
