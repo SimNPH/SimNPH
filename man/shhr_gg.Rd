@@ -12,7 +12,10 @@ shhr_gg(
   group_names = c("control", "treatment"),
   lab_time = "Days",
   lab_group = "Group",
-  trafo_time = identity
+  trafo_time = identity,
+  colours = palette()[c(1, 3)],
+  linetypes = c(1, 3),
+  linewidths = c(1.3, 1.3)
 )
 }
 \arguments{
@@ -31,6 +34,12 @@ shhr_gg(
 \item{lab_group}{Title group legend}
 
 \item{trafo_time}{Function to transform time}
+
+\item{colours}{vector of two colours}
+
+\item{linetypes}{vector of two linetypes}
+
+\item{linewidths}{vector of two linewidths}
 }
 \value{
 a \code{patchwork} object as defined in the patchwork package
