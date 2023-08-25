@@ -94,9 +94,9 @@ plot_sim_results <- function(data,
     setNames(metadata$method)
 
 
-  plot_data <- filter(data,
-                      method %in% methods) |>
-    filter(!!!filters) |>
+  plot_data <- dplyr::filter(data,
+                             method %in% methods) |>
+    dplyr::filter(!!!filters) |>
     select(all_of(columns))
 
     plot_rows <- plot_data[[parameter_row]] |> unique() |> length()
