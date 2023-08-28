@@ -52,24 +52,30 @@ analyse_ahr <- function(max_time = NA, type = "AHR", level = 0.95, alternative =
     stop(gettext("'alternative' has to be either 'two.sided' or 'one.sided'."))
   )
 
+  if(length(max_time) == 1){
+    max_time_ = c(max_time, max_time)
+  } else {
+    max_time_ <- max_time
+  }
+
   switch(type,
     AHR = {
       function(condition, dat, fixed_objects = NULL) {
         model <- trycatch_nphparams(nph::nphparams(
           dat$t, dat$evt, dat$trt,
           param_type = "avgHR",
-          param_par = max_time,
+          param_par = max_time_,
           lvl = level,
           param_alternative = alt_,
           alternative_test = alternative
         ))
 
         list(
-          p = model$tab$p_unadj,
+          p = model$tab$p_unadj[1:length(max_time)],
           alternative = alternative,
-          AHR = model$tab$Estimate,
-          AHR_lower = model$tab$lwr_unadj,
-          AHR_upper = model$tab$upr_unadj,
+          AHR = model$tab$Estimate[1:length(max_time)],
+          AHR_lower = model$tab$lwr_unadj[1:length(max_time)],
+          AHR_upper = model$tab$upr_unadj[1:length(max_time)],
           CI_level = level,
           N_pat = nrow(dat),
           N_evt = sum(dat$evt)
@@ -81,18 +87,18 @@ analyse_ahr <- function(max_time = NA, type = "AHR", level = 0.95, alternative =
         model <- trycatch_nphparams(nph::nphparams(
           dat$t, dat$evt, dat$trt,
           param_type = "HR",
-          param_par = max_time,
+          param_par = max_time_,
           lvl = level,
           param_alternative = alt_,
           alternative_test = alternative
         ))
 
         list(
-          p = model$tab$p_unadj,
+          p = model$tab$p_unadj[1:length(max_time)],
           alternative = alternative,
-          gAHR = model$tab$Estimate,
-          gAHR_lower = model$tab$lwr_unadj,
-          gAHR_upper = model$tab$upr_unadj,
+          gAHR = model$tab$Estimate[1:length(max_time)],
+          gAHR_lower = model$tab$lwr_unadj[1:length(max_time)],
+          gAHR_upper = model$tab$upr_unadj[1:length(max_time)],
           CI_level = level,
           N_pat = nrow(dat),
           N_evt = sum(dat$evt)

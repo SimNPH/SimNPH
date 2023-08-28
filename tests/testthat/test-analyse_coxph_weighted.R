@@ -21,17 +21,17 @@ test_that("weighted cox regression works", {
   analyse_sg <- analyse_coxph_weighted(type="SG")
   analyse_g  <- analyse_coxph_weighted(type="G")
 
-  analyse_s_50  <- analyse_coxph_weighted(type="S", max_time=50)
-  analyse_sg_50 <- analyse_coxph_weighted(type="SG", max_time=50)
-  analyse_g_50  <- analyse_coxph_weighted(type="G", max_time=50)
+  analyse_s_12m  <- analyse_coxph_weighted(type="S", max_time=m2d(12))
+  analyse_sg_12m <- analyse_coxph_weighted(type="SG", max_time=m2d(12))
+  analyse_g_12m  <- analyse_coxph_weighted(type="G", max_time=m2d(12))
 
   res_s  <- analyse_s (condition, dat)
   res_sg <- analyse_sg(condition, dat)
   res_g  <- analyse_g (condition, dat)
 
-  res_s_50  <- analyse_s_50 (condition, dat)
-  res_sg_50 <- analyse_sg_50(condition, dat)
-  res_g_50  <- analyse_g_50 (condition, dat)
+  res_s_50  <- analyse_s_12m (condition, dat)
+  res_sg_50 <- analyse_sg_12m(condition, dat)
+  res_g_50  <- analyse_g_12m (condition, dat)
 
   expect_error(analyse_coxph_weighted(type="something else"))
 
