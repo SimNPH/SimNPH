@@ -1,7 +1,7 @@
 Package: SimNPH
 Type: Package
 Title: Helper Functions to Simulate Non-Proportional Hazards
-Version: 0.4.2
+Version: 0.4.3
 Author: Tobias Fellinger, Florian Klinglmüller
 Maintainer: Tobias Fellinger <tobias.fellinger@ages.at>
 License: proprietary
@@ -33,8 +33,7 @@ Imports:
     dplyr,
     stringr,
     methods,
-    tidyr,
-    memoise
+    tidyr
 LinkingTo: Rcpp
 Config/testthat/edition: 3
 VignetteBuilder: R.rsp
