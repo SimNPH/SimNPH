@@ -117,6 +117,7 @@ create_summarise_function <- function(...){
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' # generate the design matrix and append the true summary statistics
 #' condition <- merge(
 #'     assumptions_delayed_effect(),
@@ -150,6 +151,7 @@ create_summarise_function <- function(...){
 #' sim_results[, names(sim_results) |> grepl(pattern="mse")]
 #' # but the variance can be estimated in all cases
 #' sim_results[, names(sim_results) |> grepl(pattern="var")]
+#' }
 summarise_estimator <- function(est, real, lower=NULL, upper=NULL, null=NULL, est_sd=NULL, name=NULL){
 
   est <- substitute(est)
@@ -275,6 +277,7 @@ summarise_estimator <- function(est, real, lower=NULL, upper=NULL, null=NULL, es
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' condition <- merge(
 #'   assumptions_delayed_effect(),
 #'   design_fixed_followup(),
@@ -299,6 +302,7 @@ summarise_estimator <- function(est, real, lower=NULL, upper=NULL, null=NULL, es
 #' )
 #'
 #' sim_results[, grepl("rejection", names(sim_results))]
+#' }
 summarise_test <- function(alpha, name=NULL){
   res <- function(condition, results, fixed_objects){
     rejection_tmp <- outer(results$p, alpha, FUN=`<`) |>

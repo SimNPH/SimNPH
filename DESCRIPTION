@@ -5,7 +5,7 @@ Version: 0.4.3
 Author: Tobias Fellinger, Florian Klinglmüller
 Maintainer: Tobias Fellinger <tobias.fellinger@ages.at>
 License: proprietary
-Description: Functions to facilitate simulation studies for time to event endpoints with non-proportional hazards. The package includes functions to simulate time to event data in different scenarios with non-proportional hazards, functions to simulate different trial-designs including fixed-followup and event driven designs as well as group sequential designs. Functions to calculate the true values of common summary statistics for the implemented scenarios are included as well as common analysis methods for time to event data. Additionally the package contains some helper functions to facilitate running simulations with the "SimDesign" package and aggregating and presenting the results.
+Description: Functions to facilitate simulation studies for time to event endpoints with non-proportional hazards. The package includes functions to simulate time to event data in different scenarios with non-proportional hazards, functions to simulate different trial-designs including fixed-followup and event driven designs as well as group sequential designs. Functions to calculate the true values of common summary statistics for the implemented scenarios are included as well as common analysis methods for time to event data. Additionally the package contains some helper functions to facilitate running simulations with the 'SimDesign' package and aggregating and presenting the results.
 Encoding: UTF-8
 LazyData: true
 Depends:
@@ -39,5 +39,5 @@ Config/testthat/edition: 3
 VignetteBuilder: R.rsp
 RoxygenNote: 7.2.3
 Roxygen: list(markdown = TRUE)
-URL: https://simnph.github.io/SimNPH, https://github.com/SimNPH/SimNPH
-BugReports: https://github.com/SimNPH/SimNPH/issues
+URL: https://simnph.github.io/SimNPH/, https://github.com/SimNPH/SimNPH/
+BugReports: https://github.com/SimNPH/SimNPH/issues/
