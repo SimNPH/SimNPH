@@ -228,13 +228,15 @@ combined_plot <- function(
   # (so gaps in lines remain gaps in each facet and only completely facets are
   # dropped)
   data <- data |>
+    dplyr::arrange()
     dplyr::ungroup() |>
     dplyr::group_by(!!!facet_vars_x_sym) |>
     dplyr::filter(!all(is.na(!!yvar))) |>
     dplyr::ungroup() |>
     dplyr::group_by(!!!facet_vars_y_sym) |>
     dplyr::filter(!all(is.na(!!yvar))) |>
-    dplyr::ungroup()
+    dplyr::ungroup() |>
+    dplyr::arrange(!!!xvars)
 
   ## split lines
 
