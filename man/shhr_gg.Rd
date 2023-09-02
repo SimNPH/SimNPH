@@ -15,7 +15,8 @@ shhr_gg(
   trafo_time = identity,
   colours = palette()[c(1, 3)],
   linetypes = c(1, 3),
-  linewidths = c(1.3, 1.3)
+  linewidths = c(1.3, 1.3),
+  as_list = FALSE
 )
 }
 \arguments{
@@ -40,9 +41,12 @@ shhr_gg(
 \item{linetypes}{vector of two linetypes}
 
 \item{linewidths}{vector of two linewidths}
+
+\item{as_list}{return a list of ggplot objects instead of a patchwork object}
 }
 \value{
-a \code{patchwork} object as defined in the patchwork package
+a \code{patchwork} object as defined in the patchwork package or a list of
+ggplot objects if \code{as_list=TRUE}.
 }
 \description{
 Plot of survival, hazard and hazard ratio of two groups as a function of time using ggplot and patchwork
