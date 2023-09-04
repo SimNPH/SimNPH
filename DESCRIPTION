@@ -1,6 +1,6 @@
 Package: SimNPH
 Type: Package
-Title: Helper Functions to Simulate Non-Proportional Hazards
+Title: Simulate Non-Proportional Hazards
 Version: 0.4.3
 Author: Tobias Fellinger, Florian Klinglmüller
 Maintainer: Tobias Fellinger <tobias.fellinger@ages.at>
