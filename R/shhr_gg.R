@@ -11,8 +11,10 @@
 #' @param colours vector of two colours
 #' @param linetypes vector of two linetypes
 #' @param linewidths vector of two linewidths
+#' @param as_list return a list of ggplot objects instead of a patchwork object
 #'
-#' @return a `patchwork` object as defined in the patchwork package
+#' @return a `patchwork` object as defined in the patchwork package or a list of
+#'   ggplot objects if `as_list=TRUE`.
 #'
 #' @export
 #'
@@ -25,7 +27,7 @@
 #' shhr_gg(A, B)
 #' shhr_gg(A, B, lab_time="Months", trafo_time=d2m)
 #' }
-shhr_gg <- function(A, B, main=NULL, sub=NULL, group_names=c("control", "treatment"), lab_time="Days", lab_group="Group", trafo_time=identity, colours=palette()[c(1,3)], linetypes=c(1,3), linewidths=c(1.3, 1.3)){
+shhr_gg <- function(A, B, main=NULL, sub=NULL, group_names=c("control", "treatment"), lab_time="Days", lab_group="Group", trafo_time=identity, colours=palette()[c(1,3)], linetypes=c(1,3), linewidths=c(1.3, 1.3), as_list=FALSE){
 
   if( !(requireNamespace("ggplot2", quietly = TRUE) & requireNamespace("patchwork", quietly = TRUE)) ){
     message("Packages ggplot2 and patchwork required for plotting functionality.")
@@ -83,15 +85,47 @@ shhr_gg <- function(A, B, main=NULL, sub=NULL, group_names=c("control", "treatme
   tmp_lty <- linetypes
   names(tmp_lty) <- group_names
 
-  patchwork::wrap_plots(gg_surv, gg_haz, gg_hr) +
-    patchwork::plot_layout(guides = "collect") +
-    patchwork::plot_annotation(main, subtitle = sub) &
-    ggplot2::theme_bw() &
-    ggplot2::theme(legend.position="bottom") &
-    ggplot2::scale_colour_manual(
-      values = tmp_colours
-    ) &
-    ggplot2::scale_linetype_manual(
-      values = tmp_lty
+  if(as_list){
+    list(
+      gg_surv +
+        ggplot2::theme_bw() +
+        ggplot2::theme(legend.position="bottom") +
+        ggplot2::scale_colour_manual(
+          values = tmp_colours
+        ) +
+        ggplot2::scale_linetype_manual(
+          values = tmp_lty
+        ),
+      gg_haz +
+        ggplot2::theme_bw() +
+        ggplot2::theme(legend.position="bottom") +
+        ggplot2::scale_colour_manual(
+          values = tmp_colours
+        ) +
+        ggplot2::scale_linetype_manual(
+          values = tmp_lty
+        ),
+      gg_hr +
+        ggplot2::theme_bw() +
+        ggplot2::theme(legend.position="bottom") +
+        ggplot2::scale_colour_manual(
+          values = tmp_colours
+        ) +
+        ggplot2::scale_linetype_manual(
+          values = tmp_lty
+        )
     )
+  } else {
+    patchwork::wrap_plots(gg_surv, gg_haz, gg_hr) +
+      patchwork::plot_layout(guides = "collect") +
+      patchwork::plot_annotation(main, subtitle = sub) &
+      ggplot2::theme_bw() &
+      ggplot2::theme(legend.position="bottom") &
+      ggplot2::scale_colour_manual(
+        values = tmp_colours
+      ) &
+      ggplot2::scale_linetype_manual(
+        values = tmp_lty
+      )
+  }
 }
