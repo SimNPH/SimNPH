@@ -68,7 +68,8 @@
 <span>  trafo_time <span class="op">=</span> <span class="va">identity</span>,</span>
 <span>  colours <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grDevices/palette.html" class="external-link">palette</a></span><span class="op">(</span><span class="op">)</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">3</span><span class="op">)</span><span class="op">]</span>,</span>
 <span>  linetypes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">3</span><span class="op">)</span>,</span>
-<span>  linewidths <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1.3</span>, <span class="fl">1.3</span><span class="op">)</span></span>
+<span>  linewidths <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1.3</span>, <span class="fl">1.3</span><span class="op">)</span>,</span>
+<span>  as_list <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -117,12 +118,17 @@
 <dt>linewidths</dt>
 <dd><p>vector of two linewidths</p></dd>
 
+
+<dt>as_list</dt>
+<dd><p>return a list of ggplot objects instead of a patchwork object</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     
 
-<p>a <code>patchwork</code> object as defined in the patchwork package</p>
+<p>a <code>patchwork</code> object as defined in the patchwork package or a list of
+ggplot objects if <code>as_list=TRUE</code>.</p>
     </div>
 
     <div class="section level2">

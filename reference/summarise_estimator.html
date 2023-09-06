@@ -120,7 +120,8 @@ in the column <code>null_cover</code></p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># generate the design matrix and append the true summary statistics</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="co"># generate the design matrix and append the true summary statistics</span></span></span>
 <span class="r-in"><span><span class="va">condition</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/merge.html" class="external-link">merge</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>    <span class="fu"><a href="generate_delayed_effect.html">assumptions_delayed_effect</a></span><span class="op">(</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>    <span class="fu"><a href="design_fixed_followup.html">design_fixed_followup</a></span><span class="op">(</span><span class="op">)</span>,</span></span>
@@ -129,19 +130,6 @@ in the column <code>null_cover</code></p>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">tail</a></span><span class="op">(</span><span class="fl">4</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="generate_delayed_effect.html">true_summary_statistics_delayed_effect</a></span><span class="op">(</span>cutoff_stats <span class="op">=</span> <span class="fl">15</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> expand.grid(</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   delay=m2d(seq(0, 10, by=2)), # delay of 0, 1, ..., 10 months</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   hazard_ctrl=m2r(24),         # median survival control of 24 months</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   hazard_trt=m2r(36),          # median survival treatment of 36 months</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   random_withdrawal=m2r(120)   # median time to random withdrawal 10 years</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> )</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> expand.grid(</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   n_trt=150,         # 150 patients in the treatment arm</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   n_ctrl=150,        # 150 patients in the control arm</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   followup=m2d(24),  # followup 2 years</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   recruitment=m2d(6) # recruitment time 6 months</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> )</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># create some summarise functions</span></span></span>
 <span class="r-in"><span><span class="va">summarise_all</span> <span class="op">&lt;-</span> <span class="fu"><a href="create_summarise_function.html">create_summarise_function</a></span><span class="op">(</span></span></span>
@@ -161,24 +149,12 @@ in the column <code>null_cover</code></p>
 <span class="r-in"><span>  <span class="op">)</span>,</span></span>
 <span class="r-in"><span>  summarise <span class="op">=</span> <span class="va">summarise_all</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Design row: 1/1;   RAM used: 168.8 Mb;   Total elapsed time: 0.00s </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Conditions: delay=121., hzrd_c=0.0009, hzrd_t=0.0006, rndm_w=0.0001, n_trt=150, n_ctrl=150, follwp=730., rcrtmn=182., mdn_srvvl_t=1034, mdn_srvvl_c=730., rmst_t_15=14.8, rmst_c_15=14.8, gAHR_1=1, AHR_15=1, AHRc_15=1, AHR__1=1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>NAs introduced by coercion</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>NAs introduced by coercion</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Simulation complete. Total execution time: 0.06s</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># mse is missing for the summarise function in which the real value was NA</span></span></span>
 <span class="r-in"><span><span class="va">sim_results</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">sim_results</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span>pattern<span class="op">=</span><span class="st">"mse"</span><span class="op">)</span><span class="op">]</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 4</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   coxph.HR.mse coxph.HR.sd_mse coxph.1.mse coxph.1.sd_mse</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>    0.009<span style="text-decoration: underline;">380</span>6        0.011<span style="text-decoration: underline;">781</span>         <span style="color: #BB0000;">NaN</span>             <span style="color: #BB0000;">NA</span></span>
 <span class="r-in"><span><span class="co"># but the variance can be estimated in all cases</span></span></span>
 <span class="r-in"><span><span class="va">sim_results</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">sim_results</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span>pattern<span class="op">=</span><span class="st">"var"</span><span class="op">)</span><span class="op">]</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 0</span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

@@ -108,31 +108,31 @@ versions.</p>
 <span class="r-in"><span><span class="va">dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="generate_delayed_effect.html">generate_delayed_effect</a></span><span class="op">(</span><span class="va">condition</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">analyse_piecewise_exponential</span><span class="op">(</span>cuts<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">90</span>, <span class="fl">360</span><span class="op">)</span><span class="op">)</span><span class="op">(</span><span class="va">condition</span>, <span class="va">dat</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $p</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.02729366</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.001247528</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $hr_s</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 3</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   `trt:intervalI1` `trt:intervalI2` `trt:intervalI3`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>            0.932            0.799            0.677</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>            0.723            0.662            0.617</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $p_s</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 3</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   `trt:intervalI1` `trt:intervalI2` `trt:intervalI3`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>            0.856            0.445          0.003<span style="text-decoration: underline;">33</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>            0.486            0.148         0.000<span style="text-decoration: underline;">250</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $hr_s_lower</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 3</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   `trt:intervalI1` `trt:intervalI2` `trt:intervalI3`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>           -<span style="color: #BB0000;">0.837</span>           -<span style="color: #BB0000;">0.809</span>           -<span style="color: #BB0000;">0.652</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>            -<span style="color: #BB0000;">1.27</span>           -<span style="color: #BB0000;">0.983</span>           -<span style="color: #BB0000;">0.742</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $hr_s_upper</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 3</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   `trt:intervalI1` `trt:intervalI2` `trt:intervalI3`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>            0.690            0.349           -<span style="color: #BB0000;">0.129</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>            0.581            0.140           -<span style="color: #BB0000;">0.224</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $N_pat</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 300</span>
@@ -143,9 +143,9 @@ versions.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $interval_table</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        0   1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   I1 273  27</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   I2 226  47</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   I3   0 226</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   I1 281  19</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   I2 230  51</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   I3   0 230</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 </code></pre></div>
     </div>
