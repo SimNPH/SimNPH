@@ -7,7 +7,6 @@
 #' @name SimNPH
 #' @import SimDesign
 #' @import survival
-#' @importFrom Rcpp evalCpp
 #' @importFrom grDevices palette
 #' @importFrom methods is
 #' @importFrom stats anova coefficients confint convolve glm integrate median na.omit pchisq pnorm poisson qnorm rbinom rexp rmultinom runif sd setNames uniroot
