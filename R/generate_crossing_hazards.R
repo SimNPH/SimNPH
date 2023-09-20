@@ -46,9 +46,10 @@ generate_crossing_hazards <- function(condition, fixed_objects=NULL){
   } else if (condition$crossing == 0){
     # if crossing is 0 leave out period bevore treatment effect
     data_trt <- data.frame(
-      t = fast_rng_fun(
+      t = miniPCH::rpch_fun(
         c(0),
-        c(condition$hazard_trt_after)
+        c(condition$hazard_trt_after),
+        discrete = TRUE
       )(condition$n_trt),
       trt = 1,
       evt = TRUE
@@ -57,9 +58,10 @@ generate_crossing_hazards <- function(condition, fixed_objects=NULL){
     # if crossing is positive simulate in the time intervals bevore and after
     # treatment effect
     data_trt <- data.frame(
-      t = fast_rng_fun(
+      t = miniPCH::rpch_fun(
         c(0, condition$crossing),
-        c(condition$hazard_trt_before, condition$hazard_trt_after)
+        c(condition$hazard_trt_before, condition$hazard_trt_after),
+        discrete = TRUE
       )(condition$n_trt),
       trt = 1,
       evt = TRUE
@@ -68,10 +70,11 @@ generate_crossing_hazards <- function(condition, fixed_objects=NULL){
 
   # simulate control group with constant hazard from 0
   data_ctrl <- data.frame(
-    t = fast_rng_fun(
-        c(0),
-        c(condition$hazard_ctrl)
-      )(condition$n_trt),
+    t = miniPCH::rpch_fun(
+      c(0),
+      c(condition$hazard_ctrl),
+      discrete = TRUE
+    )(condition$n_trt),
     trt = 0,
     evt = TRUE
   )
@@ -170,7 +173,7 @@ hr_after_crossing_from_PH_effect_size <- function(design, target_power_ph=NA_rea
     }
 
     scale <- 1/condition$hazard_ctrl
-    median_ctrl <- fast_quant_fun(0, scale*condition$hazard_ctrl)(0.5)
+    median_ctrl <- miniPCH::qpch_fun(0, scale*condition$hazard_ctrl)(0.5)
 
     if(target_power_ph == 0){
       median_trt <- median_ctrl
@@ -183,14 +186,14 @@ hr_after_crossing_from_PH_effect_size <- function(design, target_power_ph=NA_rea
         p=(condition$n_ctrl/(condition$n_ctrl + condition$n_trt))
       )
 
-      median_trt <- fast_quant_fun(0, scale*condition$hazard_ctrl*ph_hr)(0.5)
+      median_trt <- miniPCH::qpch_fun(0, scale*condition$hazard_ctrl*ph_hr)(0.5)
     }
 
-    median_trt_before <- fast_quant_fun(0, scale*condition$hazard_trt_before)(0.5)
+    median_trt_before <- miniPCH::qpch_fun(0, scale*condition$hazard_trt_before)(0.5)
 
     if(scale*median_ctrl <= condition$crossing ||
        scale*median_trt_before <= condition$crossing
-       ){
+    ){
       warning("Median survival reached before crossing of the hazards curves, calculation not possible")
       condition$hazard_trt_after  <- NA_real_
       condition$target_median_trt <- median_trt * scale
@@ -198,14 +201,26 @@ hr_after_crossing_from_PH_effect_size <- function(design, target_power_ph=NA_rea
       return(condition)
     }
 
-    target_fun_hazard_after <- function(hazard_after){
-      sapply(hazard_after, \(h){
-        median_trt -
-          fast_quant_fun(
-            c(0, condition$crossing/scale),
-            c(condition$hazard_trt_before*scale, h)
-          )(0.5)
-      })
+    if(condition$crossing != 0){
+      target_fun_hazard_after <- function(hazard_after){
+        sapply(hazard_after, \(h){
+          median_trt -
+            miniPCH::qpch_fun(
+              c(0, condition$crossing/scale),
+              c(condition$hazard_trt_before*scale, h)
+            )(0.5)
+        })
+      }
+    } else {
+      target_fun_hazard_after <- function(hazard_after){
+        sapply(hazard_after, \(h){
+          median_trt -
+            miniPCH::qpch_fun(
+              c(0),
+              c(h)
+            )(0.5)
+        })
+      }
     }
 
     # setting the lower interval bound to 0 and f.lower to -Inf
@@ -277,12 +292,19 @@ cen_rate_from_cen_prop_crossing_hazards <- function(design){
       log(10000) / condition$hazard_trt
     )
 
-    cumhaz_trt <- fast_cumhaz_fun(
-      c(                          0,         condition$crossing),
-      c(condition$hazard_trt_before, condition$hazard_trt_after)
-    )(t_max)
+    if(condition$crossing != 0){
+      cumhaz_trt <- miniPCH::chpch_fun(
+        c(                          0,         condition$crossing),
+        c(condition$hazard_trt_before, condition$hazard_trt_after)
+      )(t_max)
+    } else {
+      cumhaz_trt <- miniPCH::chpch_fun(
+        c(condition$crossing),
+        c(condition$hazard_trt_after)
+      )(t_max)
+    }
 
-    cumhaz_ctrl <- fast_cumhaz_fun(
+    cumhaz_ctrl <- miniPCH::chpch_fun(
       c(                    0),
       c(condition$hazard_ctrl)
     )(t_max)

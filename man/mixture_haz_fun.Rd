@@ -47,13 +47,11 @@ Fast implementation of hazard, cumulative hazard, ... for mixtures of subpopulat
 the last time interval extends to +Inf
 
 mixture_quant_fun relies on numeric root finding and is therefore
-not as fast as fast_quant_fun.
+not as fast as miniPCH::qpch_fun.
 
-in contrast to fast_rng_fun mixture_rng fun does not rely on the
-quantile function but samples the counts from the respective mixtures from
+mixture_rng samples the counts from the respective mixtures from
 a multinomial distribution with parameter \code{p} and then samples from the
-components and shuffles the result. This is faster, since the quantile
-function relies on numeric root finding for each point.
+components and shuffles the result.
 }
 \section{Functions}{
 \itemize{
@@ -76,12 +74,12 @@ function relies on numeric root finding for each point.
 haz <- mixture_haz_fun(
   p = c(0.3, 0.7),
   pdfs = list(
-    fast_pdf_fun(0, 0.1),
-    fast_pdf_fun(c(0,5), c(0.1, 0.12))
+    miniPCH::dpch_fun(0, 0.1),
+    miniPCH::dpch_fun(c(0,5), c(0.1, 0.12))
   ),
   survs = list(
-    fast_surv_fun(0, 0.1),
-    fast_surv_fun(c(0,5), c(0.1, 0.12))
+    miniPCH::spch_fun(0, 0.1),
+    miniPCH::spch_fun(c(0,5), c(0.1, 0.12))
   )
 )
 plot(haz(seq(0, 30, by=0.15)), ylim=c(0, 0.2), type="l")
@@ -89,32 +87,32 @@ abline(h=0)
 cumhaz <- mixture_cumhaz_fun(
   p = c(0.3, 0.7),
   survs = list(
-    fast_surv_fun(0, 0.1),
-    fast_surv_fun(c(0,5), c(0.1, 0.12))
+    miniPCH::spch_fun(0, 0.1),
+    miniPCH::spch_fun(c(0,5), c(0.1, 0.12))
   )
 )
 plot(cumhaz(seq(0, 30, by=0.15)), type="l")
 cdf <- mixture_cdf_fun(
   p = c(0.3, 0.7),
   cdfs = list(
-    fast_cdf_fun(0, 0.1),
-    fast_cdf_fun(c(0,5), c(0.1, 0.12))
+    miniPCH::ppch_fun(0, 0.1),
+    miniPCH::ppch_fun(c(0,5), c(0.1, 0.12))
   )
 )
 plot(cdf(seq(0, 30, by=0.15)), type="l")
 pdf <- mixture_pdf_fun(
   p = c(0.3, 0.7),
   pdfs = list(
-    fast_pdf_fun(0, 0.1),
-    fast_pdf_fun(c(0,5), c(0.1, 0.12))
+    miniPCH::dpch_fun(0, 0.1),
+    miniPCH::dpch_fun(c(0,5), c(0.1, 0.12))
   )
 )
 plot(pdf(seq(0, 30, by=0.15)), type="l")
 surv <- mixture_surv_fun(
   p = c(0.3, 0.7),
   survs = list(
-    fast_surv_fun(0, 0.1),
-    fast_surv_fun(c(0,5), c(0.1, 0.12))
+    miniPCH::spch_fun(0, 0.1),
+    miniPCH::spch_fun(c(0,5), c(0.1, 0.12))
   )
 )
 plot(surv(seq(0, 30, by=0.15)), type="l")
@@ -122,12 +120,12 @@ plot(surv(seq(0, 30, by=0.15)), type="l")
 quant <- mixture_quant_fun(
   p = c(0.3, 0.7),
   cdfs = list(
-    fast_cdf_fun(0, 0.1),
-    fast_cdf_fun(c(0,5), c(0.1, 0.12))
+    miniPCH::ppch_fun(0, 0.1),
+    miniPCH::ppch_fun(c(0,5), c(0.1, 0.12))
   ),
   quants = list(
-    fast_quant_fun(0, 0.1),
-    fast_quant_fun(c(0,5), c(0.1, 0.12))
+    miniPCH::qpch_fun(0, 0.1),
+    miniPCH::qpch_fun(c(0,5), c(0.1, 0.12))
   )
 )
 
@@ -136,8 +134,8 @@ plot(x, quant(x), type="l")
 rng <- mixture_rng_fun(
   p = c(0.3, 0.7),
   rngs = list(
-    fast_rng_fun(0, 0.1),
-    fast_rng_fun(c(0,5), c(0.1, 0.12))
+    miniPCH::rpch_fun(0, 0.1, discrete = TRUE),
+    miniPCH::rpch_fun(c(0,5), c(0.1, 0.12), discrete = TRUE)
   )
 )
 hist(rng(100))
