@@ -18,7 +18,7 @@ can readily be used as `generate`, `analyse` and `summarise` arguments in
 
 ### Installation
 
-The current unstable version can be installed with:
+The current development version can be installed with:
 
 ```
 remotes::install_git("https://github.com/SimNPH/SimNPH.git")
