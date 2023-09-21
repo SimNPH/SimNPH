@@ -40,4 +40,3 @@ RoxygenNote: 7.2.3
 Roxygen: list(markdown = TRUE)
 URL: https://simnph.github.io/SimNPH/, https://github.com/SimNPH/SimNPH/
 BugReports: https://github.com/SimNPH/SimNPH/issues/
-Remotes: git::git@github.com:SimNPH/miniPCH.git
