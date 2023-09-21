@@ -39,4 +39,4 @@ The results of the simulation study done by the CONFIRMS consortium in the
 course of the EMA tender will be published in an upcoming paper and are
 presented in a [Shiny App](https://sny.cemsiis.meduniwien.ac.at/~mp314/rsnph/)
 the source code of which is also on
-[github](https://github.com/SimNPH/ShinySimNPH)
+[github](https://github.com/SimNPH/ShinySimNPH/)
