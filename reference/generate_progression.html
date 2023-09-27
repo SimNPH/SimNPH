@@ -16,7 +16,7 @@ Calculate hr after onset of treatment effect"><!-- mathjax --><script src="https
     
     <a class="navbar-brand me-2" href="../index.html">SimNPH</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -252,21 +252,21 @@ hazard ratios that correspond to reasonable and realistic scenarios.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> )</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">one_simulation</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     t trt  evt t_ice   ice</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 811   1 TRUE   693  TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2 854   1 TRUE   Inf FALSE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3 649   1 TRUE   405  TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4 574   1 TRUE   477  TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5 591   1 TRUE   Inf FALSE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6 664   1 TRUE   334  TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      t trt  evt t_ice   ice</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1  741   1 TRUE   304  TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 1541   1 TRUE   831  TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  349   1 TRUE   Inf FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4  591   1 TRUE   506  TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5  130   1 TRUE    68  TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6  332   1 TRUE   327  TRUE</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">tail</a></span><span class="op">(</span><span class="va">one_simulation</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       t trt  evt t_ice   ice</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 295 555   0 TRUE    98  TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 296 376   0 TRUE   Inf FALSE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 297 423   0 TRUE   Inf FALSE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 298 272   0 TRUE   157  TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 299  79   0 TRUE   Inf FALSE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 300 605   0 TRUE    46  TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        t trt  evt t_ice   ice</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 295  220   0 TRUE   Inf FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 296  394   0 TRUE    90  TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 297 1117   0 TRUE   154  TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 298  192   0 TRUE   Inf FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 299  549   0 TRUE   466  TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 300  349   0 TRUE   Inf FALSE</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">my_design</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/merge.html" class="external-link">merge</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>  <span class="fu">assumptions_progression</span><span class="op">(</span><span class="op">)</span>,</span></span>

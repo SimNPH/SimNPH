@@ -16,7 +16,7 @@ Calculate true summary statistics for scenarios with delayed treatment effect"><
     
     <a class="navbar-brand me-2" href="../index.html">SimNPH</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -216,20 +216,20 @@ treatment effect</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> )</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">one_simulation</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      t trt  evt</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1  781   1 TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2  816   1 TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3  100   1 TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4 1721   1 TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5 1158   1 TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6 2276   1 TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1  222   1 TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 1022   1 TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  594   1 TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4 1470   1 TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5  227   1 TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6 2538   1 TRUE</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">tail</a></span><span class="op">(</span><span class="va">one_simulation</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        t trt  evt</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 295 1090   0 TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 296  340   0 TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 297  684   0 TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 298   42   0 TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 299  671   0 TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 300 1778   0 TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 295 1840   0 TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 296 2029   0 TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 297 1182   0 TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 298  214   0 TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 299  224   0 TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 300   55   0 TRUE</span>
 <span class="r-in"><span><span class="va">Design</span> <span class="op">&lt;-</span> <span class="fu">assumptions_delayed_effect</span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> expand.grid(</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   delay=m2d(seq(0, 10, by=2)), # delay of 0, 1, ..., 10 months</span>

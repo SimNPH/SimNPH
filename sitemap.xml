@@ -37,9 +37,6 @@
     <loc>https://simnph.github.io/SimNPH/reference/analyse_coxph.html</loc>
   </url>
   <url>
-    <loc>https://simnph.github.io/SimNPH/reference/analyse_coxph_weighted.html</loc>
-  </url>
-  <url>
     <loc>https://simnph.github.io/SimNPH/reference/analyse_describe.html</loc>
   </url>
   <url>
@@ -83,9 +80,6 @@
   </url>
   <url>
     <loc>https://simnph.github.io/SimNPH/reference/design_group_sequential.html</loc>
-  </url>
-  <url>
-    <loc>https://simnph.github.io/SimNPH/reference/fast_haz_fun.html</loc>
   </url>
   <url>
     <loc>https://simnph.github.io/SimNPH/reference/generate_crossing_hazards.html</loc>
