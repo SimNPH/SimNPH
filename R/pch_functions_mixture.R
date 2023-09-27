@@ -27,12 +27,12 @@ check_lists <- function(p, ...){
 #' haz <- mixture_haz_fun(
 #'   p = c(0.3, 0.7),
 #'   pdfs = list(
-#'     fast_pdf_fun(0, 0.1),
-#'     fast_pdf_fun(c(0,5), c(0.1, 0.12))
+#'     miniPCH::dpch_fun(0, 0.1),
+#'     miniPCH::dpch_fun(c(0,5), c(0.1, 0.12))
 #'   ),
 #'   survs = list(
-#'     fast_surv_fun(0, 0.1),
-#'     fast_surv_fun(c(0,5), c(0.1, 0.12))
+#'     miniPCH::spch_fun(0, 0.1),
+#'     miniPCH::spch_fun(c(0,5), c(0.1, 0.12))
 #'   )
 #' )
 #' plot(haz(seq(0, 30, by=0.15)), ylim=c(0, 0.2), type="l")
@@ -56,8 +56,8 @@ mixture_haz_fun    <- function(p, pdfs, survs){
 #' cumhaz <- mixture_cumhaz_fun(
 #'   p = c(0.3, 0.7),
 #'   survs = list(
-#'     fast_surv_fun(0, 0.1),
-#'     fast_surv_fun(c(0,5), c(0.1, 0.12))
+#'     miniPCH::spch_fun(0, 0.1),
+#'     miniPCH::spch_fun(c(0,5), c(0.1, 0.12))
 #'   )
 #' )
 #' plot(cumhaz(seq(0, 30, by=0.15)), type="l")
@@ -77,8 +77,8 @@ mixture_cumhaz_fun <- function(p, survs){
 #' cdf <- mixture_cdf_fun(
 #'   p = c(0.3, 0.7),
 #'   cdfs = list(
-#'     fast_cdf_fun(0, 0.1),
-#'     fast_cdf_fun(c(0,5), c(0.1, 0.12))
+#'     miniPCH::ppch_fun(0, 0.1),
+#'     miniPCH::ppch_fun(c(0,5), c(0.1, 0.12))
 #'   )
 #' )
 #' plot(cdf(seq(0, 30, by=0.15)), type="l")
@@ -97,8 +97,8 @@ mixture_cdf_fun    <- function(p, cdfs){
 #' pdf <- mixture_pdf_fun(
 #'   p = c(0.3, 0.7),
 #'   pdfs = list(
-#'     fast_pdf_fun(0, 0.1),
-#'     fast_pdf_fun(c(0,5), c(0.1, 0.12))
+#'     miniPCH::dpch_fun(0, 0.1),
+#'     miniPCH::dpch_fun(c(0,5), c(0.1, 0.12))
 #'   )
 #' )
 #' plot(pdf(seq(0, 30, by=0.15)), type="l")
@@ -118,8 +118,8 @@ mixture_pdf_fun    <- function(p, pdfs){
 #' surv <- mixture_surv_fun(
 #'   p = c(0.3, 0.7),
 #'   survs = list(
-#'     fast_surv_fun(0, 0.1),
-#'     fast_surv_fun(c(0,5), c(0.1, 0.12))
+#'     miniPCH::spch_fun(0, 0.1),
+#'     miniPCH::spch_fun(c(0,5), c(0.1, 0.12))
 #'   )
 #' )
 #' plot(surv(seq(0, 30, by=0.15)), type="l")
@@ -138,19 +138,19 @@ mixture_surv_fun   <- function(p, survs){
 #' @param quants list of quantile functions of the mixture components
 #'
 #' @details mixture_quant_fun relies on numeric root finding and is therefore
-#'   not as fast as fast_quant_fun.
+#'   not as fast as miniPCH::qpch_fun.
 #'
 #' @examples
 #'
 #' quant <- mixture_quant_fun(
 #'   p = c(0.3, 0.7),
 #'   cdfs = list(
-#'     fast_cdf_fun(0, 0.1),
-#'     fast_cdf_fun(c(0,5), c(0.1, 0.12))
+#'     miniPCH::ppch_fun(0, 0.1),
+#'     miniPCH::ppch_fun(c(0,5), c(0.1, 0.12))
 #'   ),
 #'   quants = list(
-#'     fast_quant_fun(0, 0.1),
-#'     fast_quant_fun(c(0,5), c(0.1, 0.12))
+#'     miniPCH::qpch_fun(0, 0.1),
+#'     miniPCH::qpch_fun(c(0,5), c(0.1, 0.12))
 #'   )
 #' )
 #'
@@ -190,18 +190,16 @@ mixture_quant_fun   <- function(p, cdfs, quants){
 #'
 #' @param rngs random number generating functions of the components
 #'
-#' @details in contrast to fast_rng_fun mixture_rng fun does not rely on the
-#'   quantile function but samples the counts from the respective mixtures from
+#' @details mixture_rng samples the counts from the respective mixtures from
 #'   a multinomial distribution with parameter `p` and then samples from the
-#'   components and shuffles the result. This is faster, since the quantile
-#'   function relies on numeric root finding for each point.
+#'   components and shuffles the result.
 #'
 #' @examples
 #' rng <- mixture_rng_fun(
 #'   p = c(0.3, 0.7),
 #'   rngs = list(
-#'     fast_rng_fun(0, 0.1),
-#'     fast_rng_fun(c(0,5), c(0.1, 0.12))
+#'     miniPCH::rpch_fun(0, 0.1, discrete = TRUE),
+#'     miniPCH::rpch_fun(c(0,5), c(0.1, 0.12), discrete = TRUE)
 #'   )
 #' )
 #' hist(rng(100))

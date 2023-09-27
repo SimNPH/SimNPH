@@ -1,5 +1,11 @@
 # SimNPH
 
+<!-- badges: start -->
+[![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
+
+[![Codecov test coverage](https://codecov.io/gh/SimNPH/SimNPH/branch/master/graph/badge.svg)](https://app.codecov.io/gh/SimNPH/SimNPH?branch=master)
+<!-- badges: end -->
+
 **Sim**ulate **N**on **P**roportional **H**azards
 
 This package provides several functions to simulate survival data with non
@@ -14,7 +20,7 @@ can readily be used as `generate`, `analyse` and `summarise` arguments in
 
 ### Installation
 
-The current unstable version can be installed with:
+The current development version can be installed with:
 
 ```
 remotes::install_git("https://github.com/SimNPH/SimNPH.git")
@@ -33,6 +39,4 @@ Some examples of data generation, testing and estimation can be found in this
 
 The results of the simulation study done by the CONFIRMS consortium in the
 course of the EMA tender will be published in an upcoming paper and are
-presented in a [Shiny App](https://sny.cemsiis.meduniwien.ac.at/~mp314/rsnph/)
-the source code of which is also on
-[github](https://github.com/SimNPH/ShinySimNPH)
+presented in a [Shiny App](https://sny.cemsiis.meduniwien.ac.at/~mp314/rsnph/).

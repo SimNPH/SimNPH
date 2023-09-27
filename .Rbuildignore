@@ -8,8 +8,6 @@
 ^scripts$
 ^data$
 ^.github$
-^notes_drafts_etc$
-^testdata$
 ^\.github$
 ^LICENSE\.md$
 ^vignettes_prebuild$

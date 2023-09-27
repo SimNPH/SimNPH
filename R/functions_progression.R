@@ -13,11 +13,11 @@ subpop_hazVfun_simnph <- function (Tint, lambda1, lambda2, lambdaProg,
   t_ <- seq(1, t_max, 1)
   nt <- length(t)
 
-  f_tod             <-    fast_pdf_fun(Tint_,    lambda1)(t_)
-  S_tod             <-   fast_surv_fun(Tint_,    lambda1)(t_)
-  f_tod_nach_switch <-    fast_pdf_fun(Tint_,    lambda2)(t_)
-  S_switch          <-   fast_surv_fun(Tint_, lambdaProg)(t)
-  f_switch          <-    fast_pdf_fun(Tint_, lambdaProg)(t)
+  f_tod             <-    miniPCH::dpch_fun(Tint_,    lambda1)(t_)
+  S_tod             <-   miniPCH::spch_fun(Tint_,    lambda1)(t_)
+  f_tod_nach_switch <-    miniPCH::dpch_fun(Tint_,    lambda2)(t_)
+  S_switch          <-   miniPCH::spch_fun(Tint_, lambdaProg)(t)
+  f_switch          <-    miniPCH::dpch_fun(Tint_, lambdaProg)(t)
 
   f_switch_vor_tod <- f_switch * S_tod
   f_tod_vor_switch <- f_tod * S_switch

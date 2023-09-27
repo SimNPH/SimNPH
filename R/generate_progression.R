@@ -68,36 +68,42 @@ invisible(
 #' tail(one_simulation)
 generate_progression <- function(condition, fixed_objects=NULL){
 
-  t_evt_ctrl <- fast_rng_fun(
+  t_evt_ctrl <- miniPCH::rpch_fun(
       c(0),
-      c(condition$hazard_ctrl)
+      c(condition$hazard_ctrl),
+      discrete = TRUE
     )(condition$n_ctrl)
 
-  t_evt_trt <- fast_rng_fun(
+  t_evt_trt <- miniPCH::rpch_fun(
       c(0),
-      c(condition$hazard_trt)
+      c(condition$hazard_trt),
+      discrete = TRUE
     )(condition$n_trt)
 
-  t_prog_ctrl <- fast_rng_fun(
+  t_prog_ctrl <- miniPCH::rpch_fun(
       c(0),
-      c(condition$prog_rate_ctrl)
+      c(condition$prog_rate_ctrl),
+      discrete = TRUE
     )(condition$n_ctrl)
 
-  t_prog_trt <- fast_rng_fun(
+  t_prog_trt <- miniPCH::rpch_fun(
       c(0),
-      c(condition$prog_rate_trt)
+      c(condition$prog_rate_trt),
+      discrete = TRUE
     )(condition$n_trt)
 
-  t_evt_after_prog_ctrl <- fast_rng_fun(
+  t_evt_after_prog_ctrl <- miniPCH::rpch_fun(
       c(0),
-      c(condition$hazard_after_prog)
+      c(condition$hazard_after_prog),
+      discrete = TRUE
     )(condition$n_ctrl)
 
   t_evt_after_prog_ctrl <- t_prog_ctrl + t_evt_after_prog_ctrl
 
-  t_evt_after_prog_trt <- fast_rng_fun(
+  t_evt_after_prog_trt <- miniPCH::rpch_fun(
       c(0),
-      c(condition$hazard_after_prog)
+      c(condition$hazard_after_prog),
+      discrete = TRUE
     )(condition$n_ctrl)
 
   t_evt_after_prog_trt <- t_prog_trt + t_evt_after_prog_trt
@@ -278,12 +284,12 @@ progression_rate_from_progression_prop <- function(design){
       log(1000) / condition$hazard_trt
     )
 
-    cumhaz_trt <- fast_cumhaz_fun(
+    cumhaz_trt <- miniPCH::chpch_fun(
       c(                   0),
       c(condition$hazard_trt)
     )(t_max)
 
-    cumhaz_ctrl <- fast_cumhaz_fun(
+    cumhaz_ctrl <- miniPCH::chpch_fun(
       c(                    0),
       c(condition$hazard_ctrl)
     )(t_max)
@@ -364,7 +370,7 @@ cen_rate_from_cen_prop_progression <- function(design){
     cumhaz_ctrl_tmax <- tail(data_generating_model_trt$cumhaz, 1)
 
     target_fun <- Vectorize(\(r){
-      cumhaz_censoring <- fast_cumhaz_fun(0, r)
+      cumhaz_censoring <- miniPCH::chpch_fun(0, r)
       prob_cen_ctrl <- cumhaz_censoring(t_max)/(cumhaz_censoring(t_max) + cumhaz_ctrl_tmax)
       prob_cen_trt  <- cumhaz_censoring(t_max)/(cumhaz_censoring(t_max) + cumhaz_trt_tmax)
       prob_cen <- a*prob_cen_trt + b*prob_cen_ctrl
@@ -476,14 +482,14 @@ hazard_before_progression_from_PH_effect_size <- function(design, target_power_p
 
     hazard_ctrl_ph <- uniroot(
       \(h){
-        fast_quant_fun(0, h)(0.5) - median_ctrl
+        miniPCH::qpch_fun(0, h)(0.5) - median_ctrl
       },
       interval=c(1e-8, 0.0001),
       extendInt="downX",
       tol = 2*.Machine$double.eps
     )$root
 
-    median_trt_ph  <- fast_quant_fun(0, hazard_ctrl_ph * ph_hr)(0.5)
+    median_trt_ph  <- miniPCH::qpch_fun(0, hazard_ctrl_ph * ph_hr)(0.5)
 
     target_fun_hazard_trt <- function(hazard_after){
       sapply(hazard_after, \(h){
