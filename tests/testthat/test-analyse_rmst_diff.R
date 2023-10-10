@@ -8,7 +8,7 @@ test_that("analyse rmst diff works", {
       head(1)
   })
 
-  dat <- generate_delayed_effect(condition)
+  dat <- withr::with_seed(123, generate_delayed_effect(condition))
   results <- analyse_rmst_diff()(condition, dat)
   results2 <- analyse_rmst_diff(10)(condition, dat)
 

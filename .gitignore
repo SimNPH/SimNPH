@@ -10,8 +10,6 @@ inst/doc
 /Meta/
 notes_drafts_etc
 /doc/
-/src/*.dll
-/src/*.o
 testdata
 %LOCALAPPDATA%
 docs

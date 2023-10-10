@@ -221,14 +221,14 @@ fast_real_statistics_pchaz <- function(
 ){
 
   fast_real_statistics(
-    haz_trt    =   fast_haz_fun( Tint_trt,  lambda_trt),
-    pdf_trt    =   fast_pdf_fun( Tint_trt,  lambda_trt),
-    surv_trt   =  fast_surv_fun( Tint_trt,  lambda_trt),
-    quant_trt  = fast_quant_fun( Tint_trt,  lambda_trt),
-    haz_ctrl   =   fast_haz_fun(Tint_ctrl, lambda_ctrl),
-    pdf_ctrl   =   fast_pdf_fun(Tint_ctrl, lambda_ctrl),
-    surv_ctrl  =  fast_surv_fun(Tint_ctrl, lambda_ctrl),
-    quant_ctrl = fast_quant_fun(Tint_ctrl, lambda_ctrl),
+    haz_trt    =   miniPCH::hpch_fun( Tint_trt,  lambda_trt),
+    pdf_trt    =   miniPCH::dpch_fun( Tint_trt,  lambda_trt),
+    surv_trt   =  miniPCH::spch_fun( Tint_trt,  lambda_trt),
+    quant_trt  = miniPCH::qpch_fun( Tint_trt,  lambda_trt),
+    haz_ctrl   =   miniPCH::hpch_fun(Tint_ctrl, lambda_ctrl),
+    pdf_ctrl   =   miniPCH::dpch_fun(Tint_ctrl, lambda_ctrl),
+    surv_ctrl  =  miniPCH::spch_fun(Tint_ctrl, lambda_ctrl),
+    quant_ctrl = miniPCH::qpch_fun(Tint_ctrl, lambda_ctrl),
     N_trt=N_trt, N_ctrl=N_ctrl, cutoff=cutoff, milestones=milestones
   )
 }

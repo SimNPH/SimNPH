@@ -39,21 +39,21 @@ generate_subgroup <- function(condition, fixed_objects=NULL){
   counts <- rmultinom(1, condition$n_trt, prob=c(condition$prevalence, 1-condition$prevalence))
 
   data_subgroup <- data.frame(
-    t = fast_rng_fun(0, condition$hazard_subgroup)(counts[1]),
+    t = miniPCH::rpch_fun(0, condition$hazard_subgroup, discrete = TRUE)(counts[1]),
     trt = 1,
     evt = TRUE,
     subgroup = 1
   )
 
   data_trt <- data.frame(
-    t = fast_rng_fun(0, condition$hazard_trt)(counts[2]),
+    t = miniPCH::rpch_fun(0, condition$hazard_trt, discrete = TRUE)(counts[2]),
     trt = 1,
     evt = TRUE,
     subgroup = 0
   )
 
   data_ctrl <- data.frame(
-    t = fast_rng_fun(0, condition$hazard_ctrl)(condition$n_ctrl),
+    t = miniPCH::rpch_fun(0, condition$hazard_ctrl, discrete = TRUE)(condition$n_ctrl),
     trt = 0,
     evt = TRUE,
     subgroup = rbinom(condition$n_ctrl, 1, condition$prevalence)
@@ -135,47 +135,47 @@ true_summary_statistics_subgroup <- function(Design, cutoff_stats=NULL, mileston
     haz_trt   <-   mixture_haz_fun(
       c(1-condition$prevalence, condition$prevalence),
       pdfs = list(
-        fast_pdf_fun(0, condition$hazard_trt),
-        fast_pdf_fun(0, condition$hazard_subgroup)
+        miniPCH::dpch_fun(0, condition$hazard_trt),
+        miniPCH::dpch_fun(0, condition$hazard_subgroup)
       ),
       survs = list(
-        fast_surv_fun(0, condition$hazard_trt),
-        fast_surv_fun(0, condition$hazard_subgroup)
+        miniPCH::spch_fun(0, condition$hazard_trt),
+        miniPCH::spch_fun(0, condition$hazard_subgroup)
       )
     )
 
     pdf_trt   <-   mixture_pdf_fun(
       c(1-condition$prevalence, condition$prevalence),
       list(
-        fast_pdf_fun(0, condition$hazard_trt),
-        fast_pdf_fun(0, condition$hazard_subgroup)
+        miniPCH::dpch_fun(0, condition$hazard_trt),
+        miniPCH::dpch_fun(0, condition$hazard_subgroup)
       )
     )
 
     surv_trt  <-  mixture_surv_fun(
       c(1-condition$prevalence, condition$prevalence),
       list(
-        fast_surv_fun(0, condition$hazard_trt),
-        fast_surv_fun(0, condition$hazard_subgroup)
+        miniPCH::spch_fun(0, condition$hazard_trt),
+        miniPCH::spch_fun(0, condition$hazard_subgroup)
       )
     )
 
     quant_trt <- mixture_quant_fun(
       c(1-condition$prevalence, condition$prevalence),
       cdfs=list(
-        fast_cdf_fun(0, condition$hazard_trt),
-        fast_cdf_fun(0, condition$hazard_subgroup)
+        miniPCH::ppch_fun(0, condition$hazard_trt),
+        miniPCH::ppch_fun(0, condition$hazard_subgroup)
       ),
       quants=list(
-        fast_quant_fun(0, condition$hazard_trt),
-        fast_quant_fun(0, condition$hazard_subgroup)
+        miniPCH::qpch_fun(0, condition$hazard_trt),
+        miniPCH::qpch_fun(0, condition$hazard_subgroup)
       )
     )
 
-    haz_ctrl   <-   fast_haz_fun(0, condition$hazard_ctrl)
-    pdf_ctrl   <-   fast_pdf_fun(0, condition$hazard_ctrl)
-    surv_ctrl  <-  fast_surv_fun(0, condition$hazard_ctrl)
-    quant_ctrl <- fast_quant_fun(0, condition$hazard_ctrl)
+    haz_ctrl   <-   miniPCH::hpch_fun(0, condition$hazard_ctrl)
+    pdf_ctrl   <-   miniPCH::dpch_fun(0, condition$hazard_ctrl)
+    surv_ctrl  <-  miniPCH::spch_fun(0, condition$hazard_ctrl)
+    quant_ctrl <- miniPCH::qpch_fun(0, condition$hazard_ctrl)
 
     real_stats <- fast_real_statistics(
       haz_trt,  pdf_trt,  surv_trt, quant_trt,
@@ -275,8 +275,8 @@ hazard_subgroup_from_PH_effect_size <- function(design, target_power_ph=NA_real_
 
     scale <- 1/condition$hazard_ctrl
 
-    median_trt  <- fast_quant_fun(0, scale * condition$hazard_ctrl * ph_hr)(0.5)
-    median_ctrl <- fast_quant_fun(0, scale * condition$hazard_ctrl        )(0.5)
+    median_trt  <- miniPCH::qpch_fun(0, scale * condition$hazard_ctrl * ph_hr)(0.5)
+    median_ctrl <- miniPCH::qpch_fun(0, scale * condition$hazard_ctrl        )(0.5)
 
     if(target_power_ph == 0){
       median_trt <- median_ctrl
@@ -287,12 +287,12 @@ hazard_subgroup_from_PH_effect_size <- function(design, target_power_ph=NA_real_
         my_quant_fun <- mixture_quant_fun(
           c(condition$prevalence, 1-condition$prevalence),
           cdfs = list(
-            fast_cdf_fun(0, h*condition$hr_subgroup_relative),
-            fast_cdf_fun(0, h)
+            miniPCH::ppch_fun(0, h*condition$hr_subgroup_relative),
+            miniPCH::ppch_fun(0, h)
           ),
           quants = list(
-            fast_quant_fun(0, h*condition$hr_subgroup_relative),
-            fast_quant_fun(0, h)
+            miniPCH::qpch_fun(0, h*condition$hr_subgroup_relative),
+            miniPCH::qpch_fun(0, h)
           )
           )
         median_trt - my_quant_fun(0.5)
@@ -366,12 +366,12 @@ cen_rate_from_cen_prop_subgroup <- function(design){
     cumhaz_trt <- mixture_cumhaz_fun(
       c(condition$prevalence, 1-condition$prevalence),
       survs = list(
-        fast_surv_fun(0, condition$hazard_subgroup),
-        fast_surv_fun(0, condition$hazard_trt)
+        miniPCH::spch_fun(0, condition$hazard_subgroup),
+        miniPCH::spch_fun(0, condition$hazard_trt)
       )
     )(t_max)
 
-    cumhaz_ctrl <- fast_cumhaz_fun(
+    cumhaz_ctrl <- miniPCH::chpch_fun(
       c(                    0),
       c(condition$hazard_ctrl)
     )(t_max)

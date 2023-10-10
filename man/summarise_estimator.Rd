@@ -48,6 +48,7 @@ output the rejection rate based on the confidence intervall. Which is output
 in the column \code{null_cover}
 }
 \examples{
+\dontrun{
 # generate the design matrix and append the true summary statistics
 condition <- merge(
     assumptions_delayed_effect(),
@@ -81,4 +82,5 @@ sim_results <- runSimulation(
 sim_results[, names(sim_results) |> grepl(pattern="mse")]
 # but the variance can be estimated in all cases
 sim_results[, names(sim_results) |> grepl(pattern="var")]
+}
 }
