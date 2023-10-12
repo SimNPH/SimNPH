@@ -1,3 +1,9 @@
+# SimNPH 0.5.1
+
+* Added references to the preprint of the paper to description and citation. 
+  Added references to the preprint and the shiny app to the readme.
+* First CRAN submission.
+
 # SimNPH 0.5.0
 
 * Moved compiled functions to new package "miniPCH" to clarify structure and to
