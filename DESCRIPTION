@@ -1,7 +1,7 @@
 Package: SimNPH
 Type: Package
 Title: Simulate Non-Proportional Hazards
-Version: 0.5.0
+Version: 0.5.1
 Author: Tobias Fellinger, Florian Klinglmüller
 Maintainer: Tobias Fellinger <tobias.fellinger@ages.at>
 License: BSL-1.0
