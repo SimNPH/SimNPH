@@ -2,8 +2,8 @@ Package: SimNPH
 Type: Package
 Title: Simulate Non-Proportional Hazards
 Version: 0.5.1
-Author: Tobias Fellinger, Florian Klinglmüller
-Maintainer: Tobias Fellinger <tobias.fellinger@ages.at>
+Authors@R: c(person("Tobias", "Fellinger", email="tobias.fellinger@ages.at", role=c("aut", "cre"), comment = c(ORCID = "0000-0001-9474-2731")),
+            person("Florian", "Klinglmueller", role=c("aut"), comment = c(ORCID = "0000-0002-7346-3669")))
 License: BSL-1.0
 Description: Functions to facilitate simulation studies for time to event 
     endpoints with non-proportional hazards. The package includes functions to 
