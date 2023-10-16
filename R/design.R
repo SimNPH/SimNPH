@@ -1,11 +1,14 @@
 #' Create a data.frame with an example fixed design
 #'
+#' @param print print code to generate parameter set?
+#'
 #' @return For design_fixed_followup: a design tibble with default values invisibly
 #'
-#' @details design_fixed_followup prints the code to generate a default
-#'   design tibble for use with generate_delayed_effect or other generate_...
-#'   functions and returns the evaluated code invisibly. This function is
-#'   intended to be used to copy paste the code and edit the parameters.
+#' @details design_fixed_followup generates a default design `data.frame` for
+#'   use with generate_delayed_effect or other generate_... functions. If print
+#'   is `TRUE` code to produce the template is also printed for copying, pasting
+#'   and editing by the user. (This is the default when run in an interactive
+#'   session.)
 #'
 #' @export
 #' @describeIn design_fixed_followup generate default fixed design
@@ -13,7 +16,7 @@
 #' @examples
 #' Design <- design_fixed_followup()
 #' Design
-design_fixed_followup <- function(){
+design_fixed_followup <- function(print=interactive()){
   skel <- "expand.grid(
   n_trt=150,         # 150 patients in the treatment arm
   n_ctrl=150,        # 150 patients in the control arm
@@ -23,31 +26,37 @@ design_fixed_followup <- function(){
 )
 "
 
-cat(skel)
-invisible(
-  skel |>
-    str2expression() |>
-    eval()
-)
+  if(print){
+    cat(skel)
+  }
+
+  invisible(
+    skel |>
+      str2expression() |>
+      eval()
+  )
 }
 
 
 #' Create a data.frame with an example group sequential design
 #'
+#' @param print print code to generate parameter set?
+#'
 #' @return For design_group_sequential: a design tibble with default values invisibly
 #'
-#' @details design_group_sequential prints the code to generate a default
-#'   design tibble for use with generate_delayed_effect or other generate_...
-#'   functions and returns the evaluated code invisibly. This function is
-#'   intended to be used to copy paste the code and edit the parameters.
+#' @details design_group_sequential generates a default design `data.frame` for
+#'   use with generate_delayed_effect or other generate_... functions. If print
+#'   is `TRUE` code to produce the template is also printed for copying, pasting
+#'   and editing by the user. (This is the default when run in an interactive
+#'   session.)
 #'
 #' @export
-#' @describeIn design_group_sequential generate default group sequential desing
+#' @describeIn design_group_sequential generate default group sequential design
 #'
 #' @examples
 #' Design <- design_group_sequential()
 #' Design
-design_group_sequential <- function(){
+design_group_sequential <- function(print=interactive()){
   skel <- "expand.grid(
   n_trt=200,          # 200 patients in the treatment arm
   n_ctrl=200,         # 200 patients in the control arm
@@ -58,10 +67,13 @@ design_group_sequential <- function(){
 )
 "
 
-cat(skel)
-invisible(
-  skel |>
-    str2expression() |>
-    eval()
-)
+  if(print){
+    cat(skel)
+  }
+
+  invisible(
+    skel |>
+      str2expression() |>
+      eval()
+  )
 }

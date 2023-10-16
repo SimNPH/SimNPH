@@ -84,20 +84,22 @@ generate_crossing_hazards <- function(condition, fixed_objects=NULL){
 
 #' Create an empty assumtions data.frame for generate_crossing_hazards
 #'
+#' @param print print code to generate parameter set?
+#'
 #' @return For assumptions_crossing_hazards: a design tibble with default values invisibly
 #'
-#' @details assumptions_crossing_hazards prints the code to generate a default
-#'   design tibble for use with generate_crossing_hazards and returns the
-#'   evaluated code invisibly. This function is intended to be used to copy
-#'   paste the code and edit the parameters.
+#' @details assumptions_crossing_hazards generates a default design `data.frame`
+#'   for use with generate_crossing_hazards If print is `TRUE` code to produce
+#'   the template is also printed for copying, pasting and editing by the user.
+#'   (This is the default when run in an interactive session.)
 #'
 #' @export
-#' @describeIn generate_crossing_hazards generate default design tibble
+#' @describeIn generate_crossing_hazards generate default assumptions `data.frame`
 #'
 #' @examples
 #' Design <- assumptions_crossing_hazards()
 #' Design
-assumptions_crossing_hazards <- function(){
+assumptions_crossing_hazards <- function(print=interactive()){
   skel <- "expand.grid(
   crossing=m2d(seq(0, 10, by=2)), # crossing after of 0, 1, ..., 10 months
   hazard_ctrl=m2r(24),            # median survival control of 24 months
@@ -107,12 +109,15 @@ assumptions_crossing_hazards <- function(){
 )
 "
 
-cat(skel)
-invisible(
-  skel |>
-    str2expression() |>
-    eval()
-)
+  if(print){
+    cat(skel)
+  }
+
+  invisible(
+    skel |>
+      str2expression() |>
+      eval()
+  )
 }
 
 

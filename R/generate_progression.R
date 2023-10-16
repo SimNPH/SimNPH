@@ -1,19 +1,21 @@
 #' Create an empty assumtions data.frame for generate_progression
 #'
+#' @param print print code to generate parameter set?
+#'
 #' @return For generate_progression: a design tibble with default values invisibly
 #'
-#' @details assumptions_progression prints the code to generate a default
-#'   design tibble for use with generate_progression and returns the
-#'   evaluated code invisibly. This function is intended to be used to copy
-#'   paste the code and edit the parameters.
+#' @details assumptions_progression generates a default design `data.frame` for
+#'   use with generate_progression If print is `TRUE` code to produce the
+#'   template is also printed for copying, pasting and editing by the user.
+#'   (This is the default when run in an interactive session.)
 #'
 #' @export
-#' @describeIn generate_progression generate default assumptions tibble
+#' @describeIn generate_progression generate default assumptions `data.frame`
 #'
 #' @examples
 #' Design <- assumptions_progression()
 #' Design
-assumptions_progression <- function(){
+assumptions_progression <- function(print=interactive()){
   skel <- "expand.grid(
   hazard_ctrl= m2r(24),              # med. survival ctrl 24 months
   hazard_trt= m2r(36),               # med. survival trt 36 months
@@ -24,12 +26,15 @@ assumptions_progression <- function(){
 )
 "
 
-cat(skel)
-invisible(
-  skel |>
-    str2expression() |>
-    eval()
-)
+  if(print){
+    cat(skel)
+  }
+
+  invisible(
+    skel |>
+      str2expression() |>
+      eval()
+  )
 }
 
 #' Generate Dataset with changing hazards after disease progression

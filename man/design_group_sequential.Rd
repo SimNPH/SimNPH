@@ -4,7 +4,10 @@
 \alias{design_group_sequential}
 \title{Create a data.frame with an example group sequential design}
 \usage{
-design_group_sequential()
+design_group_sequential(print = interactive())
+}
+\arguments{
+\item{print}{print code to generate parameter set?}
 }
 \value{
 For design_group_sequential: a design tibble with default values invisibly
@@ -13,14 +16,15 @@ For design_group_sequential: a design tibble with default values invisibly
 Create a data.frame with an example group sequential design
 }
 \details{
-design_group_sequential prints the code to generate a default
-design tibble for use with generate_delayed_effect or other generate_...
-functions and returns the evaluated code invisibly. This function is
-intended to be used to copy paste the code and edit the parameters.
+design_group_sequential generates a default design \code{data.frame} for
+use with generate_delayed_effect or other generate_... functions. If print
+is \code{TRUE} code to produce the template is also printed for copying, pasting
+and editing by the user. (This is the default when run in an interactive
+session.)
 }
 \section{Functions}{
 \itemize{
-\item \code{design_group_sequential()}: generate default group sequential desing
+\item \code{design_group_sequential()}: generate default group sequential design
 
 }}
 \examples{

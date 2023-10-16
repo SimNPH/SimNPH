@@ -7,7 +7,7 @@ test_that("assumptions_progression outputs correct tibble", {
   )
 
   expect_output(
-    assumptions_progression(),
+    assumptions_progression(print=TRUE),
     regexp = "^expand\\.grid.*",
     label = "assumptions_progression prints something with expand.grid"
   )

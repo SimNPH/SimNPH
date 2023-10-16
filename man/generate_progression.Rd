@@ -9,7 +9,7 @@
 \alias{hazard_before_progression_from_PH_effect_size}
 \title{Create an empty assumtions data.frame for generate_progression}
 \usage{
-assumptions_progression()
+assumptions_progression(print = interactive())
 
 generate_progression(condition, fixed_objects = NULL)
 
@@ -33,6 +33,8 @@ hazard_before_progression_from_PH_effect_size(
 )
 }
 \arguments{
+\item{print}{print code to generate parameter set?}
+
 \item{condition}{condition row of Design dataset}
 
 \item{fixed_objects}{additional settings, see details}
@@ -82,10 +84,10 @@ Calculate progression rate from proportion of patients who progress
 Calculate hr after onset of treatment effect
 }
 \details{
-assumptions_progression prints the code to generate a default
-design tibble for use with generate_progression and returns the
-evaluated code invisibly. This function is intended to be used to copy
-paste the code and edit the parameters.
+assumptions_progression generates a default design \code{data.frame} for
+use with generate_progression If print is \code{TRUE} code to produce the
+template is also printed for copying, pasting and editing by the user.
+(This is the default when run in an interactive session.)
 
 Condidtion has to contain the following columns:
 \itemize{
@@ -132,7 +134,7 @@ hazard ratios that correspond to reasonable and realistic scenarios.
 }
 \section{Functions}{
 \itemize{
-\item \code{assumptions_progression()}: generate default assumptions tibble
+\item \code{assumptions_progression()}: generate default assumptions \code{data.frame}
 
 \item \code{generate_progression()}: simulates a dataset with changing hazards after disease progression
 
