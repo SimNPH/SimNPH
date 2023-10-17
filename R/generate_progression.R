@@ -425,8 +425,18 @@ cen_rate_from_cen_prop_progression <- function(design){
 #'   hazard ratios that correspond to reasonable and realistic scenarios.
 #'
 #' @examples
-#' \dontrun{
-#' my_design <- hazard_before_progression_from_PH_effect_size(my_design, target_power_ph=0.9)
+#' \donttest{
+#' my_design <- merge(
+#'   design_fixed_followup(),
+#'   assumptions_progression(),
+#'   by=NULL
+#' )
+#'
+#' my_design$hazard_trt <- NULL
+#' my_design$final_events <- ceiling(0.75 * (my_design$n_trt + my_design$n_ctrl))
+#'
+#' my_design <- hazard_before_progression_from_PH_effect_size(my_design, target_power_ph=0.7)
+#' my_design
 #' }
 hazard_before_progression_from_PH_effect_size <- function(design, target_power_ph=NA_real_, final_events=NA_real_, target_alpha=0.025){
 

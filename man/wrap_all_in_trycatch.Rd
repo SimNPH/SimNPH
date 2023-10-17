@@ -62,7 +62,7 @@ the analysis functions use random numbers.
 \examples{
 funs1 <- list(\(){stop("test")}, \(){1})
 funs2 <- wrap_all_in_trycatch(funs1)
-\dontrun{
+\donttest{
 lapply(funs1, \(f){f()})
 }
 lapply(funs2, \(f){f()})

@@ -48,23 +48,22 @@ output the rejection rate based on the confidence intervall. Which is output
 in the column \code{null_cover}
 }
 \examples{
-\dontrun{
+\donttest{
 # generate the design matrix and append the true summary statistics
 condition <- merge(
-    assumptions_delayed_effect(),
-    design_fixed_followup(),
-    by=NULL
-  ) |>
+  assumptions_delayed_effect(),
+  design_fixed_followup(),
+  by=NULL
+) |>
   tail(4) |>
   head(1) |>
   true_summary_statistics_delayed_effect(cutoff_stats = 15)
 
 # create some summarise functions
 summarise_all <- create_summarise_function(
-  coxph=summarise_estimator(hr, gAHR, hr_lower, hr_upper, name="aAHR"),
+  coxph=summarise_estimator(hr, gAHR_15, hr_lower, hr_upper, name="gAHR"),
   coxph=summarise_estimator(hr, hazard_trt/hazard_ctrl, hr_lower, hr_upper, name="HR"),
-  coxph=summarise_estimator(exp(coef), gAHR),
-  coxph=summarise_estimator(hr, NA_real_)
+  coxph=summarise_estimator(hr, NA_real_, name="NA")
 )
 
 # runs simulations
@@ -79,8 +78,8 @@ sim_results <- runSimulation(
 )
 
 # mse is missing for the summarise function in which the real value was NA
-sim_results[, names(sim_results) |> grepl(pattern="mse")]
-# but the variance can be estimated in all cases
-sim_results[, names(sim_results) |> grepl(pattern="var")]
+sim_results[, names(sim_results) |> grepl(pattern="\\\\.mse$")]
+# but the standard deviation can be estimated in all cases
+sim_results[, names(sim_results) |> grepl(pattern="\\\\.sd_est$")]
 }
 }
