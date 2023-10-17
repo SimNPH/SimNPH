@@ -47,7 +47,7 @@ results_pivot_longer <- function(data, exclude_from_methods=c("descriptive")){
   result <- data |>
     dplyr::rename_with(
       .fn = \(name){rep("n_pat_design", length(name))},
-      .cols=any_of("n_pat")
+      .cols=dplyr::any_of("n_pat")
     ) |>
     tidyr::pivot_longer_spec(pivot_spec)
 }
