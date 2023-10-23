@@ -38,7 +38,7 @@ mixture_rng_fun(p, rngs)
 \item{rngs}{random number generating functions of the components}
 }
 \value{
-A function with one parameter, a vector of times where the function should be evaluated.
+A function with one parameter, a vector of times/probabilities where the function should be evaluated.
 }
 \description{
 Fast implementation of hazard, cumulative hazard, ... for mixtures of subpopulations
