@@ -55,7 +55,7 @@ internal_real_statistics_pchaz_discrete <- function(data_gen_model_trt, data_gen
       tmp <- data.frame(
         rmst_trt            = sum(data_gen_model_trt$S[ind]),
         rmst_ctrl           = sum(data_gen_model_ctrl$S[ind]),
-        gAHR                = exp(sum( (log_quot * f[ind]) , na.rm=TRUE)),
+        gAHR                = exp(sum( (log_quot * f[ind]) , na.rm=TRUE) / sum(f[ind], na.rm=TRUE)),
         AHR                 = sum(((data_gen_model_trt$haz[ind]/h[ind]) * f[ind]), na.rm=TRUE) /
           sum(((data_gen_model_ctrl$haz[ind]/h[ind]) * f[ind]), na.rm=TRUE),
         AHRoc = Int0/Int1,

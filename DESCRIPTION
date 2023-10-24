@@ -34,7 +34,7 @@ Suggests:
     patchwork,
     R.rsp
 Imports:
-    miniPCH,
+    miniPCH (>= 0.3.0),
     purrr (>= 1.0.0),
     rlang,
     tibble,

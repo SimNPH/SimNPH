@@ -1,3 +1,19 @@
+get_miniPCH_pramams_progression <- function(hazard_before, prog_rate, hazard_after){
+  Q <- matrix(c(
+    -(hazard_before + prog_rate),     prog_rate, hazard_before,
+    0, -hazard_after,  hazard_after,
+    0,             0,             0
+  ), 3,3, byrow=TRUE)
+  dim(Q) <- c(3,3,1)
+
+  list(
+    t = 0,
+    Q = Q,
+    pi = c(1,0,0),
+    abs = c(0,0,1)
+  )
+}
+
 #' Fast implementation of cumulative density function, survival function, ... for scenarios with progression
 #'
 #' @param hazard_before hazard for death before progression
@@ -26,18 +42,10 @@
 #' t <- 0:1000
 #' plot(t, cdf(t), type="l")
 progression_cdf_fun <- function(hazard_before, prog_rate, hazard_after){
-  pi <- c(1,0,0)
-  Q <- matrix(c(
-    -(hazard_before + prog_rate),     prog_rate, hazard_before,
-                               0, -hazard_after,  hazard_after,
-                               0,             0,             0
-  ), 3,3, byrow=TRUE)
-
-  function(v){
-    sapply(v, \(v_){
-      as.numeric(pi %*% Matrix::expm(v_*Q) %*% c(0,0,1))
-    })
-  }
+  do.call(
+    miniPCH::pmstate_fun,
+    get_miniPCH_pramams_progression(hazard_before, prog_rate, hazard_after)
+  )
 }
 
 #' @export
@@ -53,18 +61,10 @@ progression_cdf_fun <- function(hazard_before, prog_rate, hazard_after){
 #' t <- 0:1000
 #' plot(t, surv(t), type="l")
 progression_surv_fun <- function(hazard_before, prog_rate, hazard_after){
-  pi <- c(1,0,0)
-  Q <- matrix(c(
-    -(hazard_before + prog_rate),     prog_rate, hazard_before,
-    0, -hazard_after,  hazard_after,
-    0,             0,             0
-  ), 3,3, byrow=TRUE)
-
-  function(v){
-    sapply(v, \(v_){
-      1-as.numeric(pi %*% Matrix::expm(v_*Q) %*% c(0,0,1))
-    })
-  }
+  do.call(
+    miniPCH::smstate_fun,
+    get_miniPCH_pramams_progression(hazard_before, prog_rate, hazard_after)
+  )
 }
 
 #' @export
@@ -80,18 +80,10 @@ progression_surv_fun <- function(hazard_before, prog_rate, hazard_after){
 #' t <- 0:1000
 #' plot(t, pdf(t), type="l")
 progression_pdf_fun <- function(hazard_before, prog_rate, hazard_after){
-  pi <- c(1,0,0)
-  Q <- matrix(c(
-    -(hazard_before + prog_rate),     prog_rate, hazard_before,
-    0, -hazard_after,  hazard_after,
-    0,             0,             0
-  ), 3,3, byrow=TRUE)
-
-  function(v){
-    sapply(v, \(v_){
-      as.numeric(pi %*% Matrix::expm(v_*Q) %*% Q %*% c(0,0,1))
-    })
-  }
+  do.call(
+    miniPCH::dmstate_fun,
+    get_miniPCH_pramams_progression(hazard_before, prog_rate, hazard_after)
+  )
 }
 
 #' @export
@@ -107,24 +99,10 @@ progression_pdf_fun <- function(hazard_before, prog_rate, hazard_after){
 #' t <- 0:1000
 #' plot(t, haz(t), type="l")
 progression_haz_fun <- function(hazard_before, prog_rate, hazard_after){
-  pi <- c(1,0,0)
-  Q <- matrix(c(
-    -(hazard_before + prog_rate),     prog_rate, hazard_before,
-    0, -hazard_after,  hazard_after,
-    0,             0,             0
-  ), 3,3, byrow=TRUE)
-
-  function(v){
-    S <- sapply(v, \(v_){
-      1-as.numeric(pi %*% Matrix::expm(v_*Q) %*% c(0,0,1))
-    })
-
-    f <- sapply(v, \(v_){
-      as.numeric(pi %*% Matrix::expm(v_*Q) %*% Q %*% c(0,0,1))
-    })
-
-    S/f
-  }
+  do.call(
+    miniPCH::hmstate_fun,
+    get_miniPCH_pramams_progression(hazard_before, prog_rate, hazard_after)
+  )
 }
 
 #' @export
