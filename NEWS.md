@@ -1,3 +1,10 @@
+# SimNPH 0.5.2
+
+* Added option to suppress output in design and assumption templates.
+* Changed `\dontrun` to `\donttest` in examples where it was appropirate.
+* Improved examples in documentation.
+* Cleaned up package metadata.
+
 # SimNPH 0.5.1
 
 * Added references to the preprint of the paper to description and citation. 

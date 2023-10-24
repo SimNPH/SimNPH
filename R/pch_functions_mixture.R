@@ -16,7 +16,7 @@ check_lists <- function(p, ...){
 #' @param survs list of survuval functions of the mixture components
 #'
 #' @return
-#' A function with one parameter, a vector of times where the function should be evaluated.
+#' A function with one parameter, a vector of times/probabilities where the function should be evaluated.
 #' @export
 #'
 #' @describeIn mixture_haz_fun hazard function of mixture
