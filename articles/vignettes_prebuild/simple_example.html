@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../../index.html">SimNPH</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.2</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -126,21 +126,8 @@ varying from 0 to 10.</p>
 <code class="sourceCode R"><span><span class="va">N_sim</span> <span class="op">&lt;-</span> <span class="fl">100</span></span>
 <span></span>
 <span><span class="va">Assumptions</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/generate_delayed_effect.html">assumptions_delayed_effect</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; expand.grid(</span></span>
-<span><span class="co">#&gt;   delay=m2d(seq(0, 10, by=2)), # delay of 0, 1, ..., 10 months</span></span>
-<span><span class="co">#&gt;   hazard_ctrl=m2r(24),         # median survival control of 24 months</span></span>
-<span><span class="co">#&gt;   hazard_trt=m2r(36),          # median survival treatment of 36 months</span></span>
-<span><span class="co">#&gt;   random_withdrawal=m2r(120)   # median time to random withdrawal 10 years</span></span>
-<span><span class="co">#&gt; )</span></span>
 <span></span>
 <span><span class="va">Options</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/design_fixed_followup.html">design_fixed_followup</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; expand.grid(</span></span>
-<span><span class="co">#&gt;   n_trt=150,         # 150 patients in the treatment arm</span></span>
-<span><span class="co">#&gt;   n_ctrl=150,        # 150 patients in the control arm</span></span>
-<span><span class="co">#&gt;   followup=m2d(24),  # followup 2 years</span></span>
-<span><span class="co">#&gt;   recruitment=m2d(6) # recruitment time 6 months</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; )</span></span>
 <span></span>
 <span><span class="va">Design</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/merge.html" class="external-link">merge</a></span><span class="op">(</span><span class="va">Assumptions</span>, <span class="va">Options</span>, by<span class="op">=</span><span class="cn">NULL</span><span class="op">)</span></span>
 <span></span>
@@ -297,7 +284,7 @@ defined before and the simulations should be run in parallel.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Number of parallel clusters in use: 8</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Simulation complete. Total execution time: 24.32s</span></span></code></pre></div>
+<span><span class="co">#&gt; Simulation complete. Total execution time: 27.23s</span></span></code></pre></div>
 <p>Finally we select the interesting columns from the output. Since all
 other parameters are the same for each scenario we just select delay.
 And we are interested in the rejection rate of the tests.</p>
@@ -315,32 +302,32 @@ And we are interested in the rejection rate of the tests.</p>
 <tr class="odd">
 <td align="right">0.000</td>
 <td align="right">0.58</td>
-<td align="right">0.62</td>
+<td align="right">0.58</td>
 </tr>
 <tr class="even">
 <td align="right">60.875</td>
-<td align="right">0.34</td>
-<td align="right">0.33</td>
+<td align="right">0.43</td>
+<td align="right">0.42</td>
 </tr>
 <tr class="odd">
 <td align="right">121.750</td>
-<td align="right">0.36</td>
-<td align="right">0.29</td>
+<td align="right">0.40</td>
+<td align="right">0.32</td>
 </tr>
 <tr class="even">
 <td align="right">182.625</td>
-<td align="right">0.35</td>
-<td align="right">0.30</td>
+<td align="right">0.38</td>
+<td align="right">0.28</td>
 </tr>
 <tr class="odd">
 <td align="right">243.500</td>
 <td align="right">0.30</td>
-<td align="right">0.23</td>
+<td align="right">0.20</td>
 </tr>
 <tr class="even">
 <td align="right">304.375</td>
-<td align="right">0.16</td>
-<td align="right">0.10</td>
+<td align="right">0.25</td>
+<td align="right">0.20</td>
 </tr>
 </tbody>
 </table>
@@ -356,14 +343,6 @@ For this we will define additional analyse functions.</p>
 events after which an interim analysis should be done.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">Options</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/design_group_sequential.html">design_group_sequential</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; expand.grid(</span></span>
-<span><span class="co">#&gt;   n_trt=200,          # 200 patients in the treatment arm</span></span>
-<span><span class="co">#&gt;   n_ctrl=200,         # 200 patients in the control arm</span></span>
-<span><span class="co">#&gt;   followup=m2d(48),   # maximum followup time 4 years</span></span>
-<span><span class="co">#&gt;   recruitment=m2d(6), # recruitment time 6 months</span></span>
-<span><span class="co">#&gt;   interim_events=150, # interim analysis after 150 events</span></span>
-<span><span class="co">#&gt;   final_events=300    # final analysis after 300 events</span></span>
-<span><span class="co">#&gt; )</span></span>
 <span></span>
 <span><span class="va">Design</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/merge.html" class="external-link">merge</a></span><span class="op">(</span><span class="va">Assumptions</span>, <span class="va">Options</span>, by<span class="op">=</span><span class="cn">NULL</span><span class="op">)</span></span>
 <span></span>
@@ -536,7 +515,7 @@ functions are included in the result.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Number of parallel clusters in use: 8</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Simulation complete. Total execution time: 56.40s</span></span></code></pre></div>
+<span><span class="co">#&gt; Simulation complete. Total execution time: 01m 1.84s</span></span></code></pre></div>
 <p>In the case of a group sequential design we are also interested in
 the average running time of the study in terms of patients recruited,
 number of events and running time of the study.</p>
@@ -576,69 +555,69 @@ number of events and running time of the study.</p>
 <tbody>
 <tr class="odd">
 <td align="right">0.000</td>
-<td align="right">0.86</td>
-<td align="right">0.87</td>
+<td align="right">0.88</td>
+<td align="right">0.89</td>
 <td align="right">400</td>
 <td align="right">400</td>
-<td align="right">212.39</td>
-<td align="right">213.11</td>
-<td align="right">1252.62</td>
-<td align="right">1259.23</td>
+<td align="right">211.81</td>
+<td align="right">211.01</td>
+<td align="right">1254.82</td>
+<td align="right">1248.22</td>
 </tr>
 <tr class="even">
 <td align="right">60.875</td>
-<td align="right">0.70</td>
-<td align="right">0.77</td>
+<td align="right">0.73</td>
+<td align="right">0.75</td>
 <td align="right">400</td>
 <td align="right">400</td>
-<td align="right">223.41</td>
-<td align="right">223.67</td>
-<td align="right">1340.65</td>
-<td align="right">1341.78</td>
+<td align="right">220.87</td>
+<td align="right">219.19</td>
+<td align="right">1310.07</td>
+<td align="right">1297.12</td>
 </tr>
 <tr class="odd">
 <td align="right">121.750</td>
-<td align="right">0.61</td>
-<td align="right">0.63</td>
+<td align="right">0.77</td>
+<td align="right">0.76</td>
 <td align="right">400</td>
 <td align="right">400</td>
-<td align="right">226.16</td>
-<td align="right">226.17</td>
-<td align="right">1347.81</td>
-<td align="right">1347.75</td>
+<td align="right">225.37</td>
+<td align="right">228.85</td>
+<td align="right">1351.43</td>
+<td align="right">1379.92</td>
 </tr>
 <tr class="even">
 <td align="right">182.625</td>
-<td align="right">0.68</td>
-<td align="right">0.62</td>
+<td align="right">0.73</td>
+<td align="right">0.74</td>
 <td align="right">400</td>
 <td align="right">400</td>
-<td align="right">231.26</td>
-<td align="right">234.66</td>
-<td align="right">1385.40</td>
-<td align="right">1413.90</td>
+<td align="right">226.02</td>
+<td align="right">232.29</td>
+<td align="right">1333.18</td>
+<td align="right">1387.91</td>
 </tr>
 <tr class="odd">
 <td align="right">243.500</td>
-<td align="right">0.63</td>
-<td align="right">0.51</td>
+<td align="right">0.55</td>
+<td align="right">0.53</td>
 <td align="right">400</td>
 <td align="right">400</td>
-<td align="right">237.80</td>
-<td align="right">240.64</td>
-<td align="right">1418.72</td>
-<td align="right">1442.09</td>
+<td align="right">233.37</td>
+<td align="right">236.95</td>
+<td align="right">1388.40</td>
+<td align="right">1418.33</td>
 </tr>
 <tr class="even">
 <td align="right">304.375</td>
-<td align="right">0.50</td>
-<td align="right">0.47</td>
+<td align="right">0.46</td>
+<td align="right">0.37</td>
 <td align="right">400</td>
 <td align="right">400</td>
-<td align="right">239.73</td>
-<td align="right">238.64</td>
-<td align="right">1427.85</td>
-<td align="right">1419.27</td>
+<td align="right">241.70</td>
+<td align="right">242.60</td>
+<td align="right">1442.66</td>
+<td align="right">1450.80</td>
 </tr>
 </tbody>
 </table>
@@ -658,13 +637,6 @@ to the function and the values of the statistics are added as
 columns.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">Options</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/design_fixed_followup.html">design_fixed_followup</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; expand.grid(</span></span>
-<span><span class="co">#&gt;   n_trt=150,         # 150 patients in the treatment arm</span></span>
-<span><span class="co">#&gt;   n_ctrl=150,        # 150 patients in the control arm</span></span>
-<span><span class="co">#&gt;   followup=m2d(24),  # followup 2 years</span></span>
-<span><span class="co">#&gt;   recruitment=m2d(6) # recruitment time 6 months</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; )</span></span>
 <span></span>
 <span><span class="va">Design</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/merge.html" class="external-link">merge</a></span><span class="op">(</span><span class="va">Assumptions</span>, <span class="va">Options</span>, by<span class="op">=</span><span class="cn">NULL</span><span class="op">)</span></span>
 <span></span>
@@ -867,7 +839,7 @@ different summary statistics.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Number of parallel clusters in use: 8</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Simulation complete. Total execution time: 1.79s</span></span></code></pre></div>
+<span><span class="co">#&gt; Simulation complete. Total execution time: 2.03s</span></span></code></pre></div>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">res</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span>select<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
@@ -897,57 +869,57 @@ different summary statistics.</p>
 <tbody>
 <tr class="odd">
 <td align="right">0.000</td>
-<td align="right">0.0177483</td>
-<td align="right">0.0177483</td>
-<td align="right">0.0184691</td>
-<td align="right">0.0184691</td>
-<td align="right">0.94</td>
-<td align="right">0.94</td>
+<td align="right">0.0252337</td>
+<td align="right">0.0252337</td>
+<td align="right">0.0178171</td>
+<td align="right">0.0178171</td>
+<td align="right">0.95</td>
+<td align="right">0.95</td>
 </tr>
 <tr class="even">
 <td align="right">60.875</td>
-<td align="right">0.0481866</td>
-<td align="right">-0.2851468</td>
-<td align="right">0.0198270</td>
-<td align="right">0.0988137</td>
-<td align="right">0.95</td>
-<td align="right">0.57</td>
+<td align="right">0.0668128</td>
+<td align="right">-0.2665205</td>
+<td align="right">0.0252206</td>
+<td align="right">0.0917898</td>
+<td align="right">0.93</td>
+<td align="right">0.60</td>
 </tr>
 <tr class="odd">
 <td align="right">121.750</td>
-<td align="right">0.0668043</td>
-<td align="right">-0.2665290</td>
-<td align="right">0.0241465</td>
-<td align="right">0.0907214</td>
-<td align="right">0.95</td>
-<td align="right">0.61</td>
+<td align="right">0.0816572</td>
+<td align="right">-0.2516761</td>
+<td align="right">0.0253192</td>
+<td align="right">0.0819922</td>
+<td align="right">0.94</td>
+<td align="right">0.63</td>
 </tr>
 <tr class="even">
 <td align="right">182.625</td>
-<td align="right">0.1136195</td>
-<td align="right">-0.2197138</td>
-<td align="right">0.0392613</td>
-<td align="right">0.0746261</td>
-<td align="right">0.88</td>
-<td align="right">0.73</td>
+<td align="right">0.1528493</td>
+<td align="right">-0.1804841</td>
+<td align="right">0.0473553</td>
+<td align="right">0.0565669</td>
+<td align="right">0.81</td>
+<td align="right">0.75</td>
 </tr>
 <tr class="odd">
 <td align="right">243.500</td>
-<td align="right">0.1674859</td>
-<td align="right">-0.1658475</td>
-<td align="right">0.0528609</td>
-<td align="right">0.0523147</td>
-<td align="right">0.77</td>
-<td align="right">0.81</td>
+<td align="right">0.1886897</td>
+<td align="right">-0.1446436</td>
+<td align="right">0.0622790</td>
+<td align="right">0.0475970</td>
+<td align="right">0.75</td>
+<td align="right">0.84</td>
 </tr>
 <tr class="even">
 <td align="right">304.375</td>
-<td align="right">0.2323219</td>
-<td align="right">-0.1010114</td>
-<td align="right">0.0717345</td>
-<td align="right">0.0279643</td>
-<td align="right">0.69</td>
-<td align="right">0.94</td>
+<td align="right">0.2092206</td>
+<td align="right">-0.1241127</td>
+<td align="right">0.0728509</td>
+<td align="right">0.0444816</td>
+<td align="right">0.68</td>
+<td align="right">0.88</td>
 </tr>
 </tbody>
 </table>
@@ -961,7 +933,7 @@ different summary statistics.</p>
 
     <footer><div class="pkgdown-footer-left">
   <p></p>
-<p>Developed by Tobias Fellinger.</p>
+<p>Developed by Tobias Fellinger, Florian Klinglmueller.</p>
 </div>
 
 <div class="pkgdown-footer-right">

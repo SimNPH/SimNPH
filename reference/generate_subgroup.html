@@ -16,7 +16,7 @@ Calculate hazards in treatment arm in subgroup and compliment"><!-- mathjax --><
     
     <a class="navbar-brand me-2" href="../index.html">SimNPH</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.2</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -68,7 +68,7 @@ Calculate hazards in treatment arm in subgroup and compliment"><!-- mathjax --><
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">generate_subgroup</span><span class="op">(</span><span class="va">condition</span>, fixed_objects <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">assumptions_subgroup</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu">assumptions_subgroup</span><span class="op">(</span>print <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">true_summary_statistics_subgroup</span><span class="op">(</span></span>
 <span>  <span class="va">Design</span>,</span>
@@ -95,6 +95,10 @@ Calculate hazards in treatment arm in subgroup and compliment"><!-- mathjax --><
 
 <dt>fixed_objects</dt>
 <dd><p>additional settings, see details</p></dd>
+
+
+<dt>print</dt>
+<dd><p>print code to generate parameter set?</p></dd>
 
 
 <dt>Design</dt>
@@ -155,10 +159,10 @@ additional column random_withdrawal</p>
 <li><p>hazard_trt hazard in the treatment arm for not cured patients</p></li>
 <li><p>hazard_subgroup hazard in the subgroup in the treatment arm</p></li>
 <li><p>prevalence proportion of cured patients</p></li>
-</ul><p>assumptions_subgroup prints the code to generate a default
-design tibble for use with generate_subgroup and returns the
-evaluated code invisibly. This function is intended to be used to copy
-paste the code and edit the parameters.</p>
+</ul><p>assumptions_subgroup generates a default design <code>data.frame</code> for use
+with generate_subgroup If print is <code>TRUE</code> code to produce the template is
+also printed for copying, pasting and editing by the user. (This is the
+default when run in an interactive session.)</p>
 <p><code>cutoff_stats</code> are the times used to calculate the statistics like average
 hazard ratios and RMST, that are only calculated up to a certain point.</p>
 <p><code>hazard_subgroup_from_PH_effect_size</code> calculates the hazard rate in
@@ -182,7 +186,7 @@ event, without regard to administrative censoring.</p>
     
 <ul><li><p><code>generate_subgroup()</code>: simulates a dataset with a mixture of cured
 patients</p></li>
-<li><p><code>assumptions_subgroup()</code>: generate default assumptions tibble</p></li>
+<li><p><code>assumptions_subgroup()</code>: generate default assumptions <code>data.frame</code></p></li>
 <li><p><code>true_summary_statistics_subgroup()</code>: calculate true summary statistics for subgroup</p></li>
 <li><p><code>hazard_subgroup_from_PH_effect_size()</code>: Calculate hazards in treatement arm</p></li>
 <li><p><code>cen_rate_from_cen_prop_subgroup()</code>: calculate censoring rate from censoring proportion</p></li>
@@ -197,44 +201,23 @@ patients</p></li>
 <span class="r-in"><span>  <span class="op">)</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>  <span class="fu">generate_subgroup</span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> expand.grid(</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   hazard_ctrl=m2r(24),              # med. survival ctrl. 24 months</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   hazard_trt=m2r(36),               # med. survival trt 36 months</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   hazard_subgroup=m2r(240),         # med. survival subgroup 20 years</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   prevalence=seq(0.2, 0.8, by=0.2), # prevalence 0.2, 0.4, 0.6, 0.8</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   random_withdrawal=m2r(120)        # median time to random withdrawal 10 years</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> )</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> expand.grid(</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   n_trt=150,         # 150 patients in the treatment arm</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   n_ctrl=150,        # 150 patients in the control arm</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   followup=m2d(24),  # followup 2 years</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   recruitment=m2d(6) # recruitment time 6 months</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> )</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">one_simulation</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      t trt  evt subgroup</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 2275   1 TRUE        0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2  554   1 TRUE        0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3 3651   1 TRUE        0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4 1714   1 TRUE        0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5 2152   1 TRUE        0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6  212   1 TRUE        0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1    2   1 TRUE        0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 1443   1 TRUE        0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  859   1 TRUE        0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4 5527   1 TRUE        0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5   31   1 TRUE        0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6 1757   1 TRUE        0</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">tail</a></span><span class="op">(</span><span class="va">one_simulation</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        t trt  evt subgroup</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 295  828   0 TRUE        0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 296  578   0 TRUE        0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 297 1646   0 TRUE        0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 298 3614   0 TRUE        0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 299 1365   0 TRUE        0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 300 1560   0 TRUE        0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 295  827   0 TRUE        0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 296  843   0 TRUE        0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 297   16   0 TRUE        0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 298 1755   0 TRUE        0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 299 2994   0 TRUE        0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 300  721   0 TRUE        0</span>
 <span class="r-in"><span><span class="va">Design</span> <span class="op">&lt;-</span> <span class="fu">assumptions_subgroup</span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> expand.grid(</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   hazard_ctrl=m2r(24),              # med. survival ctrl. 24 months</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   hazard_trt=m2r(36),               # med. survival trt 36 months</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   hazard_subgroup=m2r(240),         # med. survival subgroup 20 years</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   prevalence=seq(0.2, 0.8, by=0.2), # prevalence 0.2, 0.4, 0.6, 0.8</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   random_withdrawal=m2r(120)        # median time to random withdrawal 10 years</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> )</span>
 <span class="r-in"><span><span class="va">Design</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    hazard_ctrl   hazard_trt hazard_subgroup prevalence random_withdrawal</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.0009488668 0.0006325779    9.488668e-05        0.2      0.0001897734</span>
@@ -246,20 +229,6 @@ patients</p></li>
 <span class="r-in"><span>    <span class="fu"><a href="design_fixed_followup.html">design_fixed_followup</a></span><span class="op">(</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>    by<span class="op">=</span><span class="cn">NULL</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> expand.grid(</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   hazard_ctrl=m2r(24),              # med. survival ctrl. 24 months</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   hazard_trt=m2r(36),               # med. survival trt 36 months</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   hazard_subgroup=m2r(240),         # med. survival subgroup 20 years</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   prevalence=seq(0.2, 0.8, by=0.2), # prevalence 0.2, 0.4, 0.6, 0.8</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   random_withdrawal=m2r(120)        # median time to random withdrawal 10 years</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> )</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> expand.grid(</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   n_trt=150,         # 150 patients in the treatment arm</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   n_ctrl=150,        # 150 patients in the control arm</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   followup=m2d(24),  # followup 2 years</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   recruitment=m2d(6) # recruitment time 6 months</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> )</span>
 <span class="r-in"><span><span class="va">my_design</span> <span class="op">&lt;-</span> <span class="fu">true_summary_statistics_subgroup</span><span class="op">(</span><span class="va">my_design</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">my_design</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    hazard_ctrl   hazard_trt hazard_subgroup prevalence random_withdrawal n_trt</span>
@@ -278,20 +247,6 @@ patients</p></li>
 <span class="r-in"><span>  <span class="fu"><a href="design_fixed_followup.html">design_fixed_followup</a></span><span class="op">(</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>  by<span class="op">=</span><span class="cn">NULL</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> expand.grid(</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   hazard_ctrl=m2r(24),              # med. survival ctrl. 24 months</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   hazard_trt=m2r(36),               # med. survival trt 36 months</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   hazard_subgroup=m2r(240),         # med. survival subgroup 20 years</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   prevalence=seq(0.2, 0.8, by=0.2), # prevalence 0.2, 0.4, 0.6, 0.8</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   random_withdrawal=m2r(120)        # median time to random withdrawal 10 years</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> )</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> expand.grid(</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   n_trt=150,         # 150 patients in the treatment arm</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   n_ctrl=150,        # 150 patients in the control arm</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   followup=m2d(24),  # followup 2 years</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   recruitment=m2d(6) # recruitment time 6 months</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> )</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">my_design</span><span class="op">$</span><span class="va">hazard_trt</span> <span class="op">&lt;-</span> <span class="cn">NA</span></span></span>
 <span class="r-in"><span><span class="va">my_design</span><span class="op">$</span><span class="va">hazard_subgroup</span> <span class="op">&lt;-</span> <span class="cn">NA</span></span></span>
@@ -346,7 +301,7 @@ patients</p></li>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p></p><p>Developed by Tobias Fellinger.</p>
+  <p></p><p>Developed by Tobias Fellinger, Florian Klinglmueller.</p>
 </div>
 
 <div class="pkgdown-footer-right">

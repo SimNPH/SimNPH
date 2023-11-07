@@ -16,7 +16,7 @@ Calculate true summary statistics for scenarios with crossing hazards"><!-- math
     
     <a class="navbar-brand me-2" href="../index.html">SimNPH</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.2</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -68,7 +68,7 @@ Calculate true summary statistics for scenarios with crossing hazards"><!-- math
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">generate_crossing_hazards</span><span class="op">(</span><span class="va">condition</span>, fixed_objects <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">assumptions_crossing_hazards</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu">assumptions_crossing_hazards</span><span class="op">(</span>print <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">hr_after_crossing_from_PH_effect_size</span><span class="op">(</span></span>
 <span>  <span class="va">design</span>,</span>
@@ -95,6 +95,10 @@ Calculate true summary statistics for scenarios with crossing hazards"><!-- math
 
 <dt>fixed_objects</dt>
 <dd><p>additional settings, see details</p></dd>
+
+
+<dt>print</dt>
+<dd><p>print code to generate parameter set?</p></dd>
 
 
 <dt>design</dt>
@@ -160,10 +164,10 @@ effect</p></li>
 as the cutoff for the simulation used internally. If t_max is not given in
 this way the 1-(1/10000) quantile of the survival distribution in the control
 or treatment arm is used (which ever is larger).</p>
-<p>assumptions_crossing_hazards prints the code to generate a default
-design tibble for use with generate_crossing_hazards and returns the
-evaluated code invisibly. This function is intended to be used to copy
-paste the code and edit the parameters.</p>
+<p>assumptions_crossing_hazards generates a default design <code>data.frame</code>
+for use with generate_crossing_hazards If print is <code>TRUE</code> code to produce
+the template is also printed for copying, pasting and editing by the user.
+(This is the default when run in an interactive session.)</p>
 <p><code>hr_after_crossing_from_PH_effect_size</code> calculates the hazard ratio
 after crossing of hazards as follows: First, the hazard ratio needed
 to archive the desired power under proportional hazards is calculated by
@@ -186,7 +190,7 @@ hazard ratios and RMST, that are only calculated up to a certain point.</p>
     
 <ul><li><p><code>generate_crossing_hazards()</code>: simulates a dataset with crossing
 hazards</p></li>
-<li><p><code>assumptions_crossing_hazards()</code>: generate default design tibble</p></li>
+<li><p><code>assumptions_crossing_hazards()</code>: generate default assumptions <code>data.frame</code></p></li>
 <li><p><code>hr_after_crossing_from_PH_effect_size()</code>: Calculate hr after crossing of the hazards from PH effect size</p></li>
 <li><p><code>cen_rate_from_cen_prop_crossing_hazards()</code>: calculate censoring rate from censoring proportion</p></li>
 <li><p><code>true_summary_statistics_crossing_hazards()</code>: calculate true summary statistics for crossing hazards</p></li>
@@ -201,44 +205,23 @@ hazards</p></li>
 <span class="r-in"><span>  <span class="op">)</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>  <span class="fu">generate_crossing_hazards</span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> expand.grid(</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   crossing=m2d(seq(0, 10, by=2)), # crossing after of 0, 1, ..., 10 months</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   hazard_ctrl=m2r(24),            # median survival control of 24 months</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   hazard_trt_before=m2r(18),      # median survival before crossing 18 months</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   hazard_trt_after=m2r(36),       # median survival after crossing 36 months</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   random_withdrawal=m2r(120)      # median time to random withdrawal 10 years</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> )</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> expand.grid(</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   n_trt=150,         # 150 patients in the treatment arm</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   n_ctrl=150,        # 150 patients in the control arm</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   followup=m2d(24),  # followup 2 years</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   recruitment=m2d(6) # recruitment time 6 months</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> )</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">one_simulation</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      t trt  evt</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1  170   1 TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2 1053   1 TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3 2987   1 TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4 2171   1 TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5  389   1 TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6  371   1 TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 3422   1 TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 1709   1 TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  224   1 TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4  469   1 TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5 6525   1 TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6 1522   1 TRUE</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">tail</a></span><span class="op">(</span><span class="va">one_simulation</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        t trt  evt</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 295   99   0 TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 296  118   0 TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 297  938   0 TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 298 1254   0 TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 299 3006   0 TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 300 1833   0 TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 295 3562   0 TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 296  332   0 TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 297  522   0 TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 298  358   0 TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 299  556   0 TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 300 2901   0 TRUE</span>
 <span class="r-in"><span><span class="va">Design</span> <span class="op">&lt;-</span> <span class="fu">assumptions_crossing_hazards</span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> expand.grid(</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   crossing=m2d(seq(0, 10, by=2)), # crossing after of 0, 1, ..., 10 months</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   hazard_ctrl=m2r(24),            # median survival control of 24 months</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   hazard_trt_before=m2r(18),      # median survival before crossing 18 months</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   hazard_trt_after=m2r(36),       # median survival after crossing 36 months</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   random_withdrawal=m2r(120)      # median time to random withdrawal 10 years</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> )</span>
 <span class="r-in"><span><span class="va">Design</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   crossing  hazard_ctrl hazard_trt_before hazard_trt_after random_withdrawal</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1    0.000 0.0009488668       0.001265156     0.0006325779      0.0001897734</span>
@@ -252,20 +235,6 @@ hazards</p></li>
 <span class="r-in"><span>    <span class="fu"><a href="design_fixed_followup.html">design_fixed_followup</a></span><span class="op">(</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>    by<span class="op">=</span><span class="cn">NULL</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> expand.grid(</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   crossing=m2d(seq(0, 10, by=2)), # crossing after of 0, 1, ..., 10 months</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   hazard_ctrl=m2r(24),            # median survival control of 24 months</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   hazard_trt_before=m2r(18),      # median survival before crossing 18 months</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   hazard_trt_after=m2r(36),       # median survival after crossing 36 months</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   random_withdrawal=m2r(120)      # median time to random withdrawal 10 years</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> )</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> expand.grid(</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   n_trt=150,         # 150 patients in the treatment arm</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   n_ctrl=150,        # 150 patients in the control arm</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   followup=m2d(24),  # followup 2 years</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   recruitment=m2d(6) # recruitment time 6 months</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> )</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">my_design</span><span class="op">$</span><span class="va">final_events</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">ceiling</a></span><span class="op">(</span><span class="op">(</span><span class="va">my_design</span><span class="op">$</span><span class="va">n_trt</span> <span class="op">+</span> <span class="va">my_design</span><span class="op">$</span><span class="va">n_ctrl</span><span class="op">)</span><span class="op">*</span><span class="fl">0.75</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">my_design</span><span class="op">$</span><span class="va">hazard_trt</span> <span class="op">&lt;-</span> <span class="cn">NA</span></span></span>
@@ -317,20 +286,6 @@ hazards</p></li>
 <span class="r-in"><span>    <span class="fu"><a href="design_fixed_followup.html">design_fixed_followup</a></span><span class="op">(</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>    by<span class="op">=</span><span class="cn">NULL</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> expand.grid(</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   crossing=m2d(seq(0, 10, by=2)), # crossing after of 0, 1, ..., 10 months</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   hazard_ctrl=m2r(24),            # median survival control of 24 months</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   hazard_trt_before=m2r(18),      # median survival before crossing 18 months</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   hazard_trt_after=m2r(36),       # median survival after crossing 36 months</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   random_withdrawal=m2r(120)      # median time to random withdrawal 10 years</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> )</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> expand.grid(</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   n_trt=150,         # 150 patients in the treatment arm</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   n_ctrl=150,        # 150 patients in the control arm</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   followup=m2d(24),  # followup 2 years</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   recruitment=m2d(6) # recruitment time 6 months</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> )</span>
 <span class="r-in"><span><span class="va">my_design</span><span class="op">$</span><span class="va">follwup</span> <span class="op">&lt;-</span> <span class="fl">15</span></span></span>
 <span class="r-in"><span><span class="va">my_design</span> <span class="op">&lt;-</span> <span class="fu">true_summary_statistics_crossing_hazards</span><span class="op">(</span><span class="va">my_design</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">my_design</span></span></span>
@@ -362,7 +317,7 @@ hazards</p></li>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p></p><p>Developed by Tobias Fellinger.</p>
+  <p></p><p>Developed by Tobias Fellinger, Florian Klinglmueller.</p>
 </div>
 
 <div class="pkgdown-footer-right">

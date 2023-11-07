@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">SimNPH</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.2</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -120,23 +120,22 @@ in the column <code>null_cover</code></p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="co"># generate the design matrix and append the true summary statistics</span></span></span>
 <span class="r-in"><span><span class="va">condition</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/merge.html" class="external-link">merge</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>    <span class="fu"><a href="generate_delayed_effect.html">assumptions_delayed_effect</a></span><span class="op">(</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>    <span class="fu"><a href="design_fixed_followup.html">design_fixed_followup</a></span><span class="op">(</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>    by<span class="op">=</span><span class="cn">NULL</span></span></span>
-<span class="r-in"><span>  <span class="op">)</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="generate_delayed_effect.html">assumptions_delayed_effect</a></span><span class="op">(</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  <span class="fu"><a href="design_fixed_followup.html">design_fixed_followup</a></span><span class="op">(</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  by<span class="op">=</span><span class="cn">NULL</span></span></span>
+<span class="r-in"><span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">tail</a></span><span class="op">(</span><span class="fl">4</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="generate_delayed_effect.html">true_summary_statistics_delayed_effect</a></span><span class="op">(</span>cutoff_stats <span class="op">=</span> <span class="fl">15</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># create some summarise functions</span></span></span>
 <span class="r-in"><span><span class="va">summarise_all</span> <span class="op">&lt;-</span> <span class="fu"><a href="create_summarise_function.html">create_summarise_function</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>  coxph<span class="op">=</span><span class="fu">summarise_estimator</span><span class="op">(</span><span class="va">hr</span>, <span class="va">gAHR</span>, <span class="va">hr_lower</span>, <span class="va">hr_upper</span>, name<span class="op">=</span><span class="st">"aAHR"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  coxph<span class="op">=</span><span class="fu">summarise_estimator</span><span class="op">(</span><span class="va">hr</span>, <span class="va">gAHR_15</span>, <span class="va">hr_lower</span>, <span class="va">hr_upper</span>, name<span class="op">=</span><span class="st">"gAHR"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>  coxph<span class="op">=</span><span class="fu">summarise_estimator</span><span class="op">(</span><span class="va">hr</span>, <span class="va">hazard_trt</span><span class="op">/</span><span class="va">hazard_ctrl</span>, <span class="va">hr_lower</span>, <span class="va">hr_upper</span>, name<span class="op">=</span><span class="st">"HR"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>  coxph<span class="op">=</span><span class="fu">summarise_estimator</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">coef</span><span class="op">)</span>, <span class="va">gAHR</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>  coxph<span class="op">=</span><span class="fu">summarise_estimator</span><span class="op">(</span><span class="va">hr</span>, <span class="cn">NA_real_</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  coxph<span class="op">=</span><span class="fu">summarise_estimator</span><span class="op">(</span><span class="va">hr</span>, <span class="cn">NA_real_</span>, name<span class="op">=</span><span class="st">"NA"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># runs simulations</span></span></span>
@@ -149,12 +148,26 @@ in the column <code>null_cover</code></p>
 <span class="r-in"><span>  <span class="op">)</span>,</span></span>
 <span class="r-in"><span>  summarise <span class="op">=</span> <span class="va">summarise_all</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Design row: 1/1;   RAM used: 187.5 Mb;   Total elapsed time: 0.00s </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Conditions: delay=121., hzrd_c=0.0009, hzrd_t=0.0006, rndm_w=0.0001, n_trt=150, n_ctrl=150, follwp=730., rcrtmn=182., mdn_srvvl_t=1034, mdn_srvvl_c=730., rmst_t_15=14.8, rmst_c_15=14.8, gAHR_1=1, AHR_15=1, AHRc_15=1, AHR__1=1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Simulation complete. Total execution time: 0.06s</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># mse is missing for the summarise function in which the real value was NA</span></span></span>
-<span class="r-in"><span><span class="va">sim_results</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">sim_results</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span>pattern<span class="op">=</span><span class="st">"mse"</span><span class="op">)</span><span class="op">]</span></span></span>
-<span class="r-in"><span><span class="co"># but the variance can be estimated in all cases</span></span></span>
-<span class="r-in"><span><span class="va">sim_results</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">sim_results</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span>pattern<span class="op">=</span><span class="st">"var"</span><span class="op">)</span><span class="op">]</span></span></span>
-<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span><span class="va">sim_results</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">sim_results</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span>pattern<span class="op">=</span><span class="st">"\\.mse$"</span><span class="op">)</span><span class="op">]</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 3</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   coxph.gAHR.mse coxph.HR.mse coxph.NA.mse</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>       0.085<span style="text-decoration: underline;">095</span>    0.006<span style="text-decoration: underline;">715</span>4          <span style="color: #BB0000;">NaN</span></span>
+<span class="r-in"><span><span class="co"># but the standard deviation can be estimated in all cases</span></span></span>
+<span class="r-in"><span><span class="va">sim_results</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">sim_results</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span>pattern<span class="op">=</span><span class="st">"\\.sd_est$"</span><span class="op">)</span><span class="op">]</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 3</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   coxph.gAHR.sd_est coxph.HR.sd_est coxph.NA.sd_est</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>               <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>          0.069<span style="text-decoration: underline;">160</span>        0.069<span style="text-decoration: underline;">160</span>        0.069<span style="text-decoration: underline;">160</span></span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
@@ -162,7 +175,7 @@ in the column <code>null_cover</code></p>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p></p><p>Developed by Tobias Fellinger.</p>
+  <p></p><p>Developed by Tobias Fellinger, Florian Klinglmueller.</p>
 </div>
 
 <div class="pkgdown-footer-right">

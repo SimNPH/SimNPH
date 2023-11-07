@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">SimNPH</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.2</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -57,9 +57,15 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">design_group_sequential</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">design_group_sequential</span><span class="op">(</span>print <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
     </div>
 
+    <div class="section level2">
+    <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
+    <dl><dt>print</dt>
+<dd><p>print code to generate parameter set?</p></dd>
+
+</dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     
@@ -68,28 +74,21 @@
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>design_group_sequential prints the code to generate a default
-design tibble for use with generate_delayed_effect or other generate_...
-functions and returns the evaluated code invisibly. This function is
-intended to be used to copy paste the code and edit the parameters.</p>
+    <p>design_group_sequential generates a default design <code>data.frame</code> for
+use with generate_delayed_effect or other generate_... functions. If print
+is <code>TRUE</code> code to produce the template is also printed for copying, pasting
+and editing by the user. (This is the default when run in an interactive
+session.)</p>
     </div>
     <div class="section level2">
     <h2 id="functions">Functions<a class="anchor" aria-label="anchor" href="#functions"></a></h2>
     
-<ul><li><p><code>design_group_sequential()</code>: generate default group sequential desing</p></li>
+<ul><li><p><code>design_group_sequential()</code>: generate default group sequential design</p></li>
 </ul></div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">Design</span> <span class="op">&lt;-</span> <span class="fu">design_group_sequential</span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> expand.grid(</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   n_trt=200,          # 200 patients in the treatment arm</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   n_ctrl=200,         # 200 patients in the control arm</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   followup=m2d(48),   # maximum followup time 4 years</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   recruitment=m2d(6), # recruitment time 6 months</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   interim_events=150, # interim analysis after 150 events</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   final_events=300    # final analysis after 300 events</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> )</span>
 <span class="r-in"><span><span class="va">Design</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   n_trt n_ctrl followup recruitment interim_events final_events</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1   200    200     1461     182.625            150          300</span>
@@ -100,7 +99,7 @@ intended to be used to copy paste the code and edit the parameters.</p>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p></p><p>Developed by Tobias Fellinger.</p>
+  <p></p><p>Developed by Tobias Fellinger, Florian Klinglmueller.</p>
 </div>
 
 <div class="pkgdown-footer-right">

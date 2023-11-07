@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">SimNPH</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.2</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -95,53 +95,40 @@ the medians and respective variances with the delta-method.</p>
 <span class="r-in"><span>  <span class="op">)</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fl">3</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">tail</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> expand.grid(</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   delay=m2d(seq(0, 10, by=2)), # delay of 0, 1, ..., 10 months</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   hazard_ctrl=m2r(24),         # median survival control of 24 months</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   hazard_trt=m2r(36),          # median survival treatment of 36 months</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   random_withdrawal=m2r(120)   # median time to random withdrawal 10 years</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> )</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> expand.grid(</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   n_trt=150,         # 150 patients in the treatment arm</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   n_ctrl=150,        # 150 patients in the control arm</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   followup=m2d(24),  # followup 2 years</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   recruitment=m2d(6) # recruitment time 6 months</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> )</span>
 <span class="r-in"><span><span class="va">dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="generate_delayed_effect.html">generate_delayed_effect</a></span><span class="op">(</span><span class="va">condition</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">analyse_weibull</span><span class="op">(</span><span class="op">)</span><span class="op">(</span><span class="va">condition</span>, <span class="va">dat</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $p</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.4522976</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.03690039</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $alternative</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "two.sided"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $med_trt_est</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 770.9085</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 702.7604</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $med_trt_lower</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 625.6035</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 565.707</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $med_trt_upper</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 916.2134</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 839.8137</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $med_ctrl_est</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 859.8723</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 942.6998</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $med_ctrl_lower</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 679.0169</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 763.8185</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $med_ctrl_upper</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1040.728</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1121.581</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $diff_med_est</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 88.96387</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 239.9395</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $diff_med_lower</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] -143.0323</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 14.59052</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $diff_med_upper</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 320.96</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 465.2884</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $CI_level</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.95</span>
@@ -159,7 +146,7 @@ the medians and respective variances with the delta-method.</p>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p></p><p>Developed by Tobias Fellinger.</p>
+  <p></p><p>Developed by Tobias Fellinger, Florian Klinglmueller.</p>
 </div>
 
 <div class="pkgdown-footer-right">
