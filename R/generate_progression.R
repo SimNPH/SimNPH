@@ -1,19 +1,21 @@
 #' Create an empty assumtions data.frame for generate_progression
 #'
+#' @param print print code to generate parameter set?
+#'
 #' @return For generate_progression: a design tibble with default values invisibly
 #'
-#' @details assumptions_progression prints the code to generate a default
-#'   design tibble for use with generate_progression and returns the
-#'   evaluated code invisibly. This function is intended to be used to copy
-#'   paste the code and edit the parameters.
+#' @details assumptions_progression generates a default design `data.frame` for
+#'   use with generate_progression If print is `TRUE` code to produce the
+#'   template is also printed for copying, pasting and editing by the user.
+#'   (This is the default when run in an interactive session.)
 #'
 #' @export
-#' @describeIn generate_progression generate default assumptions tibble
+#' @describeIn generate_progression generate default assumptions `data.frame`
 #'
 #' @examples
 #' Design <- assumptions_progression()
 #' Design
-assumptions_progression <- function(){
+assumptions_progression <- function(print=interactive()){
   skel <- "expand.grid(
   hazard_ctrl= m2r(24),              # med. survival ctrl 24 months
   hazard_trt= m2r(36),               # med. survival trt 36 months
@@ -24,12 +26,15 @@ assumptions_progression <- function(){
 )
 "
 
-cat(skel)
-invisible(
-  skel |>
-    str2expression() |>
-    eval()
-)
+  if(print){
+    cat(skel)
+  }
+
+  invisible(
+    skel |>
+      str2expression() |>
+      eval()
+  )
 }
 
 #' Generate Dataset with changing hazards after disease progression
@@ -420,8 +425,18 @@ cen_rate_from_cen_prop_progression <- function(design){
 #'   hazard ratios that correspond to reasonable and realistic scenarios.
 #'
 #' @examples
-#' \dontrun{
-#' my_design <- hazard_before_progression_from_PH_effect_size(my_design, target_power_ph=0.9)
+#' \donttest{
+#' my_design <- merge(
+#'   design_fixed_followup(),
+#'   assumptions_progression(),
+#'   by=NULL
+#' )
+#'
+#' my_design$hazard_trt <- NULL
+#' my_design$final_events <- ceiling(0.75 * (my_design$n_trt + my_design$n_ctrl))
+#'
+#' my_design <- hazard_before_progression_from_PH_effect_size(my_design, target_power_ph=0.7)
+#' my_design
 #' }
 hazard_before_progression_from_PH_effect_size <- function(design, target_power_ph=NA_real_, final_events=NA_real_, target_alpha=0.025){
 

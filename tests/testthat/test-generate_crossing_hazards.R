@@ -7,7 +7,7 @@ test_that("assumptions_crossing_hazards outputs correct tibble", {
   )
 
   expect_output(
-    assumptions_crossing_hazards(),
+    assumptions_crossing_hazards(print=TRUE),
     regexp = "^expand\\.grid.*",
     label = "assumptions_crossing_hazards prints something with expand.grid"
   )

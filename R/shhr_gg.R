@@ -19,9 +19,10 @@
 #' @export
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' library(ggplot2)
 #' library(patchwork)
+#' library(nph)
 #' B <- pchaz(c(0, 10, 100), c(0.1, 0.05))
 #' A <- pchaz(c(0, 100), c(0.1))
 #' shhr_gg(A, B)

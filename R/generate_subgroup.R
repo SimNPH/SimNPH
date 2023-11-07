@@ -64,20 +64,22 @@ generate_subgroup <- function(condition, fixed_objects=NULL){
 
 #' Create an empty assumtions data.frame for generate_subgroup
 #'
+#' @param print print code to generate parameter set?
+#'
 #' @return For assumptions_subgroup: a design tibble with default values invisibly
 #'
-#' @details assumptions_subgroup prints the code to generate a default
-#'   design tibble for use with generate_subgroup and returns the
-#'   evaluated code invisibly. This function is intended to be used to copy
-#'   paste the code and edit the parameters.
+#' @details assumptions_subgroup generates a default design `data.frame` for use
+#'   with generate_subgroup If print is `TRUE` code to produce the template is
+#'   also printed for copying, pasting and editing by the user. (This is the
+#'   default when run in an interactive session.)
 #'
 #' @export
-#' @describeIn generate_subgroup generate default assumptions tibble
+#' @describeIn generate_subgroup generate default assumptions `data.frame`
 #'
 #' @examples
 #' Design <- assumptions_subgroup()
 #' Design
-assumptions_subgroup <- function(){
+assumptions_subgroup <- function(print=interactive()){
   skel <- "expand.grid(
   hazard_ctrl=m2r(24),              # med. survival ctrl. 24 months
   hazard_trt=m2r(36),               # med. survival trt 36 months
@@ -87,12 +89,15 @@ assumptions_subgroup <- function(){
 )
 "
 
-cat(skel)
-invisible(
-  skel |>
-    str2expression() |>
-    eval()
-)
+  if(print){
+    cat(skel)
+  }
+
+  invisible(
+    skel |>
+      str2expression() |>
+      eval()
+  )
 }
 
 

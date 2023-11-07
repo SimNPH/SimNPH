@@ -71,20 +71,22 @@ generate_delayed_effect <- function(condition, fixed_objects=NULL){
 
 #' Create an empty assumtions data.frame for generate_delayed_effect
 #'
+#' @param print print code to generate parameter set?
+#'
 #' @return For assumptions_delayed_effect: a design tibble with default values invisibly
 #'
-#' @details assumptions_delayed_effect prints the code to generate a default
-#'   design tibble for use with generate_delayed_effect and returns the
-#'   evaluated code invisibly. This function is intended to be used to copy
-#'   paste the code and edit the parameters.
+#' @details assumptions_delayed_effect generates a default design `data.frame`
+#'   for use with generate_delayed_effect. If print is `TRUE` code to produce
+#'   the template is also printed for copying, pasting and editing by the user.
+#'   (This is the default when run in an interactive session.)
 #'
 #' @export
-#' @describeIn generate_delayed_effect generate default design tibble
+#' @describeIn generate_delayed_effect generate default assumptions `data.frame`
 #'
 #' @examples
 #' Design <- assumptions_delayed_effect()
 #' Design
-assumptions_delayed_effect <- function(){
+assumptions_delayed_effect <- function(print=interactive()){
   skel <- "expand.grid(
   delay=m2d(seq(0, 10, by=2)), # delay of 0, 1, ..., 10 months
   hazard_ctrl=m2r(24),         # median survival control of 24 months
@@ -93,12 +95,15 @@ assumptions_delayed_effect <- function(){
 )
 "
 
-cat(skel)
-invisible(
-  skel |>
-    str2expression() |>
-    eval()
-)
+  if(print){
+    cat(skel)
+  }
+
+  invisible(
+    skel |>
+      str2expression() |>
+      eval()
+  )
 }
 
 #' Calculate hr after onset of treatment effect

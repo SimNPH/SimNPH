@@ -61,34 +61,41 @@ generate_x <- function(condition, fixed_objects=NULL){
   data.frame(t=numeric(0), trt=integer(0), evt=logical(0))
 }
 
-#' Create an empty assumtions data.frame for generate_x
+#' Create an empty assumtions data.frame for generate_x_...
 #'
-#' @return For assumptions_x: a design tibble with default values invisibly
+#' @param print print code to generate parameter set?
 #'
-#' @details assumptions_x prints the code to generate a default
-#'   design tibble for use with generate_delayed_effect and returns the
-#'   evaluated code invisibly. This function is intended to be used to copy
-#'   paste the code and edit the parameters.
+#' @return For assumptions_delayed_effect: a design tibble with default values invisibly
+#'
+#' @details assumptions_x_... generates a default design `data.frame`
+#'   for use with generate_x_.... If print is `TRUE` code to produce
+#'   the template is also printed for copying, pasting and editing by the user.
+#'   (This is the default when run in an interactive session.)
 #'
 #' @export
-#' @describeIn generate_x generate default design tibble
+#' @describeIn generate_x_... generate default design tibble
 #'
 #' @examples
-#' Design <- assumptions_x()
+#' Design <- assumptions_x_...()
 #' Design
-assumptions_delayed_effect <- function(){
+assumptions_x_... <- function(print=interactive()){
   skel <- "expand.grid(
-  X = 1:3,
-  Y = c("a", "b")
+  delay=m2d(seq(0, 10, by=2)), # delay of 0, 1, ..., 10 months
+  hazard_ctrl=m2r(24),         # median survival control of 24 months
+  hazard_trt=m2r(36),          # median survival treatment of 36 months
+  random_withdrawal=m2r(120)   # median time to random withdrawal 10 years
 )
 "
 
-cat(skel)
-invisible(
-  skel |>
-    str2expression() |>
-    eval()
-)
+  if(print){
+    cat(skel)
+  }
+
+  invisible(
+    skel |>
+      str2expression() |>
+      eval()
+  )
 }
 
 #' Calculate true summary statistics for scenarios with delayed treatment effect

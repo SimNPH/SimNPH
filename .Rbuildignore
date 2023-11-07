@@ -6,7 +6,7 @@
 ^Meta$
 ^codecov\.yml$
 ^scripts$
-^data$
+^data_sim_study$
 ^.github$
 ^notes_drafts_etc$
 ^testdata$
@@ -16,3 +16,4 @@
 ^_pkgdown\.yml$
 ^docs$
 ^pkgdown$
+^data-raw$

@@ -10,7 +10,7 @@
 \usage{
 generate_crossing_hazards(condition, fixed_objects = NULL)
 
-assumptions_crossing_hazards()
+assumptions_crossing_hazards(print = interactive())
 
 hr_after_crossing_from_PH_effect_size(
   design,
@@ -32,6 +32,8 @@ true_summary_statistics_crossing_hazards(
 \item{condition}{condition row of Design dataset}
 
 \item{fixed_objects}{additional settings, see details}
+
+\item{print}{print code to generate parameter set?}
 
 \item{design}{design data.frame}
 
@@ -88,10 +90,10 @@ as the cutoff for the simulation used internally. If t_max is not given in
 this way the 1-(1/10000) quantile of the survival distribution in the control
 or treatment arm is used (which ever is larger).
 
-assumptions_crossing_hazards prints the code to generate a default
-design tibble for use with generate_crossing_hazards and returns the
-evaluated code invisibly. This function is intended to be used to copy
-paste the code and edit the parameters.
+assumptions_crossing_hazards generates a default design \code{data.frame}
+for use with generate_crossing_hazards If print is \code{TRUE} code to produce
+the template is also printed for copying, pasting and editing by the user.
+(This is the default when run in an interactive session.)
 
 \code{hr_after_crossing_from_PH_effect_size} calculates the hazard ratio
 after crossing of hazards as follows: First, the hazard ratio needed
@@ -118,7 +120,7 @@ hazard ratios and RMST, that are only calculated up to a certain point.
 \item \code{generate_crossing_hazards()}: simulates a dataset with crossing
 hazards
 
-\item \code{assumptions_crossing_hazards()}: generate default design tibble
+\item \code{assumptions_crossing_hazards()}: generate default assumptions \code{data.frame}
 
 \item \code{hr_after_crossing_from_PH_effect_size()}: Calculate hr after crossing of the hazards from PH effect size
 

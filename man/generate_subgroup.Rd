@@ -10,7 +10,7 @@
 \usage{
 generate_subgroup(condition, fixed_objects = NULL)
 
-assumptions_subgroup()
+assumptions_subgroup(print = interactive())
 
 true_summary_statistics_subgroup(
   Design,
@@ -32,6 +32,8 @@ cen_rate_from_cen_prop_subgroup(design)
 \item{condition}{condition row of Design dataset}
 
 \item{fixed_objects}{additional settings, see details}
+
+\item{print}{print code to generate parameter set?}
 
 \item{Design}{Design data.frame for subgroup}
 
@@ -82,10 +84,10 @@ Condidtion has to contain the following columns:
 \item prevalence proportion of cured patients
 }
 
-assumptions_subgroup prints the code to generate a default
-design tibble for use with generate_subgroup and returns the
-evaluated code invisibly. This function is intended to be used to copy
-paste the code and edit the parameters.
+assumptions_subgroup generates a default design \code{data.frame} for use
+with generate_subgroup If print is \code{TRUE} code to produce the template is
+also printed for copying, pasting and editing by the user. (This is the
+default when run in an interactive session.)
 
 \code{cutoff_stats} are the times used to calculate the statistics like average
 hazard ratios and RMST, that are only calculated up to a certain point.
@@ -113,7 +115,7 @@ event, without regard to administrative censoring.
 \item \code{generate_subgroup()}: simulates a dataset with a mixture of cured
 patients
 
-\item \code{assumptions_subgroup()}: generate default assumptions tibble
+\item \code{assumptions_subgroup()}: generate default assumptions \code{data.frame}
 
 \item \code{true_summary_statistics_subgroup()}: calculate true summary statistics for subgroup
 

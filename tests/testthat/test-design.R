@@ -7,7 +7,7 @@ test_that("design_fixed_followup works", {
   )
 
   expect_output(
-    design_fixed_followup(),
+    design_fixed_followup(print=TRUE),
     regexp = "^expand\\.grid.*",
     label = "design_fixed_followup prints something with createDesign"
   )
@@ -42,7 +42,7 @@ test_that("design_group_sequential works", {
   )
 
   expect_output(
-    design_group_sequential(),
+    design_group_sequential(print=TRUE),
     regexp = "^expand\\.grid.*",
     label = "design_group_sequential prints something with createDesign"
   )
