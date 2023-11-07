@@ -26,7 +26,7 @@ Where X, Y, ... are the alpha levels given in the argument
 Generic summarise function for tests
 }
 \examples{
-\dontrun{
+\donttest{
 condition <- merge(
   assumptions_delayed_effect(),
   design_fixed_followup(),

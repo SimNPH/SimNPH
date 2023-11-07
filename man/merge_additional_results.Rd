@@ -60,9 +60,65 @@ from an exact replication of the simulation results.
 a <- data.frame(x=5:2, y=5:2, a=5:2)
 b <- data.frame(x=1:4, y=1:4+10, b=1:4*10)
 upsert_merge(a, b, by="x")
-\dontrun{
-old <- readRDS("old_results.Rds")
-new <- readRDS("new_results.Rds")
-combined <- merge_additional_results(old, new)
+\donttest{
+condition <- merge(
+  assumptions_delayed_effect(),
+  design_fixed_followup(),
+  by=NULL
+) |>
+  tail(4) |>
+  true_summary_statistics_delayed_effect(cutoff_stats = 15)
+
+condition_1 <- condition[1:2, ]
+condition_2 <- condition[3:4, ]
+
+# runs simulations
+sim_results_1 <- runSimulation(
+  design=condition_1,
+  replications=100,
+  generate=generate_delayed_effect,
+  analyse=list(
+    logrank  = analyse_logrank(alternative = "one.sided"),
+    maxcombo = analyse_logrank(alternative = "one.sided")
+  ),
+  summarise = create_summarise_function(
+    logrank = summarise_test(0.025),
+    maxcombo = summarise_test(0.025)
+  )
+)
+
+sim_results_2 <- runSimulation(
+  design=condition_2,
+  replications=100,
+  generate=generate_delayed_effect,
+  analyse=list(
+    logrank  = analyse_logrank(alternative = "one.sided"),
+    maxcombo = analyse_logrank(alternative = "one.sided")
+  ),
+  summarise = create_summarise_function(
+    logrank = summarise_test(0.025),
+    maxcombo = summarise_test(0.025)
+  )
+)
+
+sim_results_3 <- runSimulation(
+  design=condition,
+  replications=100,
+  generate=generate_delayed_effect,
+  analyse=list(
+    mwlrt = analyse_modelstly_weighted(t_star = m2d(24))
+  ),
+  summarise = create_summarise_function(
+    mwlrt = summarise_test(0.025)
+  )
+)
+
+all_results <- sim_results_1 |>
+  merge_additional_results(sim_results_2) |>
+  merge_additional_results(sim_results_3)
+
+all_results |>
+  subset(select=c(delay, logrank.rejection_0.025, maxcombo.rejection_0.025, mwlrt.rejection_0.025))
+
 }
 }

@@ -7,7 +7,7 @@ test_that("assumptions_subgroup outputs correct tibble", {
   )
 
   expect_output(
-    assumptions_subgroup(),
+    assumptions_subgroup(print=TRUE),
     regexp = "^expand.grid.*",
     label = "assumptions_subgroup prints something with createDesign"
   )

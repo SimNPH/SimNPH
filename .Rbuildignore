@@ -6,7 +6,7 @@
 ^Meta$
 ^codecov\.yml$
 ^scripts$
-^data$
+^data_sim_study$
 ^.github$
 ^\.github$
 ^LICENSE\.md$
@@ -14,3 +14,4 @@
 ^_pkgdown\.yml$
 ^docs$
 ^pkgdown$
+^data-raw$

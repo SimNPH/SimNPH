@@ -7,7 +7,7 @@ test_that("assumptions_delayed_effect outputs correct tibble", {
   )
 
   expect_output(
-    assumptions_delayed_effect(),
+    assumptions_delayed_effect(print=TRUE),
     regexp = "^expand\\.grid.*",
     label = "assumptions_delayed_effect prints something with expand.grid"
   )
