@@ -6,7 +6,7 @@ Authors@R: c(person("Tobias", "Fellinger", email="tobias.fellinger@ages.at", rol
             person("Florian", "Klinglmueller", role=c("aut"), comment = c(ORCID = "0000-0002-7346-3669")))
 License: BSL-1.0
 Description: A toolkit for simulation studies concerning time-to-event endpoints
-    with non-proportional hazards. ‘SimNPH’ encompasses functions for simulating
+    with non-proportional hazards. 'SimNPH' encompasses functions for simulating
     time-to-event data in various scenarios, simulating different trial designs
     like fixed-followup, event-driven, and group sequential designs. The package
     provides functions to calculate the true values of common summary statistics
