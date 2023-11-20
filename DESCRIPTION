@@ -1,12 +1,12 @@
 Package: SimNPH
 Type: Package
 Title: Simulate Non-Proportional Hazards
-Version: 0.5.2
+Version: 0.5.3
 Authors@R: c(person("Tobias", "Fellinger", email="tobias.fellinger@ages.at", role=c("aut", "cre"), comment = c(ORCID = "0000-0001-9474-2731")),
             person("Florian", "Klinglmueller", role=c("aut"), comment = c(ORCID = "0000-0002-7346-3669")))
 License: BSL-1.0
 Description: A toolkit for simulation studies concerning time-to-event endpoints
-    with non-proportional hazards. ‘SimNPH’ encompasses functions for simulating
+    with non-proportional hazards. 'SimNPH' encompasses functions for simulating
     time-to-event data in various scenarios, simulating different trial designs
     like fixed-followup, event-driven, and group sequential designs. The package
     provides functions to calculate the true values of common summary statistics
@@ -34,7 +34,7 @@ Suggests:
     patchwork,
     R.rsp
 Imports:
-    miniPCH,
+    miniPCH (>= 0.3.0),
     purrr (>= 1.0.0),
     rlang,
     tibble,

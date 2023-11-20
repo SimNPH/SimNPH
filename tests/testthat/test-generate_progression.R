@@ -78,8 +78,6 @@ test_that("true summary statistics progression works", {
   summaries_os_3   <- true_summary_statistics_progression(design_2, what="os", cutoff=c("a"=m2d(24)), milestones=m2d(c("first"=6, "second"=12)))
   summaries_pfs_3  <- true_summary_statistics_progression(design_2, what="pfs", cutoff=c("a"=m2d(24)), milestones=m2d(c("first"=6, "second"=12)))
 
-  expect_warning(true_summary_statistics_progression(head(design,1), what="os", cutoff=Inf))
-
   expect_error(true_summary_statistics_progression(design, what="something else"))
 
   expect_named(

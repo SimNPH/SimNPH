@@ -191,44 +191,24 @@ true_summary_statistics_progression <- function(Design, what="os", cutoff_stats=
 
   true_summary_statistics_progression_rowwise_os <- function(condition, cutoff_stats, milestones){
 
-    # if t_max is not given in fixed_objects
-    if(is.null(fixed_objects) || (!hasName(fixed_objects, "t_max"))){
-      # set t_max to 1-1/10000 quantile of control or treatment survival function
-      # whichever is later
-      t_max <- max(
-        log(10000) / condition$hazard_ctrl,
-        log(10000) / condition$hazard_trt
-      )
-    } else {
-      t_max <- fixed_objects$t_max
-    }
-
-    data_generating_model_ctrl <- subpop_hazVfun_simnph(
-      c(0, t_max),
-      lambda1 = condition$hazard_ctrl,
-      lambda2 = condition$hazard_after_prog,
-      lambdaProg = condition$prog_rate_ctrl,
-      timezero = TRUE
-    )
-
-    data_generating_model_trt <- subpop_hazVfun_simnph(
-      c(0, t_max),
-      lambda1 = condition$hazard_trt,
-      lambda2 = condition$hazard_after_prog,
-      lambdaProg = condition$prog_rate_trt,
-      timezero = TRUE
+    real_stats <- fast_real_statistics(
+      haz_trt   = progression_haz_fun  (condition$hazard_trt , condition$prog_rate_trt , condition$hazard_after_prog),
+      pdf_trt   = progression_pdf_fun  (condition$hazard_trt , condition$prog_rate_trt , condition$hazard_after_prog),
+      surv_trt  = progression_surv_fun (condition$hazard_trt , condition$prog_rate_trt , condition$hazard_after_prog),
+      quant_trt = progression_quant_fun(condition$hazard_trt , condition$prog_rate_trt , condition$hazard_after_prog),
+      haz_ctrl  = progression_haz_fun  (condition$hazard_ctrl, condition$prog_rate_ctrl, condition$hazard_after_prog),
+      pdf_ctrl  = progression_pdf_fun  (condition$hazard_ctrl, condition$prog_rate_ctrl, condition$hazard_after_prog),
+      surv_ctrl = progression_surv_fun (condition$hazard_ctrl, condition$prog_rate_ctrl, condition$hazard_after_prog),
+      quant_ctrl= progression_quant_fun(condition$hazard_ctrl, condition$prog_rate_ctrl, condition$hazard_after_prog),
+      N_trt=condition$n_trt,
+      N_ctrl=condition$n_ctrl,
+      cutoff = cutoff_stats,
+      milestones = milestones
     )
 
     res <- cbind(
       condition,
-      internal_real_statistics_pchaz_discrete(
-        data_generating_model_trt,
-        data_generating_model_ctrl,
-        N_trt=condition$n_trt,
-        N_ctrl=condition$n_ctrl,
-        cutoff = cutoff_stats,
-        milestones = milestones
-      )
+      real_stats
     )
 
     row.names(res) <- NULL
