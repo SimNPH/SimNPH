@@ -1,107 +1,3 @@
-internal_real_statistics_pchaz_discrete <- function(data_gen_model_trt, data_gen_model_ctrl, N_trt=1, N_ctrl=1, cutoff=NULL, milestones=NULL){
-  stopifnot(
-    length(data_gen_model_trt$t) == length(data_gen_model_ctrl$t)
-  )
-
-  stopifnot(
-    all(data_gen_model_trt$t == data_gen_model_ctrl$t)
-  )
-
-  res <- data.frame(
-    median_survival_trt = ifelse(
-      any(data_gen_model_trt$F >= 0.5),
-      data_gen_model_trt$t[data_gen_model_trt$F >= 0.5][1],
-      Inf
-    ),
-    median_survival_ctrl= ifelse(
-      any(data_gen_model_ctrl$F >= 0.5),
-      data_gen_model_ctrl$t[data_gen_model_ctrl$F >= 0.5][1],
-      Inf
-    )
-  )
-
-  if(!is.null(cutoff)){
-
-    if(is.null(names(cutoff))){
-      names(cutoff) <- as.character(cutoff)
-    } else {
-      names(cutoff)[names(cutoff) %in% c("", NA_character_)] <- as.character(cutoff[names(cutoff) %in% c("", NA_character_)])
-    }
-
-    h <- data_gen_model_trt$haz + data_gen_model_ctrl$haz
-    f1 <- c(diff(data_gen_model_trt$F), 0)
-    f2 <- c(diff(data_gen_model_ctrl$F), 0)
-    f <- (1/(N_trt+N_ctrl))*(N_trt*f1 + N_ctrl*f2)
-
-    #AHRoc
-    true_avg_HR_fun0 <- data_gen_model_ctrl$S * c(diff(data_gen_model_trt$F), 0)
-    true_avg_HR_fun1 <- data_gen_model_trt$S * c(diff(data_gen_model_ctrl$F), 0)
-
-
-    rmst_ahr <- purrr::imap(cutoff, function(cutoff, label){
-      ind <- (data_gen_model_trt$t <= cutoff)
-
-      Int0 <- sum(true_avg_HR_fun0[ind])
-      Int1 <- sum(true_avg_HR_fun1[ind])
-
-      log_quot <- suppressWarnings({
-        log(data_gen_model_trt$haz[ind] / data_gen_model_ctrl$haz[ind])
-      })
-
-      if(any(is.nan(log_quot))){
-        warning("NaN values in log hazard ratio, check cutoff value.")
-      }
-
-      tmp <- data.frame(
-        rmst_trt            = sum(data_gen_model_trt$S[ind]),
-        rmst_ctrl           = sum(data_gen_model_ctrl$S[ind]),
-        gAHR                = exp(sum( (log_quot * f[ind]) , na.rm=TRUE)),
-        AHR                 = sum(((data_gen_model_trt$haz[ind]/h[ind]) * f[ind]), na.rm=TRUE) /
-          sum(((data_gen_model_ctrl$haz[ind]/h[ind]) * f[ind]), na.rm=TRUE),
-        AHRoc = Int0/Int1,
-        AHRoc_robust = Int0/Int1
-      )
-
-      names(tmp) <- paste0(names(tmp), "_", label)
-      tmp
-    }) |>
-      unname() |>
-      do.call(what=cbind)
-
-    res <- cbind(res, rmst_ahr)
-  }
-
-  if(!is.null(milestones)){
-
-    if(is.null(names(milestones))){
-      names(milestones) <- as.character(milestones)
-    } else {
-      names(milestones)[names(milestones) %in% c("", NA_character_)] <- as.character(milestones[names(milestones) %in% c("", NA_character_)])
-    }
-
-    milestones <- purrr::imap(milestones, function(v, label){
-      tmp <- data.frame(
-        milestone_survival_trt  = tail(data_gen_model_trt$S[data_gen_model_trt$t < v], 1),
-        milestone_survival_ctrl = tail(data_gen_model_ctrl$S[data_gen_model_ctrl$t < v], 1)
-      )
-
-      names(tmp) <- paste0(names(tmp), "_", label)
-      tmp
-    }) |>
-      unname() |>
-      do.call(what=cbind)
-
-    res <- cbind(
-      res,
-      milestones
-    )
-  }
-
-  res
-}
-
-
-
 # function to calculate the real summary statistics for piecewise constant hazards
 #
 # arguments:
@@ -221,14 +117,14 @@ fast_real_statistics_pchaz <- function(
 ){
 
   fast_real_statistics(
-    haz_trt    =   fast_haz_fun( Tint_trt,  lambda_trt),
-    pdf_trt    =   fast_pdf_fun( Tint_trt,  lambda_trt),
-    surv_trt   =  fast_surv_fun( Tint_trt,  lambda_trt),
-    quant_trt  = fast_quant_fun( Tint_trt,  lambda_trt),
-    haz_ctrl   =   fast_haz_fun(Tint_ctrl, lambda_ctrl),
-    pdf_ctrl   =   fast_pdf_fun(Tint_ctrl, lambda_ctrl),
-    surv_ctrl  =  fast_surv_fun(Tint_ctrl, lambda_ctrl),
-    quant_ctrl = fast_quant_fun(Tint_ctrl, lambda_ctrl),
+    haz_trt    =   miniPCH::hpch_fun( Tint_trt,  lambda_trt),
+    pdf_trt    =   miniPCH::dpch_fun( Tint_trt,  lambda_trt),
+    surv_trt   =  miniPCH::spch_fun( Tint_trt,  lambda_trt),
+    quant_trt  = miniPCH::qpch_fun( Tint_trt,  lambda_trt),
+    haz_ctrl   =   miniPCH::hpch_fun(Tint_ctrl, lambda_ctrl),
+    pdf_ctrl   =   miniPCH::dpch_fun(Tint_ctrl, lambda_ctrl),
+    surv_ctrl  =  miniPCH::spch_fun(Tint_ctrl, lambda_ctrl),
+    quant_ctrl = miniPCH::qpch_fun(Tint_ctrl, lambda_ctrl),
     N_trt=N_trt, N_ctrl=N_ctrl, cutoff=cutoff, milestones=milestones
   )
 }

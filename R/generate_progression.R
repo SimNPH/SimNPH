@@ -1,19 +1,21 @@
 #' Create an empty assumtions data.frame for generate_progression
 #'
+#' @param print print code to generate parameter set?
+#'
 #' @return For generate_progression: a design tibble with default values invisibly
 #'
-#' @details assumptions_progression prints the code to generate a default
-#'   design tibble for use with generate_progression and returns the
-#'   evaluated code invisibly. This function is intended to be used to copy
-#'   paste the code and edit the parameters.
+#' @details assumptions_progression generates a default design `data.frame` for
+#'   use with generate_progression If print is `TRUE` code to produce the
+#'   template is also printed for copying, pasting and editing by the user.
+#'   (This is the default when run in an interactive session.)
 #'
 #' @export
-#' @describeIn generate_progression generate default assumptions tibble
+#' @describeIn generate_progression generate default assumptions `data.frame`
 #'
 #' @examples
 #' Design <- assumptions_progression()
 #' Design
-assumptions_progression <- function(){
+assumptions_progression <- function(print=interactive()){
   skel <- "expand.grid(
   hazard_ctrl= m2r(24),              # med. survival ctrl 24 months
   hazard_trt= m2r(36),               # med. survival trt 36 months
@@ -24,12 +26,15 @@ assumptions_progression <- function(){
 )
 "
 
-cat(skel)
-invisible(
-  skel |>
-    str2expression() |>
-    eval()
-)
+  if(print){
+    cat(skel)
+  }
+
+  invisible(
+    skel |>
+      str2expression() |>
+      eval()
+  )
 }
 
 #' Generate Dataset with changing hazards after disease progression
@@ -68,36 +73,42 @@ invisible(
 #' tail(one_simulation)
 generate_progression <- function(condition, fixed_objects=NULL){
 
-  t_evt_ctrl <- fast_rng_fun(
+  t_evt_ctrl <- miniPCH::rpch_fun(
       c(0),
-      c(condition$hazard_ctrl)
+      c(condition$hazard_ctrl),
+      discrete = TRUE
     )(condition$n_ctrl)
 
-  t_evt_trt <- fast_rng_fun(
+  t_evt_trt <- miniPCH::rpch_fun(
       c(0),
-      c(condition$hazard_trt)
+      c(condition$hazard_trt),
+      discrete = TRUE
     )(condition$n_trt)
 
-  t_prog_ctrl <- fast_rng_fun(
+  t_prog_ctrl <- miniPCH::rpch_fun(
       c(0),
-      c(condition$prog_rate_ctrl)
+      c(condition$prog_rate_ctrl),
+      discrete = TRUE
     )(condition$n_ctrl)
 
-  t_prog_trt <- fast_rng_fun(
+  t_prog_trt <- miniPCH::rpch_fun(
       c(0),
-      c(condition$prog_rate_trt)
+      c(condition$prog_rate_trt),
+      discrete = TRUE
     )(condition$n_trt)
 
-  t_evt_after_prog_ctrl <- fast_rng_fun(
+  t_evt_after_prog_ctrl <- miniPCH::rpch_fun(
       c(0),
-      c(condition$hazard_after_prog)
+      c(condition$hazard_after_prog),
+      discrete = TRUE
     )(condition$n_ctrl)
 
   t_evt_after_prog_ctrl <- t_prog_ctrl + t_evt_after_prog_ctrl
 
-  t_evt_after_prog_trt <- fast_rng_fun(
+  t_evt_after_prog_trt <- miniPCH::rpch_fun(
       c(0),
-      c(condition$hazard_after_prog)
+      c(condition$hazard_after_prog),
+      discrete = TRUE
     )(condition$n_ctrl)
 
   t_evt_after_prog_trt <- t_prog_trt + t_evt_after_prog_trt
@@ -180,44 +191,24 @@ true_summary_statistics_progression <- function(Design, what="os", cutoff_stats=
 
   true_summary_statistics_progression_rowwise_os <- function(condition, cutoff_stats, milestones){
 
-    # if t_max is not given in fixed_objects
-    if(is.null(fixed_objects) || (!hasName(fixed_objects, "t_max"))){
-      # set t_max to 1-1/10000 quantile of control or treatment survival function
-      # whichever is later
-      t_max <- max(
-        log(10000) / condition$hazard_ctrl,
-        log(10000) / condition$hazard_trt
-      )
-    } else {
-      t_max <- fixed_objects$t_max
-    }
-
-    data_generating_model_ctrl <- subpop_hazVfun_simnph(
-      c(0, t_max),
-      lambda1 = condition$hazard_ctrl,
-      lambda2 = condition$hazard_after_prog,
-      lambdaProg = condition$prog_rate_ctrl,
-      timezero = TRUE
-    )
-
-    data_generating_model_trt <- subpop_hazVfun_simnph(
-      c(0, t_max),
-      lambda1 = condition$hazard_trt,
-      lambda2 = condition$hazard_after_prog,
-      lambdaProg = condition$prog_rate_trt,
-      timezero = TRUE
+    real_stats <- fast_real_statistics(
+      haz_trt   = progression_haz_fun  (condition$hazard_trt , condition$prog_rate_trt , condition$hazard_after_prog),
+      pdf_trt   = progression_pdf_fun  (condition$hazard_trt , condition$prog_rate_trt , condition$hazard_after_prog),
+      surv_trt  = progression_surv_fun (condition$hazard_trt , condition$prog_rate_trt , condition$hazard_after_prog),
+      quant_trt = progression_quant_fun(condition$hazard_trt , condition$prog_rate_trt , condition$hazard_after_prog),
+      haz_ctrl  = progression_haz_fun  (condition$hazard_ctrl, condition$prog_rate_ctrl, condition$hazard_after_prog),
+      pdf_ctrl  = progression_pdf_fun  (condition$hazard_ctrl, condition$prog_rate_ctrl, condition$hazard_after_prog),
+      surv_ctrl = progression_surv_fun (condition$hazard_ctrl, condition$prog_rate_ctrl, condition$hazard_after_prog),
+      quant_ctrl= progression_quant_fun(condition$hazard_ctrl, condition$prog_rate_ctrl, condition$hazard_after_prog),
+      N_trt=condition$n_trt,
+      N_ctrl=condition$n_ctrl,
+      cutoff = cutoff_stats,
+      milestones = milestones
     )
 
     res <- cbind(
       condition,
-      internal_real_statistics_pchaz_discrete(
-        data_generating_model_trt,
-        data_generating_model_ctrl,
-        N_trt=condition$n_trt,
-        N_ctrl=condition$n_ctrl,
-        cutoff = cutoff_stats,
-        milestones = milestones
-      )
+      real_stats
     )
 
     row.names(res) <- NULL
@@ -278,12 +269,12 @@ progression_rate_from_progression_prop <- function(design){
       log(1000) / condition$hazard_trt
     )
 
-    cumhaz_trt <- fast_cumhaz_fun(
+    cumhaz_trt <- miniPCH::chpch_fun(
       c(                   0),
       c(condition$hazard_trt)
     )(t_max)
 
-    cumhaz_ctrl <- fast_cumhaz_fun(
+    cumhaz_ctrl <- miniPCH::chpch_fun(
       c(                    0),
       c(condition$hazard_ctrl)
     )(t_max)
@@ -364,7 +355,7 @@ cen_rate_from_cen_prop_progression <- function(design){
     cumhaz_ctrl_tmax <- tail(data_generating_model_trt$cumhaz, 1)
 
     target_fun <- Vectorize(\(r){
-      cumhaz_censoring <- fast_cumhaz_fun(0, r)
+      cumhaz_censoring <- miniPCH::chpch_fun(0, r)
       prob_cen_ctrl <- cumhaz_censoring(t_max)/(cumhaz_censoring(t_max) + cumhaz_ctrl_tmax)
       prob_cen_trt  <- cumhaz_censoring(t_max)/(cumhaz_censoring(t_max) + cumhaz_trt_tmax)
       prob_cen <- a*prob_cen_trt + b*prob_cen_ctrl
@@ -414,8 +405,18 @@ cen_rate_from_cen_prop_progression <- function(design){
 #'   hazard ratios that correspond to reasonable and realistic scenarios.
 #'
 #' @examples
-#' \dontrun{
-#' my_design <- hazard_before_progression_from_PH_effect_size(my_design, target_power_ph=0.9)
+#' \donttest{
+#' my_design <- merge(
+#'   design_fixed_followup(),
+#'   assumptions_progression(),
+#'   by=NULL
+#' )
+#'
+#' my_design$hazard_trt <- NULL
+#' my_design$final_events <- ceiling(0.75 * (my_design$n_trt + my_design$n_ctrl))
+#'
+#' my_design <- hazard_before_progression_from_PH_effect_size(my_design, target_power_ph=0.7)
+#' my_design
 #' }
 hazard_before_progression_from_PH_effect_size <- function(design, target_power_ph=NA_real_, final_events=NA_real_, target_alpha=0.025){
 
@@ -476,14 +477,14 @@ hazard_before_progression_from_PH_effect_size <- function(design, target_power_p
 
     hazard_ctrl_ph <- uniroot(
       \(h){
-        fast_quant_fun(0, h)(0.5) - median_ctrl
+        miniPCH::qpch_fun(0, h)(0.5) - median_ctrl
       },
       interval=c(1e-8, 0.0001),
       extendInt="downX",
       tol = 2*.Machine$double.eps
     )$root
 
-    median_trt_ph  <- fast_quant_fun(0, hazard_ctrl_ph * ph_hr)(0.5)
+    median_trt_ph  <- miniPCH::qpch_fun(0, hazard_ctrl_ph * ph_hr)(0.5)
 
     target_fun_hazard_trt <- function(hazard_after){
       sapply(hazard_after, \(h){

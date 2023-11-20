@@ -60,7 +60,7 @@ combined_plot(
 dataset in long format with one row per method and scenario and one
 column per metric
 
-a ggplot/patchwork object conatining the plots
+a ggplot/patchwork object containing the plots
 }
 \description{
 Functions for Plotting and Reporting Results
@@ -80,16 +80,25 @@ the simulation parameters.
 
 }}
 \examples{
-\dontrun{
-plot_data <- simulation_results |>
-  results_pivot_longer()
+\donttest{
+data("combination_tests_delayed")
+
+combination_tests_delayed |>
+  results_pivot_longer() |>
+  head()
 }
-\dontrun{
+\donttest{
+library("ggplot2")
+library("patchwork")
+data("combination_tests_delayed")
+
+results_long <- results_pivot_longer(combination_tests_delayed)
+
 # plot the rejection rate of two methods
 combined_plot(
   results_long,
-  c("logrank", "max_combo"),
-  c("effect_size_ph", "delay", "hazard_ctrl", "n_pat_design", "recruitment", "censoring_prop"),
+  c("logrank", "mwlrt", "maxcombo"),
+  c("hr", "n_pat_design", "delay", "hazard_ctrl", "recruitment"),
   "rejection_0.025",
   grid_level=2
 )
@@ -99,32 +108,20 @@ combined_plot(
 # this is also helpful if methods should have the same aesthetics across plots
 my_colours <- c(
   logrank="black",
-  max_combo="blue",
-  fh_1_0="green",
-  fh_0_1="red"
+  mwlrt="blue",
+  maxcombo="green"
 )
 
 my_shapes <- c(
   logrank=1,
-  max_combo=2,
-  fh_1_0=3,
-  fh_0_1=3
+  mwlrt=2,
+  maxcombo=2
 )
 
 combined_plot(
   results_long,
-  c("logrank", "max_combo", "fh_1_0", "fh_0_1"),
-  c("effect_size_ph", "delay", "hazard_ctrl", "n_pat_design", "recruitment", "censoring_prop"),
-  "rejection_0.025",
-  grid_level=2,
-  use_colours = my_colours,
-  use_shapes = my_shapes
-)
-
-combined_plot(
-  results_long,
-  c("logrank", "max_combo"),
-  c("effect_size_ph", "delay", "hazard_ctrl", "n_pat_design", "recruitment", "censoring_prop"),
+  c("logrank", "mwlrt", "maxcombo"),
+  c("hr", "n_pat_design", "delay", "hazard_ctrl", "recruitment"),
   "rejection_0.025",
   grid_level=2,
   use_colours = my_colours,
@@ -134,6 +131,12 @@ combined_plot(
 # if one has a dataset of metadata with categories of methods
 # one could uses those two definitions
 # colours for methods, same shapes for methods of same category
+metadata <- data.frame(
+  method = c("logrank", "mwlrt", "maxcombo"),
+  method_name = c("logrank test", "modestly weighed logrank test", "maxcombo test"),
+  category = c("logrank test", "combination test", "combination test")
+)
+
 my_colours <- ggplot2::scale_colour_discrete()$palette(n=nrow(metadata)) |>
   sample() |>
   setNames(metadata$method)
@@ -143,20 +146,10 @@ my_shapes <- metadata$category |>
   as.integer() |>
   setNames(metadata$method)
 
-  combined_plot(
-results_long,
-c("logrank", "max_combo", "fh_1_0", "fh_0_1"),
-c("effect_size_ph", "delay", "hazard_ctrl", "n_pat_design", "recruitment", "censoring_prop"),
-"rejection_0.025",
-grid_level=2,
-use_colours = my_colours,
-use_shapes = my_shapes
-)
-
 combined_plot(
   results_long,
-  c("logrank", "max_combo"),
-  c("effect_size_ph", "delay", "hazard_ctrl", "n_pat_design", "recruitment", "censoring_prop"),
+  c("logrank", "mwlrt", "maxcombo"),
+  c("hr", "n_pat_design", "delay", "hazard_ctrl", "recruitment"),
   "rejection_0.025",
   grid_level=2,
   use_colours = my_colours,

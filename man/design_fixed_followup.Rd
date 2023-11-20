@@ -4,7 +4,10 @@
 \alias{design_fixed_followup}
 \title{Create a data.frame with an example fixed design}
 \usage{
-design_fixed_followup()
+design_fixed_followup(print = interactive())
+}
+\arguments{
+\item{print}{print code to generate parameter set?}
 }
 \value{
 For design_fixed_followup: a design tibble with default values invisibly
@@ -13,10 +16,11 @@ For design_fixed_followup: a design tibble with default values invisibly
 Create a data.frame with an example fixed design
 }
 \details{
-design_fixed_followup prints the code to generate a default
-design tibble for use with generate_delayed_effect or other generate_...
-functions and returns the evaluated code invisibly. This function is
-intended to be used to copy paste the code and edit the parameters.
+design_fixed_followup generates a default design \code{data.frame} for
+use with generate_delayed_effect or other generate_... functions. If print
+is \code{TRUE} code to produce the template is also printed for copying, pasting
+and editing by the user. (This is the default when run in an interactive
+session.)
 }
 \section{Functions}{
 \itemize{

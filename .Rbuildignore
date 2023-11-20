@@ -6,13 +6,12 @@
 ^Meta$
 ^codecov\.yml$
 ^scripts$
-^data$
+^data_sim_study$
 ^.github$
-^notes_drafts_etc$
-^testdata$
 ^\.github$
 ^LICENSE\.md$
 ^vignettes_prebuild$
 ^_pkgdown\.yml$
 ^docs$
 ^pkgdown$
+^data-raw$

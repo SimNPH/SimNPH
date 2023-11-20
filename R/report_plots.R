@@ -15,9 +15,12 @@
 #' @export
 #'
 #' @examples
-#' \dontrun{
-#' plot_data <- simulation_results |>
-#'   results_pivot_longer()
+#' \donttest{
+#' data("combination_tests_delayed")
+#'
+#' combination_tests_delayed |>
+#'   results_pivot_longer() |>
+#'   head()
 #' }
 results_pivot_longer <- function(data, exclude_from_methods=c("descriptive")){
   # delete potentially huge attributes that are not needed for plots
@@ -42,8 +45,9 @@ results_pivot_longer <- function(data, exclude_from_methods=c("descriptive")){
     )
 
   result <- data |>
-    dplyr::rename(
-      n_pat_design = n_pat
+    dplyr::rename_with(
+      .fn = \(name){rep("n_pat_design", length(name))},
+      .cols=dplyr::any_of("n_pat")
     ) |>
     tidyr::pivot_longer_spec(pivot_spec)
 }
@@ -108,18 +112,24 @@ order_combine_xvars <- function(data, xvars, facet_vars=c(), height_x_axis=0.8, 
 #' @param use_colours optional named vector of colours used in `scale_colour_manual`
 #' @param use_shapes optional named vector of shapes used in `scale_shape_manual`
 #'
-#' @return a ggplot/patchwork object conatining the plots
+#' @return a ggplot/patchwork object containing the plots
 #' @export
 #'
 #' @details `use_colours` and `use_shapes` both use the `method` variable in their respective aesthetics.
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
+#' library("ggplot2")
+#' library("patchwork")
+#' data("combination_tests_delayed")
+#'
+#' results_long <- results_pivot_longer(combination_tests_delayed)
+#'
 #' # plot the rejection rate of two methods
 #' combined_plot(
 #'   results_long,
-#'   c("logrank", "max_combo"),
-#'   c("effect_size_ph", "delay", "hazard_ctrl", "n_pat_design", "recruitment", "censoring_prop"),
+#'   c("logrank", "mwlrt", "maxcombo"),
+#'   c("hr", "n_pat_design", "delay", "hazard_ctrl", "recruitment"),
 #'   "rejection_0.025",
 #'   grid_level=2
 #' )
@@ -129,32 +139,20 @@ order_combine_xvars <- function(data, xvars, facet_vars=c(), height_x_axis=0.8, 
 #' # this is also helpful if methods should have the same aesthetics across plots
 #' my_colours <- c(
 #'   logrank="black",
-#'   max_combo="blue",
-#'   fh_1_0="green",
-#'   fh_0_1="red"
+#'   mwlrt="blue",
+#'   maxcombo="green"
 #' )
 #'
 #' my_shapes <- c(
 #'   logrank=1,
-#'   max_combo=2,
-#'   fh_1_0=3,
-#'   fh_0_1=3
+#'   mwlrt=2,
+#'   maxcombo=2
 #' )
 #'
 #' combined_plot(
 #'   results_long,
-#'   c("logrank", "max_combo", "fh_1_0", "fh_0_1"),
-#'   c("effect_size_ph", "delay", "hazard_ctrl", "n_pat_design", "recruitment", "censoring_prop"),
-#'   "rejection_0.025",
-#'   grid_level=2,
-#'   use_colours = my_colours,
-#'   use_shapes = my_shapes
-#' )
-#'
-#' combined_plot(
-#'   results_long,
-#'   c("logrank", "max_combo"),
-#'   c("effect_size_ph", "delay", "hazard_ctrl", "n_pat_design", "recruitment", "censoring_prop"),
+#'   c("logrank", "mwlrt", "maxcombo"),
+#'   c("hr", "n_pat_design", "delay", "hazard_ctrl", "recruitment"),
 #'   "rejection_0.025",
 #'   grid_level=2,
 #'   use_colours = my_colours,
@@ -164,6 +162,12 @@ order_combine_xvars <- function(data, xvars, facet_vars=c(), height_x_axis=0.8, 
 #' # if one has a dataset of metadata with categories of methods
 #' # one could uses those two definitions
 #' # colours for methods, same shapes for methods of same category
+#' metadata <- data.frame(
+#'   method = c("logrank", "mwlrt", "maxcombo"),
+#'   method_name = c("logrank test", "modestly weighed logrank test", "maxcombo test"),
+#'   category = c("logrank test", "combination test", "combination test")
+#' )
+#'
 #' my_colours <- ggplot2::scale_colour_discrete()$palette(n=nrow(metadata)) |>
 #'   sample() |>
 #'   setNames(metadata$method)
@@ -173,20 +177,10 @@ order_combine_xvars <- function(data, xvars, facet_vars=c(), height_x_axis=0.8, 
 #'   as.integer() |>
 #'   setNames(metadata$method)
 #'
-#'   combined_plot(
-#' results_long,
-#' c("logrank", "max_combo", "fh_1_0", "fh_0_1"),
-#' c("effect_size_ph", "delay", "hazard_ctrl", "n_pat_design", "recruitment", "censoring_prop"),
-#' "rejection_0.025",
-#' grid_level=2,
-#' use_colours = my_colours,
-#' use_shapes = my_shapes
-#' )
-#'
 #' combined_plot(
 #'   results_long,
-#'   c("logrank", "max_combo"),
-#'   c("effect_size_ph", "delay", "hazard_ctrl", "n_pat_design", "recruitment", "censoring_prop"),
+#'   c("logrank", "mwlrt", "maxcombo"),
+#'   c("hr", "n_pat_design", "delay", "hazard_ctrl", "recruitment"),
 #'   "rejection_0.025",
 #'   grid_level=2,
 #'   use_colours = my_colours,
@@ -228,6 +222,7 @@ combined_plot <- function(
   # (so gaps in lines remain gaps in each facet and only completely facets are
   # dropped)
   data <- data |>
+    dplyr::arrange(!!!xvars) |>
     dplyr::ungroup() |>
     dplyr::group_by(!!!facet_vars_x_sym) |>
     dplyr::filter(!all(is.na(!!yvar))) |>
@@ -316,7 +311,8 @@ combined_plot <- function(
 #' @export
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
+#' library("ggplot2")
 #' test <- mtcars
 #' # add a label attribute
 #' attr(test$cyl, "label") <- "cylinders"

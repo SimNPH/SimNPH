@@ -45,7 +45,7 @@ generate_delayed_effect <- function(condition, fixed_objects=NULL){
   } else if (condition$delay == 0){
     # if delay is 0 leave out period bevore treatment effect
     data_trt <- data.frame(
-      t = fast_rng_fun(c(0), c(condition$hazard_trt))(condition$n_trt),
+      t = miniPCH::rpch_fun(c(0), c(condition$hazard_trt), discrete = TRUE)(condition$n_trt),
       trt = 1,
       evt = TRUE
     )
@@ -53,7 +53,7 @@ generate_delayed_effect <- function(condition, fixed_objects=NULL){
     # if delay is positive simulate in the time intervals bevore and after
     # treatment effect
     data_trt <- data.frame(
-      t = fast_rng_fun(c(0, condition$delay), c(condition$hazard_ctrl, condition$hazard_trt))(condition$n_trt),
+      t = miniPCH::rpch_fun(c(0, condition$delay), c(condition$hazard_ctrl, condition$hazard_trt), discrete = TRUE)(condition$n_trt),
       trt = 1,
       evt = TRUE
     )
@@ -61,7 +61,7 @@ generate_delayed_effect <- function(condition, fixed_objects=NULL){
 
   # simulate control group with constant hazard from 0
   data_ctrl <- data.frame(
-    t = fast_rng_fun(c(0), c(condition$hazard_ctrl))(condition$n_ctrl),
+    t = miniPCH::rpch_fun(c(0), c(condition$hazard_ctrl), discrete = TRUE)(condition$n_ctrl),
     trt = 0,
     evt = TRUE
   )
@@ -71,20 +71,22 @@ generate_delayed_effect <- function(condition, fixed_objects=NULL){
 
 #' Create an empty assumtions data.frame for generate_delayed_effect
 #'
+#' @param print print code to generate parameter set?
+#'
 #' @return For assumptions_delayed_effect: a design tibble with default values invisibly
 #'
-#' @details assumptions_delayed_effect prints the code to generate a default
-#'   design tibble for use with generate_delayed_effect and returns the
-#'   evaluated code invisibly. This function is intended to be used to copy
-#'   paste the code and edit the parameters.
+#' @details assumptions_delayed_effect generates a default design `data.frame`
+#'   for use with generate_delayed_effect. If print is `TRUE` code to produce
+#'   the template is also printed for copying, pasting and editing by the user.
+#'   (This is the default when run in an interactive session.)
 #'
 #' @export
-#' @describeIn generate_delayed_effect generate default design tibble
+#' @describeIn generate_delayed_effect generate default assumptions `data.frame`
 #'
 #' @examples
 #' Design <- assumptions_delayed_effect()
 #' Design
-assumptions_delayed_effect <- function(){
+assumptions_delayed_effect <- function(print=interactive()){
   skel <- "expand.grid(
   delay=m2d(seq(0, 10, by=2)), # delay of 0, 1, ..., 10 months
   hazard_ctrl=m2r(24),         # median survival control of 24 months
@@ -93,12 +95,15 @@ assumptions_delayed_effect <- function(){
 )
 "
 
-cat(skel)
-invisible(
-  skel |>
-    str2expression() |>
-    eval()
-)
+  if(print){
+    cat(skel)
+  }
+
+  invisible(
+    skel |>
+      str2expression() |>
+      eval()
+  )
 }
 
 #' Calculate hr after onset of treatment effect
@@ -161,7 +166,7 @@ hr_after_onset_from_PH_effect_size <- function(design, target_power_ph=NA_real_,
 
     # scaling the hazards and medians to give better accuracy for the optimizer
     scale <- 1/condition$hazard_ctrl
-    median_ctrl <- fast_quant_fun(0, scale*condition$hazard_ctrl        )(0.5)
+    median_ctrl <- miniPCH::qpch_fun(0, scale*condition$hazard_ctrl        )(0.5)
 
     if(target_power_ph == 0){
       condition$hazard_trt <- condition$hazard_ctrl
@@ -176,7 +181,7 @@ hr_after_onset_from_PH_effect_size <- function(design, target_power_ph=NA_real_,
       beta=(1-target_power_ph),
       p=(condition$n_ctrl/(condition$n_ctrl + condition$n_trt))
     )
-    median_trt  <- fast_quant_fun(0, scale*condition$hazard_ctrl * ph_hr)(0.5)
+    median_trt  <- miniPCH::qpch_fun(0, scale*condition$hazard_ctrl * ph_hr)(0.5)
 
     if(median_trt*scale <= condition$delay ||
        median_ctrl*scale <= condition$delay){
@@ -187,14 +192,26 @@ hr_after_onset_from_PH_effect_size <- function(design, target_power_ph=NA_real_,
       return(condition)
     }
 
-    target_fun_hazard_after <- function(hazard_after){
-      sapply(hazard_after, \(h){
+    if(condition$delay != 0){
+      target_fun_hazard_after <- function(hazard_after){
+        sapply(hazard_after, \(h){
           median_trt -
-            fast_quant_fun(
+            miniPCH::qpch_fun(
               c(0, condition$delay/scale),
               c(condition$hazard_ctrl*scale, h)
             )(0.5)
-      })
+        })
+      }
+    }else {
+      target_fun_hazard_after <- function(hazard_after){
+        sapply(hazard_after, \(h){
+          median_trt -
+            miniPCH::qpch_fun(
+              c(0),
+              c(h)
+            )(0.5)
+        })
+      }
     }
 
     # setting the lower interval bound to 0 and f.lower to -Inf
@@ -264,12 +281,19 @@ cen_rate_from_cen_prop_delayed_effect <- function(design){
       log(10000) / condition$hazard_trt
     )
 
-    cumhaz_trt <- fast_cumhaz_fun(
-      c(                    0,      condition$delay),
-      c(condition$hazard_ctrl, condition$hazard_trt)
-    )(t_max)
+    if(condition$delay != 0){
+      cumhaz_trt <- miniPCH::chpch_fun(
+        c(                    0,      condition$delay),
+        c(condition$hazard_ctrl, condition$hazard_trt)
+      )(t_max)
+    } else {
+      cumhaz_trt <- miniPCH::chpch_fun(
+        c(                   0),
+        c(condition$hazard_trt)
+      )(t_max)
+    }
 
-    cumhaz_ctrl <- fast_cumhaz_fun(
+    cumhaz_ctrl <- miniPCH::chpch_fun(
       c(                    0),
       c(condition$hazard_ctrl)
     )(t_max)

@@ -10,7 +10,7 @@
 \usage{
 generate_delayed_effect(condition, fixed_objects = NULL)
 
-assumptions_delayed_effect()
+assumptions_delayed_effect(print = interactive())
 
 hr_after_onset_from_PH_effect_size(
   design,
@@ -32,6 +32,8 @@ true_summary_statistics_delayed_effect(
 \item{condition}{condition row of Design dataset}
 
 \item{fixed_objects}{additional settings, see details}
+
+\item{print}{print code to generate parameter set?}
 
 \item{design}{design data.frame}
 
@@ -88,10 +90,10 @@ as the cutoff for the simulation used internally. If t_max is not given in
 this way the 1-(1/10000) quantile of the survival distribution in the control
 or treatment arm is used (which ever is larger).
 
-assumptions_delayed_effect prints the code to generate a default
-design tibble for use with generate_delayed_effect and returns the
-evaluated code invisibly. This function is intended to be used to copy
-paste the code and edit the parameters.
+assumptions_delayed_effect generates a default design \code{data.frame}
+for use with generate_delayed_effect. If print is \code{TRUE} code to produce
+the template is also printed for copying, pasting and editing by the user.
+(This is the default when run in an interactive session.)
 
 \code{hr_after_onset_from_PH_effect_size} calculates the hazard ratio
 after onset of treatment effect as follows: First, the hazard ratio needed
@@ -118,7 +120,7 @@ hazard ratios and RMST, that are only calculated up to a certain point.
 \item \code{generate_delayed_effect()}: simulates a dataset with delayed
 treatment effect
 
-\item \code{assumptions_delayed_effect()}: generate default design tibble
+\item \code{assumptions_delayed_effect()}: generate default assumptions \code{data.frame}
 
 \item \code{hr_after_onset_from_PH_effect_size()}: Calculate hr after onset of treatment effect of the hazards from PH effect size
 

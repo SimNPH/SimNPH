@@ -32,10 +32,68 @@ Rename Columns in Simulation Results and Update Attributes
 
 }}
 \examples{
-\dontrun{
-results2 <- rename_results_column(results, c("old_name"="new_name"))
+\donttest{
+condition <- merge(
+assumptions_delayed_effect(),
+design_fixed_followup(),
+by=NULL
+) |>
+  tail(4) |>
+  true_summary_statistics_delayed_effect(cutoff_stats = 15)
+
+sim_results <- runSimulation(
+  design=condition,
+  replications=10,
+  generate=generate_delayed_effect,
+  analyse=list(
+    logrank  = analyse_logrank(alternative = "one.sided"),
+    mwlrt = analyse_modelstly_weighted(t_star = m2d(24))
+  ),
+  summarise = create_summarise_function(
+    logrank = summarise_test(0.025),
+    mwlrt = summarise_test(0.025)
+  )
+)
+
+names(sim_results)
+attr(sim_results, "design_names")
+
+sim_results <- sim_results |>
+  rename_results_column(c("delay"="onset"))
+
+names(sim_results)
+attr(sim_results, "design_names")
 }
-\dontrun{
-results2 <- rename_results_column_pattern(results, "old_name", "new_name")
+\donttest{
+  condition <- merge(
+    assumptions_delayed_effect(),
+    design_fixed_followup(),
+    by=NULL
+  ) |>
+    tail(4) |>
+    true_summary_statistics_delayed_effect(cutoff_stats = 15)
+
+  sim_results <- runSimulation(
+    design=condition,
+    replications=10,
+    generate=generate_delayed_effect,
+    analyse=list(
+      logrank  = analyse_logrank(alternative = "one.sided"),
+      mwlrt = analyse_modelstly_weighted(t_star = m2d(24))
+    ),
+    summarise = create_summarise_function(
+      logrank = summarise_test(0.025),
+      mwlrt = summarise_test(0.025)
+    )
+  )
+
+  names(sim_results)
+  attr(sim_results, "design_names")
+
+  sim_results <- sim_results |>
+    rename_results_column_pattern(pattern = "_0.025", replacement = "")
+
+  names(sim_results)
+  attr(sim_results, "design_names")
 }
 }

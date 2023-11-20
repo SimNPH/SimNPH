@@ -29,10 +29,8 @@
 #' @examples
 #' funs1 <- list(\(){stop("test")}, \(){1})
 #' funs2 <- wrap_all_in_trycatch(funs1)
-#' \dontrun{
-#' lapply(funs1, \(f){f()})
-#' }
-#' lapply(funs2, \(f){f()})
+#' try(lapply(funs1, \(f){f()}))
+#' try(lapply(funs2, \(f){f()}))
 #'
 wrap_all_in_trycatch <- function(list_of_functions, error=\(e){warning(e$message); NA}){
   lapply(

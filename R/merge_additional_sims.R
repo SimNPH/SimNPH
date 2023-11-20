@@ -49,10 +49,66 @@ upsert_merge <- function(x, y, by){
 #'   from an exact replication of the simulation results.
 #'
 #' @examples
-#' \dontrun{
-#' old <- readRDS("old_results.Rds")
-#' new <- readRDS("new_results.Rds")
-#' combined <- merge_additional_results(old, new)
+#' \donttest{
+#' condition <- merge(
+#'   assumptions_delayed_effect(),
+#'   design_fixed_followup(),
+#'   by=NULL
+#' ) |>
+#'   tail(4) |>
+#'   true_summary_statistics_delayed_effect(cutoff_stats = 15)
+#'
+#' condition_1 <- condition[1:2, ]
+#' condition_2 <- condition[3:4, ]
+#'
+#' # runs simulations
+#' sim_results_1 <- runSimulation(
+#'   design=condition_1,
+#'   replications=100,
+#'   generate=generate_delayed_effect,
+#'   analyse=list(
+#'     logrank  = analyse_logrank(alternative = "one.sided"),
+#'     maxcombo = analyse_logrank(alternative = "one.sided")
+#'   ),
+#'   summarise = create_summarise_function(
+#'     logrank = summarise_test(0.025),
+#'     maxcombo = summarise_test(0.025)
+#'   )
+#' )
+#'
+#' sim_results_2 <- runSimulation(
+#'   design=condition_2,
+#'   replications=100,
+#'   generate=generate_delayed_effect,
+#'   analyse=list(
+#'     logrank  = analyse_logrank(alternative = "one.sided"),
+#'     maxcombo = analyse_logrank(alternative = "one.sided")
+#'   ),
+#'   summarise = create_summarise_function(
+#'     logrank = summarise_test(0.025),
+#'     maxcombo = summarise_test(0.025)
+#'   )
+#' )
+#'
+#' sim_results_3 <- runSimulation(
+#'   design=condition,
+#'   replications=100,
+#'   generate=generate_delayed_effect,
+#'   analyse=list(
+#'     mwlrt = analyse_modelstly_weighted(t_star = m2d(24))
+#'   ),
+#'   summarise = create_summarise_function(
+#'     mwlrt = summarise_test(0.025)
+#'   )
+#' )
+#'
+#' all_results <- sim_results_1 |>
+#'   merge_additional_results(sim_results_2) |>
+#'   merge_additional_results(sim_results_3)
+#'
+#' all_results |>
+#'   subset(select=c(delay, logrank.rejection_0.025, maxcombo.rejection_0.025, mwlrt.rejection_0.025))
+#'
 #' }
 merge_additional_results <- function(old, new, design_names=NULL, descriptive_regex=NULL){
   if( is.null(design_names) ){
@@ -113,8 +169,37 @@ merge_additional_results <- function(old, new, design_names=NULL, descriptive_re
 #' @describeIn rename_results_column Rename Columns in Simulation Results
 #'
 #' @examples
-#' \dontrun{
-#' results2 <- rename_results_column(results, c("old_name"="new_name"))
+#' \donttest{
+#' condition <- merge(
+#' assumptions_delayed_effect(),
+#' design_fixed_followup(),
+#' by=NULL
+#' ) |>
+#'   tail(4) |>
+#'   true_summary_statistics_delayed_effect(cutoff_stats = 15)
+#'
+#' sim_results <- runSimulation(
+#'   design=condition,
+#'   replications=10,
+#'   generate=generate_delayed_effect,
+#'   analyse=list(
+#'     logrank  = analyse_logrank(alternative = "one.sided"),
+#'     mwlrt = analyse_modelstly_weighted(t_star = m2d(24))
+#'   ),
+#'   summarise = create_summarise_function(
+#'     logrank = summarise_test(0.025),
+#'     mwlrt = summarise_test(0.025)
+#'   )
+#' )
+#'
+#' names(sim_results)
+#' attr(sim_results, "design_names")
+#'
+#' sim_results <- sim_results |>
+#'   rename_results_column(c("delay"="onset"))
+#'
+#' names(sim_results)
+#' attr(sim_results, "design_names")
 #' }
 rename_results_column <- function(results, rename){
   rename_helper <- function(x, rename){
@@ -140,8 +225,37 @@ rename_results_column <- function(results, rename){
 #' @describeIn rename_results_column Rename Columns in Simulation Results by Pattern
 #'
 #' @examples
-#' \dontrun{
-#' results2 <- rename_results_column_pattern(results, "old_name", "new_name")
+#' \donttest{
+#'   condition <- merge(
+#'     assumptions_delayed_effect(),
+#'     design_fixed_followup(),
+#'     by=NULL
+#'   ) |>
+#'     tail(4) |>
+#'     true_summary_statistics_delayed_effect(cutoff_stats = 15)
+#'
+#'   sim_results <- runSimulation(
+#'     design=condition,
+#'     replications=10,
+#'     generate=generate_delayed_effect,
+#'     analyse=list(
+#'       logrank  = analyse_logrank(alternative = "one.sided"),
+#'       mwlrt = analyse_modelstly_weighted(t_star = m2d(24))
+#'     ),
+#'     summarise = create_summarise_function(
+#'       logrank = summarise_test(0.025),
+#'       mwlrt = summarise_test(0.025)
+#'     )
+#'   )
+#'
+#'   names(sim_results)
+#'   attr(sim_results, "design_names")
+#'
+#'   sim_results <- sim_results |>
+#'     rename_results_column_pattern(pattern = "_0.025", replacement = "")
+#'
+#'   names(sim_results)
+#'   attr(sim_results, "design_names")
 #' }
 rename_results_column_pattern <- function(results, pattern, replacement){
   names(results) <- stringr::str_replace_all(names(results), pattern, replacement)
