@@ -234,20 +234,20 @@ hazard ratios that correspond to reasonable and realistic scenarios.</p>
 <span class="r-in"><span>  <span class="fu">generate_progression</span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">one_simulation</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      t trt  evt t_ice   ice</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1  652   1 TRUE   587  TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2  557   1 TRUE   552  TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3 1124   1 TRUE   372  TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4  123   1 TRUE   Inf FALSE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5  547   1 TRUE   448  TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6  614   1 TRUE   245  TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 1159   1 TRUE   Inf FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 1183   1 TRUE  1178  TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  635   1 TRUE   344  TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4  421   1 TRUE   177  TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5   67   1 TRUE   Inf FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6  233   1 TRUE    60  TRUE</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">tail</a></span><span class="op">(</span><span class="va">one_simulation</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       t trt  evt t_ice   ice</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 295 472   0 TRUE   Inf FALSE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 296 501   0 TRUE   453  TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 297 221   0 TRUE   219  TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 298 274   0 TRUE   Inf FALSE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 299 186   0 TRUE    80  TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 300 619   0 TRUE   Inf FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        t trt  evt t_ice   ice</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 295 1002   0 TRUE   556  TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 296 1015   0 TRUE   191  TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 297  347   0 TRUE   111  TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 298  873   0 TRUE   128  TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 299  574   0 TRUE   516  TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 300   24   0 TRUE   Inf FALSE</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">my_design</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/merge.html" class="external-link">merge</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>  <span class="fu">assumptions_progression</span><span class="op">(</span><span class="op">)</span>,</span></span>
@@ -338,6 +338,7 @@ hazard ratios that correspond to reasonable and realistic scenarios.</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">my_design</span> <span class="op">&lt;-</span> <span class="fu">hazard_before_progression_from_PH_effect_size</span><span class="op">(</span><span class="va">my_design</span>, target_power_ph<span class="op">=</span><span class="fl">0.7</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>  <span style="color: #00BB00;">■■■■■■■■■■■                     </span>  33% |  ETA:  3s</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  <span style="color: #00BB00;">■■■■■■■■■■■■■■■■■■■■■           </span>  67% |  ETA:  2s</span>
 <span class="r-in"><span><span class="va">my_design</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   n_trt n_ctrl followup recruitment  hazard_ctrl hazard_after_prog</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1   150    150    730.5     182.625 0.0009488668       0.003795467</span>
