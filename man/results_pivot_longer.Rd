@@ -16,7 +16,7 @@ combined_plot(
   facet_y_vars = c(),
   split_var = 1,
   heights_plots = c(3, 1),
-  scale_stairs = 0.75,
+  scale_stairs = NULL,
   grid_level = 2,
   scales = "fixed",
   hlines = numeric(0),
@@ -43,7 +43,7 @@ combined_plot(
 
 \item{heights_plots}{relative heights of the main plot and the stairs on the bottom}
 
-\item{scale_stairs}{height of the stairs for each variable between 0 and 1}
+\item{scale_stairs}{this argument is deprecated and will be ignored}
 
 \item{grid_level}{depth of loops for which the grid-lines are drawn}
 
