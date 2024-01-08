@@ -1,7 +1,14 @@
+# SimNPH 0.5.4
+
+* Reworked the `combined_plot` function. Fixed a bug where the `split_var`
+  argument was not working. Deprecated the defunct argument `scale_stairs`,
+  providing this argument now gives a warning. Improved speed and removed
+  dependencies.
+
 # SimNPH 0.5.3
 
 * Changed the calculation of the real summary measures for the progression
-  scenario: corrected one mistake in the calculation of the gAHR and the 
+  scenario: corrected one mistake in the calculation of the gAHR and the
   functions now use the new, faster implementation from the miniPCH package.
 
 # SimNPH 0.5.2
