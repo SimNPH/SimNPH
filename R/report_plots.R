@@ -59,7 +59,7 @@ results_pivot_longer <- function(data, exclude_from_methods=c("descriptive")){
 #' @param yvar variable name of the variable to be displayed on the y axis (metric)
 #' @param facet_x_vars vector of variable names to create columns of facets
 #' @param facet_y_vars vector of variable names to create rows of facets
-#' @param split_var index of xvars along groups of which the plot should be split
+#' @param split_var where should the lines be split, see details
 #' @param heights_plots relative heights of the main plot and the stairs on the bottom
 #' @param scale_stairs this argument is deprecated and will be ignored
 #' @param grid_level depth of loops for which the grid-lines are drawn
@@ -72,7 +72,11 @@ results_pivot_longer <- function(data, exclude_from_methods=c("descriptive")){
 #' @return a ggplot/patchwork object containing the plots
 #' @export
 #'
-#' @details `use_colours` and `use_shapes` both use the `method` variable in their respective aesthetics.
+#' @details
+#'
+#' `use_colours` and `use_shapes` both use the `method` variable in their respective aesthetics.
+#'
+#' `split_var` break the lines after the 1st, 2nd, ... variable in `xvars`. Use 0 for one continuous line per method.
 #'
 #' @examples
 #' \donttest{
@@ -166,7 +170,7 @@ combined_plot <- function(
   }
 
   stopifnot(split_var <= length(xvars))
-  stopifnot(split_var > 0)
+  stopifnot(split_var >= 0)
 
   stopifnot(grid_level > 0)
   grid_level <- min(grid_level, length(xvars))
@@ -186,10 +190,14 @@ combined_plot <- function(
   data <- data |>
     subset(!is.na(get(yvar)))
 
+  if(split_var > 0){
   # split lines
   group_vars <- xvars[1:split_var]
   data$x_split <- do.call(interaction, c(data[, group_vars], lex.order=TRUE, drop=TRUE)) |>
     as.integer()
+  } else {
+    data$x_split <- 1L
+  }
 
   # grid breaks
   grid_vars <- xvars[1:grid_level]
