@@ -40,5 +40,4 @@ Some examples of data generation, testing and estimation can be found in this
 The results of the simulation study done by the CONFIRMS consortium in the
 course of the EMA tender will be published in an upcoming paper 
 ([preprint on arXiv](https://arxiv.org/abs/2310.05622)) and are presented in a 
-Shiny App. The app can be downloaded and run locally, check out the app's 
-[github repository](https://github.com/SimNPH/ShinySimNPH).
+[shinylive App](https://simnph.github.io/SimResultsShinylive/about.html). 
