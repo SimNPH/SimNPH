@@ -2,7 +2,6 @@
 #'
 #' @describeIn results_pivot_longer pivot simulation results into long format
 #'
-#' @param data for results_pivot_longer: simulation result as retured by SimDesign
 #' @param exclude_from_methods "methods" that should not be pivoted into long format
 #'
 #' @return dataset in long format with one row per method and scenario and one
@@ -54,7 +53,7 @@ results_pivot_longer <- function(data, exclude_from_methods=c("descriptive")){
 
 #' @describeIn results_pivot_longer Nested Loop Plot with optional Facets
 #'
-#' @param data for combined_plto simulation results in long format, as returned by `results_pivot_longer`.
+#' @param data for results_pivot_longer: simulation result as retured by SimDesign, for combined_plot: simulation results in long format, as returned by `results_pivot_longer`.
 #' @param methods methods to include in the plot
 #' @param xvars orderd vector of variable names to display on the x axis
 #' @param yvar variable name of the variable to be displayed on the y axis (metric)

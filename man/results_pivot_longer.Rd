@@ -25,7 +25,7 @@ combined_plot(
 )
 }
 \arguments{
-\item{data}{for combined_plto simulation results in long format, as returned by \code{results_pivot_longer}.}
+\item{data}{for results_pivot_longer: simulation result as retured by SimDesign, for combined_plot: simulation results in long format, as returned by \code{results_pivot_longer}.}
 
 \item{exclude_from_methods}{"methods" that should not be pivoted into long format}
 
