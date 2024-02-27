@@ -1,3 +1,9 @@
+# SimNPH 0.5.5
+
+* Sped up calculation of treatment arm hazard from effect size and calculation
+  of censoring rate from censoring proportion for progression secenarios.
+* Minor improvements to plot functions and their documentation.
+
 # SimNPH 0.5.4
 
 * Reworked the `combined_plot` function. Fixed a bug where the `split_var`
