@@ -16,7 +16,7 @@ Calculate hazards in treatment arm in subgroup and compliment"><!-- mathjax --><
     
     <a class="navbar-brand me-2" href="../index.html">SimNPH</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.5</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -203,20 +203,20 @@ patients</p></li>
 <span class="r-in"><span>  <span class="fu">generate_subgroup</span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">one_simulation</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      t trt  evt subgroup</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1  617   1 TRUE        0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2  959   1 TRUE        0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3  610   1 TRUE        0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4  748   1 TRUE        0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5 1240   1 TRUE        0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6 9770   1 TRUE        0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1  428   1 TRUE        0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  132   1 TRUE        0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 3087   1 TRUE        0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4  734   1 TRUE        0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5  578   1 TRUE        0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6  192   1 TRUE        0</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">tail</a></span><span class="op">(</span><span class="va">one_simulation</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        t trt  evt subgroup</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 295  641   0 TRUE        0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 296  683   0 TRUE        0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 297  279   0 TRUE        0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 298 2773   0 TRUE        0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 299  819   0 TRUE        0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 300  129   0 TRUE        0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 295 6391   0 TRUE        0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 296 2128   0 TRUE        0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 297  762   0 TRUE        0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 298 2131   0 TRUE        1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 299 1323   0 TRUE        0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 300  840   0 TRUE        0</span>
 <span class="r-in"><span><span class="va">Design</span> <span class="op">&lt;-</span> <span class="fu">assumptions_subgroup</span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">Design</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    hazard_ctrl   hazard_trt hazard_subgroup prevalence random_withdrawal</span>

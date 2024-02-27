@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">SimNPH</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.5</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -149,7 +149,7 @@ in the column <code>null_cover</code></p>
 <span class="r-in"><span>  summarise <span class="op">=</span> <span class="va">summarise_all</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Design row: 1/1;   RAM used: 184.6 Mb;   Total elapsed time: 0.00s </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Design: 1/1;   RAM Used: 186.3 Mb;   Replications: 10;   Total Time: 0.00s </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  Conditions: delay=121., hzrd_c=0.0009, hzrd_t=0.0006, rndm_w=0.0001, n_trt=150, n_ctrl=150, follwp=730., rcrtmn=182., mdn_srvvl_t=1034, mdn_srvvl_c=730., rmst_t_15=14.8, rmst_c_15=14.8, gAHR_1=1, AHR_15=1, AHRc_15=1, AHR__1=1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
@@ -160,13 +160,13 @@ in the column <code>null_cover</code></p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 3</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   coxph.gAHR.mse coxph.HR.mse coxph.NA.mse</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>       0.073<span style="text-decoration: underline;">270</span>     0.012<span style="text-decoration: underline;">284</span>          <span style="color: #BB0000;">NaN</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>        0.101<span style="text-decoration: underline;">49</span>     0.025<span style="text-decoration: underline;">430</span>          <span style="color: #BB0000;">NaN</span></span>
 <span class="r-in"><span><span class="co"># but the standard deviation can be estimated in all cases</span></span></span>
 <span class="r-in"><span><span class="va">sim_results</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">sim_results</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span>pattern<span class="op">=</span><span class="st">"\\.sd_est$"</span><span class="op">)</span><span class="op">]</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 3</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   coxph.gAHR.sd_est coxph.HR.sd_est coxph.NA.sd_est</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>               <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>          0.085<span style="text-decoration: underline;">836</span>        0.085<span style="text-decoration: underline;">836</span>        0.085<span style="text-decoration: underline;">836</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>           0.158<span style="text-decoration: underline;">69</span>         0.158<span style="text-decoration: underline;">69</span>         0.158<span style="text-decoration: underline;">69</span></span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>

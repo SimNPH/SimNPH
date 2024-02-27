@@ -16,7 +16,7 @@ Calculate hr after onset of treatment effect"><!-- mathjax --><script src="https
     
     <a class="navbar-brand me-2" href="../index.html">SimNPH</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.5</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -233,21 +233,21 @@ hazard ratios that correspond to reasonable and realistic scenarios.</p>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">tail</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>  <span class="fu">generate_progression</span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">one_simulation</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      t trt  evt t_ice   ice</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1  787   1 TRUE   295  TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2  668   1 TRUE   592  TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3  111   1 TRUE   Inf FALSE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4   16   1 TRUE   Inf FALSE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5 1018   1 TRUE   913  TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6  432   1 TRUE   216  TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     t trt  evt t_ice  ice</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 531   1 TRUE   334 TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 700   1 TRUE   678 TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 172   1 TRUE     4 TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4 556   1 TRUE   173 TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5 553   1 TRUE   330 TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6 201   1 TRUE    77 TRUE</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">tail</a></span><span class="op">(</span><span class="va">one_simulation</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        t trt  evt t_ice   ice</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 295  150   0 TRUE   Inf FALSE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 296 1234   0 TRUE  1000  TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 297  642   0 TRUE   399  TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 298  620   0 TRUE   Inf FALSE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 299  134   0 TRUE    96  TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 300  430   0 TRUE   Inf FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 295  344   0 TRUE   Inf FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 296 1330   0 TRUE   519  TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 297  243   0 TRUE   Inf FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 298   73   0 TRUE   Inf FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 299  134   0 TRUE    37  TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 300  124   0 TRUE   115  TRUE</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">my_design</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/merge.html" class="external-link">merge</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>  <span class="fu">assumptions_progression</span><span class="op">(</span><span class="op">)</span>,</span></span>
@@ -323,9 +323,9 @@ hazard ratios that correspond to reasonable and realistic scenarios.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2 0.001518187 0.001265156       0.007590934    0.001897734   0.001423300</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3 0.001518187 0.001265156       0.007590934    0.001897734   0.001265156</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   censoring_prop followup n_trt n_ctrl random_withdrawal</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1            0.1      100    50     50      0.0001268863</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2            0.1      100    50     50      0.0001272055</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3            0.1      100    50     50      0.0001275449</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1            0.1      100    50     50      0.0003575638</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2            0.1      100    50     50      0.0003285652</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3            0.1      100    50     50      0.0003179468</span>
 <span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="va">my_design</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/merge.html" class="external-link">merge</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="design_fixed_followup.html">design_fixed_followup</a></span><span class="op">(</span><span class="op">)</span>,</span></span>
@@ -337,16 +337,15 @@ hazard ratios that correspond to reasonable and realistic scenarios.</p>
 <span class="r-in"><span><span class="va">my_design</span><span class="op">$</span><span class="va">final_events</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">ceiling</a></span><span class="op">(</span><span class="fl">0.75</span> <span class="op">*</span> <span class="op">(</span><span class="va">my_design</span><span class="op">$</span><span class="va">n_trt</span> <span class="op">+</span> <span class="va">my_design</span><span class="op">$</span><span class="va">n_ctrl</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">my_design</span> <span class="op">&lt;-</span> <span class="fu">hazard_before_progression_from_PH_effect_size</span><span class="op">(</span><span class="va">my_design</span>, target_power_ph<span class="op">=</span><span class="fl">0.7</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>  <span style="color: #00BB00;">■■■■■■■■■■■■■■■■■■■■■           </span>  67% |  ETA:  2s</span>
 <span class="r-in"><span><span class="va">my_design</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   n_trt n_ctrl followup recruitment  hazard_ctrl hazard_after_prog</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1   150    150    730.5     182.625 0.0009488668       0.003795467</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2   150    150    730.5     182.625 0.0009488668       0.003795467</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3   150    150    730.5     182.625 0.0009488668       0.003795467</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   prog_rate_ctrl prog_rate_trt random_withdrawal final_events   hazard_trt</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1    0.001897734   0.001897734      0.0001897734          225 0.0001872067</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2    0.001897734   0.001423300      0.0001897734          225 0.0004463965</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3    0.001897734   0.001265156      0.0001897734          225 0.0005312536</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1    0.001897734   0.001897734      0.0001897734          225 0.0001912378</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2    0.001897734   0.001423300      0.0001897734          225 0.0004496909</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3    0.001897734   0.001265156      0.0001897734          225 0.0005343131</span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>
