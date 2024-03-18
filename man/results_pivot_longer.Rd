@@ -39,7 +39,7 @@ combined_plot(
 
 \item{facet_y_vars}{vector of variable names to create rows of facets}
 
-\item{split_var}{index of xvars along groups of which the plot should be split}
+\item{split_var}{where should the lines be split, see details}
 
 \item{heights_plots}{relative heights of the main plot and the stairs on the bottom}
 
@@ -71,6 +71,8 @@ reference methods can be kept as own columns and used like the columns of
 the simulation parameters.
 
 \code{use_colours} and \code{use_shapes} both use the \code{method} variable in their respective aesthetics.
+
+\code{split_var} break the lines after the 1st, 2nd, ... variable in \code{xvars}. Use 0 for one continuous line per method.
 }
 \section{Functions}{
 \itemize{
