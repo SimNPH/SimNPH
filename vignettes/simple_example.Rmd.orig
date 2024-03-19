@@ -5,7 +5,7 @@ author: "Tobias Fellinger"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteEngine{knitr::knitr}
+  %\VignetteEngine{knitr::rmarkdown}
   %\VignetteIndexEntry{Examples for the Usage of the SimNPH Package}
   %\usepackage[UTF-8]{inputenc}
 ---

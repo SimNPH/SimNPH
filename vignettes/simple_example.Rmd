@@ -5,7 +5,7 @@ author: "Tobias Fellinger"
 date: "2024-03-19"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteEngine{knitr::knitr}
+  %\VignetteEngine{knitr::rmarkdown}
   %\VignetteIndexEntry{Examples for the Usage of the SimNPH Package}
   %\usepackage[UTF-8]{inputenc}
 ---
