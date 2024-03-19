@@ -8,14 +8,10 @@ output:
     self_contained: yes
 ---
 
-```{r, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
-)
-```
 
-```{r setup, results='hide', message=FALSE, warning=FALSE}
+
+
+```r
 library(SimDesign)
 library(SimNPH)
 library(parallel)
@@ -54,33 +50,58 @@ By default this will create a simulation design skeleton for simulations of 50
 patients in each arm, a constant hazard of 0.2 under control and a hazard of
 0.02 under treatment after the effect onset varying from 0 to 10.
 
-<!-- TODO set parameters to be somehow relevant (e.g. not 5mts delay and 200mts follow-up) -->
 
-```{r}
+```r
 N_sim <- 100
 
 Assumptions <- assumptions_delayed_effect()
+#> expand.grid(
+#>   delay=m2d(seq(0, 10, by=2)), # delay of 0, 1, ..., 10 months
+#>   hazard_ctrl=m2r(24),         # median survival control of 24 months
+#>   hazard_trt=m2r(36),          # median survival treatment of 36 months
+#>   random_withdrawal=m2r(120)   # median time to random withdrawal 10 years
+#> )
 
 Options <- design_fixed_followup()
+#> expand.grid(
+#>   n_trt=150,         # 150 patients in the treatment arm
+#>   n_ctrl=150,        # 150 patients in the control arm
+#>   followup=m2d(24),  # followup 2 years
+#>   recruitment=m2d(6) # recruitment time 6 months
+#> 
+#> )
 
 Design <- merge(Assumptions, Options, by=NULL)
 
 knitr::kable(Design)
 ```
 
+
+
+|   delay| hazard_ctrl| hazard_trt| random_withdrawal| n_trt| n_ctrl| followup| recruitment|
+|-------:|-----------:|----------:|-----------------:|-----:|------:|--------:|-----------:|
+|   0.000|   0.0009489|  0.0006326|         0.0001898|   150|    150|    730.5|     182.625|
+|  60.875|   0.0009489|  0.0006326|         0.0001898|   150|    150|    730.5|     182.625|
+| 121.750|   0.0009489|  0.0006326|         0.0001898|   150|    150|    730.5|     182.625|
+| 182.625|   0.0009489|  0.0006326|         0.0001898|   150|    150|    730.5|     182.625|
+| 243.500|   0.0009489|  0.0006326|         0.0001898|   150|    150|    730.5|     182.625|
+| 304.375|   0.0009489|  0.0006326|         0.0001898|   150|    150|    730.5|     182.625|
+
+
+
 ## Defining the 'Generate' funcion
 
 Define the data generating 'generate' function, that beside simulating the time
 to event also applies the different censoring processes.
 
-```{r}
+
+```r
 my_generator <- function(condition, fixed_objects=NULL){
   generate_delayed_effect(condition, fixed_objects) |>
     recruitment_uniform(condition$recruitment) |>
     random_censoring_exp(condition$random_withdrawal) |>
     admin_censoring_time(condition$followup)
 } 
-
 ```
 
 ## Defining the 'Summarise' function
@@ -99,7 +120,8 @@ all `N_sim` p-values returned by the `analyse_maxcombo` or `analyse_logrank`
 functions respectively. The Summary will contain columns with the rejection rate
 and some other summary statistics for both methods.
 
-```{r}
+
+```r
 alpha <- 0.05
 
 Summarise <- create_summarise_function(
@@ -118,7 +140,8 @@ analyse each replication of each scenario with the two functions
 the `Summarise` function defined before and the simulations should be run in
 parallel.
 
-```{r, results='hide'}
+
+```r
 res <- runSimulation(
   Design,
   replications = N_sim,
@@ -131,18 +154,35 @@ res <- runSimulation(
   cl = cl,
   save=FALSE
 )
-
+#> 
+#> Number of parallel clusters in use: 8
+#> 
+#> Simulation complete. Total execution time: 13.28s
 ```
 
 Finally we select the interesting columns from the output. Since all other
 parameters are the same for each scenario we just select delay. And we are
 interested in the rejection rate of the tests.
 
-```{r}
+
+```r
 res |> 
   subset(select=c("delay", "maxcombo.rejection_0.05", "logrank.rejection_0.05")) |>
   knitr::kable()
 ```
+
+
+
+|   delay| maxcombo.rejection_0.05| logrank.rejection_0.05|
+|-------:|-----------------------:|----------------------:|
+|   0.000|                    0.55|                   0.56|
+|  60.875|                    0.57|                   0.58|
+| 121.750|                    0.33|                   0.33|
+| 182.625|                    0.35|                   0.27|
+| 243.500|                    0.31|                   0.24|
+| 304.375|                    0.22|                   0.16|
+
+
 
 # A scenario with an interim analysis
 
@@ -153,13 +193,35 @@ define additional analyse functions.
 First we extend the Design to include a column with the number of events after
 which an interim analysis should be done.
 
-```{r}
+
+```r
 Options <- design_group_sequential()
+#> expand.grid(
+#>   n_trt=200,          # 200 patients in the treatment arm
+#>   n_ctrl=200,         # 200 patients in the control arm
+#>   followup=m2d(48),   # maximum followup time 4 years
+#>   recruitment=m2d(6), # recruitment time 6 months
+#>   interim_events=150, # interim analysis after 150 events
+#>   final_events=300    # final analysis after 300 events
+#> )
 
 Design <- merge(Assumptions, Options, by=NULL)
 
 knitr::kable(Design)
 ```
+
+
+
+|   delay| hazard_ctrl| hazard_trt| random_withdrawal| n_trt| n_ctrl| followup| recruitment| interim_events| final_events|
+|-------:|-----------:|----------:|-----------------:|-----:|------:|--------:|-----------:|--------------:|------------:|
+|   0.000|   0.0009489|  0.0006326|         0.0001898|   200|    200|     1461|     182.625|            150|          300|
+|  60.875|   0.0009489|  0.0006326|         0.0001898|   200|    200|     1461|     182.625|            150|          300|
+| 121.750|   0.0009489|  0.0006326|         0.0001898|   200|    200|     1461|     182.625|            150|          300|
+| 182.625|   0.0009489|  0.0006326|         0.0001898|   200|    200|     1461|     182.625|            150|          300|
+| 243.500|   0.0009489|  0.0006326|         0.0001898|   200|    200|     1461|     182.625|            150|          300|
+| 304.375|   0.0009489|  0.0006326|         0.0001898|   200|    200|     1461|     182.625|            150|          300|
+
+
 
 ## 'Analyse' functions with an interim analysis
 
@@ -169,7 +231,8 @@ design. The arguments are the times or events after which the analyses are done,
 the nominal alpha at each stage and the analyse functions to be used at each
 stage.
 
-```{r}
+
+```r
 ## O'Brien-Fleming Bounds for GSD with interim analysis at information time 1/2
 nominal_alpha <- ldbounds::ldBounds(c(0.5,1))$nom.alpha
 
@@ -203,7 +266,8 @@ at which the last analysis was done.
 The results object also includes the results returned by each stage in
 `results_stages`, but here we only use the overall test-decision.
 
-```{r}
+
+```r
 Summarise <- create_summarise_function(
   maxcombo_seq = summarise_group_sequential(),
   logrank_seq = summarise_group_sequential()
@@ -216,7 +280,8 @@ The call to `runSimulation` looks almost the same as above but now the
 additional columns we defined in our `Summarise` functions are included in the
 result.
 
-```{r, results='hide'}
+
+```r
 res <- runSimulation(
   Design,
   replications = N_sim,
@@ -226,13 +291,18 @@ res <- runSimulation(
   cl = cl,
   save=FALSE
 )
+#> 
+#> Number of parallel clusters in use: 8
+#> 
+#> Simulation complete. Total execution time: 30.25s
 ```
 
 In the case of a group sequential design we are also interested in the average
 running time of the study in terms of patients recruited, number of events and
 running time of the study.
 
-```{r}
+
+```r
 res |>
   subset(select=c(
     "delay", 
@@ -244,6 +314,19 @@ res |>
   knitr::kable()
 ```
 
+
+
+|   delay| maxcombo_seq.rejection| logrank_seq.rejection| maxcombo_seq.n_pat| logrank_seq.n_pat| maxcombo_seq.n_evt| logrank_seq.n_evt| maxcombo_seq.followup| logrank_seq.followup|
+|-------:|----------------------:|---------------------:|------------------:|-----------------:|------------------:|-----------------:|---------------------:|--------------------:|
+|   0.000|                   0.88|                  0.88|                400|               400|             213.53|            208.04|               1278.60|              1226.25|
+|  60.875|                   0.78|                  0.78|                400|               400|             225.13|            225.96|               1346.22|              1352.96|
+| 121.750|                   0.81|                  0.75|                400|               400|             227.92|            230.52|               1368.19|              1391.11|
+| 182.625|                   0.61|                  0.60|                400|               400|             231.20|            233.93|               1379.38|              1402.06|
+| 243.500|                   0.65|                  0.60|                400|               400|             232.27|            234.93|               1381.79|              1405.35|
+| 304.375|                   0.48|                  0.44|                400|               400|             240.51|            240.44|               1435.50|              1435.95|
+
+
+
 # Estimation
 
 ## Calculating the true values of the summary statistics
@@ -254,8 +337,16 @@ relevant true summary statistics can be computed by a convenience function for
 each scenario. Just pipe the Design data.frame to the function and the values of
 the statistics are added as columns.
 
-```{r}
+
+```r
 Options <- design_fixed_followup()
+#> expand.grid(
+#>   n_trt=150,         # 150 patients in the treatment arm
+#>   n_ctrl=150,        # 150 patients in the control arm
+#>   followup=m2d(24),  # followup 2 years
+#>   recruitment=m2d(6) # recruitment time 6 months
+#> 
+#> )
 
 Design <- merge(Assumptions, Options, by=NULL)
 
@@ -264,6 +355,19 @@ Design <- Design |>
 
 knitr::kable(Design)
 ```
+
+
+
+|   delay| hazard_ctrl| hazard_trt| random_withdrawal| n_trt| n_ctrl| followup| recruitment| median_survival_trt| median_survival_ctrl| rmst_trt_20| rmst_ctrl_20|   gAHR_20|    AHR_20|  AHRoc_20| AHRoc_robust_20|
+|-------:|-----------:|----------:|-----------------:|-----:|------:|--------:|-----------:|-------------------:|--------------------:|-----------:|------------:|---------:|---------:|---------:|---------------:|
+|   0.000|   0.0009489|  0.0006326|         0.0001898|   150|    150|    730.5|     182.625|           1095.7500|                730.5|    19.87402|     19.81142| 0.6666667| 0.6666667| 0.6666667|       0.6666667|
+|  60.875|   0.0009489|  0.0006326|         0.0001898|   150|    150|    730.5|     182.625|           1065.3125|                730.5|    19.81142|     19.81142| 1.0000000| 1.0000000| 1.0000000|       1.0000000|
+| 121.750|   0.0009489|  0.0006326|         0.0001898|   150|    150|    730.5|     182.625|           1034.8750|                730.5|    19.81142|     19.81142| 1.0000000| 1.0000000| 1.0000000|       1.0000000|
+| 182.625|   0.0009489|  0.0006326|         0.0001898|   150|    150|    730.5|     182.625|           1004.4375|                730.5|    19.81142|     19.81142| 1.0000000| 1.0000000| 1.0000000|       1.0000000|
+| 243.500|   0.0009489|  0.0006326|         0.0001898|   150|    150|    730.5|     182.625|            974.0000|                730.5|    19.81142|     19.81142| 1.0000000| 1.0000000| 1.0000000|       1.0000000|
+| 304.375|   0.0009489|  0.0006326|         0.0001898|   150|    150|    730.5|     182.625|            943.5625|                730.5|    19.81142|     19.81142| 1.0000000| 1.0000000| 1.0000000|       1.0000000|
+
+
 
 ## Defining the `Summarise` function
 
@@ -285,7 +389,8 @@ Note that one name can be used twice to summarise the output of one analysis
 method two times, like in this case, comparing it to two different summary
 statistics.
 
-```{r}
+
+```r
 Summarise <- create_summarise_function(
     coxph=summarise_estimator(hr, gAHR_20, hr_lower, hr_upper, name="gAHR"),
     coxph=summarise_estimator(hr, hazard_trt/hazard_ctrl, hr_lower, hr_upper, name="HR")
@@ -294,7 +399,8 @@ Summarise <- create_summarise_function(
 
 ## Putting it all together
 
-```{r, results='hide'}
+
+```r
 Analyse <- list(
   coxph = analyse_coxph()
 )
@@ -308,9 +414,14 @@ res <- runSimulation(
   cl = cl,
   save=FALSE
 )
+#> 
+#> Number of parallel clusters in use: 8
+#> 
+#> Simulation complete. Total execution time: 0.99s
 ```
 
-```{r}
+
+```r
 res |>
   subset(select=c(
     "delay", "coxph.HR.bias", "coxph.gAHR.bias", "coxph.HR.mse", 
@@ -318,4 +429,17 @@ res |>
   )) |> 
   knitr::kable()
 ```
+
+
+
+|   delay| coxph.HR.bias| coxph.gAHR.bias| coxph.HR.mse| coxph.gAHR.mse| coxph.HR.coverage| coxph.gAHR.coverage|
+|-------:|-------------:|---------------:|------------:|--------------:|-----------------:|-------------------:|
+|   0.000|     0.0029152|       0.0029152|    0.0159069|      0.0159069|              0.94|                0.94|
+|  60.875|     0.0600237|      -0.2733096|    0.0268971|      0.0979924|              0.86|                0.57|
+| 121.750|     0.0938556|      -0.2394777|    0.0322495|      0.0807902|              0.86|                0.64|
+| 182.625|     0.1522637|      -0.1810697|    0.0448642|      0.0544663|              0.83|                0.80|
+| 243.500|     0.1609376|      -0.1723958|    0.0582003|      0.0620197|              0.79|                0.73|
+| 304.375|     0.1797369|      -0.1535965|    0.0557430|      0.0470295|              0.75|                0.84|
+
+
 

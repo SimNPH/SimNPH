@@ -1,0 +1,319 @@
+---
+title: "Examples for the Usage of the SimNPH Package"
+subtitle: "Generate Data, Test and Estimate, Summarise"
+output:
+  html_document:
+    toc: true
+    toc_depth: 2
+    self_contained: yes
+---
+
+```{r knitr_opts, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup, results='hide', message=FALSE, warning=FALSE}
+library(SimDesign)
+library(SimNPH)
+library(parallel)
+
+cl <- makeCluster(8)
+clusterEvalQ(cl, {
+  library(SimDesign)
+  library(SimNPH)
+  library(parallel)
+})
+```
+
+# A simple scenario with fixed followup
+
+This is a simple example on how to run a simulation of analyses of datasets with
+a delayed treatment effect using the max-combo and the log-rank test. The 
+
+## Setting up the Scenarios
+
+Setting up the simulations to be run. `createDesign` creates a `tibble` with
+every combination of the parameters. Each line corresponds to one simulation to
+be run.
+
+The function `generate_delayed_effect` needs the columns: `n_trt`: number of
+patients in the treatment arm, `n_ctrl`: number of patients in the control arm,
+`delay`: delay until onset of treatment effect, `hazard_ctrl`: hazard under
+control and before onset of treatment effect, `hazart_trt`: hazard under
+treatment, `t_max`: maximum time of observation.
+
+An example design `tibble` with all parameters filled out can be created with
+`desing_skeleton_delayed_effect`. Use the function to output an example function
+call that you can copy and modify as needed, or assign the result to a variable
+to obtain a design `tibble` with some default parameters.
+
+By default this will create a simulation design skeleton for simulations of 50
+patients in each arm, a constant hazard of 0.2 under control and a hazard of
+0.02 under treatment after the effect onset varying from 0 to 10.
+
+```{r design_1}
+N_sim <- 100
+
+Assumptions <- assumptions_delayed_effect()
+
+Options <- design_fixed_followup()
+
+Design <- merge(Assumptions, Options, by=NULL)
+
+knitr::kable(Design)
+```
+
+## Defining the 'Generate' funcion
+
+Define the data generating 'generate' function, that beside simulating the time
+to event also applies the different censoring processes.
+
+```{r generator_1}
+my_generator <- function(condition, fixed_objects=NULL){
+  generate_delayed_effect(condition, fixed_objects) |>
+    recruitment_uniform(condition$recruitment) |>
+    random_censoring_exp(condition$random_withdrawal) |>
+    admin_censoring_time(condition$followup)
+} 
+
+```
+
+## Defining the 'Summarise' function
+
+Next, we need to specify a summary function that computes the desired operating
+characteristics for each simulation scenario, and each analysis method. In the
+example below, we use a summary function that computes the power (as we consider
+scenarios under the alternative in the example) of the log-rank test and the
+max-combo test across simulated scenarios. For each scenario the function just
+averages the number of times the computed p-value is below the significance
+level obtain the power.
+
+The results object contains the results of all replications of the corresponding
+method for each row of the `Design` object. In this example `results$p` contains
+all `N_sim` p-values returned by the `analyse_maxcombo` or `analyse_logrank`
+functions respectively. The Summary will contain columns with the rejection rate
+and some other summary statistics for both methods.
+
+```{r summarise_1}
+alpha <- 0.05
+
+Summarise <- create_summarise_function(
+  maxcombo = summarise_test(alpha),
+  logrank  = summarise_test(alpha)
+)
+```
+
+## Putting it all together
+
+Now we put it all together: in Design we give the scenarios defined before. We
+want to run 100 replications for each scenario. We want to generate data using
+the `generate_delayed_effect` function using the parameters from `Design` and
+analyse each replication of each scenario with the two functions
+`analyse_logrank` and `analyse_maxcombo`. The output should be summarised with
+the `Summarise` function defined before and the simulations should be run in
+parallel.
+
+```{r run_1, results='hide'}
+res <- runSimulation(
+  Design,
+  replications = N_sim,
+  generate = my_generator,
+  analyse = list(
+    logrank  = analyse_logrank(),
+    maxcombo = analyse_maxcombo()
+  ),
+  summarise = Summarise,
+  cl = cl,
+  save=FALSE
+)
+
+```
+
+Finally we select the interesting columns from the output. Since all other
+parameters are the same for each scenario we just select delay. And we are
+interested in the rejection rate of the tests.
+
+```{r report_1}
+res |> 
+  subset(select=c("delay", "maxcombo.rejection_0.05", "logrank.rejection_0.05")) |>
+  knitr::kable()
+```
+
+# A scenario with an interim analysis
+
+In this scenario we extend the scenario from above to include a fixed followup
+as well as an interim analysis after a fixed number of events. For this we will
+define additional analyse functions.
+
+First we extend the Design to include a column with the number of events after
+which an interim analysis should be done.
+
+```{r design_2}
+Options <- design_group_sequential()
+
+Design <- merge(Assumptions, Options, by=NULL)
+
+knitr::kable(Design)
+```
+
+## 'Analyse' functions with an interim analysis
+
+The `analyse_group_sequential` function allows to combine two or more analyse
+functions to create an analysis function corresponding to a group sequential
+design. The arguments are the times or events after which the analyses are done,
+the nominal alpha at each stage and the analyse functions to be used at each
+stage.
+
+```{r analyse_2}
+## O'Brien-Fleming Bounds for GSD with interim analysis at information time 1/2
+nominal_alpha <- ldbounds::ldBounds(c(0.5,1))$nom.alpha
+
+clusterExport(cl, "nominal_alpha")
+
+Analyse <-  list(
+  logrank_seq  = analyse_group_sequential(
+    followup = c(condition$interim_events, condition$final_events),
+    followup_type = c("event", "event"),
+    alpha = nominal_alpha,
+    analyse_functions = analyse_logrank()
+  ),
+  maxcombo_seq = analyse_group_sequential(
+    followup = c(condition$interim_events, condition$final_events),
+    followup_type = c("event", "event"),
+    alpha = nominal_alpha,
+    analyse_functions = analyse_maxcombo()
+  )
+)
+```
+
+## A 'Summarise' function for the more complex scenario
+
+The output of the function created with `analyse_group_sequential` contains
+additional columns. `rejected_at_stage` includes the stage at which the null was
+first rejected or `Inf` if the null was not rejected, `N_pat` and `N_evt`
+contain the number of patients recruited and the number of events observed
+before the null was rejected and `followup` contains the time after study start
+at which the last analysis was done.
+
+The results object also includes the results returned by each stage in
+`results_stages`, but here we only use the overall test-decision.
+
+```{r summarise_2}
+Summarise <- create_summarise_function(
+  maxcombo_seq = summarise_group_sequential(),
+  logrank_seq = summarise_group_sequential()
+)
+```
+
+## Putting it all together
+
+The call to `runSimulation` looks almost the same as above but now the
+additional columns we defined in our `Summarise` functions are included in the
+result.
+
+```{r run_2, results='hide'}
+res <- runSimulation(
+  Design,
+  replications = N_sim,
+  generate = my_generator,
+  analyse = Analyse,
+  summarise = Summarise,
+  cl = cl,
+  save=FALSE
+)
+```
+
+In the case of a group sequential design we are also interested in the average
+running time of the study in terms of patients recruited, number of events and
+running time of the study.
+
+```{r report_2}
+res |>
+  subset(select=c(
+    "delay", 
+    "maxcombo_seq.rejection", "logrank_seq.rejection",
+    "maxcombo_seq.n_pat", "logrank_seq.n_pat",
+    "maxcombo_seq.n_evt", "logrank_seq.n_evt",
+    "maxcombo_seq.followup", "logrank_seq.followup"
+    )) |>
+  knitr::kable()
+```
+
+# Estimation
+
+## Calculating the true values of the summary statistics
+
+To evaluate the performance of an estimator, we first compute the values of some
+true summary statistics to which the estimates will be compared. The most
+relevant true summary statistics can be computed by a convenience function for
+each scenario. Just pipe the Design data.frame to the function and the values of
+the statistics are added as columns.
+
+```{r design_3}
+Options <- design_fixed_followup()
+
+Design <- merge(Assumptions, Options, by=NULL)
+
+Design <- Design |> 
+  true_summary_statistics_delayed_effect(cutoff_stats = 20)
+
+knitr::kable(Design)
+```
+
+## Defining the `Summarise` function
+
+In the Summarise function the true value against which the estimator should be
+compared has to be specified. If coverage and average width of the confidence
+intervals should be estimated, the CI bounds should also be specified.
+
+The arguments to the functions are left un-evaluated and are later evaluated in
+the `results` and `condition` datasets respectively. So any expressions using
+variables from results can be used for the estimated value and the CI bounds and
+expressions using variables from condition can be used in the argument for the
+real value.
+
+In this case we want to compare the hazard ratio estimated by the Cox model to
+the geometric average hazard ratio as well as to the hazard ratio after onset of
+treatment, calculated from the two respective columns of the Design data.frame.
+
+Note that one name can be used twice to summarise the output of one analysis
+method two times, like in this case, comparing it to two different summary
+statistics.
+
+```{r summarise_3}
+Summarise <- create_summarise_function(
+    coxph=summarise_estimator(hr, gAHR_20, hr_lower, hr_upper, name="gAHR"),
+    coxph=summarise_estimator(hr, hazard_trt/hazard_ctrl, hr_lower, hr_upper, name="HR")
+  )
+```
+
+## Putting it all together
+
+```{r run_3, results='hide'}
+Analyse <- list(
+  coxph = analyse_coxph()
+)
+
+res <- runSimulation(
+  Design,
+  replications = N_sim,
+  generate = my_generator,
+  analyse = Analyse,
+  summarise = Summarise,
+  cl = cl,
+  save=FALSE
+)
+```
+
+```{r report_3}
+res |>
+  subset(select=c(
+    "delay", "coxph.HR.bias", "coxph.gAHR.bias", "coxph.HR.mse", 
+    "coxph.gAHR.mse", "coxph.HR.coverage", "coxph.gAHR.coverage"
+  )) |> 
+  knitr::kable()
+```
+
