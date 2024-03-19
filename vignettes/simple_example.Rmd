@@ -1,11 +1,13 @@
 ---
 title: "Examples for the Usage of the SimNPH Package"
 subtitle: "Generate Data, Test and Estimate, Summarise"
-output:
-  html_document:
-    toc: true
-    toc_depth: 2
-    self_contained: yes
+author: "Tobias Fellinger"
+date: "2024-03-19"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteEngine{knitr::knitr}
+  %\VignetteIndexEntry{Examples for the Usage of the SimNPH Package}
+  %\usepackage[UTF-8]{inputenc}
 ---
 
 
@@ -157,7 +159,7 @@ res <- runSimulation(
 #> 
 #> Number of parallel clusters in use: 8
 #> 
-#> Simulation complete. Total execution time: 13.28s
+#> Simulation complete. Total execution time: 14.28s
 ```
 
 Finally we select the interesting columns from the output. Since all other
@@ -175,12 +177,12 @@ res |>
 
 |   delay| maxcombo.rejection_0.05| logrank.rejection_0.05|
 |-------:|-----------------------:|----------------------:|
-|   0.000|                    0.55|                   0.56|
-|  60.875|                    0.57|                   0.58|
-| 121.750|                    0.33|                   0.33|
-| 182.625|                    0.35|                   0.27|
-| 243.500|                    0.31|                   0.24|
-| 304.375|                    0.22|                   0.16|
+|   0.000|                    0.47|                   0.50|
+|  60.875|                    0.45|                   0.46|
+| 121.750|                    0.37|                   0.32|
+| 182.625|                    0.27|                   0.23|
+| 243.500|                    0.20|                   0.14|
+| 304.375|                    0.16|                   0.12|
 
 
 
@@ -294,7 +296,7 @@ res <- runSimulation(
 #> 
 #> Number of parallel clusters in use: 8
 #> 
-#> Simulation complete. Total execution time: 30.25s
+#> Simulation complete. Total execution time: 30.07s
 ```
 
 In the case of a group sequential design we are also interested in the average
@@ -318,12 +320,12 @@ res |>
 
 |   delay| maxcombo_seq.rejection| logrank_seq.rejection| maxcombo_seq.n_pat| logrank_seq.n_pat| maxcombo_seq.n_evt| logrank_seq.n_evt| maxcombo_seq.followup| logrank_seq.followup|
 |-------:|----------------------:|---------------------:|------------------:|-----------------:|------------------:|-----------------:|---------------------:|--------------------:|
-|   0.000|                   0.88|                  0.88|                400|               400|             213.53|            208.04|               1278.60|              1226.25|
-|  60.875|                   0.78|                  0.78|                400|               400|             225.13|            225.96|               1346.22|              1352.96|
-| 121.750|                   0.81|                  0.75|                400|               400|             227.92|            230.52|               1368.19|              1391.11|
-| 182.625|                   0.61|                  0.60|                400|               400|             231.20|            233.93|               1379.38|              1402.06|
-| 243.500|                   0.65|                  0.60|                400|               400|             232.27|            234.93|               1381.79|              1405.35|
-| 304.375|                   0.48|                  0.44|                400|               400|             240.51|            240.44|               1435.50|              1435.95|
+|   0.000|                   0.82|                  0.84|                400|               400|             213.73|            212.11|               1271.03|              1256.83|
+|  60.875|                   0.77|                  0.76|                400|               400|             215.33|            218.62|               1280.30|              1308.13|
+| 121.750|                   0.73|                  0.70|                400|               400|             228.36|            231.12|               1362.40|              1385.58|
+| 182.625|                   0.71|                  0.65|                400|               400|             223.63|            228.97|               1320.08|              1368.20|
+| 243.500|                   0.55|                  0.49|                400|               400|             238.05|            239.26|               1426.16|              1436.63|
+| 304.375|                   0.58|                  0.50|                400|               400|             237.93|            241.80|               1411.85|              1442.90|
 
 
 
@@ -417,7 +419,7 @@ res <- runSimulation(
 #> 
 #> Number of parallel clusters in use: 8
 #> 
-#> Simulation complete. Total execution time: 0.99s
+#> Simulation complete. Total execution time: 0.93s
 ```
 
 
@@ -434,12 +436,12 @@ res |>
 
 |   delay| coxph.HR.bias| coxph.gAHR.bias| coxph.HR.mse| coxph.gAHR.mse| coxph.HR.coverage| coxph.gAHR.coverage|
 |-------:|-------------:|---------------:|------------:|--------------:|-----------------:|-------------------:|
-|   0.000|     0.0029152|       0.0029152|    0.0159069|      0.0159069|              0.94|                0.94|
-|  60.875|     0.0600237|      -0.2733096|    0.0268971|      0.0979924|              0.86|                0.57|
-| 121.750|     0.0938556|      -0.2394777|    0.0322495|      0.0807902|              0.86|                0.64|
-| 182.625|     0.1522637|      -0.1810697|    0.0448642|      0.0544663|              0.83|                0.80|
-| 243.500|     0.1609376|      -0.1723958|    0.0582003|      0.0620197|              0.79|                0.73|
-| 304.375|     0.1797369|      -0.1535965|    0.0557430|      0.0470295|              0.75|                0.84|
+|   0.000|     0.0307004|       0.0307004|    0.0171681|      0.0171681|              0.97|                0.97|
+|  60.875|     0.0437173|      -0.2896160|    0.0213150|      0.1032812|              0.94|                0.55|
+| 121.750|     0.0715696|      -0.2617637|    0.0222560|      0.0856541|              0.91|                0.63|
+| 182.625|     0.1197364|      -0.2135969|    0.0353176|      0.0666045|              0.87|                0.72|
+| 243.500|     0.1591968|      -0.1741365|    0.0495382|      0.0545181|              0.81|                0.78|
+| 304.375|     0.1861441|      -0.1471892|    0.0633401|      0.0503551|              0.73|                0.84|
 
 
 

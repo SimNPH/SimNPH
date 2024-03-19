@@ -1,11 +1,13 @@
 ---
 title: "Examples for the Usage of the SimNPH Package"
 subtitle: "Generate Data, Test and Estimate, Summarise"
-output:
-  html_document:
-    toc: true
-    toc_depth: 2
-    self_contained: yes
+author: "Tobias Fellinger"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteEngine{knitr::knitr}
+  %\VignetteIndexEntry{Examples for the Usage of the SimNPH Package}
+  %\usepackage[UTF-8]{inputenc}
 ---
 
 ```{r knitr_opts, include = FALSE}

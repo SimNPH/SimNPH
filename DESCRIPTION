@@ -45,6 +45,7 @@ Imports:
     methods,
     tidyr
 Config/testthat/edition: 3
+VignetteBuilder: knitr
 RoxygenNote: 7.2.3
 Roxygen: list(markdown = TRUE)
 URL: https://simnph.github.io/SimNPH/, https://github.com/SimNPH/SimNPH/
