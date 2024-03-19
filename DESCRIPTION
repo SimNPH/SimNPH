@@ -31,8 +31,7 @@ Suggests:
     withr,
     ldbounds,
     ggplot2,
-    patchwork,
-    R.rsp
+    patchwork
 Imports:
     miniPCH (>= 0.3.0),
     purrr (>= 1.0.0),
@@ -46,7 +45,7 @@ Imports:
     methods,
     tidyr
 Config/testthat/edition: 3
-VignetteBuilder: R.rsp
+VignetteBuilder: knitr
 RoxygenNote: 7.2.3
 Roxygen: list(markdown = TRUE)
 URL: https://simnph.github.io/SimNPH/, https://github.com/SimNPH/SimNPH/
