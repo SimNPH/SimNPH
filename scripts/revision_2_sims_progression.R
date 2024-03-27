@@ -3,7 +3,7 @@ library(SimNPH)
 library(SimDesign)
 library(parallel)
 
-if(packageVersion("SimNPH") != "0.5.4"){
+if(packageVersion("SimNPH") != "0.5.5"){
   stop("Please run the simulations with the correct vesion of the SimNPH package for reproducability.")
 }
 
@@ -17,12 +17,16 @@ design <- read.table("data_sim_study/parameters/revision_progression_os_2023-05-
 design <- design |>
   dplyr::select(-c(median_survival_trt:milestone_survival_ctrl_12m))
 
-design <- purrr::map_dfr(1:nrow(design), function(n){
+design <- purrr::map(1:nrow(design), function(n){
   data <- design[n,]
   true_summary_statistics_progression(
     data,
-    cutoff_stats = m2d(c("24m"=24, "36m"=36))
-  )})
+    cutoff_stats = m2d(c("6m"=6, "12m"=12, "24m"=24, "36m"=36)),
+    milestones   = m2d(c("6m"=6, "12m"=12, "24m"=24, "36m"=36))
+  )}, .progress = TRUE) |>
+  purrr::list_rbind()
+
+row.names(design) <- 1:nrow(design)
 
 # setup cluster -----------------------------------------------------------
 
