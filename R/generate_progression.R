@@ -335,24 +335,29 @@ cen_rate_from_cen_prop_progression <- function(design){
     a <- condition$n_trt / (condition$n_trt + condition$n_ctrl)
     b <- 1-a
 
-    data_generating_model_ctrl <- subpop_hazVfun_simnph(
-      c(0, t_max),
-      lambda1 = condition$hazard_ctrl,
-      lambda2 = condition$hazard_after_prog,
-      lambdaProg = condition$prog_rate_ctrl,
-      timezero = TRUE
+    cumhaz_trt_tmax  <- miniPCH::chmstate(
+      t_max,
+      t = 0,
+      Q = array(matrix(c(
+        -condition$prog_rate_trt -condition$hazard_trt,     condition$prog_rate_trt,       condition$hazard_trt,
+        0, -condition$hazard_after_prog, condition$hazard_after_prog,
+        0,                            0,                           0
+      ),3,3,byrow = TRUE), dim=c(3,3,1)),
+      pi = c(1,0,0),
+      abs = c(0,0,1)
     )
 
-    data_generating_model_trt <- subpop_hazVfun_simnph(
-      c(0, t_max),
-      lambda1 = condition$hazard_trt,
-      lambda2 = condition$hazard_after_prog,
-      lambdaProg = condition$prog_rate_trt,
-      timezero = TRUE
+    cumhaz_ctrl_tmax <- miniPCH::chmstate(
+      t_max,
+      t = 0,
+      Q = array(matrix(c(
+        -condition$prog_rate_ctrl -condition$hazard_ctrl,     condition$prog_rate_ctrl,       condition$hazard_ctrl,
+        0, -condition$hazard_after_prog, condition$hazard_after_prog,
+        0,                            0,                           0
+      ),3,3,byrow = TRUE), dim=c(3,3,1)),
+      pi = c(1,0,0),
+      abs = c(0,0,1)
     )
-
-    cumhaz_trt_tmax  <- tail(data_generating_model_trt$cumhaz, 1)
-    cumhaz_ctrl_tmax <- tail(data_generating_model_trt$cumhaz, 1)
 
     target_fun <- Vectorize(\(r){
       cumhaz_censoring <- miniPCH::chpch_fun(0, r)
@@ -443,28 +448,6 @@ hazard_before_progression_from_PH_effect_size <- function(design, target_power_p
       return(condition)
     }
 
-    # set t_max to 1/500 quantile of control arm
-    t_max <- log(500) / condition$hazard_ctrl
-
-    ## This is an internal function that is not exported
-    model_control <- subpop_hazVfun_simnph(
-      c(0, t_max),
-      lambda1 = condition$hazard_ctrl,
-      lambda2 = condition$hazard_after_prog,
-      lambdaProg = condition$prog_rate_ctrl,
-      timezero = TRUE
-    )
-
-    # setting median to max(t) if less than half die
-    # only for uniroot later, not for general use!
-    median_progression <- function(mod){
-      med <- mod$t[mod$S <= 0.5][1] + 1
-      if(is.na(med)){
-        med <- max(mod$t)
-      }
-      med
-    }
-
     ph_hr <- hr_required_schoenfeld(
       final_events,
       alpha=target_alpha,
@@ -472,32 +455,39 @@ hazard_before_progression_from_PH_effect_size <- function(design, target_power_p
       p=(condition$n_ctrl/(condition$n_ctrl + condition$n_trt))
     )
 
+    p_ctrl <- miniPCH::pmstate_fun(
+      t = 0,
+      Q=array(matrix(c(
+        -condition$prog_rate_ctrl -condition$hazard_ctrl,     condition$prog_rate_ctrl,       condition$hazard_ctrl,
+                                                       0, -condition$hazard_after_prog, condition$hazard_after_prog,
+                                                       0,                            0,                           0
+      ),3,3,byrow = TRUE), dim=c(3,3,1)),
+      pi=c(1L,0,0),
+      abs=c(0,0,1L)
+    )
 
-    median_ctrl <- median_progression(model_control)
+    t_max <- miniPCH::qpch(0.9, 0, min(condition$hazard_ctrl, condition$prog_rate_ctrl, condition$hazard_after_prog))
 
-    hazard_ctrl_ph <- uniroot(
-      \(h){
-        miniPCH::qpch_fun(0, h)(0.5) - median_ctrl
-      },
-      interval=c(1e-8, 0.0001),
-      extendInt="downX",
-      tol = 2*.Machine$double.eps
-    )$root
+    median_ctrl <- uniroot(\(t){
+      p_ctrl(t) - 0.5
+    }, c(0,t_max))$root
 
-    median_trt_ph  <- miniPCH::qpch_fun(0, hazard_ctrl_ph * ph_hr)(0.5)
+    hazard_ctrl_ph <- m2r(d2m(median_ctrl))
 
-    target_fun_hazard_trt <- function(hazard_after){
-      sapply(hazard_after, \(h){
-        mod_trt <- subpop_hazVfun_simnph(
-          c(0, t_max),
-          lambda1 = h,
-          lambda2 = condition$hazard_after_prog,
-          lambdaProg = condition$prog_rate_trt,
-          timezero = TRUE
-        )
-        median_trt <- median_progression(mod_trt)
-        median_trt_ph - median_trt
-      })
+    median_trt_ph  <- miniPCH::qpch(0.5, 0, hazard_ctrl_ph * ph_hr)
+
+    target_fun_hazard_trt <- function(h){
+      miniPCH::pmstate(
+        median_trt_ph,
+        t=0,
+        Q=array(matrix(c(
+          -condition$prog_rate_trt -h,      condition$prog_rate_trt,                           h,
+                                    0, -condition$hazard_after_prog, condition$hazard_after_prog,
+                                    0,                            0,                           0
+        ),3,3,byrow = TRUE), dim=c(3,3,1)),
+        pi=c(1L,0,0),
+        abs=c(0,0,1L)
+      ) - 0.5
     }
 
     condition$hazard_trt <- uniroot(target_fun_hazard_trt, interval=c(1e-8, 0.0001), extendInt = "upX", tol=.Machine$double.eps*2)$root
