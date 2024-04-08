@@ -10,7 +10,6 @@ test_that("shhr ggplot works", {
 
   expect_s3_class(my_obj, "patchwork")
 
-
   withr::with_package("ggplot2", {
     withr::with_package("patchwork", {
       my_obj <- shhr_gg(A, B, lab_time="Months", trafo_time=d2m)
@@ -18,4 +17,23 @@ test_that("shhr ggplot works", {
   })
 
   expect_s3_class(my_obj, "patchwork")
+
+  expect_equal(my_obj[[1]]$labels$y, "Survival")
+  expect_equal(my_obj[[2]]$labels$y, "Hazard")
+  expect_equal(my_obj[[3]]$labels$y, "Hazard ratio")
+
+
+  withr::with_package("ggplot2", {
+    withr::with_package("patchwork", {
+      my_obj2 <- shhr_gg(A, B, lab_time="Months", trafo_time=d2m, as_list=TRUE)
+    })
+  })
+
+  expect_equal(my_obj2[[1]]$labels$y, "Survival")
+  expect_equal(my_obj2[[2]]$labels$y, "Hazard")
+  expect_equal(my_obj2[[3]]$labels$y, "Hazard ratio")
+
+  expect_s3_class(my_obj2, NA)
+
+  my_obj3 <- shhr_gg(A, B)
 })
