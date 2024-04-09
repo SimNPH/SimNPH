@@ -30,4 +30,11 @@ test_that("random censoring works", {
   test_res3 <- random_censoring_exp(test_data2, rate)
   expect(all(test_res3$t_ice <= test_data2$t_ice), "not all censored times less equal uncensored times")
   expect_named(test_res3, c("t", "evt", "additional_column", "ice", "t_ice"))
+
+  test_res4 <- withr::with_seed(123, {
+    random_censoring_exp(test_data2, rate, discrete = FALSE)
+  })
+  expect(all(test_res4$t_ice <= test_res4$t_ice), "not all censored times less equal uncensored times")
+  expect_named(test_res4, c("t", "evt", "additional_column", "ice", "t_ice"))
+  expect_true(any(test_res4$t != round(test_res4$t)))
 })
