@@ -46,7 +46,7 @@ Imports:
     tidyr
 Config/testthat/edition: 3
 VignetteBuilder: knitr
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.1
 Roxygen: list(markdown = TRUE)
 URL: https://simnph.github.io/SimNPH/, https://github.com/SimNPH/SimNPH/
 BugReports: https://github.com/SimNPH/SimNPH/issues/
