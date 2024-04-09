@@ -1,3 +1,7 @@
+# SimNPH 0.5.6
+
+* Fixed minor mistakes in documentation
+
 # SimNPH 0.5.5
 
 * Sped up calculation of treatment arm hazard from effect size and calculation
