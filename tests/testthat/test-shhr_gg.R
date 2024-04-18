@@ -42,17 +42,14 @@ test_that("shhr gives warning if packages are missing", {
   B <- nph::pchaz(c(0, 10, 100), c(0.1, 0.05))
   A <- nph::pchaz(c(0, 100), c(0.1))
 
-  # overwrite requireNamespace
-  old_fn <- base::requireNamespace
-  myrequireNamespace <- function(...) FALSE
-  unlockBinding("requireNamespace", as.environment("package:base"))
-  assign("requireNamespace",myrequireNamespace, "package:base")
 
-  expect_message(my_obj <- shhr_gg(A, B))
-  expect_null(my_obj)
+  with_mocked_bindings(
+    {
+      expect_message(my_obj <- shhr_gg(A, B))
+      expect_null(my_obj)
+    },
+    requireNamespace = function(...){FALSE},
+    .package="base"
+  )
 
-  # restore normal search path
-  assign("requireNamespace",old_fn, "package:base")
-  lockBinding("requireNamespace", as.environment("package:base"))
-  rm(old_fn, myrequireNamespace)
 })
