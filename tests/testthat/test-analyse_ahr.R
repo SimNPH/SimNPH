@@ -17,6 +17,7 @@ test_that("analyse ahr works", {
   results2 <- analyse_ahr(type="gAHR")(condition, dat)
   results3 <- analyse_ahr(max_time=50, type="AHR") (condition, dat)
   results4 <- analyse_ahr(max_time=50, type="gAHR", alternative="one.sided")(condition, dat)
+  results5 <- analyse_ahr(max_time=c(50, 100), type="gAHR", alternative="one.sided")(condition, dat)
 
   expect_type(results1, "list")
   expect_s3_class(results1, NA)
@@ -33,5 +34,10 @@ test_that("analyse ahr works", {
   expect_type(results4, "list")
   expect_s3_class(results4, NA)
   expect_named(results4, c("p", "alternative", "gAHR", "gAHR_lower", "gAHR_upper", "CI_level", "N_pat", "N_evt"))
+  expect_equal(length(results4$gAHR), 1)
 
+  expect_type(results5, "list")
+  expect_s3_class(results5, NA)
+  expect_named(results5, c("p", "alternative", "gAHR", "gAHR_lower", "gAHR_upper", "CI_level", "N_pat", "N_evt"))
+  expect_equal(length(results5$gAHR), 2)
 })

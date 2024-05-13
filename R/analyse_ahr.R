@@ -1,6 +1,6 @@
 #' Analyse the dataset using extimators for the the average hazard ratio
 #'
-#' @param max_time time for which the RMST is calculated
+#' @param max_time time for which the AHR is calculated
 #' @param type "AHR" for average hazard ratio "gAHR" for geometric average hazard ratio
 #' @param level confidence level for CI computation
 #' @param alternative alternative hypothesis for the tests "two.sided" or "one.sieded"
