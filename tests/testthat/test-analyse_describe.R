@@ -24,7 +24,8 @@ test_that("descriptive statistics work (summary of many lines)", {
         analyse=list(
           describe=analyse_describe()
         ),
-        summarise = summarise_all
+        summarise = summarise_all,
+        save=FALSE
       )
     )
   )
