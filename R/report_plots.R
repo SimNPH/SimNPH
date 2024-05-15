@@ -68,6 +68,7 @@ results_pivot_longer <- function(data, exclude_from_methods=c("descriptive")){
 #'   `geom_hline`
 #' @param use_colours optional named vector of colours used in `scale_colour_manual`
 #' @param use_shapes optional named vector of shapes used in `scale_shape_manual`
+#' @param expand_x_axis axis expansion factor, passed to `scale_x_continuous`
 #'
 #' @return a ggplot/patchwork object containing the plots
 #' @export
@@ -162,7 +163,8 @@ combined_plot <- function(
     scales = "fixed",
     hlines = numeric(0),
     use_colours = NULL,
-    use_shapes  = NULL
+    use_shapes  = NULL,
+    expand_x_axis = c(0.05,0,0.05,0)
 ){
 
   if(!is.null(scale_stairs)){
@@ -216,7 +218,7 @@ combined_plot <- function(
     ggplot2::scale_x_continuous(
       breaks = grid_breaks,
       minor_breaks = NULL,
-      expand = ggplot2::expansion(0,0)
+      expand = expand_x_axis
     ) +
     ggplot2::theme(
       axis.text.x = ggplot2::element_blank(),
@@ -245,7 +247,7 @@ combined_plot <- function(
       ggplot2::scale_x_continuous(
         breaks = grid_breaks,
         minor_breaks = NULL,
-        expand = ggplot2::expansion(0,0)
+        expand = expand_x_axis
       ) +
       ggplot2::theme_void(
         base_size = 9
