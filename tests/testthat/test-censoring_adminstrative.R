@@ -18,10 +18,24 @@ test_that("adding recruitment times works", {
 
   expect(all(data1$rec_time <= 50), "max recruitment time not smaller than given in argument")
 
-
   expect(all(data1$rec_time >= 10), "min recruitment time not larger than given in argument")
 
   expect_named(data1, c("t", "trt", "evt", "additional_column", "rec_time"))
+
+  expect_equal(round(data1$rec_time), data1$rec_time)
+
+  withr::with_seed(123, {
+    data2 <- data |>
+      recruitment_uniform(50, 10, discrete = FALSE)
+  })
+
+  expect(all(data2$rec_time <= 50), "max recruitment time not smaller than given in argument")
+
+  expect(all(data2$rec_time >= 10), "min recruitment time not larger than given in argument")
+
+  expect_named(data2, c("t", "trt", "evt", "additional_column", "rec_time"))
+
+  expect_true(any(data2$rec_time != round(data2$rec_time)))
 })
 
 test_that("administrative censoring after fixed time works", {

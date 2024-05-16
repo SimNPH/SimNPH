@@ -2,9 +2,28 @@
 % Please edit documentation in R/SimNPH-package.R
 \docType{package}
 \name{SimNPH}
+\alias{SimNPH-package}
 \alias{SimNPH}
 \title{SimNPH: Simulate Non Proportional Hazards}
 \description{
 This package provides several functions to simulate survival data with non
 proportional hazards using the general purpose simulation package SimDesign.
+}
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://simnph.github.io/SimNPH/}
+  \item \url{https://github.com/SimNPH/SimNPH/}
+  \item Report bugs at \url{https://github.com/SimNPH/SimNPH/issues/}
+}
+
+}
+\author{
+\strong{Maintainer}: Tobias Fellinger \email{tobias.fellinger@ages.at} (\href{https://orcid.org/0000-0001-9474-2731}{ORCID})
+
+Authors:
+\itemize{
+  \item Florian Klinglmueller (\href{https://orcid.org/0000-0002-7346-3669}{ORCID})
+}
+
 }

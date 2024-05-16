@@ -12,7 +12,7 @@ analyse_ahr(
 )
 }
 \arguments{
-\item{max_time}{time for which the RMST is calculated}
+\item{max_time}{time for which the AHR is calculated}
 
 \item{type}{"AHR" for average hazard ratio "gAHR" for geometric average hazard ratio}
 

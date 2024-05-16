@@ -16,16 +16,17 @@ combined_plot(
   facet_y_vars = c(),
   split_var = 1,
   heights_plots = c(3, 1),
-  scale_stairs = 0.75,
+  scale_stairs = NULL,
   grid_level = 2,
   scales = "fixed",
   hlines = numeric(0),
   use_colours = NULL,
-  use_shapes = NULL
+  use_shapes = NULL,
+  expand_x_axis = c(0.05, 0, 0.05, 0)
 )
 }
 \arguments{
-\item{data}{for combined_plto simulation results in long format, as returned by \code{results_pivot_longer}.}
+\item{data}{for results_pivot_longer: simulation result as retured by SimDesign, for combined_plot: simulation results in long format, as returned by \code{results_pivot_longer}.}
 
 \item{exclude_from_methods}{"methods" that should not be pivoted into long format}
 
@@ -39,11 +40,11 @@ combined_plot(
 
 \item{facet_y_vars}{vector of variable names to create rows of facets}
 
-\item{split_var}{index of xvars along groups of which the plot should be split}
+\item{split_var}{where should the lines be split, see details}
 
 \item{heights_plots}{relative heights of the main plot and the stairs on the bottom}
 
-\item{scale_stairs}{height of the stairs for each variable between 0 and 1}
+\item{scale_stairs}{this argument is deprecated and will be ignored}
 
 \item{grid_level}{depth of loops for which the grid-lines are drawn}
 
@@ -55,6 +56,8 @@ combined_plot(
 \item{use_colours}{optional named vector of colours used in \code{scale_colour_manual}}
 
 \item{use_shapes}{optional named vector of shapes used in \code{scale_shape_manual}}
+
+\item{expand_x_axis}{axis expansion factor, passed to \code{scale_x_continuous}}
 }
 \value{
 dataset in long format with one row per method and scenario and one
@@ -71,6 +74,8 @@ reference methods can be kept as own columns and used like the columns of
 the simulation parameters.
 
 \code{use_colours} and \code{use_shapes} both use the \code{method} variable in their respective aesthetics.
+
+\code{split_var} break the lines after the 1st, 2nd, ... variable in \code{xvars}. Use 0 for one continuous line per method.
 }
 \section{Functions}{
 \itemize{

@@ -1,7 +1,7 @@
 Package: SimNPH
 Type: Package
 Title: Simulate Non-Proportional Hazards
-Version: 0.5.3
+Version: 0.5.5
 Authors@R: c(person("Tobias", "Fellinger", email="tobias.fellinger@ages.at", role=c("aut", "cre"), comment = c(ORCID = "0000-0001-9474-2731")),
             person("Florian", "Klinglmueller", role=c("aut"), comment = c(ORCID = "0000-0002-7346-3669")))
 License: BSL-1.0
@@ -31,8 +31,7 @@ Suggests:
     withr,
     ldbounds,
     ggplot2,
-    patchwork,
-    R.rsp
+    patchwork
 Imports:
     miniPCH (>= 0.3.0),
     purrr (>= 1.0.0),
@@ -46,8 +45,8 @@ Imports:
     methods,
     tidyr
 Config/testthat/edition: 3
-VignetteBuilder: R.rsp
-RoxygenNote: 7.2.3
+VignetteBuilder: knitr
+RoxygenNote: 7.3.1
 Roxygen: list(markdown = TRUE)
 URL: https://simnph.github.io/SimNPH/, https://github.com/SimNPH/SimNPH/
 BugReports: https://github.com/SimNPH/SimNPH/issues/

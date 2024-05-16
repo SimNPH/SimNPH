@@ -1,4 +1,4 @@
-test_that("descriptive statistics work", {
+test_that("descriptive statistics work (summary of many lines)", {
 
   capture_output(
     condition <- merge(
@@ -24,7 +24,8 @@ test_that("descriptive statistics work", {
         analyse=list(
           describe=analyse_describe()
         ),
-        summarise = summarise_all
+        summarise = summarise_all,
+        save=FALSE
       )
     )
   )
@@ -35,4 +36,76 @@ test_that("descriptive statistics work", {
                 "describe.sd_study_time")
 
   expect(all(my_names %in% names(sim_results)), "some expected names are missing")
+})
+
+
+test_that("descriptive statistics work (one line)", {
+
+  capture_output(
+    condition <- merge(
+      assumptions_delayed_effect(),
+      design_fixed_followup(),
+      by=NULL
+    ) |>
+      head(1)
+  )
+
+  withr::with_seed(123,{
+    dat <- generate_delayed_effect(condition) |>
+      within({
+        rec_time <- 0
+      }) |>
+      admin_censoring_time(2000)
+  })
+
+  desc <- analyse_describe()(condition, dat)
+  expect_equal(desc$study_time, 2000)
+})
+
+
+test_that("descriptive statistics work (subgroup)", {
+  capture_output(
+    condition <- merge(
+      assumptions_subgroup(),
+      design_fixed_followup(),
+      by=NULL
+    ) |>
+      head(1)
+  )
+
+  withr::with_seed(123,{
+    dat <- generate_subgroup(condition)
+  })
+
+  desc <- analyse_describe()(condition, dat)
+  expect_named(
+    desc,
+    c("n_pat", "max_followup", "evt", "evt_ctrl", "evt_trt", "study_time",
+      "subgroup", "subgroup_ctrl", "subgroup_trt"),
+    ignore.order = TRUE
+  )
+})
+
+
+test_that("descriptive statistics work (intercurrent event)", {
+  capture_output(
+    condition <- merge(
+      assumptions_progression(),
+      design_fixed_followup(),
+      by=NULL
+    ) |>
+      head(1)
+  )
+
+  withr::with_seed(123,{
+    dat <- generate_progression(condition)
+  })
+
+  desc <- analyse_describe()(condition, dat)
+  expect_named(
+    desc,
+    c("n_pat", "max_followup", "evt", "evt_ctrl", "evt_trt", "study_time",
+      "ice", "ice_ctrl", "ice_trt"),
+    ignore.order = TRUE
+  )
 })

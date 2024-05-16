@@ -4,6 +4,7 @@
 [![Codecov test coverage](https://codecov.io/gh/SimNPH/SimNPH/branch/master/graph/badge.svg)](https://app.codecov.io/gh/SimNPH/SimNPH?branch=master)
 [![CRAN status](https://www.r-pkg.org/badges/version/SimNPH)](https://CRAN.R-project.org/package=SimNPH)
 [![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
+[![R-CMD-check](https://github.com/SimNPH/SimNPH/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/SimNPH/SimNPH/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 **Sim**ulate **N**on **P**roportional **H**azards
@@ -40,5 +41,4 @@ Some examples of data generation, testing and estimation can be found in this
 The results of the simulation study done by the CONFIRMS consortium in the
 course of the EMA tender will be published in an upcoming paper 
 ([preprint on arXiv](https://arxiv.org/abs/2310.05622)) and are presented in a 
-Shiny App. The app can be downloaded and run locally, check out the app's 
-[github repository](https://github.com/SimNPH/ShinySimNPH).
+[shinylive App](https://simnph.github.io/SimResultsShinylive/about.html). 
