@@ -21,7 +21,8 @@ combined_plot(
   scales = "fixed",
   hlines = numeric(0),
   use_colours = NULL,
-  use_shapes = NULL
+  use_shapes = NULL,
+  expand_x_axis = c(0.05, 0, 0.05, 0)
 )
 }
 \arguments{
@@ -55,6 +56,8 @@ combined_plot(
 \item{use_colours}{optional named vector of colours used in \code{scale_colour_manual}}
 
 \item{use_shapes}{optional named vector of shapes used in \code{scale_shape_manual}}
+
+\item{expand_x_axis}{axis expansion factor, passed to \code{scale_x_continuous}}
 }
 \value{
 dataset in long format with one row per method and scenario and one

@@ -1,6 +1,7 @@
 # SimNPH 0.5.6
 
-* Fixed minor mistakes in documentation
+* Fixed minor mistakes in documentation.
+* Added parameter to control x-axis expansion to `combined_plot`.
 
 # SimNPH 0.5.5
 

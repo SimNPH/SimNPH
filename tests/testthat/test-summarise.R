@@ -168,7 +168,8 @@ test_that("generic summarise for tests works", {
         analyse=list(
           logrank=analyse_logrank()
         ),
-        summarise = summarise_all
+        summarise = summarise_all,
+        save=FALSE
       )
     )
   )
