@@ -79,9 +79,9 @@ Changes since the conduct of the simulation study:
 
 If you want to re-use the scenarios from the simulation study to investigate
 additional methods, use the scripts and documentation provided in the
-[https://github.com/SimNPH/SimTemplate](SimTemplate) github repository. Also
+[SimTemplate](https://github.com/SimNPH/SimTemplate) github repository. Also
 refer to the documentation on
-[https://simnph.github.io/SimNPH/CONTRIBUTING.html](contributing). If you do so
+[contributing](https://simnph.github.io/SimNPH/CONTRIBUTING.html). If you do so
 please cite the simulation study, you can get a bibtex entry with
 `citation(package="SimNPH")`.
 
