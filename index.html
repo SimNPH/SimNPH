@@ -95,6 +95,38 @@
 </h2>
 <p>The results of the simulation study done by the CONFIRMS consortium in the course of the EMA tender will be published in an upcoming paper (<a href="https://arxiv.org/abs/2310.05622" class="external-link">preprint on arXiv</a>) and are presented in a <a href="https://simnph.github.io/SimResultsShinylive/about.html" class="external-link">shinylive App</a>.</p>
 </div>
+<div class="section level2">
+<h2 id="reproducing-the-results-of-the-simulation-study">Reproducing the Results of the Simulation study<a class="anchor" aria-label="anchor" href="#reproducing-the-results-of-the-simulation-study"></a>
+</h2>
+<p>The parameters for the simulations were set using the following scripts:</p>
+<ul>
+<li><code>scripts/set_parameters_delayed_effect.R</code></li>
+<li><code>scripts/set_parameters_crossing_hazards.R</code></li>
+<li><code>scripts/set_parameters_subgroup.R</code></li>
+<li><code>scripts/set_parameters_progression.R</code></li>
+</ul>
+<p>The simulations were then run using the following scripts:</p>
+<ul>
+<li><code>scripts/run_simulations_delayed_effect.R</code></li>
+<li><code>scripts/run_simulations_crossing_hazards.R</code></li>
+<li><code>scripts/run_simulations_subgroup.R</code></li>
+<li><code>scripts/run_simulations_progression.R</code></li>
+</ul>
+<p>Which in turn use <code>scripts/run_simulations_common.R</code>.</p>
+<p>All scripts are executed with the base directory of this repository as working directory.</p>
+<p>Changes since the conduct of the simulation study:</p>
+<ul>
+<li>The version number of SimNPH was increased, to reproduce the simulation study, remove the check from <code>run_simulations_...</code>
+</li>
+<li>Simulation parameters and results were previously stored in the folder <code>data</code>. This folder was renamed to <code>data_sim_study</code> because <code>data</code> is reserved for the use in R packages. Change the paths accordingly.</li>
+<li>The <code>run_simulations_...</code> scripts the parameters from a specified data. If you want to use parameter-values you generated yourself, update the path accordingly.</li>
+</ul>
+</div>
+<div class="section level2">
+<h2 id="re-using-the-scenarios">Re-Using the Scenarios<a class="anchor" aria-label="anchor" href="#re-using-the-scenarios"></a>
+</h2>
+<p>If you want to re-use the scenarios from the simulation study to investigate additional methods, use the scripts and documentation provided in the <a href="https://github.com/SimNPH/SimTemplate" class="external-link">SimTemplate</a> github repository. Also refer to the documentation on <a href="https://simnph.github.io/SimNPH/CONTRIBUTING.html">contributing</a>. If you do so please cite the simulation study, you can get a bibtex entry with <code>citation(package="SimNPH")</code>.</p>
+</div>
 </div>
   </main><aside class="col-md-3"><div class="links">
 <h2 data-toc-skip>Links</h2>
