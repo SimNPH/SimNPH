@@ -71,8 +71,8 @@ Changes since the conduct of the simulation study:
 * Simulation parameters and results were previously stored in the folder `data`.
   This folder was renamed to `data_sim_study` because `data` is reserved for the
   use in R packages. Change the paths accordingly.
-* The `run_simulations_...` scripts the parameters from a specified data. If you
-  want to use parameter-values you generated yourself, update the path 
+* The `run_simulations_...` scripts use the parameters from a specified data. If
+  you want to use parameter-values you generated yourself, update the path 
   accordingly.
   
 ## Re-Using the Scenarios
