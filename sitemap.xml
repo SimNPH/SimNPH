@@ -1,138 +1,48 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://simnph.github.io/SimNPH/404.html</loc>
-  </url>
-  <url>
-    <loc>https://simnph.github.io/SimNPH/CONTRIBUTING.html</loc>
-  </url>
-  <url>
-    <loc>https://simnph.github.io/SimNPH/articles/index.html</loc>
-  </url>
-  <url>
-    <loc>https://simnph.github.io/SimNPH/articles/simple_example.html</loc>
-  </url>
-  <url>
-    <loc>https://simnph.github.io/SimNPH/authors.html</loc>
-  </url>
-  <url>
-    <loc>https://simnph.github.io/SimNPH/index.html</loc>
-  </url>
-  <url>
-    <loc>https://simnph.github.io/SimNPH/news/index.html</loc>
-  </url>
-  <url>
-    <loc>https://simnph.github.io/SimNPH/reference/SimNPH.html</loc>
-  </url>
-  <url>
-    <loc>https://simnph.github.io/SimNPH/reference/admin_censoring_time.html</loc>
-  </url>
-  <url>
-    <loc>https://simnph.github.io/SimNPH/reference/analyse_aft.html</loc>
-  </url>
-  <url>
-    <loc>https://simnph.github.io/SimNPH/reference/analyse_ahr.html</loc>
-  </url>
-  <url>
-    <loc>https://simnph.github.io/SimNPH/reference/analyse_coxph.html</loc>
-  </url>
-  <url>
-    <loc>https://simnph.github.io/SimNPH/reference/analyse_describe.html</loc>
-  </url>
-  <url>
-    <loc>https://simnph.github.io/SimNPH/reference/analyse_diff_median_survival.html</loc>
-  </url>
-  <url>
-    <loc>https://simnph.github.io/SimNPH/reference/analyse_gehan_wilcoxon.html</loc>
-  </url>
-  <url>
-    <loc>https://simnph.github.io/SimNPH/reference/analyse_group_sequential.html</loc>
-  </url>
-  <url>
-    <loc>https://simnph.github.io/SimNPH/reference/analyse_logrank.html</loc>
-  </url>
-  <url>
-    <loc>https://simnph.github.io/SimNPH/reference/analyse_logrank_fh_weights.html</loc>
-  </url>
-  <url>
-    <loc>https://simnph.github.io/SimNPH/reference/analyse_maxcombo.html</loc>
-  </url>
-  <url>
-    <loc>https://simnph.github.io/SimNPH/reference/analyse_milestone_survival.html</loc>
-  </url>
-  <url>
-    <loc>https://simnph.github.io/SimNPH/reference/analyse_modelstly_weighted.html</loc>
-  </url>
-  <url>
-    <loc>https://simnph.github.io/SimNPH/reference/analyse_piecewise_exponential.html</loc>
-  </url>
-  <url>
-    <loc>https://simnph.github.io/SimNPH/reference/analyse_rmst_diff.html</loc>
-  </url>
-  <url>
-    <loc>https://simnph.github.io/SimNPH/reference/analyse_weibull.html</loc>
-  </url>
-  <url>
-    <loc>https://simnph.github.io/SimNPH/reference/combination_tests_delayed.html</loc>
-  </url>
-  <url>
-    <loc>https://simnph.github.io/SimNPH/reference/create_summarise_function.html</loc>
-  </url>
-  <url>
-    <loc>https://simnph.github.io/SimNPH/reference/design_fixed_followup.html</loc>
-  </url>
-  <url>
-    <loc>https://simnph.github.io/SimNPH/reference/design_group_sequential.html</loc>
-  </url>
-  <url>
-    <loc>https://simnph.github.io/SimNPH/reference/generate_crossing_hazards.html</loc>
-  </url>
-  <url>
-    <loc>https://simnph.github.io/SimNPH/reference/generate_delayed_effect.html</loc>
-  </url>
-  <url>
-    <loc>https://simnph.github.io/SimNPH/reference/generate_progression.html</loc>
-  </url>
-  <url>
-    <loc>https://simnph.github.io/SimNPH/reference/generate_subgroup.html</loc>
-  </url>
-  <url>
-    <loc>https://simnph.github.io/SimNPH/reference/index.html</loc>
-  </url>
-  <url>
-    <loc>https://simnph.github.io/SimNPH/reference/labs_from_labels.html</loc>
-  </url>
-  <url>
-    <loc>https://simnph.github.io/SimNPH/reference/merge_additional_results.html</loc>
-  </url>
-  <url>
-    <loc>https://simnph.github.io/SimNPH/reference/mixture_haz_fun.html</loc>
-  </url>
-  <url>
-    <loc>https://simnph.github.io/SimNPH/reference/progression_cdf_fun.html</loc>
-  </url>
-  <url>
-    <loc>https://simnph.github.io/SimNPH/reference/r2m.html</loc>
-  </url>
-  <url>
-    <loc>https://simnph.github.io/SimNPH/reference/random_censoring_exp.html</loc>
-  </url>
-  <url>
-    <loc>https://simnph.github.io/SimNPH/reference/rename_results_column.html</loc>
-  </url>
-  <url>
-    <loc>https://simnph.github.io/SimNPH/reference/results_pivot_longer.html</loc>
-  </url>
-  <url>
-    <loc>https://simnph.github.io/SimNPH/reference/shhr_gg.html</loc>
-  </url>
-  <url>
-    <loc>https://simnph.github.io/SimNPH/reference/summarise_estimator.html</loc>
-  </url>
-  <url>
-    <loc>https://simnph.github.io/SimNPH/reference/summarise_test.html</loc>
-  </url>
-  <url>
-    <loc>https://simnph.github.io/SimNPH/reference/wrap_all_in_trycatch.html</loc>
-  </url>
+<urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
+<url><loc>https://simnph.github.io/SimNPH/404.html</loc></url>
+<url><loc>https://simnph.github.io/SimNPH/CONTRIBUTING.html</loc></url>
+<url><loc>https://simnph.github.io/SimNPH/articles/index.html</loc></url>
+<url><loc>https://simnph.github.io/SimNPH/articles/simple_example.html</loc></url>
+<url><loc>https://simnph.github.io/SimNPH/authors.html</loc></url>
+<url><loc>https://simnph.github.io/SimNPH/index.html</loc></url>
+<url><loc>https://simnph.github.io/SimNPH/news/index.html</loc></url>
+<url><loc>https://simnph.github.io/SimNPH/reference/SimNPH.html</loc></url>
+<url><loc>https://simnph.github.io/SimNPH/reference/admin_censoring_time.html</loc></url>
+<url><loc>https://simnph.github.io/SimNPH/reference/analyse_aft.html</loc></url>
+<url><loc>https://simnph.github.io/SimNPH/reference/analyse_ahr.html</loc></url>
+<url><loc>https://simnph.github.io/SimNPH/reference/analyse_coxph.html</loc></url>
+<url><loc>https://simnph.github.io/SimNPH/reference/analyse_describe.html</loc></url>
+<url><loc>https://simnph.github.io/SimNPH/reference/analyse_diff_median_survival.html</loc></url>
+<url><loc>https://simnph.github.io/SimNPH/reference/analyse_gehan_wilcoxon.html</loc></url>
+<url><loc>https://simnph.github.io/SimNPH/reference/analyse_group_sequential.html</loc></url>
+<url><loc>https://simnph.github.io/SimNPH/reference/analyse_logrank.html</loc></url>
+<url><loc>https://simnph.github.io/SimNPH/reference/analyse_logrank_fh_weights.html</loc></url>
+<url><loc>https://simnph.github.io/SimNPH/reference/analyse_maxcombo.html</loc></url>
+<url><loc>https://simnph.github.io/SimNPH/reference/analyse_milestone_survival.html</loc></url>
+<url><loc>https://simnph.github.io/SimNPH/reference/analyse_modelstly_weighted.html</loc></url>
+<url><loc>https://simnph.github.io/SimNPH/reference/analyse_piecewise_exponential.html</loc></url>
+<url><loc>https://simnph.github.io/SimNPH/reference/analyse_rmst_diff.html</loc></url>
+<url><loc>https://simnph.github.io/SimNPH/reference/analyse_weibull.html</loc></url>
+<url><loc>https://simnph.github.io/SimNPH/reference/combination_tests_delayed.html</loc></url>
+<url><loc>https://simnph.github.io/SimNPH/reference/create_summarise_function.html</loc></url>
+<url><loc>https://simnph.github.io/SimNPH/reference/design_fixed_followup.html</loc></url>
+<url><loc>https://simnph.github.io/SimNPH/reference/design_group_sequential.html</loc></url>
+<url><loc>https://simnph.github.io/SimNPH/reference/generate_crossing_hazards.html</loc></url>
+<url><loc>https://simnph.github.io/SimNPH/reference/generate_delayed_effect.html</loc></url>
+<url><loc>https://simnph.github.io/SimNPH/reference/generate_progression.html</loc></url>
+<url><loc>https://simnph.github.io/SimNPH/reference/generate_subgroup.html</loc></url>
+<url><loc>https://simnph.github.io/SimNPH/reference/index.html</loc></url>
+<url><loc>https://simnph.github.io/SimNPH/reference/labs_from_labels.html</loc></url>
+<url><loc>https://simnph.github.io/SimNPH/reference/merge_additional_results.html</loc></url>
+<url><loc>https://simnph.github.io/SimNPH/reference/mixture_haz_fun.html</loc></url>
+<url><loc>https://simnph.github.io/SimNPH/reference/progression_cdf_fun.html</loc></url>
+<url><loc>https://simnph.github.io/SimNPH/reference/r2m.html</loc></url>
+<url><loc>https://simnph.github.io/SimNPH/reference/random_censoring_exp.html</loc></url>
+<url><loc>https://simnph.github.io/SimNPH/reference/rename_results_column.html</loc></url>
+<url><loc>https://simnph.github.io/SimNPH/reference/results_pivot_longer.html</loc></url>
+<url><loc>https://simnph.github.io/SimNPH/reference/shhr_gg.html</loc></url>
+<url><loc>https://simnph.github.io/SimNPH/reference/summarise_estimator.html</loc></url>
+<url><loc>https://simnph.github.io/SimNPH/reference/summarise_test.html</loc></url>
+<url><loc>https://simnph.github.io/SimNPH/reference/wrap_all_in_trycatch.html</loc></url>
 </urlset>
+

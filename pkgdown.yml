@@ -1,10 +1,9 @@
 pandoc: 3.1.11
-pkgdown: 2.0.9
+pkgdown: 2.1.0
 pkgdown_sha: ~
 articles:
   simple_example: simple_example.html
-last_built: 2024-06-18T13:18Z
+last_built: 2024-07-17T05:58Z
 urls:
   reference: https://simnph.github.io/SimNPH/reference
   article: https://simnph.github.io/SimNPH/articles
-
