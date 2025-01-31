@@ -8,8 +8,14 @@ test_that("if labs_from_labels works", {
 
   gg2 <- labs_from_labels(gg)
 
-  expect_equal(gg$labels, list(x="wt", y="mpg"))
-  expect_equal(gg2$labels, list(x="weight", y="mpg"))
+  if ("get_labs" %in% getNamespaceExports("ggplot2")) {
+    # ggplot2 3.6.0 also extracts label attribute by default
+    expect_equal(ggplot2::get_labs(gg)[c("x", "y")], list(x = "weight", y = "mpg"))
+    expect_equal(ggplot2::get_labs(gg2)[c("x", "y")], list(x = "weight", y = "mpg"))
+  } else {
+    expect_equal(gg$labels, list(x="wt", y="mpg"))
+    expect_equal(gg2$labels, list(x="weight", y="mpg"))
+  }
 })
 
 test_that("results pivot longer works", {
@@ -86,8 +92,14 @@ test_that("combined_plot works", {
     grid_level=2
   )
 
-  expect_equal(gg[[1]]$labels$y, "rejection_0.025")
-  expect_equal(gg[[1]]$labels$colour, "method")
+  labels <- if ("get_labs" %in% getNamespaceExports("ggplot2")) {
+    ggplot2::get_labs(gg[[1]])
+  } else {
+    gg[[1]]$labels
+  }
+
+  expect_equal(labels$y, "rejection_0.025")
+  expect_equal(labels$colour, "method")
 
   expect_equal(gg[[2]][[1]]$labels$y, "hr")
   expect_equal(gg[[2]][[2]]$labels$y, "n_pat_design")
