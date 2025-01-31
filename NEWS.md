@@ -2,6 +2,7 @@
 
 * Fixed minor mistakes in documentation.
 * Added parameter to control x-axis expansion to `combined_plot`.
+* Updated tests to be compatible with upcoming release of ggplot2 3.6.0
 
 # SimNPH 0.5.5
 
