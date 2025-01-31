@@ -1,7 +1,7 @@
 Package: SimNPH
 Type: Package
 Title: Simulate Non-Proportional Hazards
-Version: 0.5.5
+Version: 0.5.6
 Authors@R: c(person("Tobias", "Fellinger", email="tobias.fellinger@ages.at", role=c("aut", "cre"), comment = c(ORCID = "0000-0001-9474-2731")),
             person("Florian", "Klinglmueller", role=c("aut"), comment = c(ORCID = "0000-0002-7346-3669")))
 License: BSL-1.0
