@@ -3,7 +3,7 @@ pkgdown: 2.1.1
 pkgdown_sha: ~
 articles:
   simple_example: simple_example.html
-last_built: 2025-01-31T14:01Z
+last_built: 2025-02-20T12:10Z
 urls:
   reference: https://simnph.github.io/SimNPH/reference
   article: https://simnph.github.io/SimNPH/articles
