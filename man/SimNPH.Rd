@@ -4,8 +4,11 @@
 \name{SimNPH}
 \alias{SimNPH-package}
 \alias{SimNPH}
-\title{SimNPH: Simulate Non Proportional Hazards}
+\title{SimNPH}
 \description{
+SimNPH: Simulate Non Proportional Hazards
+}
+\details{
 This package provides several functions to simulate survival data with non
 proportional hazards using the general purpose simulation package SimDesign.
 }
@@ -27,3 +30,4 @@ Authors:
 }
 
 }
+\keyword{internal}

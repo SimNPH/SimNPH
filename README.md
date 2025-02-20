@@ -39,9 +39,9 @@ Some examples of data generation, testing and estimation can be found in this
 ## Results of the Simulation Study
 
 The results of the simulation study done by the CONFIRMS consortium in the
-course of the EMA tender will be published in an upcoming paper 
-([preprint on arXiv](https://arxiv.org/abs/2310.05622)) and are presented in a 
-[shinylive App](https://simnph.github.io/SimResultsShinylive/about.html). 
+course of the EMA tender are published in the paper 
+[A Comparison of Statistical Methods for Time-To-Event Analyses in Randomized Controlled Trials Under Non-Proportional Hazards, Klinglmüller et al. (2025)](http://dx.doi.org/10.1002/sim.70019) 
+and are presented in a [shinylive App](https://simnph.github.io/SimResultsShinylive/about.html). 
 
 ## Reproducing the Results of the Simulation study
 
