@@ -177,6 +177,21 @@ test_that("test that hr_after_onset_from_PH_effect_size works", {
     )
   )
 
+  my_design_error <- my_design
+  my_design_error$final_events <- NULL
+  expect_error({
+    hr_after_onset_from_PH_effect_size(my_design_error, 0.9)
+  })
+
+  expect_error({
+    hr_after_onset_from_PH_effect_size(my_design)
+  })
+
+  my_design_target_power <- my_design
+  my_design_target_power$effect_size_ph  <- 0
+  expect_no_error({
+    hr_after_onset_from_PH_effect_size(my_design_target_power)
+  })
 
   my_design_E <- hr_after_onset_from_PH_effect_size(my_design, 0)
   expect_equal(my_design_E$hazard_trt, my_design$hazard_ctrl)

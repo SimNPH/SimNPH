@@ -202,16 +202,46 @@ test_that("test that hr_after_onset_from_PH_effect_size works", {
   )
 
   my_design$hazard_trt_after <- NA
-  my_design$hazard_ctrl <- 0.1
+  my_design$hazard_ctrl <- 0.002
+
+  my_design_error <- my_design
+  my_design_error$final_events <- NULL
+  expect_error({
+    hr_after_crossing_from_PH_effect_size(my_design_error, 0.9)
+  })
+
 
   my_design$followup <- NULL
   my_design$final_events <- (my_design$n_trt + my_design$n_ctrl) * 0.75
 
+  expect_error({
+    hr_after_crossing_from_PH_effect_size(my_design)
+  })
+
+  my_design_target_power <- my_design
+  my_design_target_power$effect_size_ph  <- 0
+  expect_no_error({
+    hr_after_crossing_from_PH_effect_size(my_design_target_power)
+  })
+
   suppressWarnings(
-    expect_warning(
-      my_design_B <- hr_after_crossing_from_PH_effect_size(my_design, 0.9)
-    )
+    expect_warning({
+      design_warning <- my_design
+      design_warning$hazard_ctrl <- 0.1
+      my_design_B <- hr_after_crossing_from_PH_effect_size(design_warning, 0.9)
+    })
   )
+
+  expect_no_error({
+    my_design_C <- hr_after_crossing_from_PH_effect_size(my_design, target_power_ph = 0)
+  })
+
+  expect_lte(
+    max(abs(sapply(my_design_C$hazard_ctrl, \(h){miniPCH::qpch_fun(0, h)(0.5)}) - my_design_C$target_median_trt)),
+    1e-4
+  )
+
+  expect_equal(my_design_C$target_hr, rep(1,6))
 
 })
 
