@@ -1,3 +1,7 @@
+# SimNPH 0.5.7
+
+* Updated citation info.
+
 # SimNPH 0.5.6
 
 * Fixed minor mistakes in documentation.
