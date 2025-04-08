@@ -1,5 +1,7 @@
 # SimNPH 0.5.7
 
+* Hotfix: disabled one test to avoid an error due to changes in an upcoming
+  ggplot2 release
 * Updated citation info.
 
 # SimNPH 0.5.6
