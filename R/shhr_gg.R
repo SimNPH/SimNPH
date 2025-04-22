@@ -86,8 +86,7 @@ shhr_gg <- function(A, B, main=NULL, sub=NULL, group_names=c("control", "treatme
   tmp_lty <- linetypes
   names(tmp_lty) <- group_names
 
-  if(as_list){
-    list(
+  plot_list <- list(
       gg_surv +
         ggplot2::theme_bw() +
         ggplot2::theme(legend.position="bottom") +
@@ -108,25 +107,15 @@ shhr_gg <- function(A, B, main=NULL, sub=NULL, group_names=c("control", "treatme
         ),
       gg_hr +
         ggplot2::theme_bw() +
-        ggplot2::theme(legend.position="bottom") +
-        ggplot2::scale_colour_manual(
-          values = tmp_colours
-        ) +
-        ggplot2::scale_linetype_manual(
-          values = tmp_lty
-        )
+        ggplot2::theme(legend.position="bottom")
     )
+
+  if(as_list){
+    plot_list
   } else {
-    patchwork::wrap_plots(gg_surv, gg_haz, gg_hr) +
+    patchwork::wrap_plots(plot_list) +
       patchwork::plot_layout(guides = "collect") +
       patchwork::plot_annotation(main, subtitle = sub) &
-      ggplot2::theme_bw() &
-      ggplot2::theme(legend.position="bottom") &
-      ggplot2::scale_colour_manual(
-        values = tmp_colours
-      ) &
-      ggplot2::scale_linetype_manual(
-        values = tmp_lty
-      )
+      ggplot2::theme(legend.position="bottom")
   }
 }
