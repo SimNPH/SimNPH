@@ -1,25 +1,3 @@
-# # Hotfix: Test disabled to avoid failed tests due to changes in upcoming
-# # ggplot2 release
-# test_that("if labs_from_labels works", {
-#   test <- mtcars
-#
-#   attr(test$wt, "label") <- "weight"
-#
-#   gg <- ggplot2::ggplot(test, ggplot2::aes(x=wt, y=mpg)) +
-#     ggplot2::geom_point()
-#
-#   gg2 <- labs_from_labels(gg)
-#
-#   if ("get_labs" %in% getNamespaceExports("ggplot2")) {
-#     # ggplot2 3.6.0 also extracts label attribute by default
-#     expect_equal(ggplot2::get_labs(gg)[c("x", "y")], list(x = "weight", y = "mpg"))
-#     expect_equal(ggplot2::get_labs(gg2)[c("x", "y")], list(x = "weight", y = "mpg"))
-#   } else {
-#     expect_equal(gg$labels, list(x="wt", y="mpg"))
-#     expect_equal(gg2$labels, list(x="weight", y="mpg"))
-#   }
-# })
-
 test_that("results pivot longer works", {
   data_wide <- combination_tests_delayed
 
@@ -40,6 +18,19 @@ test_that("results pivot longer works", {
     ncol(data_wide) - cols_per_method * n_methods,
     ncol(data_long) - cols_per_method - 1
   )
+})
+
+test_that("if labs_from_labels works", {
+  test <- mtcars
+
+  attr(test$wt, "label") <- "weight"
+
+  gg <- ggplot2::ggplot(test, ggplot2::aes(x=wt, y=mpg)) +
+    ggplot2::geom_point()
+
+  gg2 <- labs_from_labels(gg)
+
+  vdiffr::expect_doppelganger("plot_labs_from_labels", gg2)
 })
 
 test_that("combined_plot works", {
@@ -94,35 +85,7 @@ test_that("combined_plot works", {
     grid_level=2
   )
 
-  labels <- if ("get_labs" %in% getNamespaceExports("ggplot2")) {
-    ggplot2::get_labs(gg[[1]])
-  } else {
-    gg[[1]]$labels
-  }
-
-  expect_equal(labels$y, "rejection_0.025")
-  expect_equal(labels$colour, "method")
-
-  expect_equal(gg[[2]][[1]]$labels$y, "hr")
-  expect_equal(gg[[2]][[2]]$labels$y, "n_pat_design")
-  expect_equal(gg[[2]][[3]]$labels$y, "delay")
-  expect_equal(gg[[2]][[4]]$labels$y, "hazard_ctrl")
-  expect_equal(gg[[2]][[5]]$labels$y, "recruitment")
-
-  expect_s3_class(gg, "ggplot")
-  expect_s3_class(gg, "patchwork")
-
-  expect_s3_class(gg[[1]], "ggplot")
-  expect_s3_class(gg[[2]], "patchwork")
-  expect_s3_class(gg[[2]], "ggplot")
-
-  expect_s3_class(gg[[2]][[1]], "ggplot")
-  expect_s3_class(gg[[2]][[2]], "ggplot")
-  expect_s3_class(gg[[2]][[3]], "ggplot")
-  expect_s3_class(gg[[2]][[4]], "ggplot")
-  expect_s3_class(gg[[2]][[5]], "ggplot")
-
-  expect_equal(sort(unique(gg[[1]]$data$x_split)), 1:3)
+  vdiffr::expect_doppelganger("plot_combined_plot_1", gg)
 
   gg2 <- combined_plot(
     results_long,
@@ -133,7 +96,7 @@ test_that("combined_plot works", {
     split_var = 0
   )
 
-  expect_equal(sort(unique(gg2[[1]]$data$x_split)), 1)
+  vdiffr::expect_doppelganger("plot_combined_plot_2", gg2)
 
   my_colours <- c(
     logrank="black",
@@ -157,8 +120,5 @@ test_that("combined_plot works", {
     use_shapes = my_shapes
   )
 
-  g3 <- ggplot2::ggplot_build(gg3[[1]])
-
-  expect_equal(unique(g3$data[[1]][["shape"]]), 1:2)
-  expect_equal(unique(g3$data[[1]][["colour"]]), c("black", "green", "blue"))
+  vdiffr::expect_doppelganger("plot_combined_plot_3", gg3)
 })
