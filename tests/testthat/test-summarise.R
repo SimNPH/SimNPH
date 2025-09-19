@@ -134,9 +134,13 @@ test_that("creating a summarise function for an estimator works", {
     apply(1, paste, collapse="") |>
     unname()
 
-  expected_names <- c(names(condition), expected_names, c("REPLICATIONS", "SIM_TIME", "COMPLETED", "SEED", "RAM_USED"))
+  actual_names <- names(sim_results)
+  sim_design_names <- c("REPLICATIONS", "SIM_TIME", "COMPLETED", "SEED", "RAM_USED")
+  names_to_check <- setdiff(actual_names, sim_design_names)
 
-  expect_named(sim_results, expected_names, ignore.order = TRUE)
+  expected_names <- c(names(condition), expected_names)
+
+  expect_true(setequal(names_to_check, expected_names), label="names of summary contain names of design and summaries and optionally names created by simDesign")
 
   expect(all(is.na(sim_results[, c("coxph.1.mse", "coxph.1.mae", "coxph.1.bias", "coxph.1.coverage")])), "summary results depending on the true value should be missing when the true value is not given")
   expect(all(is.na(sim_results[, c("coxph.coverage", "coxph.width")])), "summary results depending on the CI should be missing if no CI boundaries are given")
@@ -158,18 +162,21 @@ test_that("generic summarise for tests works", {
     logrank=summarise_test(alpha=c(0.9), name="innovative")
   )
 
-  # runs simulations
-  capture.output(
-    suppressMessages(
-      sim_results <- runSimulation(
-        design=condition,
-        replications=10,
-        generate=generate_delayed_effect,
-        analyse=list(
-          logrank=analyse_logrank()
-        ),
-        summarise = summarise_all,
-        save=FALSE
+  # TODO: remove caputre warnings when sessioninfo is fixed
+  tmp_output <- capture_warnings(
+    # runs simulations
+    capture.output(
+      suppressMessages(
+        sim_results <- runSimulation(
+          design=condition,
+          replications=10,
+          generate=generate_delayed_effect,
+          analyse=list(
+            logrank=analyse_logrank()
+          ),
+          summarise = summarise_all,
+          save=FALSE
+        )
       )
     )
   )
