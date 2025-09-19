@@ -14,18 +14,21 @@ test_that("descriptive statistics work (summary of many lines)", {
     describe=summarise_describe()
   )
 
-  capture_messages(
-    capture_output(
-      # runs simulations
-      sim_results <- runSimulation(
-        design=condition,
-        replications=100,
-        generate=generate_delayed_effect,
-        analyse=list(
-          describe=analyse_describe()
-        ),
-        summarise = summarise_all,
-        save=FALSE
+  # TODO: remove caputre warnings when sessioninfo is fixed
+  tmp_output <- capture_warnings(
+    capture_messages(
+      capture_output(
+        # runs simulations
+        sim_results <- runSimulation(
+          design=condition,
+          replications=100,
+          generate=generate_delayed_effect,
+          analyse=list(
+            describe=analyse_describe()
+          ),
+          summarise = summarise_all,
+          save=FALSE
+        )
       )
     )
   )
@@ -109,3 +112,4 @@ test_that("descriptive statistics work (intercurrent event)", {
     ignore.order = TRUE
   )
 })
+

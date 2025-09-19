@@ -2,7 +2,7 @@
 title: "Examples for the Usage of the SimNPH Package"
 subtitle: "Generate Data, Test and Estimate, Summarise"
 author: "Tobias Fellinger"
-date: "2024-03-19"
+date: "2025-09-19"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteEngine{knitr::rmarkdown}
@@ -13,7 +13,7 @@ vignette: >
 
 
 
-```r
+``` r
 library(SimDesign)
 library(SimNPH)
 library(parallel)
@@ -53,7 +53,7 @@ patients in each arm, a constant hazard of 0.2 under control and a hazard of
 0.02 under treatment after the effect onset varying from 0 to 10.
 
 
-```r
+``` r
 N_sim <- 100
 
 Assumptions <- assumptions_delayed_effect()
@@ -97,13 +97,14 @@ Define the data generating 'generate' function, that beside simulating the time
 to event also applies the different censoring processes.
 
 
-```r
+``` r
 my_generator <- function(condition, fixed_objects=NULL){
   generate_delayed_effect(condition, fixed_objects) |>
     recruitment_uniform(condition$recruitment) |>
     random_censoring_exp(condition$random_withdrawal) |>
     admin_censoring_time(condition$followup)
 } 
+
 ```
 
 ## Defining the 'Summarise' function
@@ -123,7 +124,7 @@ functions respectively. The Summary will contain columns with the rejection rate
 and some other summary statistics for both methods.
 
 
-```r
+``` r
 alpha <- 0.05
 
 Summarise <- create_summarise_function(
@@ -143,7 +144,7 @@ the `Summarise` function defined before and the simulations should be run in
 parallel.
 
 
-```r
+``` r
 res <- runSimulation(
   Design,
   replications = N_sim,
@@ -159,7 +160,9 @@ res <- runSimulation(
 #> 
 #> Number of parallel clusters in use: 8
 #> 
-#> Simulation complete. Total execution time: 14.28s
+#> Simulation complete. Total execution time: 10.61s
+#> Warning in system2("quarto", "-V", stdout = TRUE, env = paste0("TMPDIR=", : Ausführung von Kommando '"quarto" TMPDIR=C:/Users/Tobias11/AppData/Local/Temp/RtmpGKzPDq/file530456a56ad2
+#> -V' ergab Status 1
 ```
 
 Finally we select the interesting columns from the output. Since all other
@@ -167,7 +170,7 @@ parameters are the same for each scenario we just select delay. And we are
 interested in the rejection rate of the tests.
 
 
-```r
+``` r
 res |> 
   subset(select=c("delay", "maxcombo.rejection_0.05", "logrank.rejection_0.05")) |>
   knitr::kable()
@@ -177,12 +180,12 @@ res |>
 
 |   delay| maxcombo.rejection_0.05| logrank.rejection_0.05|
 |-------:|-----------------------:|----------------------:|
-|   0.000|                    0.47|                   0.50|
-|  60.875|                    0.45|                   0.46|
-| 121.750|                    0.37|                   0.32|
-| 182.625|                    0.27|                   0.23|
-| 243.500|                    0.20|                   0.14|
-| 304.375|                    0.16|                   0.12|
+|   0.000|                    0.54|                   0.52|
+|  60.875|                    0.42|                   0.41|
+| 121.750|                    0.45|                   0.34|
+| 182.625|                    0.24|                   0.15|
+| 243.500|                    0.18|                   0.18|
+| 304.375|                    0.21|                   0.18|
 
 
 
@@ -196,7 +199,7 @@ First we extend the Design to include a column with the number of events after
 which an interim analysis should be done.
 
 
-```r
+``` r
 Options <- design_group_sequential()
 #> expand.grid(
 #>   n_trt=200,          # 200 patients in the treatment arm
@@ -234,7 +237,7 @@ the nominal alpha at each stage and the analyse functions to be used at each
 stage.
 
 
-```r
+``` r
 ## O'Brien-Fleming Bounds for GSD with interim analysis at information time 1/2
 nominal_alpha <- ldbounds::ldBounds(c(0.5,1))$nom.alpha
 
@@ -269,7 +272,7 @@ The results object also includes the results returned by each stage in
 `results_stages`, but here we only use the overall test-decision.
 
 
-```r
+``` r
 Summarise <- create_summarise_function(
   maxcombo_seq = summarise_group_sequential(),
   logrank_seq = summarise_group_sequential()
@@ -283,7 +286,7 @@ additional columns we defined in our `Summarise` functions are included in the
 result.
 
 
-```r
+``` r
 res <- runSimulation(
   Design,
   replications = N_sim,
@@ -296,7 +299,9 @@ res <- runSimulation(
 #> 
 #> Number of parallel clusters in use: 8
 #> 
-#> Simulation complete. Total execution time: 30.07s
+#> Simulation complete. Total execution time: 21.83s
+#> Warning in system2("quarto", "-V", stdout = TRUE, env = paste0("TMPDIR=", : Ausführung von Kommando '"quarto" TMPDIR=C:/Users/Tobias11/AppData/Local/Temp/RtmpGKzPDq/file5304116837a0
+#> -V' ergab Status 1
 ```
 
 In the case of a group sequential design we are also interested in the average
@@ -304,7 +309,7 @@ running time of the study in terms of patients recruited, number of events and
 running time of the study.
 
 
-```r
+``` r
 res |>
   subset(select=c(
     "delay", 
@@ -320,12 +325,12 @@ res |>
 
 |   delay| maxcombo_seq.rejection| logrank_seq.rejection| maxcombo_seq.n_pat| logrank_seq.n_pat| maxcombo_seq.n_evt| logrank_seq.n_evt| maxcombo_seq.followup| logrank_seq.followup|
 |-------:|----------------------:|---------------------:|------------------:|-----------------:|------------------:|-----------------:|---------------------:|--------------------:|
-|   0.000|                   0.82|                  0.84|                400|               400|             213.73|            212.11|               1271.03|              1256.83|
-|  60.875|                   0.77|                  0.76|                400|               400|             215.33|            218.62|               1280.30|              1308.13|
-| 121.750|                   0.73|                  0.70|                400|               400|             228.36|            231.12|               1362.40|              1385.58|
-| 182.625|                   0.71|                  0.65|                400|               400|             223.63|            228.97|               1320.08|              1368.20|
-| 243.500|                   0.55|                  0.49|                400|               400|             238.05|            239.26|               1426.16|              1436.63|
-| 304.375|                   0.58|                  0.50|                400|               400|             237.93|            241.80|               1411.85|              1442.90|
+|   0.000|                   0.85|                  0.82|                400|               400|             213.53|            213.07|               1278.40|              1272.17|
+|  60.875|                   0.75|                  0.75|                400|               400|             219.45|            219.06|               1300.93|              1298.89|
+| 121.750|                   0.72|                  0.72|                400|               400|             225.80|            226.10|               1342.47|              1343.26|
+| 182.625|                   0.60|                  0.59|                400|               400|             232.30|            234.03|               1380.38|              1396.26|
+| 243.500|                   0.63|                  0.59|                400|               400|             238.15|            240.42|               1410.94|              1428.86|
+| 304.375|                   0.61|                  0.53|                400|               400|             240.66|            240.66|               1443.26|              1443.26|
 
 
 
@@ -340,7 +345,7 @@ each scenario. Just pipe the Design data.frame to the function and the values of
 the statistics are added as columns.
 
 
-```r
+``` r
 Options <- design_fixed_followup()
 #> expand.grid(
 #>   n_trt=150,         # 150 patients in the treatment arm
@@ -392,7 +397,7 @@ method two times, like in this case, comparing it to two different summary
 statistics.
 
 
-```r
+``` r
 Summarise <- create_summarise_function(
     coxph=summarise_estimator(hr, gAHR_20, hr_lower, hr_upper, name="gAHR"),
     coxph=summarise_estimator(hr, hazard_trt/hazard_ctrl, hr_lower, hr_upper, name="HR")
@@ -402,7 +407,7 @@ Summarise <- create_summarise_function(
 ## Putting it all together
 
 
-```r
+``` r
 Analyse <- list(
   coxph = analyse_coxph()
 )
@@ -419,11 +424,13 @@ res <- runSimulation(
 #> 
 #> Number of parallel clusters in use: 8
 #> 
-#> Simulation complete. Total execution time: 0.93s
+#> Simulation complete. Total execution time: 0.77s
+#> Warning in system2("quarto", "-V", stdout = TRUE, env = paste0("TMPDIR=", : Ausführung von Kommando '"quarto" TMPDIR=C:/Users/Tobias11/AppData/Local/Temp/RtmpGKzPDq/file530433727d3d
+#> -V' ergab Status 1
 ```
 
 
-```r
+``` r
 res |>
   subset(select=c(
     "delay", "coxph.HR.bias", "coxph.gAHR.bias", "coxph.HR.mse", 
@@ -436,12 +443,12 @@ res |>
 
 |   delay| coxph.HR.bias| coxph.gAHR.bias| coxph.HR.mse| coxph.gAHR.mse| coxph.HR.coverage| coxph.gAHR.coverage|
 |-------:|-------------:|---------------:|------------:|--------------:|-----------------:|-------------------:|
-|   0.000|     0.0307004|       0.0307004|    0.0171681|      0.0171681|              0.97|                0.97|
-|  60.875|     0.0437173|      -0.2896160|    0.0213150|      0.1032812|              0.94|                0.55|
-| 121.750|     0.0715696|      -0.2617637|    0.0222560|      0.0856541|              0.91|                0.63|
-| 182.625|     0.1197364|      -0.2135969|    0.0353176|      0.0666045|              0.87|                0.72|
-| 243.500|     0.1591968|      -0.1741365|    0.0495382|      0.0545181|              0.81|                0.78|
-| 304.375|     0.1861441|      -0.1471892|    0.0633401|      0.0503551|              0.73|                0.84|
+|   0.000|     0.0103694|       0.0103694|    0.0201519|      0.0201519|              0.95|                0.95|
+|  60.875|     0.0400061|      -0.2933273|    0.0192242|      0.1036646|              0.95|                0.51|
+| 121.750|     0.0805660|      -0.2527674|    0.0245258|      0.0819263|              0.96|                0.67|
+| 182.625|     0.1388977|      -0.1944356|    0.0420955|      0.0606081|              0.80|                0.73|
+| 243.500|     0.1835182|      -0.1498151|    0.0578980|      0.0466636|              0.78|                0.82|
+| 304.375|     0.1764311|      -0.1569022|    0.0609472|      0.0544376|              0.77|                0.79|
 
 
 
