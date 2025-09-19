@@ -142,7 +142,7 @@ metadata <- data.frame(
   category = c("logrank test", "combination test", "combination test")
 )
 
-my_colours <- ggplot2::scale_colour_discrete()$palette(n=nrow(metadata)) |>
+my_colours <- rainbow(n=nrow(metadata)) |>
   sample() |>
   setNames(metadata$method)
 

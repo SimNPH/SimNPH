@@ -8,7 +8,7 @@ test_that("shhr ggplot works", {
     })
   })
 
-  expect_s3_class(my_obj, "patchwork")
+  vdiffr::expect_doppelganger("plot_shhr_gg1", my_obj)
 
   withr::with_package("ggplot2", {
     withr::with_package("patchwork", {
@@ -16,12 +16,7 @@ test_that("shhr ggplot works", {
     })
   })
 
-  expect_s3_class(my_obj, "patchwork")
-
-  expect_equal(my_obj[[1]]$labels$y, "Survival")
-  expect_equal(my_obj[[2]]$labels$y, "Hazard")
-  expect_equal(my_obj[[3]]$labels$y, "Hazard ratio")
-
+  vdiffr::expect_doppelganger("plot_shhr_gg2", my_obj)
 
   withr::with_package("ggplot2", {
     withr::with_package("patchwork", {

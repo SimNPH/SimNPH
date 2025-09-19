@@ -1,3 +1,8 @@
+# SimNPH 0.5.8
+
+* Test plots with `vdiffr` to avoid using non-exported functions of plotting 
+  libraries in test cases.
+
 # SimNPH 0.5.7
 
 * Hotfix: disabled one test to avoid an error due to changes in an upcoming
