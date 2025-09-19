@@ -62,7 +62,7 @@ Estimate, Summarise</h3>
                         <h4 data-toc-skip class="author">Tobias
 Fellinger</h4>
             
-            <h4 data-toc-skip class="date">2024-03-19</h4>
+            <h4 data-toc-skip class="date">2025-09-19</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/SimNPH/SimNPH/blob/main/vignettes/simple_example.Rmd" class="external-link"><code>vignettes/simple_example.Rmd</code></a></small>
       <div class="d-none name"><code>simple_example.Rmd</code></div>
@@ -284,7 +284,9 @@ defined before and the simulations should be run in parallel.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Number of parallel clusters in use: 8</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Simulation complete. Total execution time: 14.28s</span></span></code></pre></div>
+<span><span class="co">#&gt; Simulation complete. Total execution time: 10.61s</span></span>
+<span><span class="co">#&gt; Warning in system2("quarto", "-V", stdout = TRUE, env = paste0("TMPDIR=", : Ausführung von Kommando '"quarto" TMPDIR=C:/Users/Tobias11/AppData/Local/Temp/RtmpGKzPDq/file530456a56ad2</span></span>
+<span><span class="co">#&gt; -V' ergab Status 1</span></span></code></pre></div>
 <p>Finally we select the interesting columns from the output. Since all
 other parameters are the same for each scenario we just select delay.
 And we are interested in the rejection rate of the tests.</p>
@@ -301,33 +303,33 @@ And we are interested in the rejection rate of the tests.</p>
 <tbody>
 <tr class="odd">
 <td align="right">0.000</td>
-<td align="right">0.47</td>
-<td align="right">0.50</td>
+<td align="right">0.54</td>
+<td align="right">0.52</td>
 </tr>
 <tr class="even">
 <td align="right">60.875</td>
-<td align="right">0.45</td>
-<td align="right">0.46</td>
+<td align="right">0.42</td>
+<td align="right">0.41</td>
 </tr>
 <tr class="odd">
 <td align="right">121.750</td>
-<td align="right">0.37</td>
-<td align="right">0.32</td>
+<td align="right">0.45</td>
+<td align="right">0.34</td>
 </tr>
 <tr class="even">
 <td align="right">182.625</td>
-<td align="right">0.27</td>
-<td align="right">0.23</td>
+<td align="right">0.24</td>
+<td align="right">0.15</td>
 </tr>
 <tr class="odd">
 <td align="right">243.500</td>
-<td align="right">0.20</td>
-<td align="right">0.14</td>
+<td align="right">0.18</td>
+<td align="right">0.18</td>
 </tr>
 <tr class="even">
 <td align="right">304.375</td>
-<td align="right">0.16</td>
-<td align="right">0.12</td>
+<td align="right">0.21</td>
+<td align="right">0.18</td>
 </tr>
 </tbody>
 </table>
@@ -523,7 +525,9 @@ functions are included in the result.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Number of parallel clusters in use: 8</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Simulation complete. Total execution time: 30.07s</span></span></code></pre></div>
+<span><span class="co">#&gt; Simulation complete. Total execution time: 21.83s</span></span>
+<span><span class="co">#&gt; Warning in system2("quarto", "-V", stdout = TRUE, env = paste0("TMPDIR=", : Ausführung von Kommando '"quarto" TMPDIR=C:/Users/Tobias11/AppData/Local/Temp/RtmpGKzPDq/file5304116837a0</span></span>
+<span><span class="co">#&gt; -V' ergab Status 1</span></span></code></pre></div>
 <p>In the case of a group sequential design we are also interested in
 the average running time of the study in terms of patients recruited,
 number of events and running time of the study.</p>
@@ -563,69 +567,69 @@ number of events and running time of the study.</p>
 <tbody>
 <tr class="odd">
 <td align="right">0.000</td>
+<td align="right">0.85</td>
 <td align="right">0.82</td>
-<td align="right">0.84</td>
 <td align="right">400</td>
 <td align="right">400</td>
-<td align="right">213.73</td>
-<td align="right">212.11</td>
-<td align="right">1271.03</td>
-<td align="right">1256.83</td>
+<td align="right">213.53</td>
+<td align="right">213.07</td>
+<td align="right">1278.40</td>
+<td align="right">1272.17</td>
 </tr>
 <tr class="even">
 <td align="right">60.875</td>
-<td align="right">0.77</td>
-<td align="right">0.76</td>
+<td align="right">0.75</td>
+<td align="right">0.75</td>
 <td align="right">400</td>
 <td align="right">400</td>
-<td align="right">215.33</td>
-<td align="right">218.62</td>
-<td align="right">1280.30</td>
-<td align="right">1308.13</td>
+<td align="right">219.45</td>
+<td align="right">219.06</td>
+<td align="right">1300.93</td>
+<td align="right">1298.89</td>
 </tr>
 <tr class="odd">
 <td align="right">121.750</td>
-<td align="right">0.73</td>
-<td align="right">0.70</td>
+<td align="right">0.72</td>
+<td align="right">0.72</td>
 <td align="right">400</td>
 <td align="right">400</td>
-<td align="right">228.36</td>
-<td align="right">231.12</td>
-<td align="right">1362.40</td>
-<td align="right">1385.58</td>
+<td align="right">225.80</td>
+<td align="right">226.10</td>
+<td align="right">1342.47</td>
+<td align="right">1343.26</td>
 </tr>
 <tr class="even">
 <td align="right">182.625</td>
-<td align="right">0.71</td>
-<td align="right">0.65</td>
+<td align="right">0.60</td>
+<td align="right">0.59</td>
 <td align="right">400</td>
 <td align="right">400</td>
-<td align="right">223.63</td>
-<td align="right">228.97</td>
-<td align="right">1320.08</td>
-<td align="right">1368.20</td>
+<td align="right">232.30</td>
+<td align="right">234.03</td>
+<td align="right">1380.38</td>
+<td align="right">1396.26</td>
 </tr>
 <tr class="odd">
 <td align="right">243.500</td>
-<td align="right">0.55</td>
-<td align="right">0.49</td>
+<td align="right">0.63</td>
+<td align="right">0.59</td>
 <td align="right">400</td>
 <td align="right">400</td>
-<td align="right">238.05</td>
-<td align="right">239.26</td>
-<td align="right">1426.16</td>
-<td align="right">1436.63</td>
+<td align="right">238.15</td>
+<td align="right">240.42</td>
+<td align="right">1410.94</td>
+<td align="right">1428.86</td>
 </tr>
 <tr class="even">
 <td align="right">304.375</td>
-<td align="right">0.58</td>
-<td align="right">0.50</td>
+<td align="right">0.61</td>
+<td align="right">0.53</td>
 <td align="right">400</td>
 <td align="right">400</td>
-<td align="right">237.93</td>
-<td align="right">241.80</td>
-<td align="right">1411.85</td>
-<td align="right">1442.90</td>
+<td align="right">240.66</td>
+<td align="right">240.66</td>
+<td align="right">1443.26</td>
+<td align="right">1443.26</td>
 </tr>
 </tbody>
 </table>
@@ -854,7 +858,9 @@ different summary statistics.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Number of parallel clusters in use: 8</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Simulation complete. Total execution time: 0.93s</span></span></code></pre></div>
+<span><span class="co">#&gt; Simulation complete. Total execution time: 0.77s</span></span>
+<span><span class="co">#&gt; Warning in system2("quarto", "-V", stdout = TRUE, env = paste0("TMPDIR=", : Ausführung von Kommando '"quarto" TMPDIR=C:/Users/Tobias11/AppData/Local/Temp/RtmpGKzPDq/file530433727d3d</span></span>
+<span><span class="co">#&gt; -V' ergab Status 1</span></span></code></pre></div>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">res</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span>select<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
@@ -884,57 +890,57 @@ different summary statistics.</p>
 <tbody>
 <tr class="odd">
 <td align="right">0.000</td>
-<td align="right">0.0307004</td>
-<td align="right">0.0307004</td>
-<td align="right">0.0171681</td>
-<td align="right">0.0171681</td>
-<td align="right">0.97</td>
-<td align="right">0.97</td>
+<td align="right">0.0103694</td>
+<td align="right">0.0103694</td>
+<td align="right">0.0201519</td>
+<td align="right">0.0201519</td>
+<td align="right">0.95</td>
+<td align="right">0.95</td>
 </tr>
 <tr class="even">
 <td align="right">60.875</td>
-<td align="right">0.0437173</td>
-<td align="right">-0.2896160</td>
-<td align="right">0.0213150</td>
-<td align="right">0.1032812</td>
-<td align="right">0.94</td>
-<td align="right">0.55</td>
+<td align="right">0.0400061</td>
+<td align="right">-0.2933273</td>
+<td align="right">0.0192242</td>
+<td align="right">0.1036646</td>
+<td align="right">0.95</td>
+<td align="right">0.51</td>
 </tr>
 <tr class="odd">
 <td align="right">121.750</td>
-<td align="right">0.0715696</td>
-<td align="right">-0.2617637</td>
-<td align="right">0.0222560</td>
-<td align="right">0.0856541</td>
-<td align="right">0.91</td>
-<td align="right">0.63</td>
+<td align="right">0.0805660</td>
+<td align="right">-0.2527674</td>
+<td align="right">0.0245258</td>
+<td align="right">0.0819263</td>
+<td align="right">0.96</td>
+<td align="right">0.67</td>
 </tr>
 <tr class="even">
 <td align="right">182.625</td>
-<td align="right">0.1197364</td>
-<td align="right">-0.2135969</td>
-<td align="right">0.0353176</td>
-<td align="right">0.0666045</td>
-<td align="right">0.87</td>
-<td align="right">0.72</td>
+<td align="right">0.1388977</td>
+<td align="right">-0.1944356</td>
+<td align="right">0.0420955</td>
+<td align="right">0.0606081</td>
+<td align="right">0.80</td>
+<td align="right">0.73</td>
 </tr>
 <tr class="odd">
 <td align="right">243.500</td>
-<td align="right">0.1591968</td>
-<td align="right">-0.1741365</td>
-<td align="right">0.0495382</td>
-<td align="right">0.0545181</td>
-<td align="right">0.81</td>
+<td align="right">0.1835182</td>
+<td align="right">-0.1498151</td>
+<td align="right">0.0578980</td>
+<td align="right">0.0466636</td>
 <td align="right">0.78</td>
+<td align="right">0.82</td>
 </tr>
 <tr class="even">
 <td align="right">304.375</td>
-<td align="right">0.1861441</td>
-<td align="right">-0.1471892</td>
-<td align="right">0.0633401</td>
-<td align="right">0.0503551</td>
-<td align="right">0.73</td>
-<td align="right">0.84</td>
+<td align="right">0.1764311</td>
+<td align="right">-0.1569022</td>
+<td align="right">0.0609472</td>
+<td align="right">0.0544376</td>
+<td align="right">0.77</td>
+<td align="right">0.79</td>
 </tr>
 </tbody>
 </table>
