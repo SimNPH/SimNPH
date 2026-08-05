@@ -1,0 +1,109 @@
+# Wrappers around Analyse Functions
+
+Wrappers around Analyse Functions
+
+## Usage
+
+``` r
+wrap_all_in_trycatch(
+  list_of_functions,
+  error = function(e) {
+     warning(e$message)
+     NA
+ }
+)
+
+wrap_all_in_preserve_seed(list_of_functions)
+```
+
+## Arguments
+
+- list_of_functions:
+
+  the list of functions to be wrapped
+
+- error:
+
+  the error function in the tryCatch call
+
+## Value
+
+a list of functions
+
+## Details
+
+SimDesign redraws data if one analysis function fails. This is not only
+highly inefficient for large studies, but failure of a method is
+informative and might be of interest. Moreover redrawing of data might
+introduce bias if the failure of the method is not independent of the
+parameter value, which would be a strong assumption.
+
+To avoid redrawing data, we can catch all errors the analysis methods
+could throw and return `NA` instead.
+
+This is handled well by the summarise functions generated with
+`create_summarise_function` other summarise functions might throw errors
+when trying to `rbind` a data.frame to a scalar `NA` value. In this case
+add another `error` argument. For example `\(e){NULL}` could work in
+some cases, in other cases you'll have to give a function that returns a
+data.frame with the same columns as the analyse functions and only NA
+values.
+
+Analysis functions might use random numbers. If simulations should be
+replicated this can interfere with the RNG state of other analysis
+functions. To avoid this you can wrap all analysis function in a
+[`withr::with_preserve_seed`](https://withr.r-lib.org/reference/with_seed.html)
+call, so that the RNG state is reset after each analysis function is
+called. This way adding, removing or changing one analysis function has
+no effect on the other analysis functions, even if the analysis
+functions use random numbers.
+
+## Functions
+
+- `wrap_all_in_trycatch()`: Wrap all functions in a list in tryCatch
+  calls
+
+- `wrap_all_in_preserve_seed()`: wrap all functions in
+  [`withr::with_preserve_seed`](https://withr.r-lib.org/reference/with_seed.html)
+
+## Examples
+
+``` r
+funs1 <- list(\(){stop("test")}, \(){1})
+funs2 <- wrap_all_in_trycatch(funs1)
+try(lapply(funs1, \(f){f()}))
+#> Error in f() : test
+try(lapply(funs2, \(f){f()}))
+#> Warning: test
+#> [[1]]
+#> [1] NA
+#> 
+#> [[2]]
+#> [1] 1
+#> 
+
+funs1 <- list(\(){rnorm(1)})
+funs2 <- list(\(){runif(1)}, \(){rnorm(1)})
+funs3 <- funs2 |> wrap_all_in_preserve_seed()
+set.seed(1)
+lapply(funs1, \(f){f()})
+#> [[1]]
+#> [1] -0.6264538
+#> 
+set.seed(1)
+lapply(funs2, \(f){f()})
+#> [[1]]
+#> [1] 0.2655087
+#> 
+#> [[2]]
+#> [1] -0.3262334
+#> 
+set.seed(1)
+lapply(funs3, \(f){f()})
+#> [[1]]
+#> [1] 0.2655087
+#> 
+#> [[2]]
+#> [1] -0.6264538
+#> 
+```

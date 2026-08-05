@@ -1,0 +1,318 @@
+# Create an empty assumtions data.frame for generate_progression
+
+Create an empty assumtions data.frame for generate_progression
+
+Generate Dataset with changing hazards after disease progression
+
+Calculate progression rate from proportion of patients who progress
+
+Calculate hr after onset of treatment effect
+
+## Usage
+
+``` r
+assumptions_progression(print = interactive())
+
+generate_progression(condition, fixed_objects = NULL)
+
+true_summary_statistics_progression(
+  Design,
+  what = "os",
+  cutoff_stats = NULL,
+  fixed_objects = NULL,
+  milestones = NULL
+)
+
+progression_rate_from_progression_prop(design)
+
+cen_rate_from_cen_prop_progression(design)
+
+hazard_before_progression_from_PH_effect_size(
+  design,
+  target_power_ph = NA_real_,
+  final_events = NA_real_,
+  target_alpha = 0.025
+)
+```
+
+## Arguments
+
+- print:
+
+  print code to generate parameter set?
+
+- condition:
+
+  condition row of Design dataset
+
+- fixed_objects:
+
+  additional settings, see details
+
+- Design:
+
+  Design data.frame for subgroup
+
+- what:
+
+  True summary statistics for which estimand
+
+- cutoff_stats:
+
+  (optionally named) cutoff time, see details
+
+- milestones:
+
+  (optionally named) vector of times at which milestone survival should
+  be calculated
+
+- design:
+
+  design data.frame
+
+- target_power_ph:
+
+  target power under proportional hazards
+
+- final_events:
+
+  target events for inversion of Schönfeld Formula, defaults to
+  `condition$final_events`
+
+- target_alpha:
+
+  target one-sided alpha level for the power calculation
+
+## Value
+
+For generate_progression: a design tibble with default values invisibly
+
+For generate_progression: A dataset with the columns t (time) and trt
+(1=treatment, 0=control), evt (event, currently TRUE for all
+observations), t_ice (time of intercurrent event), ice (intercurrent
+event)
+
+For true_summary_statistics_subgroup: the design data.frame passed as
+argument with the additional columns
+
+For progression_rate_from_progression_prop: the design data.frame passed
+as argument with the additional columns prog_rate_trt, prog_rate_ctrl
+
+for cen_rate_from_cen_prop_progression: design data.frame with the
+additional column random_withdrawal
+
+For hazard_before_progression_from_PH_effect_size: the design data.frame
+passed as argument with the additional column hazard_trt.
+
+## Details
+
+assumptions_progression generates a default design `data.frame` for use
+with generate_progression If print is `TRUE` code to produce the
+template is also printed for copying, pasting and editing by the user.
+(This is the default when run in an interactive session.)
+
+Condidtion has to contain the following columns:
+
+- n_trt number of paitents in treatment arm
+
+- n_ctrl number of patients in control arm
+
+- hazard_ctrl hazard in the control arm
+
+- hazard_trt hazard in the treatment arm for not cured patients
+
+- hazard_after_prog hazard after disease progression
+
+- prog_rate_ctrl hazard rate for disease progression unter control
+
+- prog_rate_trt hazard rate for disease progression unter treatment
+
+`what` can be `"os"` for overall survival and `"pfs"` for progression
+free survival.
+
+The if `fixed_objects` contains `t_max` then this value is used as the
+maximum time to calculate function like survival, hazard, ... of the
+data generating models. If this is not given `t_max` is choosen as the
+minimum of the `1-(1/10000)` quantile of all survival distributions in
+the model.
+
+`cutoff_stats` are the times used to calculate the statistics like
+average hazard ratios and RMST, that are only calculated up to a certain
+point.
+
+For progression_rate_from_progression_prop, the design data.frame, has
+to contain the columns `prog_prop_trt` and `prog_prop_ctrl` with the
+proportions of patients, who progress in the respective arms.
+
+cen_rate_from_cen_prop_progression takes the proportion of censored
+patients from the column `censoring_prop`. This column describes the
+proportion of patients who are censored randomly before experiencing an
+event, without regard to administrative censoring.
+
+`hazard_before_progression_from_PH_effect_size` calculates the hazard
+ratio after onset of treatment effect as follows: First calculate the
+hazard in the control arm that would give the same median survival under
+an exponential model. Then calculate the median survival in the
+treatment arm that would give the desired power of the logrank test
+under exponential models in control and treatment arm. Then callibrate
+the hazard before progression in the treatment arm to give the same
+median survival time.
+
+This is a heuristic and to some extent arbitrary approach to calculate
+hazard ratios that correspond to reasonable and realistic scenarios.
+
+## Functions
+
+- `assumptions_progression()`: generate default assumptions `data.frame`
+
+- `generate_progression()`: simulates a dataset with changing hazards
+  after disease progression
+
+- `true_summary_statistics_progression()`: calculate true summary
+  statistics for scenarios with disease progression
+
+- `progression_rate_from_progression_prop()`: Calculate progression rate
+  from proportion of patients who progress
+
+- `cen_rate_from_cen_prop_progression()`: calculate censoring rate from
+  censoring proportion
+
+- `hazard_before_progression_from_PH_effect_size()`: Calculate hazard in
+  the treatment arm before progression from PH effect size
+
+## Examples
+
+``` r
+Design <- assumptions_progression()
+Design
+#>    hazard_ctrl   hazard_trt hazard_after_prog prog_rate_ctrl prog_rate_trt
+#> 1 0.0009488668 0.0006325779       0.003795467    0.001897734   0.001897734
+#> 2 0.0009488668 0.0006325779       0.003795467    0.001897734   0.001423300
+#> 3 0.0009488668 0.0006325779       0.003795467    0.001897734   0.001265156
+#>   random_withdrawal
+#> 1      0.0001897734
+#> 2      0.0001897734
+#> 3      0.0001897734
+one_simulation <- merge(
+    assumptions_progression(),
+    design_fixed_followup(),
+    by=NULL
+  ) |>
+  tail(1) |>
+  generate_progression()
+head(one_simulation)
+#>     t trt  evt t_ice  ice
+#> 1 531   1 TRUE   334 TRUE
+#> 2 700   1 TRUE   678 TRUE
+#> 3 172   1 TRUE     4 TRUE
+#> 4 556   1 TRUE   173 TRUE
+#> 5 553   1 TRUE   330 TRUE
+#> 6 201   1 TRUE    77 TRUE
+tail(one_simulation)
+#>        t trt  evt t_ice   ice
+#> 295  344   0 TRUE   Inf FALSE
+#> 296 1330   0 TRUE   519  TRUE
+#> 297  243   0 TRUE   Inf FALSE
+#> 298   73   0 TRUE   Inf FALSE
+#> 299  134   0 TRUE    37  TRUE
+#> 300  124   0 TRUE   115  TRUE
+
+my_design <- merge(
+  assumptions_progression(),
+  design_fixed_followup(),
+  by=NULL
+)
+
+my_design_os  <- true_summary_statistics_progression(my_design, "os")
+my_design_pfs <- true_summary_statistics_progression(my_design, "pfs")
+my_design_os
+#>    hazard_ctrl   hazard_trt hazard_after_prog prog_rate_ctrl prog_rate_trt
+#> 1 0.0009488668 0.0006325779       0.003795467    0.001897734   0.001897734
+#> 2 0.0009488668 0.0006325779       0.003795467    0.001897734   0.001423300
+#> 3 0.0009488668 0.0006325779       0.003795467    0.001897734   0.001265156
+#>   random_withdrawal n_trt n_ctrl followup recruitment median_survival_trt
+#> 1      0.0001897734   150    150    730.5     182.625            479.4919
+#> 2      0.0001897734   150    150    730.5     182.625            532.4814
+#> 3      0.0001897734   150    150    730.5     182.625            555.2914
+#>   median_survival_ctrl
+#> 1             421.3531
+#> 2             421.3531
+#> 3             421.3531
+my_design_pfs
+#>    hazard_ctrl   hazard_trt hazard_after_prog prog_rate_ctrl prog_rate_trt
+#> 1 0.0009488668 0.0006325779       0.003795467    0.001897734   0.001897734
+#> 2 0.0009488668 0.0006325779       0.003795467    0.001897734   0.001423300
+#> 3 0.0009488668 0.0006325779       0.003795467    0.001897734   0.001265156
+#>   random_withdrawal n_trt n_ctrl followup recruitment median_survival_trt
+#> 1      0.0001897734   150    150    730.5     182.625            273.9375
+#> 2      0.0001897734   150    150    730.5     182.625            337.1538
+#> 3      0.0001897734   150    150    730.5     182.625            365.2500
+#>   median_survival_ctrl
+#> 1                243.5
+#> 2                243.5
+#> 3                243.5
+my_design <- merge(
+    assumptions_progression(),
+    design_fixed_followup(),
+    by=NULL
+  )
+my_design$prog_rate_ctrl <- NA_real_
+my_design$prog_rate_trt <- NA_real_
+my_design$prog_prop_trt <- 0.2
+my_design$prog_prop_ctrl <- 0.3
+my_design <- progression_rate_from_progression_prop(my_design)
+my_design
+#>    hazard_ctrl   hazard_trt hazard_after_prog prog_rate_ctrl prog_rate_trt
+#> 1 0.0009488668 0.0006325779       0.003795467   0.0004066572  0.0001581445
+#> 2 0.0009488668 0.0006325779       0.003795467   0.0004066572  0.0001581445
+#> 3 0.0009488668 0.0006325779       0.003795467   0.0004066572  0.0001581445
+#>   random_withdrawal n_trt n_ctrl followup recruitment prog_prop_trt
+#> 1      0.0001897734   150    150    730.5     182.625           0.2
+#> 2      0.0001897734   150    150    730.5     182.625           0.2
+#> 3      0.0001897734   150    150    730.5     182.625           0.2
+#>   prog_prop_ctrl
+#> 1            0.3
+#> 2            0.3
+#> 3            0.3
+design <- expand.grid(
+hazard_ctrl         = m2r(15),          # hazard under control
+hazard_trt          = m2r(18),          # hazard under treatment
+hazard_after_prog   = m2r(3),           # hazard after progression
+prog_rate_ctrl      = m2r(12),          # hazard for disease progression under control
+prog_rate_trt       = m2r(c(12,16,18)), # hazard for disease progression under treatment
+censoring_prop      = 0.1,              # rate of random withdrawal
+followup            = 100,              # follow up time
+n_trt               = 50,               # patients in treatment arm
+n_ctrl              = 50                # patients in control arm
+)
+cen_rate_from_cen_prop_progression(design)
+#>   hazard_ctrl  hazard_trt hazard_after_prog prog_rate_ctrl prog_rate_trt
+#> 1 0.001518187 0.001265156       0.007590934    0.001897734   0.001897734
+#> 2 0.001518187 0.001265156       0.007590934    0.001897734   0.001423300
+#> 3 0.001518187 0.001265156       0.007590934    0.001897734   0.001265156
+#>   censoring_prop followup n_trt n_ctrl random_withdrawal
+#> 1            0.1      100    50     50      0.0003575638
+#> 2            0.1      100    50     50      0.0003285652
+#> 3            0.1      100    50     50      0.0003179468
+# \donttest{
+my_design <- merge(
+  design_fixed_followup(),
+  assumptions_progression(),
+  by=NULL
+)
+
+my_design$hazard_trt <- NULL
+my_design$final_events <- ceiling(0.75 * (my_design$n_trt + my_design$n_ctrl))
+
+my_design <- hazard_before_progression_from_PH_effect_size(my_design, target_power_ph=0.7)
+my_design
+#>   n_trt n_ctrl followup recruitment  hazard_ctrl hazard_after_prog
+#> 1   150    150    730.5     182.625 0.0009488668       0.003795467
+#> 2   150    150    730.5     182.625 0.0009488668       0.003795467
+#> 3   150    150    730.5     182.625 0.0009488668       0.003795467
+#>   prog_rate_ctrl prog_rate_trt random_withdrawal final_events   hazard_trt
+#> 1    0.001897734   0.001897734      0.0001897734          225 0.0001912378
+#> 2    0.001897734   0.001423300      0.0001897734          225 0.0004496909
+#> 3    0.001897734   0.001265156      0.0001897734          225 0.0005343131
+# }
+```

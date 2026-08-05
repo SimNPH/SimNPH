@@ -1,0 +1,424 @@
+# Examples for the Usage of the SimNPH Package
+
+``` r
+
+library(SimDesign)
+library(SimNPH)
+library(parallel)
+
+cl <- makeCluster(8)
+clusterEvalQ(cl, {
+  library(SimDesign)
+  library(SimNPH)
+  library(parallel)
+})
+```
+
+## A simple scenario with fixed followup
+
+This is a simple example on how to run a simulation of analyses of
+datasets with a delayed treatment effect using the max-combo and the
+log-rank test. The
+
+### Setting up the Scenarios
+
+Setting up the simulations to be run. `createDesign` creates a `tibble`
+with every combination of the parameters. Each line corresponds to one
+simulation to be run.
+
+The function `generate_delayed_effect` needs the columns: `n_trt`:
+number of patients in the treatment arm, `n_ctrl`: number of patients in
+the control arm, `delay`: delay until onset of treatment effect,
+`hazard_ctrl`: hazard under control and before onset of treatment
+effect, `hazart_trt`: hazard under treatment, `t_max`: maximum time of
+observation.
+
+An example design `tibble` with all parameters filled out can be created
+with `desing_skeleton_delayed_effect`. Use the function to output an
+example function call that you can copy and modify as needed, or assign
+the result to a variable to obtain a design `tibble` with some default
+parameters.
+
+By default this will create a simulation design skeleton for simulations
+of 50 patients in each arm, a constant hazard of 0.2 under control and a
+hazard of 0.02 under treatment after the effect onset varying from 0 to
+10.
+
+``` r
+
+N_sim <- 100
+
+Assumptions <- assumptions_delayed_effect()
+#> expand.grid(
+#>   delay=m2d(seq(0, 10, by=2)), # delay of 0, 1, ..., 10 months
+#>   hazard_ctrl=m2r(24),         # median survival control of 24 months
+#>   hazard_trt=m2r(36),          # median survival treatment of 36 months
+#>   random_withdrawal=m2r(120)   # median time to random withdrawal 10 years
+#> )
+
+Options <- design_fixed_followup()
+#> expand.grid(
+#>   n_trt=150,         # 150 patients in the treatment arm
+#>   n_ctrl=150,        # 150 patients in the control arm
+#>   followup=m2d(24),  # followup 2 years
+#>   recruitment=m2d(6) # recruitment time 6 months
+#> 
+#> )
+
+Design <- merge(Assumptions, Options, by=NULL)
+
+knitr::kable(Design)
+```
+
+| delay | hazard_ctrl | hazard_trt | random_withdrawal | n_trt | n_ctrl | followup | recruitment |
+|---:|---:|---:|---:|---:|---:|---:|---:|
+| 0.000 | 0.0009489 | 0.0006326 | 0.0001898 | 150 | 150 | 730.5 | 182.625 |
+| 60.875 | 0.0009489 | 0.0006326 | 0.0001898 | 150 | 150 | 730.5 | 182.625 |
+| 121.750 | 0.0009489 | 0.0006326 | 0.0001898 | 150 | 150 | 730.5 | 182.625 |
+| 182.625 | 0.0009489 | 0.0006326 | 0.0001898 | 150 | 150 | 730.5 | 182.625 |
+| 243.500 | 0.0009489 | 0.0006326 | 0.0001898 | 150 | 150 | 730.5 | 182.625 |
+| 304.375 | 0.0009489 | 0.0006326 | 0.0001898 | 150 | 150 | 730.5 | 182.625 |
+
+### Defining the ‘Generate’ funcion
+
+Define the data generating ‘generate’ function, that beside simulating
+the time to event also applies the different censoring processes.
+
+``` r
+
+my_generator <- function(condition, fixed_objects=NULL){
+  generate_delayed_effect(condition, fixed_objects) |>
+    recruitment_uniform(condition$recruitment) |>
+    random_censoring_exp(condition$random_withdrawal) |>
+    admin_censoring_time(condition$followup)
+} 
+```
+
+### Defining the ‘Summarise’ function
+
+Next, we need to specify a summary function that computes the desired
+operating characteristics for each simulation scenario, and each
+analysis method. In the example below, we use a summary function that
+computes the power (as we consider scenarios under the alternative in
+the example) of the log-rank test and the max-combo test across
+simulated scenarios. For each scenario the function just averages the
+number of times the computed p-value is below the significance level
+obtain the power.
+
+The results object contains the results of all replications of the
+corresponding method for each row of the `Design` object. In this
+example `results$p` contains all `N_sim` p-values returned by the
+`analyse_maxcombo` or `analyse_logrank` functions respectively. The
+Summary will contain columns with the rejection rate and some other
+summary statistics for both methods.
+
+``` r
+
+alpha <- 0.05
+
+Summarise <- create_summarise_function(
+  maxcombo = summarise_test(alpha),
+  logrank  = summarise_test(alpha)
+)
+```
+
+### Putting it all together
+
+Now we put it all together: in Design we give the scenarios defined
+before. We want to run 100 replications for each scenario. We want to
+generate data using the `generate_delayed_effect` function using the
+parameters from `Design` and analyse each replication of each scenario
+with the two functions `analyse_logrank` and `analyse_maxcombo`. The
+output should be summarised with the `Summarise` function defined before
+and the simulations should be run in parallel.
+
+``` r
+
+res <- runSimulation(
+  Design,
+  replications = N_sim,
+  generate = my_generator,
+  analyse = list(
+    logrank  = analyse_logrank(),
+    maxcombo = analyse_maxcombo()
+  ),
+  summarise = Summarise,
+  cl = cl,
+  save=FALSE
+)
+#> 
+#> Number of parallel clusters in use: 8
+#> 
+#> Simulation complete. Total execution time: 10.61s
+#> Warning in system2("quarto", "-V", stdout = TRUE, env = paste0("TMPDIR=", : Ausführung von Kommando '"quarto" TMPDIR=C:/Users/Tobias11/AppData/Local/Temp/RtmpGKzPDq/file530456a56ad2
+#> -V' ergab Status 1
+```
+
+Finally we select the interesting columns from the output. Since all
+other parameters are the same for each scenario we just select delay.
+And we are interested in the rejection rate of the tests.
+
+``` r
+
+res |> 
+  subset(select=c("delay", "maxcombo.rejection_0.05", "logrank.rejection_0.05")) |>
+  knitr::kable()
+```
+
+|   delay | maxcombo.rejection_0.05 | logrank.rejection_0.05 |
+|--------:|------------------------:|-----------------------:|
+|   0.000 |                    0.54 |                   0.52 |
+|  60.875 |                    0.42 |                   0.41 |
+| 121.750 |                    0.45 |                   0.34 |
+| 182.625 |                    0.24 |                   0.15 |
+| 243.500 |                    0.18 |                   0.18 |
+| 304.375 |                    0.21 |                   0.18 |
+
+## A scenario with an interim analysis
+
+In this scenario we extend the scenario from above to include a fixed
+followup as well as an interim analysis after a fixed number of events.
+For this we will define additional analyse functions.
+
+First we extend the Design to include a column with the number of events
+after which an interim analysis should be done.
+
+``` r
+
+Options <- design_group_sequential()
+#> expand.grid(
+#>   n_trt=200,          # 200 patients in the treatment arm
+#>   n_ctrl=200,         # 200 patients in the control arm
+#>   followup=m2d(48),   # maximum followup time 4 years
+#>   recruitment=m2d(6), # recruitment time 6 months
+#>   interim_events=150, # interim analysis after 150 events
+#>   final_events=300    # final analysis after 300 events
+#> )
+
+Design <- merge(Assumptions, Options, by=NULL)
+
+knitr::kable(Design)
+```
+
+| delay | hazard_ctrl | hazard_trt | random_withdrawal | n_trt | n_ctrl | followup | recruitment | interim_events | final_events |
+|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| 0.000 | 0.0009489 | 0.0006326 | 0.0001898 | 200 | 200 | 1461 | 182.625 | 150 | 300 |
+| 60.875 | 0.0009489 | 0.0006326 | 0.0001898 | 200 | 200 | 1461 | 182.625 | 150 | 300 |
+| 121.750 | 0.0009489 | 0.0006326 | 0.0001898 | 200 | 200 | 1461 | 182.625 | 150 | 300 |
+| 182.625 | 0.0009489 | 0.0006326 | 0.0001898 | 200 | 200 | 1461 | 182.625 | 150 | 300 |
+| 243.500 | 0.0009489 | 0.0006326 | 0.0001898 | 200 | 200 | 1461 | 182.625 | 150 | 300 |
+| 304.375 | 0.0009489 | 0.0006326 | 0.0001898 | 200 | 200 | 1461 | 182.625 | 150 | 300 |
+
+### ‘Analyse’ functions with an interim analysis
+
+The `analyse_group_sequential` function allows to combine two or more
+analyse functions to create an analysis function corresponding to a
+group sequential design. The arguments are the times or events after
+which the analyses are done, the nominal alpha at each stage and the
+analyse functions to be used at each stage.
+
+``` r
+
+## O'Brien-Fleming Bounds for GSD with interim analysis at information time 1/2
+nominal_alpha <- ldbounds::ldBounds(c(0.5,1))$nom.alpha
+
+clusterExport(cl, "nominal_alpha")
+
+Analyse <-  list(
+  logrank_seq  = analyse_group_sequential(
+    followup = c(condition$interim_events, condition$final_events),
+    followup_type = c("event", "event"),
+    alpha = nominal_alpha,
+    analyse_functions = analyse_logrank()
+  ),
+  maxcombo_seq = analyse_group_sequential(
+    followup = c(condition$interim_events, condition$final_events),
+    followup_type = c("event", "event"),
+    alpha = nominal_alpha,
+    analyse_functions = analyse_maxcombo()
+  )
+)
+```
+
+### A ‘Summarise’ function for the more complex scenario
+
+The output of the function created with `analyse_group_sequential`
+contains additional columns. `rejected_at_stage` includes the stage at
+which the null was first rejected or `Inf` if the null was not rejected,
+`N_pat` and `N_evt` contain the number of patients recruited and the
+number of events observed before the null was rejected and `followup`
+contains the time after study start at which the last analysis was done.
+
+The results object also includes the results returned by each stage in
+`results_stages`, but here we only use the overall test-decision.
+
+``` r
+
+Summarise <- create_summarise_function(
+  maxcombo_seq = summarise_group_sequential(),
+  logrank_seq = summarise_group_sequential()
+)
+```
+
+### Putting it all together
+
+The call to `runSimulation` looks almost the same as above but now the
+additional columns we defined in our `Summarise` functions are included
+in the result.
+
+``` r
+
+res <- runSimulation(
+  Design,
+  replications = N_sim,
+  generate = my_generator,
+  analyse = Analyse,
+  summarise = Summarise,
+  cl = cl,
+  save=FALSE
+)
+#> 
+#> Number of parallel clusters in use: 8
+#> 
+#> Simulation complete. Total execution time: 21.83s
+#> Warning in system2("quarto", "-V", stdout = TRUE, env = paste0("TMPDIR=", : Ausführung von Kommando '"quarto" TMPDIR=C:/Users/Tobias11/AppData/Local/Temp/RtmpGKzPDq/file5304116837a0
+#> -V' ergab Status 1
+```
+
+In the case of a group sequential design we are also interested in the
+average running time of the study in terms of patients recruited, number
+of events and running time of the study.
+
+``` r
+
+res |>
+  subset(select=c(
+    "delay", 
+    "maxcombo_seq.rejection", "logrank_seq.rejection",
+    "maxcombo_seq.n_pat", "logrank_seq.n_pat",
+    "maxcombo_seq.n_evt", "logrank_seq.n_evt",
+    "maxcombo_seq.followup", "logrank_seq.followup"
+    )) |>
+  knitr::kable()
+```
+
+| delay | maxcombo_seq.rejection | logrank_seq.rejection | maxcombo_seq.n_pat | logrank_seq.n_pat | maxcombo_seq.n_evt | logrank_seq.n_evt | maxcombo_seq.followup | logrank_seq.followup |
+|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| 0.000 | 0.85 | 0.82 | 400 | 400 | 213.53 | 213.07 | 1278.40 | 1272.17 |
+| 60.875 | 0.75 | 0.75 | 400 | 400 | 219.45 | 219.06 | 1300.93 | 1298.89 |
+| 121.750 | 0.72 | 0.72 | 400 | 400 | 225.80 | 226.10 | 1342.47 | 1343.26 |
+| 182.625 | 0.60 | 0.59 | 400 | 400 | 232.30 | 234.03 | 1380.38 | 1396.26 |
+| 243.500 | 0.63 | 0.59 | 400 | 400 | 238.15 | 240.42 | 1410.94 | 1428.86 |
+| 304.375 | 0.61 | 0.53 | 400 | 400 | 240.66 | 240.66 | 1443.26 | 1443.26 |
+
+## Estimation
+
+### Calculating the true values of the summary statistics
+
+To evaluate the performance of an estimator, we first compute the values
+of some true summary statistics to which the estimates will be compared.
+The most relevant true summary statistics can be computed by a
+convenience function for each scenario. Just pipe the Design data.frame
+to the function and the values of the statistics are added as columns.
+
+``` r
+
+Options <- design_fixed_followup()
+#> expand.grid(
+#>   n_trt=150,         # 150 patients in the treatment arm
+#>   n_ctrl=150,        # 150 patients in the control arm
+#>   followup=m2d(24),  # followup 2 years
+#>   recruitment=m2d(6) # recruitment time 6 months
+#> 
+#> )
+
+Design <- merge(Assumptions, Options, by=NULL)
+
+Design <- Design |> 
+  true_summary_statistics_delayed_effect(cutoff_stats = 20)
+
+knitr::kable(Design)
+```
+
+| delay | hazard_ctrl | hazard_trt | random_withdrawal | n_trt | n_ctrl | followup | recruitment | median_survival_trt | median_survival_ctrl | rmst_trt_20 | rmst_ctrl_20 | gAHR_20 | AHR_20 | AHRoc_20 | AHRoc_robust_20 |
+|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| 0.000 | 0.0009489 | 0.0006326 | 0.0001898 | 150 | 150 | 730.5 | 182.625 | 1095.7500 | 730.5 | 19.87402 | 19.81142 | 0.6666667 | 0.6666667 | 0.6666667 | 0.6666667 |
+| 60.875 | 0.0009489 | 0.0006326 | 0.0001898 | 150 | 150 | 730.5 | 182.625 | 1065.3125 | 730.5 | 19.81142 | 19.81142 | 1.0000000 | 1.0000000 | 1.0000000 | 1.0000000 |
+| 121.750 | 0.0009489 | 0.0006326 | 0.0001898 | 150 | 150 | 730.5 | 182.625 | 1034.8750 | 730.5 | 19.81142 | 19.81142 | 1.0000000 | 1.0000000 | 1.0000000 | 1.0000000 |
+| 182.625 | 0.0009489 | 0.0006326 | 0.0001898 | 150 | 150 | 730.5 | 182.625 | 1004.4375 | 730.5 | 19.81142 | 19.81142 | 1.0000000 | 1.0000000 | 1.0000000 | 1.0000000 |
+| 243.500 | 0.0009489 | 0.0006326 | 0.0001898 | 150 | 150 | 730.5 | 182.625 | 974.0000 | 730.5 | 19.81142 | 19.81142 | 1.0000000 | 1.0000000 | 1.0000000 | 1.0000000 |
+| 304.375 | 0.0009489 | 0.0006326 | 0.0001898 | 150 | 150 | 730.5 | 182.625 | 943.5625 | 730.5 | 19.81142 | 19.81142 | 1.0000000 | 1.0000000 | 1.0000000 | 1.0000000 |
+
+### Defining the `Summarise` function
+
+In the Summarise function the true value against which the estimator
+should be compared has to be specified. If coverage and average width of
+the confidence intervals should be estimated, the CI bounds should also
+be specified.
+
+The arguments to the functions are left un-evaluated and are later
+evaluated in the `results` and `condition` datasets respectively. So any
+expressions using variables from results can be used for the estimated
+value and the CI bounds and expressions using variables from condition
+can be used in the argument for the real value.
+
+In this case we want to compare the hazard ratio estimated by the Cox
+model to the geometric average hazard ratio as well as to the hazard
+ratio after onset of treatment, calculated from the two respective
+columns of the Design data.frame.
+
+Note that one name can be used twice to summarise the output of one
+analysis method two times, like in this case, comparing it to two
+different summary statistics.
+
+``` r
+
+Summarise <- create_summarise_function(
+    coxph=summarise_estimator(hr, gAHR_20, hr_lower, hr_upper, name="gAHR"),
+    coxph=summarise_estimator(hr, hazard_trt/hazard_ctrl, hr_lower, hr_upper, name="HR")
+  )
+```
+
+### Putting it all together
+
+``` r
+
+Analyse <- list(
+  coxph = analyse_coxph()
+)
+
+res <- runSimulation(
+  Design,
+  replications = N_sim,
+  generate = my_generator,
+  analyse = Analyse,
+  summarise = Summarise,
+  cl = cl,
+  save=FALSE
+)
+#> 
+#> Number of parallel clusters in use: 8
+#> 
+#> Simulation complete. Total execution time: 0.77s
+#> Warning in system2("quarto", "-V", stdout = TRUE, env = paste0("TMPDIR=", : Ausführung von Kommando '"quarto" TMPDIR=C:/Users/Tobias11/AppData/Local/Temp/RtmpGKzPDq/file530433727d3d
+#> -V' ergab Status 1
+```
+
+``` r
+
+res |>
+  subset(select=c(
+    "delay", "coxph.HR.bias", "coxph.gAHR.bias", "coxph.HR.mse", 
+    "coxph.gAHR.mse", "coxph.HR.coverage", "coxph.gAHR.coverage"
+  )) |> 
+  knitr::kable()
+```
+
+| delay | coxph.HR.bias | coxph.gAHR.bias | coxph.HR.mse | coxph.gAHR.mse | coxph.HR.coverage | coxph.gAHR.coverage |
+|---:|---:|---:|---:|---:|---:|---:|
+| 0.000 | 0.0103694 | 0.0103694 | 0.0201519 | 0.0201519 | 0.95 | 0.95 |
+| 60.875 | 0.0400061 | -0.2933273 | 0.0192242 | 0.1036646 | 0.95 | 0.51 |
+| 121.750 | 0.0805660 | -0.2527674 | 0.0245258 | 0.0819263 | 0.96 | 0.67 |
+| 182.625 | 0.1388977 | -0.1944356 | 0.0420955 | 0.0606081 | 0.80 | 0.73 |
+| 243.500 | 0.1835182 | -0.1498151 | 0.0578980 | 0.0466636 | 0.78 | 0.82 |
+| 304.375 | 0.1764311 | -0.1569022 | 0.0609472 | 0.0544376 | 0.77 | 0.79 |
