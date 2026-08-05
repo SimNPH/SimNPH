@@ -259,9 +259,17 @@ summarise_estimator <- function(est, real, lower=NULL, upper=NULL, null=NULL, es
 
 #' Generic summarise function for tests
 #'
-#' @param alpha the significance level(s)
+#' @param alpha the significance level(s) or critical value(s)
 #' @param name name for the summarise function,
 #' appended to the name of the analysis method in the final results
+#' @param teststat test statistic, expression evaluated in results
+#'
+#' @details
+#' For details on the evaluation of the arguments see \link[SimNPH]{summarise_estimator}.
+#'
+#' If the test-statistic used is not a p-value, alpha refers to the critical
+#' value. The test is assumed to reject if the test statistic is smaller than
+#' the critical value. To switch direction take the negative of both values.
 #'
 #' @return
 #'
@@ -286,7 +294,8 @@ summarise_estimator <- function(est, real, lower=NULL, upper=NULL, null=NULL, es
 #'   head(1)
 #'
 #' summarise_all <- create_summarise_function(
-#'   logrank=summarise_test(alpha=c(0.5, 0.9, 0.95, 0.99))
+#'   logrank=summarise_test(alpha=1-c(0.5, 0.9, 0.95, 0.99)),
+#'   logrank_zval=summarise_test(alpha=qnorm(1-c(0.5, 0.9, 0.95, 0.99)), teststat=z)
 #' )
 #'
 #' # runs simulations
@@ -295,22 +304,33 @@ summarise_estimator <- function(est, real, lower=NULL, upper=NULL, null=NULL, es
 #'   replications=100,
 #'   generate=generate_delayed_effect,
 #'   analyse=list(
-#'     logrank=analyse_logrank()
+#'     logrank=analyse_logrank(),
+#'     logrank_zval=function(condition, dat, fixed_objects=NULL){
+#'       tmp <- analyse_logrank()(condition, dat, fixed_objects)
+#'       tmp$z <- qnorm(tmp$p)
+#'       tmp
+#'     }
 #'   ),
 #'   summarise = summarise_all
 #' )
 #'
 #' sim_results[, grepl("rejection", names(sim_results))]
 #' }
-summarise_test <- function(alpha, name=NULL){
+summarise_test <- function(alpha, name=NULL, teststat=p){
+
+  teststat <- substitute(teststat)
+
   res <- function(condition, results, fixed_objects){
-    rejection_tmp <- outer(results$p, alpha, FUN=`<`) |>
+
+    teststat <- eval(teststat, envir = results)
+
+    rejection_tmp <- outer(teststat, alpha, FUN=`<`) |>
       colMeans(na.rm=TRUE) |>
       as.list() |>
       as.data.frame() |>
       setNames(paste0("rejection_", alpha))
 
-    missing_tmp <- outer(results$p, 1-alpha, FUN=\(p,a){is.na(p)}) |>
+    missing_tmp <- outer(teststat, 1-alpha, FUN=\(p,a){is.na(p)}) |>
       colSums() |>
       as.list() |>
       as.data.frame() |>

@@ -157,34 +157,45 @@ test_that("generic summarise for tests works", {
       tail(4) |>
       head(1)
   )
+
   summarise_all <- create_summarise_function(
-    logrank=summarise_test(alpha=c(0.95, 0.99)),
-    logrank=summarise_test(alpha=c(0.9), name="innovative")
+    logrank=summarise_test(alpha=1-c(0.95, 0.99)),
+    logrank=summarise_test(alpha=1-c(0.9), name="innovative"),
+    logrank=summarise_test(alpha=1-c(0.95, 0.99), name="p_explicit", teststat=p),
+    test_analysis=summarise_test(alpha=qnorm(1-0.95), name="z_stat", teststat=z),
+    test_analysis=summarise_test(alpha=1-0.95, name="p_stat", teststat=p)
   )
 
-  # TODO: remove caputre warnings when sessioninfo is fixed
+  # TODO: remove capture warnings when sessioninfo is fixed
   tmp_output <- capture_warnings(
     # runs simulations
     capture.output(
       suppressMessages(
+
         sim_results <- runSimulation(
           design=condition,
           replications=10,
           generate=generate_delayed_effect,
           analyse=list(
-            logrank=analyse_logrank()
+            logrank=analyse_logrank(),
+            test_analysis=function(condition, dat, fixed_objects=NULL){
+              tmp <- analyse_logrank()(condition, dat, fixed_objects)
+              tmp$z <- qnorm(tmp$p)
+              tmp
+            }
           ),
           summarise = summarise_all,
           save=FALSE
         )
+
       )
     )
   )
 
   expect(
     all(hasName(sim_results, c(
-      "logrank.rejection_0.95", "logrank.rejection_0.99", "logrank.innovative.rejection_0.9",
-      "logrank.N_missing_0.95", "logrank.N_missing_0.99", "logrank.innovative.N_missing_0.9",
+      "logrank.rejection_0.05", "logrank.rejection_0.01", "logrank.innovative.rejection_0.1",
+      "logrank.N_missing_0.05", "logrank.N_missing_0.01", "logrank.innovative.N_missing_0.1",
       "logrank.mean_n_pat", "logrank.sd_n_pat", "logrank.mean_n_evt", "logrank.sd_n_evt",
       "logrank.N"
       ))),
@@ -193,14 +204,22 @@ test_that("generic summarise for tests works", {
 
 
 
-  expect_gte(sim_results$logrank.rejection_0.95,           0)
-  expect_gte(sim_results$logrank.rejection_0.99,           0)
-  expect_gte(sim_results$logrank.innovative.rejection_0.9, 0)
-  expect_lte(sim_results$logrank.rejection_0.95,           1)
-  expect_lte(sim_results$logrank.rejection_0.99,           1)
-  expect_lte(sim_results$logrank.innovative.rejection_0.9, 1)
+  expect_gte(sim_results$logrank.rejection_0.05,           0)
+  expect_gte(sim_results$logrank.rejection_0.01,           0)
+  expect_gte(sim_results$logrank.innovative.rejection_0.1, 0)
+  expect_lte(sim_results$logrank.rejection_0.05,           1)
+  expect_lte(sim_results$logrank.rejection_0.01,           1)
+  expect_lte(sim_results$logrank.innovative.rejection_0.1, 1)
   expect_equal(sim_results$logrank.innovative.sd_n_pat, 0)
   expect_equal(sim_results$logrank.innovative.mean_n_evt, 300)
+
+  expect_all_equal(c(
+    sim_results$logrank.p_explicit.rejection_0.05,
+    sim_results$`test_analysis.z_stat.rejection_-1.64485362695147`,
+    sim_results$test_analysis.p_stat.rejection_0.05
+    ),
+    sim_results$logrank.rejection_0.05
+    )
 })
 
 test_that("missings are treated correctly for summarise estimator", {
@@ -235,6 +254,7 @@ test_that("missings are treated correctly for summarise estimator", {
 
 test_that("missings are treated correctly for summarise test", {
   my_summarise <- summarise_test(alpha = c(0.05, 0.01))
+  my_summarise2 <- summarise_test(alpha = qnorm(c(0.05, 0.01)), teststat=z)
 
   condition_and_results <- tibble::tribble(
     ~real,       ~p,
@@ -242,15 +262,25 @@ test_that("missings are treated correctly for summarise test", {
         0,    0.04 ,
         0,    0.1  ,
         0, NA_real_,
-  )
+  ) |>
+    transform(
+      z = qnorm(p)
+    )
 
   my_results <- my_summarise(condition_and_results, condition_and_results)
+  my_results2 <- my_summarise2(condition_and_results, condition_and_results)
 
   expect_equal(my_results$rejection_0.05, 2/3)
   expect_equal(my_results$rejection_0.01, 1/3)
   expect_equal(my_results$N_missing_0.05, 1)
   expect_equal(my_results$N_missing_0.01, 1)
   expect_equal(my_results$N, 4)
+
+  expect_equal(my_results2$`rejection_-1.64485362695147`, 2/3)
+  expect_equal(my_results2$`rejection_-2.32634787404084`, 1/3)
+  expect_equal(my_results2$`N_missing_-1.64485362695147`, 1)
+  expect_equal(my_results2$`N_missing_-2.32634787404084`, 1)
+  expect_equal(my_results2$N, 4)
 })
 
 test_that("calculations in summarise estimator work", {
