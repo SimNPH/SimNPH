@@ -4,13 +4,15 @@
 \alias{summarise_test}
 \title{Generic summarise function for tests}
 \usage{
-summarise_test(alpha, name = NULL)
+summarise_test(alpha, name = NULL, teststat = p)
 }
 \arguments{
-\item{alpha}{the significance level(s)}
+\item{alpha}{the significance level(s) or critical value(s)}
 
 \item{name}{name for the summarise function,
 appended to the name of the analysis method in the final results}
+
+\item{teststat}{test statistic, expression evaluated in results}
 }
 \value{
 A function that can be used in Summarise that returns a data frame with the columns
@@ -25,6 +27,13 @@ Where X, Y, ... are the alpha levels given in the argument
 \description{
 Generic summarise function for tests
 }
+\details{
+For details on the evaluation of the arguments see \link[SimNPH]{summarise_estimator}.
+
+If the test-statistic used is not a p-value, alpha refers to the critical
+value. The test is assumed to reject if the test statistic is smaller than
+the critical value. To switch direction take the negative of both values.
+}
 \examples{
 \donttest{
 condition <- merge(
@@ -36,7 +45,8 @@ condition <- merge(
   head(1)
 
 summarise_all <- create_summarise_function(
-  logrank=summarise_test(alpha=c(0.5, 0.9, 0.95, 0.99))
+  logrank=summarise_test(alpha=1-c(0.5, 0.9, 0.95, 0.99)),
+  logrank_zval=summarise_test(alpha=qnorm(1-c(0.5, 0.9, 0.95, 0.99)), teststat=z)
 )
 
 # runs simulations
@@ -45,7 +55,12 @@ sim_results <- runSimulation(
   replications=100,
   generate=generate_delayed_effect,
   analyse=list(
-    logrank=analyse_logrank()
+    logrank=analyse_logrank(),
+    logrank_zval=function(condition, dat, fixed_objects=NULL){
+      tmp <- analyse_logrank()(condition, dat, fixed_objects)
+      tmp$z <- qnorm(tmp$p)
+      tmp
+    }
   ),
   summarise = summarise_all
 )
