@@ -1,3 +1,9 @@
+# SimNPH 0.5.9
+
+* Added an option to use different test-statistics, or p-values from different
+  tests in `summarise_test` if an analysis function returns results from
+  multiple tests.
+
 # SimNPH 0.5.8
 
 * Fixed tests: test plots with `vdiffr` to avoid using non-exported functions
